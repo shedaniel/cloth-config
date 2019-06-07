@@ -9,7 +9,7 @@ dependencies {
 }
 ```
 ## APIs
-##### Config Screen v1 API
+#### Config Screen v1 API
 Start by using `ConfigScreenBuilder.create`, inside it you can do `addCategory` to get the category instance. Do `addOption` with the category instance to add an option.
 ```java
 ConfigScreenBuilder builder = ConfigScreenBuilder.create(parentScreen, screenTitleKey, saveConsumer);
@@ -45,7 +45,7 @@ Lastly, you can open the screen like this:
 MinecraftClient.getInstance().openScreen(builder.build());
 ```
 
-##### Config Screen v2 API
+#### Config Screen v2 API
 Start by using `ConfigBuilder.create`, inside it you can do `getOrCreateCategory` to get the category instance. Do `addEntry` with the category instance to add an option.
 ```java
 ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parentScreen).setTitle(screenTitleKey).set(setSavingRunnable);
