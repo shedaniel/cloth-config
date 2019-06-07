@@ -1,0 +1,18 @@
+{
+  "text.cloth-config.save_and_done": "Sauvegarder",
+  "text.cloth-config.quit_config": "Modifications non sauvegardées",
+  "text.cloth-config.quit_config_sure": "Voulez-vous quitter l'écran de configuration? Les modifications ne seront pas sauvegardées!",
+  "text.cloth-config.cancel_discard": "Annuler les modifications",
+  "text.cloth-config.quit_discard": "Quitter quand même",
+  "text.cloth-config.config": "Configuration",
+  "text.cloth-config.multi_error": "Problèmes multiples!",
+  "text.cloth-config.error.not_valid_number_int": "Pas un entier valide! (Integer)",
+  "text.cloth-config.error.not_valid_number_long": "Pas un nombre invalide! (Long)",
+  "text.cloth-config.error.not_valid_number_float": "Pas un nombre invalide! (Float)",
+  "text.cloth-config.error.not_valid_number_double": "Pas un nombre invalide! (Double)",
+  "text.cloth-config.error.too_large": "Trop grand! (Maximum: %d)",
+  "text.cloth-config.error.too_small": "Trop petit! (Minimum: %d)",
+  "text.cloth-config.error_cannot_save": "Erreur!",
+  "text.cloth-config.reset_value": "Réinit.",
+  "text.cloth.reset_value": "Réinit."
+}

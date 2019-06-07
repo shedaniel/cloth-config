@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "cloth-config2",
+  "name": "Cloth Config v2",
+  "description": "An API for config screens.",
+  "version": "${version}",
+  "authors": [
+    "Danielshe"
+  ],
+  "contact": {
+    "homepage": "https://minecraft.curseforge.com/projects/cloth-config",
+    "sources": "https://github.com/shedaniel/ClothConfig",
+    "issues": "https://github.com/shedaniel/ClothConfig/issues"
+  },
+  "license": "Unlicense",
+  "icon": "icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "me.shedaniel.clothconfig2.ClothConfigInitializer"
+    ]
+  },
+  "requires": {
+    "fabricloader": ">=0.4.0"
+  },
+  "custom": {
+    "modmenu:api": true,
+    "modmenu:clientsideOnly": true
+  }
+}
