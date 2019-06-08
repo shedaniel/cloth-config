@@ -56,7 +56,7 @@ To start adding fields, do `ConfigEntryBuilder.create()` to get the entry builde
 Example to add a boolean field:
 ```java
 ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
-category.addEntry(entryBuilder.startBooleanToggle("path.to.your.key", false).buildEntry());
+category.addEntry(entryBuilder.startBooleanToggle("path.to.your.key", false).build());
 ```
 
 All builtin entry builders can be found in ConfigEntryBuilder.
