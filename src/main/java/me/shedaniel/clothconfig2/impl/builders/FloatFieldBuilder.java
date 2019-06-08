@@ -1,13 +1,12 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.FloatListEntry;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class FloatFieldBuilder extends FieldBuilder<Float> {
+public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
     
     private Consumer<Float> saveConsumer = null;
     private Supplier<Optional<String[]>> tooltipSupplier = null;
@@ -29,8 +28,23 @@ public class FloatFieldBuilder extends FieldBuilder<Float> {
         return this;
     }
     
+    public FloatFieldBuilder setDefaultValue(float defaultValue) {
+        this.defaultValue = () -> defaultValue;
+        return this;
+    }
+    
     public FloatFieldBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
+        return this;
+    }
+    
+    public FloatFieldBuilder setTooltip(Optional<String[]> tooltip) {
+        this.tooltipSupplier = () -> tooltip;
+        return this;
+    }
+    
+    public FloatFieldBuilder setTooltip(String... tooltip) {
+        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -55,7 +69,7 @@ public class FloatFieldBuilder extends FieldBuilder<Float> {
     }
     
     @Override
-    public AbstractConfigListEntry buildEntry() {
+    public FloatListEntry build() {
         FloatListEntry entry = new FloatListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
         if (min != null)
             entry.setMinimum(min);

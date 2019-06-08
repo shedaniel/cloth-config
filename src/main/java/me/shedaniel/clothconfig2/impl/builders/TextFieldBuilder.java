@@ -1,6 +1,5 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
 
 import java.util.Objects;
@@ -8,7 +7,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class TextFieldBuilder extends FieldBuilder<String> {
+public class TextFieldBuilder extends FieldBuilder<String, StringListEntry> {
     
     private Consumer<String> saveConsumer = null;
     private Supplier<Optional<String[]>> tooltipSupplier = null;
@@ -30,13 +29,28 @@ public class TextFieldBuilder extends FieldBuilder<String> {
         return this;
     }
     
+    public TextFieldBuilder setDefaultValue(String defaultValue) {
+        this.defaultValue = () -> Objects.requireNonNull(defaultValue);
+        return this;
+    }
+    
     public TextFieldBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
+    public TextFieldBuilder setTooltip(Optional<String[]> tooltip) {
+        this.tooltipSupplier = () -> tooltip;
+        return this;
+    }
+    
+    public TextFieldBuilder setTooltip(String... tooltip) {
+        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        return this;
+    }
+    
     @Override
-    public AbstractConfigListEntry buildEntry() {
+    public StringListEntry build() {
         return new StringListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
     }
     

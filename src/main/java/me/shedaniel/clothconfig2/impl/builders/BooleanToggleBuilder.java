@@ -1,6 +1,5 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 
 import java.util.Objects;
@@ -9,7 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class BooleanToggleBuilder extends FieldBuilder<Boolean> {
+public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry> {
     
     private Consumer<Boolean> saveConsumer = null;
     private Supplier<Optional<String[]>> tooltipSupplier = null;
@@ -31,8 +30,23 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean> {
         return this;
     }
     
+    public BooleanToggleBuilder setDefaultValue(boolean defaultValue) {
+        this.defaultValue = () -> defaultValue;
+        return this;
+    }
+    
     public BooleanToggleBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
+        return this;
+    }
+    
+    public BooleanToggleBuilder setTooltip(Optional<String[]> tooltip) {
+        this.tooltipSupplier = () -> tooltip;
+        return this;
+    }
+    
+    public BooleanToggleBuilder setTooltip(String... tooltip) {
+        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -43,7 +57,7 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean> {
     }
     
     @Override
-    public AbstractConfigListEntry buildEntry() {
+    public BooleanListEntry build() {
         return new BooleanListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier) {
             @Override
             public String getYesNoText(boolean bool) {

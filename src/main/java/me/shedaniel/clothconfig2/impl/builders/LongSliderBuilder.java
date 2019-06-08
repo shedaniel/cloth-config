@@ -1,6 +1,5 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.LongSliderEntry;
 
 import java.util.Optional;
@@ -8,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class LongSliderBuilder extends FieldBuilder<Long> {
+public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
     
     private Consumer<Long> saveConsumer = null;
     private Supplier<Optional<String[]>> tooltipSupplier = null;
@@ -37,13 +36,28 @@ public class LongSliderBuilder extends FieldBuilder<Long> {
         return this;
     }
     
+    public LongSliderBuilder setDefaultValue(long defaultValue) {
+        this.defaultValue = () -> defaultValue;
+        return this;
+    }
+    
     public LongSliderBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
+    public LongSliderBuilder setTooltip(Optional<String[]> tooltip) {
+        this.tooltipSupplier = () -> tooltip;
+        return this;
+    }
+    
+    public LongSliderBuilder setTooltip(String... tooltip) {
+        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        return this;
+    }
+    
     @Override
-    public AbstractConfigListEntry buildEntry() {
+    public LongSliderEntry build() {
         if (textGetter == null)
             return new LongSliderEntry(getFieldNameKey(), min, max, value, saveConsumer, getResetButtonKey(), defaultValue, tooltipSupplier);
         return new LongSliderEntry(getFieldNameKey(), min, max, value, saveConsumer, getResetButtonKey(), defaultValue, tooltipSupplier).setTextGetter(textGetter);

@@ -1,13 +1,12 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.IntegerListEntry;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class IntFieldBuilder extends FieldBuilder<Integer> {
+public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
     
     private Consumer<Integer> saveConsumer = null;
     private Supplier<Optional<String[]>> tooltipSupplier = null;
@@ -29,8 +28,23 @@ public class IntFieldBuilder extends FieldBuilder<Integer> {
         return this;
     }
     
+    public IntFieldBuilder setDefaultValue(int defaultValue) {
+        this.defaultValue = () -> defaultValue;
+        return this;
+    }
+    
     public IntFieldBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
+        return this;
+    }
+    
+    public IntFieldBuilder setTooltip(Optional<String[]> tooltip) {
+        this.tooltipSupplier = () -> tooltip;
+        return this;
+    }
+    
+    public IntFieldBuilder setTooltip(String... tooltip) {
+        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -55,7 +69,7 @@ public class IntFieldBuilder extends FieldBuilder<Integer> {
     }
     
     @Override
-    public AbstractConfigListEntry buildEntry() {
+    public IntegerListEntry build() {
         IntegerListEntry entry = new IntegerListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
         if (min != null)
             entry.setMinimum(min);

@@ -1,6 +1,5 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 
 import java.util.Objects;
@@ -9,7 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T> {
+public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, EnumListEntry<T>> {
     
     private Consumer<T> saveConsumer = null;
     private Supplier<Optional<String[]>> tooltipSupplier = null;
@@ -35,8 +34,24 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T> {
         return this;
     }
     
+    public EnumSelectorBuilder setDefaultValue(T defaultValue) {
+        Objects.requireNonNull(defaultValue);
+        this.defaultValue = () -> defaultValue;
+        return this;
+    }
+    
     public EnumSelectorBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
+        return this;
+    }
+    
+    public EnumSelectorBuilder setTooltip(Optional<String[]> tooltip) {
+        this.tooltipSupplier = () -> tooltip;
+        return this;
+    }
+    
+    public EnumSelectorBuilder setTooltip(String... tooltip) {
+        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -47,8 +62,8 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T> {
     }
     
     @Override
-    public AbstractConfigListEntry buildEntry() {
-        return new EnumListEntry(getFieldNameKey(), clazz, value, getResetButtonKey(), defaultValue, saveConsumer, enumNameProvider, tooltipSupplier);
+    public EnumListEntry<T> build() {
+        return new EnumListEntry<T>(getFieldNameKey(), clazz, value, getResetButtonKey(), defaultValue, saveConsumer, enumNameProvider, tooltipSupplier);
     }
     
 }

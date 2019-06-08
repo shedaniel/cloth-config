@@ -7,7 +7,7 @@ import me.shedaniel.clothconfig2.gui.entries.SubCategoryListEntry;
 import java.util.*;
 import java.util.function.Supplier;
 
-public class SubCategoryBuilder extends FieldBuilder implements List<AbstractConfigListEntry> {
+public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntry> implements List<AbstractConfigListEntry> {
     
     private List<AbstractConfigListEntry> entries;
     private Supplier<Optional<String[]>> tooltipSupplier = null;
@@ -23,13 +23,23 @@ public class SubCategoryBuilder extends FieldBuilder implements List<AbstractCon
         return this;
     }
     
+    public SubCategoryBuilder setTooltip(Optional<String[]> tooltip) {
+        this.tooltipSupplier = () -> tooltip;
+        return this;
+    }
+    
+    public SubCategoryBuilder setTooltip(String... tooltip) {
+        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        return this;
+    }
+    
     public SubCategoryBuilder setExpended(boolean expended) {
         this.expended = expended;
         return this;
     }
     
     @Override
-    public AbstractConfigListEntry buildEntry() {
+    public SubCategoryListEntry build() {
         SubCategoryListEntry entry = new SubCategoryListEntry(getFieldNameKey(), entries, expended);
         entry.setTooltipSupplier(tooltipSupplier);
         return entry;

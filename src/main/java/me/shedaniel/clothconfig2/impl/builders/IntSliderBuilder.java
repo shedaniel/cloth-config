@@ -1,6 +1,5 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.IntegerSliderEntry;
 
 import java.util.Optional;
@@ -8,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class IntSliderBuilder extends FieldBuilder<Integer> {
+public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> {
     
     private Consumer<Integer> saveConsumer = null;
     private Supplier<Optional<String[]>> tooltipSupplier = null;
@@ -37,8 +36,23 @@ public class IntSliderBuilder extends FieldBuilder<Integer> {
         return this;
     }
     
+    public IntSliderBuilder setDefaultValue(int defaultValue) {
+        this.defaultValue = () -> defaultValue;
+        return this;
+    }
+    
     public IntSliderBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
+        return this;
+    }
+    
+    public IntSliderBuilder setTooltip(Optional<String[]> tooltip) {
+        this.tooltipSupplier = () -> tooltip;
+        return this;
+    }
+    
+    public IntSliderBuilder setTooltip(String... tooltip) {
+        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -53,7 +67,7 @@ public class IntSliderBuilder extends FieldBuilder<Integer> {
     }
     
     @Override
-    public AbstractConfigListEntry buildEntry() {
+    public IntegerSliderEntry build() {
         if (textGetter == null)
             return new IntegerSliderEntry(getFieldNameKey(), min, max, value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
         return new IntegerSliderEntry(getFieldNameKey(), min, max, value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier).setTextGetter(textGetter);

@@ -1,12 +1,11 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.TextListEntry;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class TextDescriptionBuilder extends FieldBuilder {
+public class TextDescriptionBuilder extends FieldBuilder<String, TextListEntry> {
     
     private int color = -1;
     private Supplier<Optional<String[]>> tooltipSupplier = null;
@@ -22,13 +21,23 @@ public class TextDescriptionBuilder extends FieldBuilder {
         return this;
     }
     
+    public TextDescriptionBuilder setTooltip(Optional<String[]> tooltip) {
+        this.tooltipSupplier = () -> tooltip;
+        return this;
+    }
+    
+    public TextDescriptionBuilder setTooltip(String... tooltip) {
+        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        return this;
+    }
+    
     public TextDescriptionBuilder setColor(int color) {
         this.color = color;
         return this;
     }
     
     @Override
-    public AbstractConfigListEntry buildEntry() {
+    public TextListEntry build() {
         return new TextListEntry(getFieldNameKey(), value, color, tooltipSupplier);
     }
     

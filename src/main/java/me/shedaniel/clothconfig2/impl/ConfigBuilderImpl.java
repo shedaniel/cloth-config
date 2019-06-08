@@ -28,10 +28,16 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private Consumer<Screen> afterInitConsumer = screen -> {};
     private Map<String, Identifier> categoryBackground = Maps.newHashMap();
     private Map<String, List<Pair<String, Object>>> dataMap = Maps.newLinkedHashMap();
+    private ConfigEntryBuilderImpl entryBuilder = ConfigEntryBuilderImpl.create();
     
     @Deprecated
     public ConfigBuilderImpl() {
     
+    }
+    
+    @Override
+    public ConfigEntryBuilderImpl getEntryBuilder() {
+        return entryBuilder;
     }
     
     @Override

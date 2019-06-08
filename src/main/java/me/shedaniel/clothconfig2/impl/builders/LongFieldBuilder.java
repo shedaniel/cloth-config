@@ -1,13 +1,12 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.LongListEntry;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class LongFieldBuilder extends FieldBuilder<Long> {
+public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
     
     private Consumer<Long> saveConsumer = null;
     private Supplier<Optional<String[]>> tooltipSupplier = null;
@@ -29,8 +28,23 @@ public class LongFieldBuilder extends FieldBuilder<Long> {
         return this;
     }
     
+    public LongFieldBuilder setDefaultValue(long defaultValue) {
+        this.defaultValue = () -> defaultValue;
+        return this;
+    }
+    
     public LongFieldBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
+        return this;
+    }
+    
+    public LongFieldBuilder setTooltip(Optional<String[]> tooltip) {
+        this.tooltipSupplier = () -> tooltip;
+        return this;
+    }
+    
+    public LongFieldBuilder setTooltip(String... tooltip) {
+        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -55,7 +69,7 @@ public class LongFieldBuilder extends FieldBuilder<Long> {
     }
     
     @Override
-    public AbstractConfigListEntry buildEntry() {
+    public LongListEntry build() {
         LongListEntry entry = new LongListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
         if (min != null)
             entry.setMinimum(min);

@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.clothconfig2.impl.ConfigBuilderImpl;
+import me.shedaniel.clothconfig2.impl.ConfigEntryBuilderImpl;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.Identifier;
 
@@ -66,6 +67,8 @@ public interface ConfigBuilder {
     ConfigBuilder setSavingRunnable(Runnable runnable);
     
     Consumer<Screen> getAfterInitConsumer();
+    
+    ConfigEntryBuilderImpl getEntryBuilder();
     
     ConfigBuilder setAfterInitConsumer(Consumer<Screen> afterInitConsumer);
     

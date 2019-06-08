@@ -4,7 +4,7 @@ import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 
 import java.util.function.Supplier;
 
-public abstract class FieldBuilder<T> {
+public abstract class FieldBuilder<T, A extends AbstractConfigListEntry> {
     private final String fieldNameKey;
     private final String resetButtonKey;
     protected Supplier<T> defaultValue = null;
@@ -18,7 +18,11 @@ public abstract class FieldBuilder<T> {
         return defaultValue;
     }
     
-    public abstract AbstractConfigListEntry buildEntry();
+    public final AbstractConfigListEntry buildEntry() {
+        return build();
+    }
+    
+    public abstract A build();
     
     public final String getFieldNameKey() {
         return fieldNameKey;

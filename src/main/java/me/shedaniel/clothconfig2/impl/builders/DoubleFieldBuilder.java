@@ -1,13 +1,12 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.DoubleListEntry;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class DoubleFieldBuilder extends FieldBuilder<Double> {
+public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
     
     private Consumer<Double> saveConsumer = null;
     private Supplier<Optional<String[]>> tooltipSupplier = null;
@@ -26,6 +25,11 @@ public class DoubleFieldBuilder extends FieldBuilder<Double> {
     
     public DoubleFieldBuilder setDefaultValue(Supplier<Double> defaultValue) {
         this.defaultValue = defaultValue;
+        return this;
+    }
+    
+    public DoubleFieldBuilder setDefaultValue(double defaultValue) {
+        this.defaultValue = () -> defaultValue;
         return this;
     }
     
@@ -54,8 +58,18 @@ public class DoubleFieldBuilder extends FieldBuilder<Double> {
         return this;
     }
     
+    public DoubleFieldBuilder setTooltip(Optional<String[]> tooltip) {
+        this.tooltipSupplier = () -> tooltip;
+        return this;
+    }
+    
+    public DoubleFieldBuilder setTooltip(String... tooltip) {
+        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        return this;
+    }
+    
     @Override
-    public AbstractConfigListEntry buildEntry() {
+    public DoubleListEntry build() {
         DoubleListEntry entry = new DoubleListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
         if (min != null)
             entry.setMinimum(min);
