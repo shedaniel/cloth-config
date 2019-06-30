@@ -27,14 +27,17 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     private Function<Integer, String> textGetter = integer -> String.format("Value: %d", integer);
     private List<Element> widgets;
     
+    @Deprecated
     public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, Consumer<Integer> saveConsumer) {
         this(fieldName, minimum, maximum, value, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @Deprecated
     public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer) {
         this(fieldName, minimum, maximum, value, resetButtonKey, defaultValue, saveConsumer, null);
     }
     
+    @Deprecated
     public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
         super(fieldName, tooltipSupplier);
         this.defaultValue = defaultValue;

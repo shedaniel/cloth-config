@@ -24,10 +24,12 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
     private int minimum, maximum;
     private Consumer<Integer> saveConsumer;
     
+    @Deprecated
     public IntegerListEntry(String fieldName, Integer value, Consumer<Integer> saveConsumer) {
         this(fieldName, value, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @Deprecated
     public IntegerListEntry(String fieldName, Integer value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
         this.minimum = -Integer.MAX_VALUE;
@@ -35,6 +37,7 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
         this.saveConsumer = saveConsumer;
     }
     
+    @Deprecated
     public IntegerListEntry(String fieldName, Integer value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier);
         this.minimum = -Integer.MAX_VALUE;

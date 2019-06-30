@@ -24,10 +24,12 @@ public class FloatListEntry extends TextFieldListEntry<Float> {
     private float minimum, maximum;
     private Consumer<Float> saveConsumer;
     
+    @Deprecated
     public FloatListEntry(String fieldName, Float value, Consumer<Float> saveConsumer) {
         this(fieldName, value, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @Deprecated
     public FloatListEntry(String fieldName, Float value, String resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
         this.minimum = -Float.MAX_VALUE;
@@ -35,6 +37,7 @@ public class FloatListEntry extends TextFieldListEntry<Float> {
         this.saveConsumer = saveConsumer;
     }
     
+    @Deprecated
     public FloatListEntry(String fieldName, Float value, String resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier);
         this.minimum = -Float.MAX_VALUE;

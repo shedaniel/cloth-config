@@ -27,14 +27,17 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     private Function<Long, String> textGetter = value -> String.format("Value: %d", value);
     private List<Element> widgets;
     
+    @Deprecated
     public LongSliderEntry(String fieldName, long minimum, long maximum, long value, Consumer<Long> saveConsumer) {
         this(fieldName, minimum, maximum, value, saveConsumer, "text.cloth-config.reset_value", null);
     }
     
+    @Deprecated
     public LongSliderEntry(String fieldName, long minimum, long maximum, long value, Consumer<Long> saveConsumer, String resetButtonKey, Supplier<Long> defaultValue) {
         this(fieldName, minimum, maximum, value, saveConsumer, resetButtonKey, defaultValue, null);
     }
     
+    @Deprecated
     public LongSliderEntry(String fieldName, long minimum, long maximum, long value, Consumer<Long> saveConsumer, String resetButtonKey, Supplier<Long> defaultValue, Supplier<Optional<String[]>> tooltipSupplier) {
         super(fieldName, tooltipSupplier);
         this.defaultValue = defaultValue;

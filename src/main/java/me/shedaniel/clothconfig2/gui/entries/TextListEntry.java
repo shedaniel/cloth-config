@@ -14,14 +14,17 @@ public class TextListEntry extends TooltipListEntry {
     private int color;
     private String text;
     
+    @Deprecated
     public TextListEntry(String fieldName, String text) {
         this(fieldName, text, -1);
     }
     
+    @Deprecated
     public TextListEntry(String fieldName, String text, int color) {
         this(fieldName, text, color, null);
     }
     
+    @Deprecated
     public TextListEntry(String fieldName, String text, int color, Supplier<Optional<String[]>> tooltipSupplier) {
         super(fieldName, tooltipSupplier);
         this.text = text;

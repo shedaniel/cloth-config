@@ -15,6 +15,16 @@ public interface ConfigEntryBuilder {
     
     ConfigEntryBuilder setResetButtonKey(String resetButtonKey);
     
+    IntListBuilder startIntList(String fieldNameKey, List<Integer> value);
+    
+    LongListBuilder startLongList(String fieldNameKey, List<Long> value);
+    
+    FloatListBuilder startFloatList(String fieldNameKey, List<Float> value);
+    
+    DoubleListBuilder startDoubleList(String fieldNameKey, List<Double> value);
+    
+    StringListBuilder startStrList(String fieldNameKey, List<String> value);
+    
     SubCategoryBuilder startSubCategory(String fieldNameKey);
     
     SubCategoryBuilder startSubCategory(String fieldNameKey, List<AbstractConfigListEntry> entries);

@@ -24,10 +24,12 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     private long minimum, maximum;
     private Consumer<Long> saveConsumer;
     
+    @Deprecated
     public LongListEntry(String fieldName, Long value, Consumer<Long> saveConsumer) {
         this(fieldName, value, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @Deprecated
     public LongListEntry(String fieldName, Long value, String resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
         this.minimum = -Long.MAX_VALUE;
@@ -35,6 +37,7 @@ public class LongListEntry extends TextFieldListEntry<Long> {
         this.saveConsumer = saveConsumer;
     }
     
+    @Deprecated
     public LongListEntry(String fieldName, Long value, String resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier);
         this.minimum = -Long.MAX_VALUE;

@@ -13,6 +13,8 @@
   "text.cloth-config.error.not_valid_number_double": "Not a valid number! (Double)",
   "text.cloth-config.error.too_large": "Too Large! (Maximum: %d)",
   "text.cloth-config.error.too_small": "Too Small! (Minimum: %d)",
+  "text.cloth-config.list.add": "Insert New",
+  "text.cloth-config.list.remove": "Delete Selected",
   "text.cloth-config.error_cannot_save": "Error!",
   "text.cloth-config.reset_value": "Reset",
   "text.cloth.reset_value": "Reset"

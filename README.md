@@ -5,7 +5,7 @@ repositories {
     maven { url "https://minecraft.curseforge.com/api/maven"}
 }
 dependencies {
-    mmodCompile "cloth-config:ClothConfig2:{RANDOMVERSION}"
+    modCompile "cloth-config:ClothConfig2:{RANDOMVERSION}"
 }
 ```
 ## APIs

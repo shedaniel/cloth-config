@@ -7,6 +7,7 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 
@@ -177,10 +178,11 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     
     @Override
     public Screen build() {
-        ClothConfigScreen screen = new ClothConfigScreen(parent, title, dataMap, doesConfirmSave, doesProcessErrors, listSmoothScroll, defaultBackground, categoryBackground) {
+        ClothConfigScreen screen = new ClothConfigScreen(parent, I18n.translate(title), dataMap, doesConfirmSave, doesProcessErrors, listSmoothScroll, defaultBackground, categoryBackground) {
             @Override
             public void onSave(Map<String, List<Pair<String, Object>>> o) {
-                savingRunnable.run();
+                if (savingRunnable != null)
+                    savingRunnable.run();
             }
             
             @Override

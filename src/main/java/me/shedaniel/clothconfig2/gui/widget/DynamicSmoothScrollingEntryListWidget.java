@@ -119,10 +119,10 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
                 scrollVelocity -= 16;
             return true;
         }
-        if (scroll >= 0 && scroll <= getMaxScroll()) {
-            if (double_3 < 0)
+        if (true) {
+            if (scroll <= getMaxScroll() && double_3 < 0)
                 scrollVelocity += 16;
-            if (double_3 > 0)
+            if (scroll >= 0 && double_3 > 0)
                 scrollVelocity -= 16;
             return true;
         }

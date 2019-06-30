@@ -21,14 +21,17 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     private Supplier<Boolean> defaultValue;
     private List<Element> widgets;
     
+    @Deprecated
     public BooleanListEntry(String fieldName, boolean bool, Consumer<Boolean> saveConsumer) {
         this(fieldName, bool, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @Deprecated
     public BooleanListEntry(String fieldName, boolean bool, String resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer) {
         this(fieldName, bool, resetButtonKey, defaultValue, saveConsumer, null);
     }
     
+    @Deprecated
     public BooleanListEntry(String fieldName, boolean bool, String resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
         super(fieldName, tooltipSupplier);
         this.defaultValue = defaultValue;

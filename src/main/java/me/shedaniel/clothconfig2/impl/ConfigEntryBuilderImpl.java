@@ -30,6 +30,31 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     }
     
     @Override
+    public IntListBuilder startIntList(String fieldNameKey, List<Integer> value) {
+        return new IntListBuilder(resetButtonKey, fieldNameKey, value);
+    }
+    
+    @Override
+    public LongListBuilder startLongList(String fieldNameKey, List<Long> value) {
+        return new LongListBuilder(resetButtonKey, fieldNameKey, value);
+    }
+    
+    @Override
+    public FloatListBuilder startFloatList(String fieldNameKey, List<Float> value) {
+        return new FloatListBuilder(resetButtonKey, fieldNameKey, value);
+    }
+    
+    @Override
+    public DoubleListBuilder startDoubleList(String fieldNameKey, List<Double> value) {
+        return new DoubleListBuilder(resetButtonKey, fieldNameKey, value);
+    }
+    
+    @Override
+    public StringListBuilder startStrList(String fieldNameKey, List<String> value) {
+        return new StringListBuilder(resetButtonKey, fieldNameKey, value);
+    }
+    
+    @Override
     public SubCategoryBuilder startSubCategory(String fieldNameKey) {
         return new SubCategoryBuilder(resetButtonKey, fieldNameKey);
     }

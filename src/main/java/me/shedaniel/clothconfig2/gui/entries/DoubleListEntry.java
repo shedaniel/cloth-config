@@ -24,10 +24,12 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
     private double minimum, maximum;
     private Consumer<Double> saveConsumer;
     
+    @Deprecated
     public DoubleListEntry(String fieldName, Double value, Consumer<Double> saveConsumer) {
         this(fieldName, value, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @Deprecated
     public DoubleListEntry(String fieldName, Double value, String resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
         this.minimum = -Double.MAX_VALUE;
@@ -35,6 +37,7 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
         this.saveConsumer = saveConsumer;
     }
     
+    @Deprecated
     public DoubleListEntry(String fieldName, Double value, String resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier);
         this.minimum = -Double.MAX_VALUE;

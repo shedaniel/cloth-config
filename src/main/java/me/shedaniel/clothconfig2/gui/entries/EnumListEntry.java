@@ -26,18 +26,22 @@ public class EnumListEntry<T extends Enum<?>> extends TooltipListEntry<T> {
     private List<Element> widgets;
     private Function<Enum, String> enumNameProvider;
     
+    @Deprecated
     public EnumListEntry(String fieldName, Class<T> clazz, T value, Consumer<T> saveConsumer) {
         this(fieldName, clazz, value, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @Deprecated
     public EnumListEntry(String fieldName, Class<T> clazz, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer) {
         this(fieldName, clazz, value, resetButtonKey, defaultValue, saveConsumer, DEFAULT_NAME_PROVIDER);
     }
     
+    @Deprecated
     public EnumListEntry(String fieldName, Class<T> clazz, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<Enum, String> enumNameProvider) {
         this(fieldName, clazz, value, resetButtonKey, defaultValue, saveConsumer, enumNameProvider, null);
     }
     
+    @Deprecated
     public EnumListEntry(String fieldName, Class<T> clazz, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<Enum, String> enumNameProvider, Supplier<Optional<String[]>> tooltipSupplier) {
         super(fieldName, tooltipSupplier);
         T[] valuesArray = clazz.getEnumConstants();
