@@ -1,35 +1,49 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
+import me.shedaniel.clothconfig2.api.RunSixtyTimesEverySec;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends DynamicEntryListWidget<E> {
-    
-    private static final ScheduledExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
-    
-    static {
-        EXECUTOR_SERVICE.scheduleWithFixedDelay(() -> {
-            if (MinecraftClient.getInstance() != null && MinecraftClient.getInstance().currentScreen != null)
-                for(Element child : MinecraftClient.getInstance().currentScreen.children())
-                    if (child instanceof DynamicSmoothScrollingEntryListWidget)
-                        ((DynamicSmoothScrollingEntryListWidget) child).updateScrolling();
-        }, 0, 1000 / 60, TimeUnit.MILLISECONDS);
-    }
     
     protected double scrollVelocity;
     protected boolean smoothScrolling = true;
+    protected RunSixtyTimesEverySec scroller = () -> {
+        if (scrollVelocity == 0 && scroll >= 0 && scroll <= getMaxScroll())
+            scrollerUnregisterTick();
+        else {
+            // Basic scrolling
+            double change = scrollVelocity * 0.3d;
+            if (scrollVelocity != 0) {
+                scroll += change;
+                scrollVelocity -= scrollVelocity * (scroll >= 0 && scroll <= getMaxScroll() ? 0.2d : .4d);
+                if (Math.abs(scrollVelocity) < .1)
+                    scrollVelocity = 0d;
+            }
+            
+            // Scrolling back aka bounce
+            if (scroll < 0d && scrollVelocity == 0d) {
+                scroll = Math.min(scroll + (0 - scroll) * 0.2d, 0);
+                if (scroll > -0.1d && scroll < 0d)
+                    scroll = 0d;
+            } else if (scroll > getMaxScroll() && scrollVelocity == 0d) {
+                scroll = Math.max(scroll - (scroll - getMaxScroll()) * 0.2d, getMaxScroll());
+                if (scroll > getMaxScroll() && scroll < getMaxScroll() + 0.1d)
+                    scroll = getMaxScroll();
+            }
+        }
+    };
     
     public DynamicSmoothScrollingEntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, Identifier backgroundLocation) {
         super(client, width, height, top, bottom, backgroundLocation);
+    }
+    
+    protected void scrollerUnregisterTick() {
+        scroller.unregisterTick();
     }
     
     public double getScrollVelocity() {
@@ -54,31 +68,6 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
             this.scroll = double_1;
         else
             this.scroll = MathHelper.clamp(double_1, 0.0D, (double) this.getMaxScroll());
-    }
-    
-    public void updateScrolling() {
-        if (smoothScrolling) {
-            double change = scrollVelocity * 0.3d;
-            if (scrollVelocity != 0) {
-                scroll += change;
-                scrollVelocity -= scrollVelocity * (scroll >= 0 && scroll <= getMaxScroll() ? 0.2d : .4d);
-                if (Math.abs(scrollVelocity) < .1)
-                    scrollVelocity = 0d;
-            }
-            if (scroll < 0d && scrollVelocity == 0d) {
-                scroll = Math.min(scroll + (0 - scroll) * 0.2d, 0);
-                if (scroll > -0.1d && scroll < 0d)
-                    scroll = 0d;
-            } else if (scroll > getMaxScroll() && scrollVelocity == 0d) {
-                scroll = Math.max(scroll - (scroll - getMaxScroll()) * 0.2d, getMaxScroll());
-                if (scroll > getMaxScroll() && scroll < getMaxScroll() + 0.1d)
-                    scroll = getMaxScroll();
-            }
-        } else {
-            scroll += scrollVelocity;
-            scrollVelocity = 0d;
-            capYPosition(scroll);
-        }
     }
     
     @Override
@@ -113,20 +102,21 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
     @Override
     public boolean mouseScrolled(double double_1, double double_2, double double_3) {
         if (!smoothScrolling) {
+            this.scrollVelocity = 0d;
             if (double_3 < 0)
-                scrollVelocity += 16;
+                scroll += 16;
             if (double_3 > 0)
-                scrollVelocity -= 16;
+                scroll -= 16;
+            this.scroll = MathHelper.clamp(double_1, 0.0D, (double) this.getMaxScroll());
             return true;
         }
-        if (true) {
-            if (scroll <= getMaxScroll() && double_3 < 0)
-                scrollVelocity += 16;
-            if (scroll >= 0 && double_3 > 0)
-                scrollVelocity -= 16;
-            return true;
-        }
-        return false;
+        if (scroll <= getMaxScroll() && double_3 < 0)
+            scrollVelocity += 16;
+        if (scroll >= 0 && double_3 > 0)
+            scrollVelocity -= 16;
+        if (!scroller.isRegistered())
+            scroller.registerTick();
+        return true;
     }
     
     @Override
