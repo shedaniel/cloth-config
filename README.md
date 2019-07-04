@@ -1,11 +1,11 @@
-# Cloth Config
+# Cloth Config [ ![Download](https://api.bintray.com/packages/shedaniel/ClothConfig/ClothConfig2/images/download.svg) ](https://bintray.com/shedaniel/ClothConfig/ClothConfig2/_latestVersion)
 ## Maven
 ```groovy
 repositories {
     maven { url "https://dl.bintray.com/shedaniel/ClothConfig" }
 }
 dependencies {
-    modCompile "me.shedaniel:ClothConfig:0.3.1"
+    modCompile "me.shedaniel:ClothConfig:LATEST"
 }
 ```
 ## APIs
