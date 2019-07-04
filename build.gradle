@@ -1,6 +1,8 @@
 plugins {
     id 'fabric-loom' version '0.2.4-SNAPSHOT'
     id 'maven-publish'
+    id 'maven'
+    id 'signing'
     id 'com.jfrog.bintray' version '1.8.4'
 }
 
@@ -8,7 +10,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = "me.shedaniel"
-archivesBaseName = "ClothConfig2"
+archivesBaseName = "cloth-config-2"
 version = project.mod_version
 
 minecraft {
@@ -43,6 +45,18 @@ bintray {
             name = project.version
             vcsTag = project.version
             released = new Date()
+            gpg {
+                sign = true
+            }
+            mavenCentralSync {
+                sync = true //[Default: true] Determines whether to sync the version to Maven Central.
+                user = project.hasProperty('ossToken') ? project.property('ossToken') : System.getenv('OSS_TOKEN')
+                //OSS user token: mandatory
+                password = project.hasProperty('ossPass') ? project.property('ossPass') : System.getenv('OSS_PASS')
+                //OSS user password: mandatory
+                close = '1'
+                //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+            }
         }
     }
 }
