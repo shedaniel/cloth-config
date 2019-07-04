@@ -2,10 +2,10 @@
 ## Maven
 ```groovy
 repositories {
-    maven { url "https://minecraft.curseforge.com/api/maven"}
+    maven { url "https://dl.bintray.com/shedaniel/ClothConfig" }
 }
 dependencies {
-    modCompile "cloth-config:ClothConfig2:{RANDOMVERSION}"
+    modCompile "me.shedaniel:ClothConfig:0.3.2"
 }
 ```
 ## APIs

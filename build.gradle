@@ -1,10 +1,13 @@
 plugins {
-    id 'fabric-loom' version '0.2.2-SNAPSHOT'
+    id 'fabric-loom' version '0.2.4-SNAPSHOT'
+    id 'maven-publish'
+    id 'com.jfrog.bintray' version '1.8.4'
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+group = "me.shedaniel"
 archivesBaseName = "ClothConfig2"
 version = project.mod_version
 
@@ -18,15 +21,47 @@ processResources {
     inputs.property "version", project.version
 }
 
-jar {
-    version = project.mod_version.replaceAll('\\+build.', '.')
-    classifier = null
-}
-
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_version}"
-    modCompile "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-    modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modCompile "io.github.prospector.modmenu:ModMenu:${modmenu_version}"
+    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modApi "io.github.prospector.modmenu:ModMenu:${modmenu_version}"
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
+    publications = ["MyPublication"]
+    pkg {
+        repo = "ClothConfig"
+        name = "ClothConfig2"
+        userOrg = "shedaniel"
+        licenses = ["Unlicense"]
+        vcsUrl = "https://github.com/shedaniel/ClothConfig.git"
+        version {
+            name = project.version
+            vcsTag = project.version
+            released = new Date()
+        }
+    }
+}
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            artifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
+                builtBy remapJar
+            }
+            artifact(jar) {
+                builtBy jar
+            }
+        }
+    }
+
+    // select the repositories you want to publish to
+    repositories {
+        // uncomment to publish to the local maven
+        // mavenLocal()
+    }
 }
