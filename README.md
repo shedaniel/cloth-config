@@ -5,7 +5,7 @@ repositories {
     maven { url "https://dl.bintray.com/shedaniel/ClothConfig" }
 }
 dependencies {
-    modCompile "me.shedaniel:ClothConfig:0.3.2"
+    modCompile "me.shedaniel:ClothConfig:0.3.1"
 }
 ```
 ## APIs
