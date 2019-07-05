@@ -2,10 +2,10 @@
 ## Maven
 ```groovy
 repositories {
-    maven { url "https://dl.bintray.com/shedaniel/ClothConfig" }
+    jcenter()
 }
 dependencies {
-    modCompile "me.shedaniel:ClothConfig:LATEST"
+    modCompile "me.shedaniel:cloth-config-2:LATEST"
 }
 ```
 ## APIs

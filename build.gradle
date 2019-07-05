@@ -35,16 +35,21 @@ bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
     publications = ["MyPublication"]
+    override = true
     pkg {
-        repo = "ClothConfig"
-        name = "ClothConfig2"
+        repo = "cloth-config-2"
+        name = "cloth-config-2"
         userOrg = "shedaniel"
         licenses = ["Unlicense"]
-        vcsUrl = "https://github.com/shedaniel/ClothConfig.git"
         version {
             name = project.version
             vcsTag = project.version
             released = new Date()
+            desc = "Cloth Config API for Minecraft"
+            githubRepo = 'shedaniel/ClothConfig'
+            websiteUrl = 'https://github.com/shedaniel/ClothConfig'
+            issueTrackerUrl = 'https://github.com/shedaniel/ClothConfig/issues'
+            vcsUrl = 'https://github.com/shedaniel/ClothConfig.git'
             gpg {
                 sign = true
             }
@@ -69,6 +74,15 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
+task javadocs(type: Javadoc) {
+    source = sourceSets.main.allJava
+}
+
+task javadocsJar(type: Jar, dependsOn: javadocs) {
+    classifier = "javadocs"
+    from javadocs.destinationDir
+}
+
 publishing {
     publications {
         MyPublication(MavenPublication) {
@@ -77,6 +91,30 @@ publishing {
             }
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
+            }
+            artifact javadocsJar
+            groupId 'me.shedaniel'
+            artifactId 'cloth-config-2'
+            version = project.version
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Cloth Config API for Minecraft')
+                root.appendNode('name', 'cloth-config-2')
+                root.appendNode('url', 'https://github.com/shedaniel/ClothConfig')
+                root.appendNode('packaging', 'jar')
+                def license = root.appendNode('licenses').appendNode('license')
+                license.appendNode('name', 'Unlicense')
+                license.appendNode('url', 'http://unlicense.org')
+                license.appendNode('distribution', 'repo')
+                def developers = root.appendNode('developers')
+                def shedaniel = developers.appendNode('developer')
+                shedaniel.appendNode('id', 'shedaniel')
+                shedaniel.appendNode('name', 'shedaniel')
+                shedaniel.appendNode('email', 'daniel@shedaniel.me')
+                def scm = root.appendNode('scm')
+                scm.appendNode('url', "https://github.com/shedaniel/ClothConfig")
+                scm.appendNode('connection', "scm:git:git://github.com/shedaniel/ClothConfig.git")
+                scm.appendNode('developerConnection', "scm:git:ssh://github.com:shedaniel/ClothConfig.git")
             }
         }
     }
