@@ -1,4 +1,4 @@
-# Cloth Config [ ![Download](https://api.bintray.com/packages/shedaniel/ClothConfig/ClothConfig2/images/download.svg) ](https://bintray.com/shedaniel/ClothConfig/ClothConfig2/_latestVersion)
+# Cloth Config [ ![Download](https://api.bintray.com/packages/shedaniel/cloth-config-2/cloth-config-2/images/download.svg) ](https://bintray.com/shedaniel/ClothConfig/ClothConfig2/_latestVersion)
 ## Maven
 ```groovy
 repositories {
