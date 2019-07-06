@@ -9,8 +9,8 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "me.shedaniel"
-archivesBaseName = "cloth-config-2"
+group = "me.shedaniel.cloth"
+archivesBaseName = "config-2"
 version = project.mod_version
 
 minecraft {
@@ -38,7 +38,7 @@ bintray {
     override = true
     pkg {
         repo = "cloth-config-2"
-        name = "cloth-config-2"
+        name = "config-2"
         userOrg = "shedaniel"
         licenses = ["Unlicense"]
         version {
@@ -53,15 +53,15 @@ bintray {
             gpg {
                 sign = true
             }
-            mavenCentralSync {
-                sync = true //[Default: true] Determines whether to sync the version to Maven Central.
-                user = project.hasProperty('ossToken') ? project.property('ossToken') : System.getenv('OSS_TOKEN')
-                //OSS user token: mandatory
-                password = project.hasProperty('ossPass') ? project.property('ossPass') : System.getenv('OSS_PASS')
-                //OSS user password: mandatory
-                close = '1'
-                //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
-            }
+//            mavenCentralSync {
+//                sync = true //[Default: true] Determines whether to sync the version to Maven Central.
+//                user = project.hasProperty('ossToken') ? project.property('ossToken') : System.getenv('OSS_TOKEN')
+//                OSS user token: mandatory
+//                password = project.hasProperty('ossPass') ? project.property('ossPass') : System.getenv('OSS_PASS')
+            //OSS user password: mandatory
+//                close = '1'
+            //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+//            }
         }
     }
 }
@@ -93,13 +93,13 @@ publishing {
                 builtBy remapSourcesJar
             }
             artifact javadocsJar
-            groupId 'me.shedaniel'
-            artifactId 'cloth-config-2'
+            groupId 'me.shedaniel.cloth'
+            artifactId 'config-2'
             version = project.version
             pom.withXml {
                 def root = asNode()
                 root.appendNode('description', 'Cloth Config API for Minecraft')
-                root.appendNode('name', 'cloth-config-2')
+                root.appendNode('name', 'config-2')
                 root.appendNode('url', 'https://github.com/shedaniel/ClothConfig')
                 root.appendNode('packaging', 'jar')
                 def license = root.appendNode('licenses').appendNode('license')

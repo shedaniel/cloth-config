@@ -1,11 +1,11 @@
-# Cloth Config [ ![Download](https://api.bintray.com/packages/shedaniel/cloth-config-2/cloth-config-2/images/download.svg) ](https://bintray.com/shedaniel/ClothConfig/ClothConfig2/_latestVersion)
+# Cloth Config [ ![Download](https://api.bintray.com/packages/shedaniel/cloth-config-2/config-2/images/download.svg) ](https://bintray.com/shedaniel/cloth-config-2/config-2/_latestVersion)
 ## Maven
 ```groovy
 repositories {
     jcenter()
 }
 dependencies {
-    modCompile "me.shedaniel:cloth-config-2:LATEST"
+    'me.shedaniel.cloth:config-2:LATEST'
 }
 ```
 ## APIs
