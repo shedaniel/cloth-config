@@ -1,0 +1,21 @@
+{
+  "text.cloth-config.save_and_done": "Salvesta muutused",
+  "text.cloth-config.quit_config": "Muutused on salvestamata",
+  "text.cloth-config.quit_config_sure": "Kas soovid kindlasti seadistuste muutmisest väljuda? Sinu muutusi ei salvestata!",
+  "text.cloth-config.cancel_discard": "Loobu ja tühista muutused",
+  "text.cloth-config.quit_discard": "Välju ja tühista muutused",
+  "text.cloth-config.config": "Seadistus",
+  "text.cloth-config.multi_error": "Mitu viga!",
+  "text.cloth-config.not_editable": "Pole muudetav!",
+  "text.cloth-config.error.not_valid_number_int": "Pole sobiv arv! (täisarv)",
+  "text.cloth-config.error.not_valid_number_long": "Pole sobiv arv! (suurtäisarv)",
+  "text.cloth-config.error.not_valid_number_float": "Pole sobiv arv! (ujukomaarv)",
+  "text.cloth-config.error.not_valid_number_double": "Pole sobiv arv! (topelttäisarv)",
+  "text.cloth-config.error.too_large": "Liiga suur! (Maksimum: %d)",
+  "text.cloth-config.error.too_small": "Liiga väike! (Miinimum: %d)",
+  "text.cloth-config.list.add": "Sisesta uus",
+  "text.cloth-config.list.remove": "Kustuta valitud",
+  "text.cloth-config.error_cannot_save": "Viga!",
+  "text.cloth-config.reset_value": "Lähtesta",
+  "text.cloth.reset_value": "Lähtesta"
+}
