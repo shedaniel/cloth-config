@@ -18,6 +18,11 @@ public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
         this.value = value;
     }
     
+    public IntFieldBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public IntFieldBuilder setSaveConsumer(Consumer<Integer> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
@@ -70,7 +75,7 @@ public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
     
     @Override
     public IntegerListEntry build() {
-        IntegerListEntry entry = new IntegerListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
+        IntegerListEntry entry = new IntegerListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)

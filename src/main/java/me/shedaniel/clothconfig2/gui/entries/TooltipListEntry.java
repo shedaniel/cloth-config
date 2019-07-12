@@ -11,8 +11,13 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     
     private Supplier<Optional<String[]>> tooltipSupplier;
     
+    @Deprecated
     public TooltipListEntry(String fieldName, Supplier<Optional<String[]>> tooltipSupplier) {
-        super(fieldName);
+        this(fieldName, tooltipSupplier, false);
+    }
+    
+    public TooltipListEntry(String fieldName, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+        super(fieldName, requiresRestart);
         this.tooltipSupplier = tooltipSupplier;
     }
     

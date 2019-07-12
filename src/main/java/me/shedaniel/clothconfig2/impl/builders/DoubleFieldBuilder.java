@@ -18,6 +18,11 @@ public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
         this.value = value;
     }
     
+    public DoubleFieldBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public DoubleFieldBuilder setSaveConsumer(Consumer<Double> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
@@ -70,7 +75,7 @@ public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
     
     @Override
     public DoubleListEntry build() {
-        DoubleListEntry entry = new DoubleListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
+        DoubleListEntry entry = new DoubleListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)

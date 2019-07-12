@@ -19,7 +19,12 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
     
     @Deprecated
     public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey) {
-        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new IntegerListCell(0, (IntegerListListEntry) baseListEntry), saveConsumer, resetButtonKey);
+        this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
+    }
+    
+    @Deprecated
+    public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey, boolean requiresRestart) {
+        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new IntegerListCell(0, (IntegerListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
         this.minimum = -Integer.MAX_VALUE;
         this.maximum = Integer.MAX_VALUE;
         for(int integer : value)
@@ -95,7 +100,7 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
             widget.setText(value + "");
             widget.setChangedListener(s -> {
                 if (!(value + "").equalsIgnoreCase(s))
-                    listListEntry.getScreen().setEdited(true);
+                    listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
         }
         

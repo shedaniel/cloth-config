@@ -457,8 +457,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     @Environment(EnvType.CLIENT)
     public abstract static class Entry<E extends Entry<E>> extends DrawableHelper implements Element {
-        @Deprecated
-        DynamicEntryListWidget<E> parent;
+        @Deprecated DynamicEntryListWidget<E> parent;
         
         public Entry() {
         }

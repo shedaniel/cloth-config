@@ -18,6 +18,11 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
         this.entries = Lists.newArrayList();
     }
     
+    @Override
+    public void requireRestart(boolean requireRestart) {
+        throw new UnsupportedOperationException();
+    }
+    
     public SubCategoryBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;

@@ -15,7 +15,12 @@ public class StringListListEntry extends BaseListEntry<String, StringListListEnt
     
     @Deprecated
     public StringListListEntry(String fieldName, List<String> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey) {
-        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new StringListCell("", (StringListListEntry) baseListEntry), saveConsumer, resetButtonKey);
+        this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
+    }
+    
+    @Deprecated
+    public StringListListEntry(String fieldName, List<String> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey, boolean requiresRestart) {
+        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new StringListCell("", (StringListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
         for(String str : value)
             cells.add(new StringListCell(str, this));
         this.widgets.addAll(cells);
@@ -55,7 +60,7 @@ public class StringListListEntry extends BaseListEntry<String, StringListListEnt
             widget.setText(value);
             widget.setChangedListener(s -> {
                 if (!value.contentEquals(s))
-                    listListEntry.getScreen().setEdited(true);
+                    listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
         }
         

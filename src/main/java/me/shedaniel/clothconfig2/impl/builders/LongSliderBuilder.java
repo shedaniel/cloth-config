@@ -21,6 +21,11 @@ public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
         this.min = min;
     }
     
+    public LongSliderBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public LongSliderBuilder setTextGetter(Function<Long, String> textGetter) {
         this.textGetter = textGetter;
         return this;
@@ -59,8 +64,8 @@ public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
     @Override
     public LongSliderEntry build() {
         if (textGetter == null)
-            return new LongSliderEntry(getFieldNameKey(), min, max, value, saveConsumer, getResetButtonKey(), defaultValue, tooltipSupplier);
-        return new LongSliderEntry(getFieldNameKey(), min, max, value, saveConsumer, getResetButtonKey(), defaultValue, tooltipSupplier).setTextGetter(textGetter);
+            return new LongSliderEntry(getFieldNameKey(), min, max, value, saveConsumer, getResetButtonKey(), defaultValue, tooltipSupplier, isRequireRestart());
+        return new LongSliderEntry(getFieldNameKey(), min, max, value, saveConsumer, getResetButtonKey(), defaultValue, tooltipSupplier, isRequireRestart()).setTextGetter(textGetter);
     }
     
 }

@@ -51,6 +51,7 @@ public abstract class ClothConfigScreen extends Screen {
     private LinkedHashMap<String, List<AbstractConfigEntry>> tabbedEntries;
     private List<Pair<String, Integer>> tabs;
     private boolean edited;
+    private boolean requiresRestart;
     private boolean confirmSave;
     private AbstractButtonWidget buttonQuit;
     private AbstractButtonWidget buttonSave;
@@ -102,6 +103,7 @@ public abstract class ClothConfigScreen extends Screen {
         this.selectedTabIndex = 0;
         this.confirmSave = confirmSave;
         this.edited = false;
+        this.requiresRestart = false;
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         this.tabs = tabbedEntries.keySet().stream().map(s -> new Pair<>(s, textRenderer.getStringWidth(I18n.translate(s)) + 8)).collect(Collectors.toList());
         this.tabsScrollProgress = 0d;
@@ -144,10 +146,18 @@ public abstract class ClothConfigScreen extends Screen {
         return edited;
     }
     
+    @Deprecated
     public void setEdited(boolean edited) {
         this.edited = edited;
         buttonQuit.setMessage(edited ? I18n.translate("text.cloth-config.cancel_discard") : I18n.translate("gui.cancel"));
         buttonSave.active = edited;
+    }
+    
+    @SuppressWarnings("deprecation")
+    public void setEdited(boolean edited, boolean requiresRestart) {
+        setEdited(edited);
+        if (!this.requiresRestart && requiresRestart)
+            this.requiresRestart = requiresRestart;
     }
     
     @Override
@@ -180,7 +190,10 @@ public abstract class ClothConfigScreen extends Screen {
                     for(AbstractConfigEntry entry : entries)
                         entry.save();
                 onSave(map);
-                ClothConfigScreen.this.minecraft.openScreen(parent);
+                if (requiresRestart)
+                    ClothConfigScreen.this.minecraft.openScreen(new ClothRequiresRestartScreen(parent));
+                else
+                    ClothConfigScreen.this.minecraft.openScreen(parent);
             }
             
             @Override

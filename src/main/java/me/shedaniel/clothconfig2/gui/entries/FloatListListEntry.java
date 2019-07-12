@@ -19,7 +19,12 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
     
     @Deprecated
     public FloatListListEntry(String fieldName, List<Float> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Float>> saveConsumer, Supplier<List<Float>> defaultValue, String resetButtonKey) {
-        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new FloatListCell(0, (FloatListListEntry) baseListEntry), saveConsumer, resetButtonKey);
+        this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
+    }
+    
+    @Deprecated
+    public FloatListListEntry(String fieldName, List<Float> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Float>> saveConsumer, Supplier<List<Float>> defaultValue, String resetButtonKey, boolean requiresRestart) {
+        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new FloatListCell(0, (FloatListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
         this.minimum = -Float.MAX_VALUE;
         this.maximum = Float.MAX_VALUE;
         for(float f : value)
@@ -95,7 +100,7 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
             widget.setText(value + "");
             widget.setChangedListener(s -> {
                 if (!(value + "").equalsIgnoreCase(s))
-                    listListEntry.getScreen().setEdited(true);
+                    listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
         }
         

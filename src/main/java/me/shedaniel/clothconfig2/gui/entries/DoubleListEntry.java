@@ -39,7 +39,12 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
     
     @Deprecated
     public DoubleListEntry(String fieldName, Double value, String resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
-        super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier);
+        this(fieldName, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
+    }
+    
+    @Deprecated
+    public DoubleListEntry(String fieldName, Double value, String resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+        super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
         this.minimum = -Double.MAX_VALUE;
         this.maximum = Double.MAX_VALUE;
         this.saveConsumer = saveConsumer;

@@ -39,7 +39,12 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     
     @Deprecated
     public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
-        super(fieldName, tooltipSupplier);
+        this(fieldName, minimum, maximum, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
+    }
+    
+    @Deprecated
+    public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+        super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.value = new AtomicInteger(value);
         this.saveConsumer = saveConsumer;
@@ -50,7 +55,7 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
             sliderWidget.setProgress((MathHelper.clamp(this.defaultValue.get(), minimum, maximum) - minimum) / (double) Math.abs(maximum - minimum));
             this.value.set(MathHelper.clamp(this.defaultValue.get(), minimum, maximum));
             sliderWidget.updateMessage();
-            getScreen().setEdited(true);
+            getScreen().setEdited(true, isRequiresRestart());
         });
         this.sliderWidget.setMessage(textGetter.apply(IntegerSliderEntry.this.value.get()));
         this.widgets = Lists.newArrayList(sliderWidget, resetButton);
@@ -133,7 +138,7 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
         @Override
         protected void applyValue() {
             IntegerSliderEntry.this.value.set((int) (minimum + Math.abs(maximum - minimum) * value));
-            getScreen().setEdited(true);
+            getScreen().setEdited(true, isRequiresRestart());
         }
         
         @Override

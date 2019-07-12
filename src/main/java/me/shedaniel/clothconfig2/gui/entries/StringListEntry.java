@@ -21,7 +21,12 @@ public class StringListEntry extends TextFieldListEntry<String> {
     
     @Deprecated
     public StringListEntry(String fieldName, String value, String resetButtonKey, Supplier<String> defaultValue, Consumer<String> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
-        super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier);
+        this(fieldName, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
+    }
+    
+    @Deprecated
+    public StringListEntry(String fieldName, String value, String resetButtonKey, Supplier<String> defaultValue, Consumer<String> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+        super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
         this.saveConsumer = saveConsumer;
     }
     

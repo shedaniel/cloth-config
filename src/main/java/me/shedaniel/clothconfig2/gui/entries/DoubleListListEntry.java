@@ -19,7 +19,12 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
     
     @Deprecated
     public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey) {
-        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new DoubleListCell(0d, (DoubleListListEntry) baseListEntry), saveConsumer, resetButtonKey);
+        this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
+    }
+    
+    @Deprecated
+    public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey, boolean requiresRestart) {
+        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new DoubleListCell(0d, (DoubleListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
         this.minimum = -Double.MAX_VALUE;
         this.maximum = Double.MAX_VALUE;
         for(Double f : value)
@@ -95,7 +100,7 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
             widget.setText(value + "");
             widget.setChangedListener(s -> {
                 if (!(value + "").equalsIgnoreCase(s))
-                    listListEntry.getScreen().setEdited(true);
+                    listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
         }
         

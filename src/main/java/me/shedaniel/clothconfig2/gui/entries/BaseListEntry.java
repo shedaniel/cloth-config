@@ -33,8 +33,13 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
     protected Supplier<List<T>> defaultValue;
     protected String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
     
+    @Deprecated
     public BaseListEntry(String fieldName, Supplier<Optional<String[]>> tooltipSupplier, Supplier<List<T>> defaultValue, Function<BaseListEntry, C> createNewInstance, Consumer<List<T>> saveConsumer, String resetButtonKey) {
-        super(fieldName, tooltipSupplier);
+        this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, false);
+    }
+    
+    public BaseListEntry(String fieldName, Supplier<Optional<String[]>> tooltipSupplier, Supplier<List<T>> defaultValue, Function<BaseListEntry, C> createNewInstance, Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart) {
+        super(fieldName, tooltipSupplier, requiresRestart);
         this.cells = Lists.newArrayList();
         this.labelWidget = new ListLabelWidget();
         this.widgets = Lists.newArrayList(labelWidget);
@@ -43,7 +48,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
             cells.clear();
             defaultValue.get().stream().map(this::getFromValue).forEach(cells::add);
             widgets.addAll(cells);
-            getScreen().setEdited(true);
+            getScreen().setEdited(true, isRequiresRestart());
         });
         this.widgets.add(resetWidget);
         this.saveConsumer = saveConsumer;
@@ -189,7 +194,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
                 C cell;
                 cells.add(0, cell = createNewInstance.apply(BaseListEntry.this));
                 widgets.add(0, cell);
-                getScreen().setEdited(true);
+                getScreen().setEdited(true, isRequiresRestart());
                 MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             } else if (isInsideDelete(double_1, double_2)) {
@@ -197,7 +202,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
                 if (focused != null) {
                     cells.remove(focused);
                     widgets.remove(focused);
-                    getScreen().setEdited(true);
+                    getScreen().setEdited(true, isRequiresRestart());
                     MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 }
                 return true;

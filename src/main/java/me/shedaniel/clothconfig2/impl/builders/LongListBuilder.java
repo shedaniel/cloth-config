@@ -23,6 +23,11 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
         this.value = value;
     }
     
+    public LongListBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public LongListBuilder setCreateNewInstance(Function<BaseListEntry, LongListListEntry.LongListCell> createNewInstance) {
         this.createNewInstance = createNewInstance;
         return this;
@@ -85,7 +90,7 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
     
     @Override
     public LongListListEntry build() {
-        LongListListEntry entry = new LongListListEntry(getFieldNameKey(), value, expended, tooltipSupplier, saveConsumer, defaultValue, getResetButtonKey());
+        LongListListEntry entry = new LongListListEntry(getFieldNameKey(), value, expended, tooltipSupplier, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)

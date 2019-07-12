@@ -23,6 +23,11 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
         this.value = value;
     }
     
+    public IntListBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public IntListBuilder setCreateNewInstance(Function<BaseListEntry, IntegerListListEntry.IntegerListCell> createNewInstance) {
         this.createNewInstance = createNewInstance;
         return this;
@@ -85,7 +90,7 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
     
     @Override
     public IntegerListListEntry build() {
-        IntegerListListEntry entry = new IntegerListListEntry(getFieldNameKey(), value, expended, tooltipSupplier, saveConsumer, defaultValue, getResetButtonKey());
+        IntegerListListEntry entry = new IntegerListListEntry(getFieldNameKey(), value, expended, tooltipSupplier, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)

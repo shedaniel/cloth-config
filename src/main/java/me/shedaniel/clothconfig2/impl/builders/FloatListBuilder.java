@@ -23,6 +23,11 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         this.value = value;
     }
     
+    public FloatListBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public FloatListBuilder setCreateNewInstance(Function<BaseListEntry, FloatListListEntry.FloatListCell> createNewInstance) {
         this.createNewInstance = createNewInstance;
         return this;
@@ -85,7 +90,7 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
     
     @Override
     public FloatListListEntry build() {
-        FloatListListEntry entry = new FloatListListEntry(getFieldNameKey(), value, expended, tooltipSupplier, saveConsumer, defaultValue, getResetButtonKey());
+        FloatListListEntry entry = new FloatListListEntry(getFieldNameKey(), value, expended, tooltipSupplier, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)

@@ -8,6 +8,10 @@ import java.util.Optional;
 public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> {
     private ClothConfigScreen screen;
     
+    public abstract boolean isRequiresRestart();
+    
+    public abstract void setRequiresRestart(boolean requiresRestart);
+    
     public abstract String getFieldName();
     
     public abstract T getValue();

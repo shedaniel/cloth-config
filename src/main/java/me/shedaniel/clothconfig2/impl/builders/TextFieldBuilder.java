@@ -19,6 +19,11 @@ public class TextFieldBuilder extends FieldBuilder<String, StringListEntry> {
         this.value = value;
     }
     
+    public TextFieldBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public TextFieldBuilder setSaveConsumer(Consumer<String> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
@@ -51,7 +56,7 @@ public class TextFieldBuilder extends FieldBuilder<String, StringListEntry> {
     
     @Override
     public StringListEntry build() {
-        return new StringListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
+        return new StringListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart());
     }
     
 }

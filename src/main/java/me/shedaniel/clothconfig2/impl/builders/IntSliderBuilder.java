@@ -21,6 +21,11 @@ public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> 
         this.min = min;
     }
     
+    public IntSliderBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public IntSliderBuilder setTextGetter(Function<Integer, String> textGetter) {
         this.textGetter = textGetter;
         return this;
@@ -69,8 +74,8 @@ public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> 
     @Override
     public IntegerSliderEntry build() {
         if (textGetter == null)
-            return new IntegerSliderEntry(getFieldNameKey(), min, max, value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
-        return new IntegerSliderEntry(getFieldNameKey(), min, max, value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier).setTextGetter(textGetter);
+            return new IntegerSliderEntry(getFieldNameKey(), min, max, value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart());
+        return new IntegerSliderEntry(getFieldNameKey(), min, max, value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart()).setTextGetter(textGetter);
     }
     
 }

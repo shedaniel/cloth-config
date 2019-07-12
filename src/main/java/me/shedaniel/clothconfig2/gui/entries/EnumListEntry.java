@@ -43,7 +43,12 @@ public class EnumListEntry<T extends Enum<?>> extends TooltipListEntry<T> {
     
     @Deprecated
     public EnumListEntry(String fieldName, Class<T> clazz, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<Enum, String> enumNameProvider, Supplier<Optional<String[]>> tooltipSupplier) {
-        super(fieldName, tooltipSupplier);
+        this(fieldName, clazz, value, resetButtonKey, defaultValue, saveConsumer, enumNameProvider, tooltipSupplier, false);
+    }
+    
+    @Deprecated
+    public EnumListEntry(String fieldName, Class<T> clazz, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<Enum, String> enumNameProvider, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+        super(fieldName, tooltipSupplier, requiresRestart);
         T[] valuesArray = clazz.getEnumConstants();
         if (valuesArray != null)
             this.values = ImmutableList.copyOf(valuesArray);
@@ -55,11 +60,11 @@ public class EnumListEntry<T extends Enum<?>> extends TooltipListEntry<T> {
         this.buttonWidget = new ButtonWidget(0, 0, 150, 20, "", widget -> {
             EnumListEntry.this.index.incrementAndGet();
             EnumListEntry.this.index.compareAndSet(EnumListEntry.this.values.size(), 0);
-            getScreen().setEdited(true);
+            getScreen().setEdited(true, isRequiresRestart());
         });
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {
             EnumListEntry.this.index.set(getDefaultIndex());
-            getScreen().setEdited(true);
+            getScreen().setEdited(true, isRequiresRestart());
         });
         this.saveConsumer = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);

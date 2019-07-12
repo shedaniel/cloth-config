@@ -18,6 +18,11 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
         this.value = value;
     }
     
+    public FloatFieldBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public FloatFieldBuilder setSaveConsumer(Consumer<Float> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
@@ -70,7 +75,7 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
     
     @Override
     public FloatListEntry build() {
-        FloatListEntry entry = new FloatListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
+        FloatListEntry entry = new FloatListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)

@@ -18,6 +18,11 @@ public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
         this.value = value;
     }
     
+    public LongFieldBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public LongFieldBuilder setSaveConsumer(Consumer<Long> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
@@ -70,7 +75,7 @@ public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
     
     @Override
     public LongListEntry build() {
-        LongListEntry entry = new LongListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier);
+        LongListEntry entry = new LongListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)

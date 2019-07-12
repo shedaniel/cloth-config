@@ -39,7 +39,12 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     
     @Deprecated
     public LongSliderEntry(String fieldName, long minimum, long maximum, long value, Consumer<Long> saveConsumer, String resetButtonKey, Supplier<Long> defaultValue, Supplier<Optional<String[]>> tooltipSupplier) {
-        super(fieldName, tooltipSupplier);
+        this(fieldName, minimum, maximum, value, saveConsumer, resetButtonKey, defaultValue, tooltipSupplier, false);
+    }
+    
+    @Deprecated
+    public LongSliderEntry(String fieldName, long minimum, long maximum, long value, Consumer<Long> saveConsumer, String resetButtonKey, Supplier<Long> defaultValue, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+        super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.value = new AtomicLong(value);
         this.saveConsumer = saveConsumer;
@@ -50,7 +55,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
             sliderWidget.setValue((MathHelper.clamp(this.defaultValue.get(), minimum, maximum) - minimum) / (double) Math.abs(maximum - minimum));
             this.value.set(Math.min(Math.max(this.defaultValue.get(), minimum), maximum));
             sliderWidget.updateMessage();
-            getScreen().setEdited(true);
+            getScreen().setEdited(true, isRequiresRestart());
         });
         this.sliderWidget.setMessage(textGetter.apply(LongSliderEntry.this.value.get()));
         this.widgets = Lists.newArrayList(sliderWidget, resetButton);
@@ -134,7 +139,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         @Override
         protected void applyValue() {
             LongSliderEntry.this.value.set((long) (minimum + Math.abs(maximum - minimum) * value));
-            getScreen().setEdited(true);
+            getScreen().setEdited(true, isRequiresRestart());
         }
         
         @Override

@@ -19,7 +19,12 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
     
     @Deprecated
     public LongListListEntry(String fieldName, List<Long> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, String resetButtonKey) {
-        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new LongListCell(0, (LongListListEntry) baseListEntry), saveConsumer, resetButtonKey);
+        this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
+    }
+    
+    @Deprecated
+    public LongListListEntry(String fieldName, List<Long> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, String resetButtonKey, boolean requiresRestart) {
+        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new LongListCell(0, (LongListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
         this.minimum = -Long.MAX_VALUE;
         this.maximum = Long.MAX_VALUE;
         for(long l : value)
@@ -95,7 +100,7 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
             widget.setText(value + "");
             widget.setChangedListener(s -> {
                 if (!(value + "").equalsIgnoreCase(s))
-                    listListEntry.getScreen().setEdited(true);
+                    listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
         }
         

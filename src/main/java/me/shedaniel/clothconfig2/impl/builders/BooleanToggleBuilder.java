@@ -20,6 +20,11 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
         this.value = value;
     }
     
+    public BooleanToggleBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public BooleanToggleBuilder setSaveConsumer(Consumer<Boolean> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
@@ -58,7 +63,7 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
     
     @Override
     public BooleanListEntry build() {
-        return new BooleanListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier) {
+        return new BooleanListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart()) {
             @Override
             public String getYesNoText(boolean bool) {
                 return yesNoTextSupplier.apply(bool);

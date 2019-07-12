@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 public abstract class FieldBuilder<T, A extends AbstractConfigListEntry> {
     private final String fieldNameKey;
     private final String resetButtonKey;
+    protected boolean requireRestart = false;
     protected Supplier<T> defaultValue = null;
     
     protected FieldBuilder(String resetButtonKey, String fieldNameKey) {
@@ -30,6 +31,14 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry> {
     
     public final String getResetButtonKey() {
         return resetButtonKey;
+    }
+    
+    public boolean isRequireRestart() {
+        return requireRestart;
+    }
+    
+    public void requireRestart(boolean requireRestart) {
+        this.requireRestart = requireRestart;
     }
     
 }

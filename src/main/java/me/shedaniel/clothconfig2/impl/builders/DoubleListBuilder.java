@@ -23,6 +23,11 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         this.value = value;
     }
     
+    public DoubleListBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public DoubleListBuilder setCreateNewInstance(Function<BaseListEntry, DoubleListListEntry.DoubleListCell> createNewInstance) {
         this.createNewInstance = createNewInstance;
         return this;
@@ -85,7 +90,7 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
     
     @Override
     public DoubleListListEntry build() {
-        DoubleListListEntry entry = new DoubleListListEntry(getFieldNameKey(), value, expended, tooltipSupplier, saveConsumer, defaultValue, getResetButtonKey());
+        DoubleListListEntry entry = new DoubleListListEntry(getFieldNameKey(), value, expended, tooltipSupplier, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)

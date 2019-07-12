@@ -22,6 +22,11 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
         this.value = value;
     }
     
+    public StringListBuilder requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public StringListBuilder setCreateNewInstance(Function<BaseListEntry, StringListListEntry.StringListCell> createNewInstance) {
         this.createNewInstance = createNewInstance;
         return this;
@@ -64,7 +69,7 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
     
     @Override
     public StringListListEntry build() {
-        StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, expended, tooltipSupplier, saveConsumer, defaultValue, getResetButtonKey());
+        StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, expended, tooltipSupplier, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart());
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
         return entry;

@@ -24,6 +24,11 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
         this.clazz = clazz;
     }
     
+    public EnumSelectorBuilder<T> requireRestart() {
+        requireRestart(true);
+        return this;
+    }
+    
     public EnumSelectorBuilder setSaveConsumer(Consumer<T> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
@@ -63,7 +68,7 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
     
     @Override
     public EnumListEntry<T> build() {
-        return new EnumListEntry<T>(getFieldNameKey(), clazz, value, getResetButtonKey(), defaultValue, saveConsumer, enumNameProvider, tooltipSupplier);
+        return new EnumListEntry<T>(getFieldNameKey(), clazz, value, getResetButtonKey(), defaultValue, saveConsumer, enumNameProvider, tooltipSupplier, isRequireRestart());
     }
     
 }

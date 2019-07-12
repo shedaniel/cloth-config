@@ -25,6 +25,10 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     }
     
     protected TextFieldListEntry(String fieldName, T original, String resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<String[]>> tooltipSupplier) {
+        this(fieldName, original, resetButtonKey, defaultValue, tooltipSupplier, false);
+    }
+    
+    protected TextFieldListEntry(String fieldName, T original, String resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier);
         this.defaultValue = defaultValue;
         this.original = original;
@@ -47,11 +51,11 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         textFieldWidget.setText(String.valueOf(original));
         textFieldWidget.setChangedListener(s -> {
             if (!original.equals(s))
-                getScreen().setEdited(true);
+                getScreen().setEdited(true, isRequiresRestart());
         });
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {
             TextFieldListEntry.this.textFieldWidget.setText(String.valueOf(defaultValue.get()));
-            getScreen().setEdited(true);
+            getScreen().setEdited(true, isRequiresRestart());
         });
         this.widgets = Lists.newArrayList(textFieldWidget, resetButton);
     }

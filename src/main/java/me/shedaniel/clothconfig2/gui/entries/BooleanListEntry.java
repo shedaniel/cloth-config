@@ -33,16 +33,21 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     
     @Deprecated
     public BooleanListEntry(String fieldName, boolean bool, String resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
-        super(fieldName, tooltipSupplier);
+        this(fieldName, bool, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
+    }
+    
+    @Deprecated
+    public BooleanListEntry(String fieldName, boolean bool, String resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+        super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.bool = new AtomicBoolean(bool);
         this.buttonWidget = new ButtonWidget(0, 0, 150, 20, "", widget -> {
             BooleanListEntry.this.bool.set(!BooleanListEntry.this.bool.get());
-            getScreen().setEdited(true);
+            getScreen().setEdited(true, isRequiresRestart());
         });
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {
             BooleanListEntry.this.bool.set(defaultValue.get());
-            getScreen().setEdited(true);
+            getScreen().setEdited(true, isRequiresRestart());
         });
         this.saveConsumer = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);

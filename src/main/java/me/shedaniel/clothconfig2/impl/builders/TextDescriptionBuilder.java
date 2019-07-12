@@ -16,6 +16,11 @@ public class TextDescriptionBuilder extends FieldBuilder<String, TextListEntry> 
         this.value = value;
     }
     
+    @Override
+    public void requireRestart(boolean requireRestart) {
+        throw new UnsupportedOperationException();
+    }
+    
     public TextDescriptionBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
