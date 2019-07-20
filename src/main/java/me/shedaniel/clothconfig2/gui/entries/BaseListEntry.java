@@ -56,6 +56,10 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
         this.defaultValue = defaultValue;
     }
     
+    public boolean isDeleteButtonEnabled() {
+        return true;
+    }
+    
     protected abstract C getFromValue(T value);
     
     public Function<BaseListEntry, C> getCreateNewInstance() {
@@ -135,7 +139,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
     }
     
     protected boolean isInsideDelete(double mouseX, double mouseY) {
-        return mouseX >= labelWidget.rectangle.x + 25 && mouseY >= labelWidget.rectangle.y + 3 && mouseX <= labelWidget.rectangle.x + 25 + 11 && mouseY <= labelWidget.rectangle.y + 3 + 11;
+        return isDeleteButtonEnabled() && mouseX >= labelWidget.rectangle.x + 25 && mouseY >= labelWidget.rectangle.y + 3 && mouseX <= labelWidget.rectangle.x + 25 + 11 && mouseY <= labelWidget.rectangle.y + 3 + 11;
     }
     
     public Optional<String[]> getTooltip(int mouseX, int mouseY) {
@@ -167,12 +171,13 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
         boolean insideDelete = isInsideDelete(mouseX, mouseY);
         blit(x - 15, y + 4, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expended ? 9 : 0), 9, 9);
         blit(x - 15 + 13, y + 4, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
-        blit(x - 15 + 26, y + 4, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
+        if (isDeleteButtonEnabled())
+            blit(x - 15 + 26, y + 4, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
         resetWidget.x = x + entryWidth - resetWidget.getWidth();
         resetWidget.y = y;
         resetWidget.active = isEditable() && getDefaultValue().isPresent();
         resetWidget.render(mouseX, mouseY, delta);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x + 24, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : -1);
+        MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : -1);
         if (expended) {
             int yy = y + 24;
             for(BaseListCell cell : cells) {
@@ -182,8 +187,12 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
         }
     }
     
+    public boolean insertInFront() {
+        return true;
+    }
+    
     public class ListLabelWidget implements Element {
-        private Rectangle rectangle = new Rectangle();
+        protected Rectangle rectangle = new Rectangle();
         
         @Override
         public boolean mouseClicked(double double_1, double double_2, int int_1) {
@@ -192,12 +201,17 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
             } else if (isInsideCreateNew(double_1, double_2)) {
                 expended = true;
                 C cell;
-                cells.add(0, cell = createNewInstance.apply(BaseListEntry.this));
-                widgets.add(0, cell);
+                if (insertInFront()) {
+                    cells.add(0, cell = createNewInstance.apply(BaseListEntry.this));
+                    widgets.add(0, cell);
+                } else {
+                    cells.add(cell = createNewInstance.apply(BaseListEntry.this));
+                    widgets.add(cell);
+                }
                 getScreen().setEdited(true, isRequiresRestart());
                 MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
-            } else if (isInsideDelete(double_1, double_2)) {
+            } else if (isDeleteButtonEnabled() && isInsideDelete(double_1, double_2)) {
                 BaseListCell focused = !expended && getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
                 if (focused != null) {
                     cells.remove(focused);
