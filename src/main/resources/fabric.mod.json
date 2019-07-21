@@ -20,7 +20,7 @@
       "me.shedaniel.clothconfig2.ClothConfigInitializer"
     ]
   },
-  "requires": {
+  "depends": {
     "fabricloader": ">=0.4.0"
   },
   "custom": {
