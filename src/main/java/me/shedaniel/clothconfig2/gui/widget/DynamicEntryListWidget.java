@@ -17,6 +17,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -481,12 +482,17 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     @Environment(EnvType.CLIENT)
     class Entries extends AbstractList<E> {
-        private final List<E> items;
+        private final ArrayList<E> items;
         
         private Entries() {
             this.items = Lists.newArrayList();
         }
-        
+    
+        @Override
+        public void clear() {
+            items.clear();
+        }
+    
         @Override
         public E get(int int_1) {
             return (E) this.items.get(int_1);
