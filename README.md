@@ -1,11 +1,11 @@
-# Cloth
+# Cloth [ ![Download](https://api.bintray.com/packages/shedaniel/cloth-config-2/config-1/images/download.svg) ](https://bintray.com/shedaniel/cloth-config-2/config-1/_latestVersion)
 ### Maven
 ```groovy
 repositories {
-    maven { url "https://minecraft.curseforge.com/api/maven"}
+    jcenter()
 }
 dependencies {
-    mmodCompile "cloth-config:ClothConfig:{RANDOMVERSION}"
+    'me.shedaniel.cloth:config-1:LATEST'
 }
 ```
 ### APIs
