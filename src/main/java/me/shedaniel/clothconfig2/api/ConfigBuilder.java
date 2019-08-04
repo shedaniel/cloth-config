@@ -70,7 +70,9 @@ public interface ConfigBuilder {
     
     ConfigBuilder setAfterInitConsumer(Consumer<Screen> afterInitConsumer);
     
-    ConfigEntryBuilderImpl getEntryBuilder();
+    default ConfigEntryBuilderImpl getEntryBuilder() {
+        return ConfigEntryBuilderImpl.create();
+    }
     
     Screen build();
     

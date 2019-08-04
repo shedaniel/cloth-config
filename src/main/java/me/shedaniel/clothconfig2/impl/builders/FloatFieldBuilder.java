@@ -4,12 +4,13 @@ import me.shedaniel.clothconfig2.gui.entries.FloatListEntry;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
     
     private Consumer<Float> saveConsumer = null;
-    private Supplier<Optional<String[]>> tooltipSupplier = null;
+    private Function<Float, Optional<String[]>> tooltipSupplier = f -> Optional.empty();
     private float value;
     private Float min = null, max = null;
     
@@ -38,18 +39,23 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
         return this;
     }
     
-    public FloatFieldBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public FloatFieldBuilder setTooltipSupplier(Function<Float, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
+    public FloatFieldBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+        this.tooltipSupplier = f -> tooltipSupplier.get();
+        return this;
+    }
+    
     public FloatFieldBuilder setTooltip(Optional<String[]> tooltip) {
-        this.tooltipSupplier = () -> tooltip;
+        this.tooltipSupplier = f -> tooltip;
         return this;
     }
     
     public FloatFieldBuilder setTooltip(String... tooltip) {
-        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        this.tooltipSupplier = f -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -75,11 +81,12 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
     
     @Override
     public FloatListEntry build() {
-        FloatListEntry entry = new FloatListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart());
+        FloatListEntry entry = new FloatListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)
             entry.setMaximum(max);
+        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         return entry;
     }
     

@@ -15,7 +15,7 @@ public class ConfigCategoryImpl implements ConfigCategory {
     private Supplier<List<Pair<String, Object>>> listSupplier;
     private Consumer<Identifier> backgroundConsumer;
     
-    public ConfigCategoryImpl(Consumer<Identifier> backgroundConsumer, Supplier<List<Pair<String, Object>>> listSupplier) {
+    ConfigCategoryImpl(Consumer<Identifier> backgroundConsumer, Supplier<List<Pair<String, Object>>> listSupplier) {
         this.listSupplier = listSupplier;
         this.backgroundConsumer = backgroundConsumer;
     }

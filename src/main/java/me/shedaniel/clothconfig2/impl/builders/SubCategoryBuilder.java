@@ -5,12 +5,13 @@ import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SubCategoryListEntry;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntry> implements List<AbstractConfigListEntry> {
     
     private List<AbstractConfigListEntry> entries;
-    private Supplier<Optional<String[]>> tooltipSupplier = null;
+    private Function<List<AbstractConfigListEntry>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
     private boolean expended = false;
     
     public SubCategoryBuilder(String resetButtonKey, String fieldNameKey) {
@@ -24,17 +25,22 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
     }
     
     public SubCategoryBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+        this.tooltipSupplier = list -> tooltipSupplier.get();
+        return this;
+    }
+    
+    public SubCategoryBuilder setTooltipSupplier(Function<List<AbstractConfigListEntry>, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
     public SubCategoryBuilder setTooltip(Optional<String[]> tooltip) {
-        this.tooltipSupplier = () -> tooltip;
+        this.tooltipSupplier = list -> tooltip;
         return this;
     }
     
     public SubCategoryBuilder setTooltip(String... tooltip) {
-        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -46,7 +52,7 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
     @Override
     public SubCategoryListEntry build() {
         SubCategoryListEntry entry = new SubCategoryListEntry(getFieldNameKey(), entries, expended);
-        entry.setTooltipSupplier(tooltipSupplier);
+        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         return entry;
     }
     

@@ -4,12 +4,13 @@ import me.shedaniel.clothconfig2.gui.entries.LongListEntry;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
     
     private Consumer<Long> saveConsumer = null;
-    private Supplier<Optional<String[]>> tooltipSupplier = null;
+    private Function<Long, Optional<String[]>> tooltipSupplier = l -> Optional.empty();
     private long value;
     private Long min = null, max = null;
     
@@ -39,17 +40,22 @@ public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
     }
     
     public LongFieldBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+        this.tooltipSupplier = l -> tooltipSupplier.get();
+        return this;
+    }
+    
+    public LongFieldBuilder setTooltipSupplier(Function<Long, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
     public LongFieldBuilder setTooltip(Optional<String[]> tooltip) {
-        this.tooltipSupplier = () -> tooltip;
+        this.tooltipSupplier = l -> tooltip;
         return this;
     }
     
     public LongFieldBuilder setTooltip(String... tooltip) {
-        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        this.tooltipSupplier = l -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -75,11 +81,12 @@ public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
     
     @Override
     public LongListEntry build() {
-        LongListEntry entry = new LongListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart());
+        LongListEntry entry = new LongListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)
             entry.setMaximum(max);
+        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         return entry;
     }
     

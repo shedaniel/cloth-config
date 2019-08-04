@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
     
     private Consumer<Long> saveConsumer = null;
-    private Supplier<Optional<String[]>> tooltipSupplier = null;
+    private Function<Long, Optional<String[]>> tooltipSupplier = l -> Optional.empty();
     private long value, max, min;
     private Function<Long, String> textGetter = null;
     
@@ -46,26 +46,34 @@ public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
         return this;
     }
     
-    public LongSliderBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public LongSliderBuilder setTooltipSupplier(Function<Long, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
+    public LongSliderBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+        this.tooltipSupplier = i -> tooltipSupplier.get();
+        return this;
+    }
+    
     public LongSliderBuilder setTooltip(Optional<String[]> tooltip) {
-        this.tooltipSupplier = () -> tooltip;
+        this.tooltipSupplier = i -> tooltip;
         return this;
     }
     
     public LongSliderBuilder setTooltip(String... tooltip) {
-        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
         return this;
     }
     
+    
     @Override
     public LongSliderEntry build() {
-        if (textGetter == null)
-            return new LongSliderEntry(getFieldNameKey(), min, max, value, saveConsumer, getResetButtonKey(), defaultValue, tooltipSupplier, isRequireRestart());
-        return new LongSliderEntry(getFieldNameKey(), min, max, value, saveConsumer, getResetButtonKey(), defaultValue, tooltipSupplier, isRequireRestart()).setTextGetter(textGetter);
+        LongSliderEntry entry = new LongSliderEntry(getFieldNameKey(), min, max, value, saveConsumer, getResetButtonKey(), defaultValue, null, isRequireRestart());
+        if (textGetter != null)
+            entry.setTextGetter(textGetter);
+        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        return entry;
     }
     
 }

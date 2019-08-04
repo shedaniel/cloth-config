@@ -4,12 +4,13 @@ import me.shedaniel.clothconfig2.gui.entries.IntegerListEntry;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
     
     private Consumer<Integer> saveConsumer = null;
-    private Supplier<Optional<String[]>> tooltipSupplier = null;
+    private Function<Integer, Optional<String[]>> tooltipSupplier = i -> Optional.empty();
     private int value;
     private Integer min = null, max = null;
     
@@ -38,18 +39,23 @@ public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
         return this;
     }
     
-    public IntFieldBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public IntFieldBuilder setTooltipSupplier(Function<Integer, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
+    public IntFieldBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+        this.tooltipSupplier = i -> tooltipSupplier.get();
+        return this;
+    }
+    
     public IntFieldBuilder setTooltip(Optional<String[]> tooltip) {
-        this.tooltipSupplier = () -> tooltip;
+        this.tooltipSupplier = i -> tooltip;
         return this;
     }
     
     public IntFieldBuilder setTooltip(String... tooltip) {
-        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -75,11 +81,12 @@ public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
     
     @Override
     public IntegerListEntry build() {
-        IntegerListEntry entry = new IntegerListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart());
+        IntegerListEntry entry = new IntegerListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)
             entry.setMaximum(max);
+        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         return entry;
     }
     

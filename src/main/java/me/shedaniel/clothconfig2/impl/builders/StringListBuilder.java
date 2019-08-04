@@ -2,6 +2,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.BaseListEntry;
 import me.shedaniel.clothconfig2.gui.entries.StringListListEntry;
+import net.minecraft.client.resource.language.I18n;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,14 +13,36 @@ import java.util.function.Supplier;
 public class StringListBuilder extends FieldBuilder<List<String>, StringListListEntry> {
     
     private Consumer<List<String>> saveConsumer = null;
-    private Supplier<Optional<String[]>> tooltipSupplier = null;
+    private Function<List<String>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
     private List<String> value;
     private boolean expended = false;
     private Function<BaseListEntry, StringListListEntry.StringListCell> createNewInstance;
+    private String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
+    private boolean deleteButtonEnabled = true, insertInFront = true;
     
     public StringListBuilder(String resetButtonKey, String fieldNameKey, List<String> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
+    }
+    
+    public StringListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
+        this.deleteButtonEnabled = deleteButtonEnabled;
+        return this;
+    }
+    
+    public StringListBuilder setInsertInFront(boolean insertInFront) {
+        this.insertInFront = insertInFront;
+        return this;
+    }
+    
+    public StringListBuilder setAddButtonTooltip(String addTooltip) {
+        this.addTooltip = addTooltip;
+        return this;
+    }
+    
+    public StringListBuilder setRemoveButtonTooltip(String removeTooltip) {
+        this.removeTooltip = removeTooltip;
+        return this;
     }
     
     public StringListBuilder requireRestart() {
@@ -53,25 +76,33 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
     }
     
     public StringListBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+        this.tooltipSupplier = list -> tooltipSupplier.get();
+        return this;
+    }
+    
+    public StringListBuilder setTooltipSupplier(Function<List<String>, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
     public StringListBuilder setTooltip(Optional<String[]> tooltip) {
-        this.tooltipSupplier = () -> tooltip;
+        this.tooltipSupplier = list -> tooltip;
         return this;
     }
     
     public StringListBuilder setTooltip(String... tooltip) {
-        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }
     
     @Override
     public StringListListEntry build() {
-        StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, expended, tooltipSupplier, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart());
+        StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, expended, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart());
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
+        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        entry.setAddTooltip(addTooltip);
+        entry.setAddTooltip(removeTooltip);
         return entry;
     }
     

@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, EnumListEntry<T>> {
     
     private Consumer<T> saveConsumer = null;
-    private Supplier<Optional<String[]>> tooltipSupplier = null;
+    private Function<T, Optional<String[]>> tooltipSupplier = e -> Optional.empty();
     private T value;
     private Class<T> clazz;
     private Function<Enum, String> enumNameProvider = EnumListEntry.DEFAULT_NAME_PROVIDER;
@@ -45,18 +45,23 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
         return this;
     }
     
-    public EnumSelectorBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public EnumSelectorBuilder setTooltipSupplier(Function<T, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
+    public EnumSelectorBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+        this.tooltipSupplier = e -> tooltipSupplier.get();
+        return this;
+    }
+    
     public EnumSelectorBuilder setTooltip(Optional<String[]> tooltip) {
-        this.tooltipSupplier = () -> tooltip;
+        this.tooltipSupplier = e -> tooltip;
         return this;
     }
     
     public EnumSelectorBuilder setTooltip(String... tooltip) {
-        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        this.tooltipSupplier = e -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -68,7 +73,9 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
     
     @Override
     public EnumListEntry<T> build() {
-        return new EnumListEntry<T>(getFieldNameKey(), clazz, value, getResetButtonKey(), defaultValue, saveConsumer, enumNameProvider, tooltipSupplier, isRequireRestart());
+        EnumListEntry<T> entry = new EnumListEntry<>(getFieldNameKey(), clazz, value, getResetButtonKey(), defaultValue, saveConsumer, enumNameProvider, null, isRequireRestart());
+        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        return entry;
     }
     
 }

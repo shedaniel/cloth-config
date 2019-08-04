@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry> {
     
     private Consumer<Boolean> saveConsumer = null;
-    private Supplier<Optional<String[]>> tooltipSupplier = null;
+    private Function<Boolean, Optional<String[]>> tooltipSupplier = bool -> Optional.empty();
     private boolean value;
     private Function<Boolean, String> yesNoTextSupplier = bool -> bool ? "§aYes" : "§cNo";
     
@@ -40,18 +40,23 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
         return this;
     }
     
-    public BooleanToggleBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public BooleanToggleBuilder setTooltipSupplier(Function<Boolean, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
+    public BooleanToggleBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+        this.tooltipSupplier = bool -> tooltipSupplier.get();
+        return this;
+    }
+    
     public BooleanToggleBuilder setTooltip(Optional<String[]> tooltip) {
-        this.tooltipSupplier = () -> tooltip;
+        this.tooltipSupplier = bool -> tooltip;
         return this;
     }
     
     public BooleanToggleBuilder setTooltip(String... tooltip) {
-        this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
+        this.tooltipSupplier = bool -> Optional.ofNullable(tooltip);
         return this;
     }
     
@@ -63,12 +68,14 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
     
     @Override
     public BooleanListEntry build() {
-        return new BooleanListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, tooltipSupplier, isRequireRestart()) {
+        BooleanListEntry entry = new BooleanListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart()) {
             @Override
             public String getYesNoText(boolean bool) {
                 return yesNoTextSupplier.apply(bool);
             }
         };
+        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        return entry;
     }
     
 }

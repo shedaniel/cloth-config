@@ -18,6 +18,15 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
         return new ConfigEntryBuilderImpl();
     }
     
+    public static ConfigEntryBuilderImpl createImmutable() {
+        return new ConfigEntryBuilderImpl() {
+            @Override
+            public ConfigEntryBuilder setResetButtonKey(String resetButtonKey) {
+                throw new UnsupportedOperationException("This is an immutable entry builder!");
+            }
+        };
+    }
+    
     @Override
     public String getResetButtonKey() {
         return resetButtonKey;
@@ -69,6 +78,11 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     @Override
     public BooleanToggleBuilder startBooleanToggle(String fieldNameKey, boolean value) {
         return new BooleanToggleBuilder(resetButtonKey, fieldNameKey, value);
+    }
+    
+    @Override
+    public StringFieldBuilder startStrField(String fieldNameKey, String value) {
+        return new StringFieldBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
