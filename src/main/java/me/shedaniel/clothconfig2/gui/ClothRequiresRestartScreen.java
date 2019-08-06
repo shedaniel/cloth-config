@@ -4,7 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.text.TranslatableText;
 
 public class ClothRequiresRestartScreen extends ConfirmScreen {
     
@@ -14,7 +14,7 @@ public class ClothRequiresRestartScreen extends ConfirmScreen {
                 MinecraftClient.getInstance().scheduleStop();
             else
                 MinecraftClient.getInstance().openScreen(parent);
-        }, new TranslatableComponent("text.cloth-config.restart_required"), new TranslatableComponent("text.cloth-config.restart_required_sub"), I18n.translate("text.cloth-config.exit_minecraft"), I18n.translate("text.cloth-config.ignore_restart"));
+        }, new TranslatableText("text.cloth-config.restart_required"), new TranslatableText("text.cloth-config.restart_required_sub"), I18n.translate("text.cloth-config.exit_minecraft"), I18n.translate("text.cloth-config.ignore_restart"));
     }
     
 }
