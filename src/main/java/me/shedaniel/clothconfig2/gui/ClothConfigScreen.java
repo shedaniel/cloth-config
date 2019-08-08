@@ -202,7 +202,7 @@ public abstract class ClothConfigScreen extends Screen {
                 if (displayErrors)
                     for(List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values())) {
                         for(AbstractConfigEntry entry : entries)
-                            if (entry.getError().isPresent()) {
+                            if (entry.getConfigError().isPresent()) {
                                 hasErrors = true;
                                 break;
                             }
@@ -343,8 +343,8 @@ public abstract class ClothConfigScreen extends Screen {
             List<String> errors = Lists.newArrayList();
             for(List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values()))
                 for(AbstractConfigEntry entry : entries)
-                    if (entry.getError().isPresent())
-                        errors.add(((Optional<String>) entry.getError()).get());
+                    if (entry.getConfigError().isPresent())
+                        errors.add(((Optional<String>) entry.getConfigError()).get());
             if (errors.size() > 0) {
                 minecraft.getTextureManager().bindTexture(CONFIG_TEX);
                 GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);

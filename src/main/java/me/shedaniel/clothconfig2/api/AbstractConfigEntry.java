@@ -4,9 +4,11 @@ import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> {
     private ClothConfigScreen screen;
+    private Supplier<Optional<String>> errorSupplier;
     
     public abstract boolean isRequiresRestart();
     
@@ -15,6 +17,16 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     public abstract String getFieldName();
     
     public abstract T getValue();
+    
+    public Optional<String> getConfigError() {
+        if (errorSupplier != null && errorSupplier.get().isPresent())
+            return errorSupplier.get();
+        return getError();
+    }
+    
+    public void setErrorSupplier(Supplier<Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+    }
     
     public Optional<String> getError() {
         return Optional.empty();

@@ -21,6 +21,11 @@ public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> 
         this.min = min;
     }
     
+    public IntSliderBuilder setErrorSupplier(Function<Integer, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public IntSliderBuilder requireRestart() {
         requireRestart(true);
         return this;
@@ -82,6 +87,8 @@ public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> 
         if (textGetter != null)
             entry.setTextGetter(textGetter);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

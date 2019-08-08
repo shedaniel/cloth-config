@@ -24,6 +24,11 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
         this.clazz = clazz;
     }
     
+    public EnumSelectorBuilder<T> setErrorSupplier(Function<T, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public EnumSelectorBuilder<T> requireRestart() {
         requireRestart(true);
         return this;
@@ -75,6 +80,8 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
     public EnumListEntry<T> build() {
         EnumListEntry<T> entry = new EnumListEntry<>(getFieldNameKey(), clazz, value, getResetButtonKey(), defaultValue, saveConsumer, enumNameProvider, null, isRequireRestart());
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

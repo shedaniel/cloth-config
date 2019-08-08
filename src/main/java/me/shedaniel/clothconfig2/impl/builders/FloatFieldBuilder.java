@@ -19,6 +19,11 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
         this.value = value;
     }
     
+    public FloatFieldBuilder setErrorSupplier(Function<Float, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public FloatFieldBuilder requireRestart() {
         requireRestart(true);
         return this;
@@ -87,6 +92,8 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
         if (max != null)
             entry.setMaximum(max);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

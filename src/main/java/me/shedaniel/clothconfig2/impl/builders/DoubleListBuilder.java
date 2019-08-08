@@ -26,6 +26,11 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         this.value = value;
     }
     
+    public DoubleListBuilder setErrorSupplier(Function<List<Double>, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public DoubleListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
         this.deleteButtonEnabled = deleteButtonEnabled;
         return this;
@@ -137,7 +142,9 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
             entry.setCreateNewInstance(createNewInstance);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         entry.setAddTooltip(addTooltip);
-        entry.setAddTooltip(removeTooltip);
+        entry.setRemoveTooltip(removeTooltip);
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

@@ -4,10 +4,6 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
     private String fieldName;
     private boolean editable = true;
     private boolean requiresRestart;
-    //
-    //    public AbstractConfigListEntry(String fieldName) {
-    //        this(fieldName, false);
-    //    }
     
     public AbstractConfigListEntry(String fieldName, boolean requiresRestart) {
         this.fieldName = fieldName;

@@ -26,6 +26,11 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
         this.value = value;
     }
     
+    public IntListBuilder setErrorSupplier(Function<List<Integer>, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public IntListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
         this.deleteButtonEnabled = deleteButtonEnabled;
         return this;
@@ -137,7 +142,9 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
             entry.setCreateNewInstance(createNewInstance);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         entry.setAddTooltip(addTooltip);
-        entry.setAddTooltip(removeTooltip);
+        entry.setRemoveTooltip(removeTooltip);
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

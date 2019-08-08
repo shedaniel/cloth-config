@@ -19,6 +19,11 @@ public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
         this.value = value;
     }
     
+    public DoubleFieldBuilder setErrorSupplier(Function<Double, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public DoubleFieldBuilder requireRestart() {
         requireRestart(true);
         return this;
@@ -87,6 +92,8 @@ public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
         if (max != null)
             entry.setMaximum(max);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

@@ -21,6 +21,11 @@ public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
         this.min = min;
     }
     
+    public LongSliderBuilder setErrorSupplier(Function<Long, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public LongSliderBuilder requireRestart() {
         requireRestart(true);
         return this;
@@ -73,6 +78,8 @@ public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
         if (textGetter != null)
             entry.setTextGetter(textGetter);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

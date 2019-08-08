@@ -31,6 +31,11 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         return this;
     }
     
+    public FloatListBuilder setErrorSupplier(Function<List<Float>, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public FloatListBuilder setInsertInFront(boolean insertInFront) {
         this.insertInFront = insertInFront;
         return this;
@@ -137,7 +142,9 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
             entry.setCreateNewInstance(createNewInstance);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         entry.setAddTooltip(addTooltip);
-        entry.setAddTooltip(removeTooltip);
+        entry.setRemoveTooltip(removeTooltip);
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

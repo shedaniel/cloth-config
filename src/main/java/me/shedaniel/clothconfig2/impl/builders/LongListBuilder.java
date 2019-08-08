@@ -26,6 +26,11 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
         this.value = value;
     }
     
+    public LongListBuilder setErrorSupplier(Function<List<Long>, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public LongListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
         this.deleteButtonEnabled = deleteButtonEnabled;
         return this;
@@ -137,7 +142,9 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
             entry.setCreateNewInstance(createNewInstance);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         entry.setAddTooltip(addTooltip);
-        entry.setAddTooltip(removeTooltip);
+        entry.setRemoveTooltip(removeTooltip);
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

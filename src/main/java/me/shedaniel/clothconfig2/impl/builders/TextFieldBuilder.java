@@ -20,6 +20,11 @@ public class TextFieldBuilder extends FieldBuilder<String, StringListEntry> {
         this.value = value;
     }
     
+    public TextFieldBuilder setErrorSupplier(Function<String, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public TextFieldBuilder requireRestart() {
         requireRestart(true);
         return this;
@@ -64,6 +69,8 @@ public class TextFieldBuilder extends FieldBuilder<String, StringListEntry> {
     public StringListEntry build() {
         StringListEntry entry = new StringListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

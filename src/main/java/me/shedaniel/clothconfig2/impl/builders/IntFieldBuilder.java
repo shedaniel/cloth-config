@@ -24,6 +24,11 @@ public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
         return this;
     }
     
+    public IntFieldBuilder setErrorSupplier(Function<Integer, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public IntFieldBuilder setSaveConsumer(Consumer<Integer> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
@@ -87,6 +92,8 @@ public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
         if (max != null)
             entry.setMaximum(max);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

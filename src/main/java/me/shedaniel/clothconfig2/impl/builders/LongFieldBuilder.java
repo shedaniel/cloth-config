@@ -19,6 +19,11 @@ public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
         this.value = value;
     }
     
+    public LongFieldBuilder setErrorSupplier(Function<Long, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public LongFieldBuilder requireRestart() {
         requireRestart(true);
         return this;
@@ -87,6 +92,8 @@ public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
         if (max != null)
             entry.setMaximum(max);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

@@ -25,6 +25,11 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
         this.value = value;
     }
     
+    public StringListBuilder setErrorSupplier(Function<List<String>, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public StringListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
         this.deleteButtonEnabled = deleteButtonEnabled;
         return this;
@@ -102,7 +107,9 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
             entry.setCreateNewInstance(createNewInstance);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         entry.setAddTooltip(addTooltip);
-        entry.setAddTooltip(removeTooltip);
+        entry.setRemoveTooltip(removeTooltip);
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     

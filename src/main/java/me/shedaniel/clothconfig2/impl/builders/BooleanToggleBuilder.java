@@ -20,6 +20,11 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
         this.value = value;
     }
     
+    public BooleanToggleBuilder setErrorSupplier(Function<Boolean, Optional<String>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return this;
+    }
+    
     public BooleanToggleBuilder requireRestart() {
         requireRestart(true);
         return this;
@@ -75,6 +80,8 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
             }
         };
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        if (errorSupplier != null)
+            entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
     
