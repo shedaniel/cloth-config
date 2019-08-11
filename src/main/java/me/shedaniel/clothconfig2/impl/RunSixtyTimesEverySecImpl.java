@@ -17,7 +17,13 @@ public class RunSixtyTimesEverySecImpl {
     static {
         EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             TICKS_LIST.removeIf(Objects::isNull);
-            TICKS_LIST.iterator().forEachRemaining(RunSixtyTimesEverySec::run);
+            TICKS_LIST.iterator().forEachRemaining(run -> {
+                try {
+                    run.run();
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
+            });
         }, 0, 1000 / 60, TimeUnit.MILLISECONDS);
     }
     
