@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlStateManager;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import me.shedaniel.math.api.Rectangle;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.GuiLighting;
@@ -11,7 +12,6 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 

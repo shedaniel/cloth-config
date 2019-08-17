@@ -2,8 +2,8 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.QueuedTooltip;
+import me.shedaniel.math.api.Point;
 
-import java.awt.*;
 import java.util.Optional;
 import java.util.function.Supplier;
 

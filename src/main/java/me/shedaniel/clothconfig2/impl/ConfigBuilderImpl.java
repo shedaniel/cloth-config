@@ -32,7 +32,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     
     @Deprecated
     public ConfigBuilderImpl() {
-    
+
     }
     
     @Override

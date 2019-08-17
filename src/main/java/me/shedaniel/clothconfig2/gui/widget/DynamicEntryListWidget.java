@@ -487,12 +487,12 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         private Entries() {
             this.items = Lists.newArrayList();
         }
-    
+        
         @Override
         public void clear() {
             items.clear();
         }
-    
+        
         @Override
         public E get(int int_1) {
             return (E) this.items.get(int_1);

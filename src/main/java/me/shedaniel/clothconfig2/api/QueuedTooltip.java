@@ -1,8 +1,8 @@
 package me.shedaniel.clothconfig2.api;
 
 import com.google.common.collect.Lists;
+import me.shedaniel.math.api.Point;
 
-import java.awt.*;
 import java.util.Collections;
 import java.util.List;
 
