@@ -1,7 +1,7 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
+import me.shedaniel.math.compat.RenderHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -160,12 +160,12 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         this.drawBackground();
         int scrollbarPosition = this.getScrollbarPosition();
         int int_4 = scrollbarPosition + 6;
-        GlStateManager.disableLighting();
-        GlStateManager.disableFog();
+        RenderHelper.disableLighting();
+        RenderHelper.disableFog();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBufferBuilder();
         this.client.getTextureManager().bindTexture(backgroundLocation);
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderHelper.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         float float_2 = 32.0F;
         buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
         buffer.vertex(this.left, this.bottom, 0.0D).texture(this.left / 32.0F, ((this.bottom + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).next();
@@ -179,14 +179,14 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             this.renderHeader(rowLeft, startY, tessellator);
         
         this.renderList(rowLeft, startY, mouseX, mouseY, delta);
-        GlStateManager.disableDepthTest();
+        RenderHelper.disableDepthTest();
         this.renderHoleBackground(0, this.top, 255, 255);
         this.renderHoleBackground(this.bottom, this.height, 255, 255);
-        GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
-        GlStateManager.disableAlphaTest();
-        GlStateManager.shadeModel(7425);
-        GlStateManager.disableTexture();
+        RenderHelper.enableBlend();
+        RenderHelper.blendFuncSeparate(770, 771, 0, 1);
+        RenderHelper.disableAlphaTest();
+        RenderHelper.shadeModel(7425);
+        RenderHelper.disableTexture();
         buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
         buffer.vertex(this.left, this.top + 4, 0.0D).texture(0.0D, 1.0D).color(0, 0, 0, 0).next();
         buffer.vertex(this.right, this.top + 4, 0.0D).texture(1.0D, 1.0D).color(0, 0, 0, 0).next();
@@ -203,10 +203,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         renderScrollBar(tessellator, buffer, maxScroll, scrollbarPosition, int_4);
         
         this.renderDecorations(mouseX, mouseY);
-        GlStateManager.enableTexture();
-        GlStateManager.shadeModel(7424);
-        GlStateManager.enableAlphaTest();
-        GlStateManager.disableBlend();
+        RenderHelper.enableTexture();
+        RenderHelper.shadeModel(7424);
+        RenderHelper.enableAlphaTest();
+        RenderHelper.disableBlend();
     }
     
     protected void renderScrollBar(Tessellator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
@@ -386,23 +386,23 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             if (this.visible && this.isSelected(renderIndex)) {
                 itemMinX = this.left + this.width / 2 - itemWidth / 2;
                 itemMaxX = itemMinX + itemWidth;
-                GlStateManager.disableTexture();
+                RenderHelper.disableTexture();
                 float float_2 = this.isFocused() ? 1.0F : 0.5F;
-                GlStateManager.color4f(float_2, float_2, float_2, 1.0F);
+                RenderHelper.color4f(float_2, float_2, float_2, 1.0F);
                 buffer.begin(7, VertexFormats.POSITION);
                 buffer.vertex((double) itemMinX, (double) (itemY + itemHeight + 2), 0.0D).next();
                 buffer.vertex((double) itemMaxX, (double) (itemY + itemHeight + 2), 0.0D).next();
                 buffer.vertex((double) itemMaxX, (double) (itemY - 2), 0.0D).next();
                 buffer.vertex((double) itemMinX, (double) (itemY - 2), 0.0D).next();
                 tessellator.draw();
-                GlStateManager.color4f(0.0F, 0.0F, 0.0F, 1.0F);
+                RenderHelper.color4f(0.0F, 0.0F, 0.0F, 1.0F);
                 buffer.begin(7, VertexFormats.POSITION);
                 buffer.vertex((double) (itemMinX + 1), (double) (itemY + itemHeight + 1), 0.0D).next();
                 buffer.vertex((double) (itemMaxX - 1), (double) (itemY + itemHeight + 1), 0.0D).next();
                 buffer.vertex((double) (itemMaxX - 1), (double) (itemY - 1), 0.0D).next();
                 buffer.vertex((double) (itemMinX + 1), (double) (itemY - 1), 0.0D).next();
                 tessellator.draw();
-                GlStateManager.enableTexture();
+                RenderHelper.enableTexture();
             }
             
             int y = this.getRowTop(renderIndex);
@@ -432,7 +432,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         Tessellator tessellator_1 = Tessellator.getInstance();
         BufferBuilder bufferBuilder_1 = tessellator_1.getBufferBuilder();
         this.client.getTextureManager().bindTexture(backgroundLocation);
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderHelper.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         float float_1 = 32.0F;
         bufferBuilder_1.begin(7, VertexFormats.POSITION_UV_COLOR);
         bufferBuilder_1.vertex((double) this.left, (double) int_2, 0.0D).texture(0.0D, (double) ((float) int_2 / 32.0F)).color(64, 64, 64, int_4).next();

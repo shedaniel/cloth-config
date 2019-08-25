@@ -1,10 +1,10 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
 import me.shedaniel.clothconfig2.api.QueuedTooltip;
 import me.shedaniel.math.api.Point;
 import me.shedaniel.math.api.Rectangle;
+import me.shedaniel.math.compat.RenderHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
@@ -166,7 +166,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
         }
         MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         GuiLighting.disable();
-        GlStateManager.color4f(1, 1, 1, 1);
+        RenderHelper.color4f(1, 1, 1, 1);
         BaseListCell focused = !expended || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);

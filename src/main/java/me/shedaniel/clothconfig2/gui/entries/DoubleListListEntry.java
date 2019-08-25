@@ -34,12 +34,12 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
         expended = defaultExpended;
     }
     
-    public void setCellErrorSupplier(Function<Double, Optional<String>> cellErrorSupplier) {
-        this.cellErrorSupplier = cellErrorSupplier;
-    }
-    
     public Function<Double, Optional<String>> getCellErrorSupplier() {
         return cellErrorSupplier;
+    }
+    
+    public void setCellErrorSupplier(Function<Double, Optional<String>> cellErrorSupplier) {
+        this.cellErrorSupplier = cellErrorSupplier;
     }
     
     @Override

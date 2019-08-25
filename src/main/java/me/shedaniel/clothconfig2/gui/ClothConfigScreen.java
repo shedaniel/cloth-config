@@ -3,15 +3,13 @@ package me.shedaniel.clothconfig2.gui;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AtomicDouble;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.QueuedTooltip;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import me.shedaniel.math.api.Rectangle;
+import me.shedaniel.math.compat.RenderHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
@@ -241,11 +239,11 @@ public abstract class ClothConfigScreen extends Screen {
             @Override
             public void renderButton(int int_1, int int_2, float float_1) {
                 minecraft.getTextureManager().bindTexture(CONFIG_TEX);
-                GlStateManager.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+                RenderHelper.color4f(1.0F, 1.0F, 1.0F, this.alpha);
                 int int_3 = this.getYImage(this.isHovered());
-                GlStateManager.enableBlend();
-                GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
-                GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+                RenderHelper.enableBlend();
+                RenderHelper.blendFuncSeparate(770, 771, 0, 1);
+                RenderHelper.blendFunc(770, 771);
                 this.blit(x, y, 12, 18 * int_3, width, height);
             }
         });
@@ -266,11 +264,11 @@ public abstract class ClothConfigScreen extends Screen {
             @Override
             public void renderButton(int int_1, int int_2, float float_1) {
                 minecraft.getTextureManager().bindTexture(CONFIG_TEX);
-                GlStateManager.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+                RenderHelper.color4f(1.0F, 1.0F, 1.0F, this.alpha);
                 int int_3 = this.getYImage(this.isHovered());
-                GlStateManager.enableBlend();
-                GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
-                GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+                RenderHelper.enableBlend();
+                RenderHelper.blendFuncSeparate(770, 771, 0, 1);
+                RenderHelper.blendFunc(770, 771);
                 this.blit(x, y, 0, 18 * int_3, width, height);
             }
         });
@@ -359,7 +357,7 @@ public abstract class ClothConfigScreen extends Screen {
                         errors.add(((Optional<String>) entry.getConfigError()).get());
             if (errors.size() > 0) {
                 minecraft.getTextureManager().bindTexture(CONFIG_TEX);
-                GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+                RenderHelper.color4f(1.0F, 1.0F, 1.0F, 1.0F);
                 blit(10, 10, 0, 54, 3, 11);
                 if (errors.size() == 1)
                     drawString(minecraft.textRenderer, "§c" + errors.get(0), 18, 12, -1);
@@ -368,7 +366,7 @@ public abstract class ClothConfigScreen extends Screen {
             }
         } else if (!isEditable()) {
             minecraft.getTextureManager().bindTexture(CONFIG_TEX);
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderHelper.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             blit(10, 10, 0, 54, 3, 11);
             drawString(minecraft.textRenderer, "§c" + I18n.translate("text.cloth-config.not_editable"), 18, 12, -1);
         }
@@ -382,11 +380,11 @@ public abstract class ClothConfigScreen extends Screen {
     }
     
     private void drawShades() {
-        GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ZERO, DestFactor.ONE);
-        GlStateManager.disableAlphaTest();
-        GlStateManager.shadeModel(7425);
-        GlStateManager.disableTexture();
+        RenderHelper.enableBlend();
+        RenderHelper.blendFuncSeparate(770, 771, 0, 1);
+        RenderHelper.disableAlphaTest();
+        RenderHelper.shadeModel(7425);
+        RenderHelper.disableTexture();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
@@ -401,17 +399,17 @@ public abstract class ClothConfigScreen extends Screen {
         buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0D).texture(1.0D, 0.0D).color(0, 0, 0, 0).next();
         buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMaxY() - 4, 0.0D).texture(0.0D, 0.0D).color(0, 0, 0, 0).next();
         tessellator.draw();
-        GlStateManager.enableTexture();
-        GlStateManager.shadeModel(7424);
-        GlStateManager.enableAlphaTest();
-        GlStateManager.disableBlend();
+        RenderHelper.enableTexture();
+        RenderHelper.shadeModel(7424);
+        RenderHelper.enableAlphaTest();
+        RenderHelper.disableBlend();
     }
     
     protected void overlayBackground(Rectangle rect, int red, int green, int blue, int startAlpha, int endAlpha) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBufferBuilder();
         minecraft.getTextureManager().bindTexture(getBackgroundLocation());
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderHelper.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         float f = 32.0F;
         buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
         buffer.vertex(rect.getMinX(), rect.getMaxY(), 0.0D).texture(rect.getMinX() / 32.0D, rect.getMaxY() / 32.0D).color(red, green, blue, endAlpha).next();
