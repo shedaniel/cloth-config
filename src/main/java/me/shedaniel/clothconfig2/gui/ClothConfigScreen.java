@@ -99,17 +99,29 @@ public abstract class ClothConfigScreen extends Screen {
             list.forEach(entry -> entry.setScreen(this));
             tabbedEntries.put(tab, list);
         });
+        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+        this.tabs = tabbedEntries.keySet().stream().map(s -> new Pair<>(s, textRenderer.getStringWidth(I18n.translate(s)) + 8)).collect(Collectors.toList());
         this.nextTabIndex = 0;
         this.selectedTabIndex = 0;
+        for(int i = 0; i < tabs.size(); i++) {
+            Pair<String, Integer> pair = tabs.get(i);
+            if (pair.getLeft().equals(getFallbackCategory())) {
+                this.nextTabIndex = i;
+                this.selectedTabIndex = i;
+                break;
+            }
+        }
         this.confirmSave = confirmSave;
         this.edited = false;
         this.requiresRestart = false;
-        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        this.tabs = tabbedEntries.keySet().stream().map(s -> new Pair<>(s, textRenderer.getStringWidth(I18n.translate(s)) + 8)).collect(Collectors.toList());
         this.tabsScrollProgress = 0d;
         this.tabButtons = Lists.newArrayList();
         this.displayErrors = displayErrors;
         this.categoryBackgroundLocation = categoryBackgroundLocation;
+    }
+    
+    public String getFallbackCategory() {
+        return tabs.get(0).getLeft();
     }
     
     @Override
@@ -461,6 +473,14 @@ public abstract class ClothConfigScreen extends Screen {
         
         protected final void clearStuff() {
             this.clearItems();
+        }
+        
+        @Override
+        public boolean mouseClicked(double double_1, double double_2, int int_1) {
+            boolean b = super.mouseClicked(double_1, double_2, int_1);
+            if (!scroller.isRegistered())
+                scroller.registerTick();
+            return b;
         }
     }
     

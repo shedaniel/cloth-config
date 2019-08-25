@@ -14,10 +14,17 @@ public class ConfigCategoryImpl implements ConfigCategory {
     
     private Supplier<List<Pair<String, Object>>> listSupplier;
     private Consumer<Identifier> backgroundConsumer;
+    private String categoryKey;
     
-    ConfigCategoryImpl(Consumer<Identifier> backgroundConsumer, Supplier<List<Pair<String, Object>>> listSupplier) {
+    ConfigCategoryImpl(String categoryKey, Consumer<Identifier> backgroundConsumer, Supplier<List<Pair<String, Object>>> listSupplier) {
         this.listSupplier = listSupplier;
         this.backgroundConsumer = backgroundConsumer;
+        this.categoryKey = categoryKey;
+    }
+    
+    @Override
+    public String getCategoryKey() {
+        return categoryKey;
     }
     
     @Override

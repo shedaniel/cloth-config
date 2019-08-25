@@ -28,6 +28,10 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
         this.editable = editable;
     }
     
+    public final int getPreferredTextColor() {
+        return getConfigError().isPresent() ? 16733525 : 16777215;
+    }
+    
     @Override
     public String getFieldName() {
         return fieldName;

@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListListEntry> {
     
+    protected Function<Double, Optional<String>> cellErrorSupplier;
     private Consumer<List<Double>> saveConsumer = null;
     private Function<List<Double>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
     private List<Double> value;
@@ -24,6 +25,15 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
     public DoubleListBuilder(String resetButtonKey, String fieldNameKey, List<Double> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
+    }
+    
+    public Function<Double, Optional<String>> getCellErrorSupplier() {
+        return cellErrorSupplier;
+    }
+    
+    public DoubleListBuilder setCellErrorSupplier(Function<Double, Optional<String>> cellErrorSupplier) {
+        this.cellErrorSupplier = cellErrorSupplier;
+        return this;
     }
     
     public DoubleListBuilder setErrorSupplier(Function<List<Double>, Optional<String>> errorSupplier) {
@@ -140,6 +150,7 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
             entry.setMaximum(max);
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
+        entry.setCellErrorSupplier(cellErrorSupplier);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         entry.setAddTooltip(addTooltip);
         entry.setRemoveTooltip(removeTooltip);

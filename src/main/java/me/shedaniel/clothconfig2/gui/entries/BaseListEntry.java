@@ -112,10 +112,10 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
     public Optional<String> getError() {
         String error = null;
         for(BaseListCell entry : cells)
-            if (entry.getError().isPresent()) {
+            if (entry.getConfigError().isPresent()) {
                 if (error != null)
                     return Optional.ofNullable(I18n.translate("text.cloth-config.multi_error"));
-                return Optional.ofNullable((String) entry.getError().get());
+                return Optional.ofNullable((String) entry.getConfigError().get());
             }
         return Optional.ofNullable(error);
     }
@@ -178,7 +178,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
         resetWidget.y = y;
         resetWidget.active = isEditable() && getDefaultValue().isPresent();
         resetWidget.render(mouseX, mouseY, delta);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : -1);
+        MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
         if (expended) {
             int yy = y + 24;
             for(BaseListCell cell : cells) {

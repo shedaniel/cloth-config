@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface ConfigCategory {
     
+    String getCategoryKey();
+    
     @Deprecated
     List<Object> getEntries();
     

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEntry.DoubleListCell> {
     
     private double minimum, maximum;
+    private Function<Double, Optional<String>> cellErrorSupplier;
     
     @Deprecated
     public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey) {
@@ -33,9 +34,17 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
         expended = defaultExpended;
     }
     
+    public void setCellErrorSupplier(Function<Double, Optional<String>> cellErrorSupplier) {
+        this.cellErrorSupplier = cellErrorSupplier;
+    }
+    
+    public Function<Double, Optional<String>> getCellErrorSupplier() {
+        return cellErrorSupplier;
+    }
+    
     @Override
     public List<Double> getValue() {
-        return cells.stream().map(cell -> Double.valueOf(cell.widget.getText())).collect(Collectors.toList());
+        return cells.stream().map(DoubleListCell::getValue).collect(Collectors.toList());
     }
     
     public DoubleListListEntry setMaximum(Double maximum) {
@@ -72,20 +81,13 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
         
         public DoubleListCell(double value, DoubleListListEntry listListEntry) {
             this.listListEntry = listListEntry;
+            this.setErrorSupplier(() -> listListEntry.cellErrorSupplier == null ? Optional.empty() : listListEntry.getCellErrorSupplier().apply(getValue()));
             widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "") {
                 @Override
                 public void render(int int_1, int int_2, float Double_1) {
                     boolean f = isFocused();
                     setFocused(isSelected);
-                    try {
-                        double i = Double.valueOf(getText());
-                        if (i < listListEntry.minimum || i > listListEntry.maximum)
-                            widget.setEditableColor(16733525);
-                        else
-                            widget.setEditableColor(14737632);
-                    } catch (NumberFormatException ex) {
-                        widget.setEditableColor(16733525);
-                    }
+                    widget.setEditableColor(getPreferredTextColor());
                     super.render(int_1, int_2, Double_1);
                     setFocused(f);
                 }
@@ -104,6 +106,14 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
             });
         }
         
+        public double getValue() {
+            try {
+                return Double.valueOf(widget.getText());
+            } catch (NumberFormatException e) {
+                return 0d;
+            }
+        }
+        
         @Override
         public Optional<String> getError() {
             try {
@@ -113,7 +123,7 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
                 else if (i < listListEntry.minimum)
                     return Optional.of(I18n.translate("text.cloth-config.error.too_small", listListEntry.minimum));
             } catch (NumberFormatException ex) {
-                return Optional.of(I18n.translate("text.cloth-config.error.not_valid_number_Double"));
+                return Optional.of(I18n.translate("text.cloth-config.error.not_valid_number_double"));
             }
             return Optional.empty();
         }
@@ -132,7 +142,7 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
             this.isSelected = isSelected;
             widget.render(mouseX, mouseY, delta);
             if (isSelected && listListEntry.isEditable())
-                fill(x, y + 12, x + entryWidth - 12, y + 13, getError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
+                fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
         
         @Override

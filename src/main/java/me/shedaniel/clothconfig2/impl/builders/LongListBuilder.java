@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry> {
     
+    protected Function<Long, Optional<String>> cellErrorSupplier;
     private Consumer<List<Long>> saveConsumer = null;
     private Function<List<Long>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
     private List<Long> value;
@@ -24,6 +25,15 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
     public LongListBuilder(String resetButtonKey, String fieldNameKey, List<Long> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
+    }
+    
+    public Function<Long, Optional<String>> getCellErrorSupplier() {
+        return cellErrorSupplier;
+    }
+    
+    public LongListBuilder setCellErrorSupplier(Function<Long, Optional<String>> cellErrorSupplier) {
+        this.cellErrorSupplier = cellErrorSupplier;
+        return this;
     }
     
     public LongListBuilder setErrorSupplier(Function<List<Long>, Optional<String>> errorSupplier) {
@@ -140,6 +150,7 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
             entry.setMaximum(max);
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
+        entry.setCellErrorSupplier(cellErrorSupplier);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         entry.setAddTooltip(addTooltip);
         entry.setRemoveTooltip(removeTooltip);

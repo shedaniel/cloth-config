@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.LongListCell> {
     
     private long minimum, maximum;
+    private Function<Long, Optional<String>> cellErrorSupplier;
     
     @Deprecated
     public LongListListEntry(String fieldName, List<Long> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, String resetButtonKey) {
@@ -33,9 +34,17 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
         expended = defaultExpended;
     }
     
+    public Function<Long, Optional<String>> getCellErrorSupplier() {
+        return cellErrorSupplier;
+    }
+    
+    public void setCellErrorSupplier(Function<Long, Optional<String>> cellErrorSupplier) {
+        this.cellErrorSupplier = cellErrorSupplier;
+    }
+    
     @Override
     public List<Long> getValue() {
-        return cells.stream().map(cell -> Long.valueOf(cell.widget.getText())).collect(Collectors.toList());
+        return cells.stream().map(LongListCell::getValue).collect(Collectors.toList());
     }
     
     public LongListListEntry setMaximum(long maximum) {
@@ -72,20 +81,13 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
         
         public LongListCell(long value, LongListListEntry listListEntry) {
             this.listListEntry = listListEntry;
+            this.setErrorSupplier(() -> listListEntry.cellErrorSupplier == null ? Optional.empty() : listListEntry.getCellErrorSupplier().apply(getValue()));
             widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "") {
                 @Override
                 public void render(int int_1, int int_2, float float_1) {
                     boolean f = isFocused();
                     setFocused(isSelected);
-                    try {
-                        long l = Long.valueOf(getText());
-                        if (l < listListEntry.minimum || l > listListEntry.maximum)
-                            widget.setEditableColor(16733525);
-                        else
-                            widget.setEditableColor(14737632);
-                    } catch (NumberFormatException ex) {
-                        widget.setEditableColor(16733525);
-                    }
+                    widget.setEditableColor(getPreferredTextColor());
                     super.render(int_1, int_2, float_1);
                     setFocused(f);
                 }
@@ -102,6 +104,14 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
                 if (!(value + "").equalsIgnoreCase(s))
                     listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
+        }
+        
+        public long getValue() {
+            try {
+                return Long.valueOf(widget.getText());
+            } catch (NumberFormatException e) {
+                return 0;
+            }
         }
         
         @Override
@@ -132,7 +142,7 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
             this.isSelected = isSelected;
             widget.render(mouseX, mouseY, delta);
             if (isSelected && listListEntry.isEditable())
-                fill(x, y + 12, x + entryWidth - 12, y + 13, getError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
+                fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
         
         @Override

@@ -22,6 +22,8 @@ public interface ConfigBuilder {
         return create().setParentScreen(parent).setTitle(title);
     }
     
+    ConfigBuilder setFallbackCategory(ConfigCategory fallbackCategory);
+    
     Screen getParentScreen();
     
     ConfigBuilder setParentScreen(Screen parent);

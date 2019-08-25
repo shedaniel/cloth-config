@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 public class StringListBuilder extends FieldBuilder<List<String>, StringListListEntry> {
     
+    private Function<String, Optional<String>> cellErrorSupplier;
     private Consumer<List<String>> saveConsumer = null;
     private Function<List<String>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
     private List<String> value;
@@ -23,6 +24,15 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
     public StringListBuilder(String resetButtonKey, String fieldNameKey, List<String> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
+    }
+    
+    public Function<String, Optional<String>> getCellErrorSupplier() {
+        return cellErrorSupplier;
+    }
+    
+    public StringListBuilder setCellErrorSupplier(Function<String, Optional<String>> cellErrorSupplier) {
+        this.cellErrorSupplier = cellErrorSupplier;
+        return this;
     }
     
     public StringListBuilder setErrorSupplier(Function<List<String>, Optional<String>> errorSupplier) {
@@ -105,6 +115,7 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
         StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, expended, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart());
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
+        entry.setCellErrorSupplier(cellErrorSupplier);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         entry.setAddTooltip(addTooltip);
         entry.setRemoveTooltip(removeTooltip);

@@ -13,6 +13,7 @@ import net.minecraft.util.Pair;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class ConfigBuilderImpl implements ConfigBuilder {
@@ -29,15 +30,22 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private Consumer<Screen> afterInitConsumer = screen -> {};
     private Map<String, Identifier> categoryBackground = Maps.newHashMap();
     private Map<String, List<Pair<String, Object>>> dataMap = Maps.newLinkedHashMap();
+    private String fallbackCategory = null;
     
     @Deprecated
     public ConfigBuilderImpl() {
-
+    
     }
     
     @Override
     public ConfigBuilder setAfterInitConsumer(Consumer<Screen> afterInitConsumer) {
         this.afterInitConsumer = afterInitConsumer;
+        return this;
+    }
+    
+    @Override
+    public ConfigBuilder setFallbackCategory(ConfigCategory fallbackCategory) {
+        this.fallbackCategory = Objects.requireNonNull(fallbackCategory).getCategoryKey();
         return this;
     }
     
@@ -77,23 +85,29 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     @Override
     public ConfigCategory getOrCreateCategory(String categoryKey) {
         if (dataMap.containsKey(categoryKey))
-            return new ConfigCategoryImpl(identifier -> {
+            return new ConfigCategoryImpl(categoryKey, identifier -> {
                 categoryBackground.put(categoryKey, identifier);
             }, () -> dataMap.get(categoryKey));
         dataMap.put(categoryKey, Lists.newArrayList());
-        return new ConfigCategoryImpl(identifier -> {
+        if (fallbackCategory == null)
+            fallbackCategory = categoryKey;
+        return new ConfigCategoryImpl(categoryKey, identifier -> {
             categoryBackground.put(categoryKey, identifier);
         }, () -> dataMap.get(categoryKey));
     }
     
     @Override
     public ConfigBuilder removeCategory(String category) {
+        if (dataMap.containsKey(category) && fallbackCategory.equals(category))
+            fallbackCategory = null;
         dataMap.remove(category);
         return this;
     }
     
     @Override
     public ConfigBuilder removeCategoryIfExists(String category) {
+        if (dataMap.containsKey(category) && fallbackCategory.equals(category))
+            fallbackCategory = null;
         if (dataMap.containsKey(category))
             dataMap.remove(category);
         return this;
@@ -172,6 +186,8 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     
     @Override
     public Screen build() {
+        if (dataMap.isEmpty() || fallbackCategory == null)
+            throw new NullPointerException("There cannot be no categories or fallback category!");
         ClothConfigScreen screen = new ClothConfigScreen(parent, I18n.translate(title), dataMap, doesConfirmSave, doesProcessErrors, listSmoothScroll, defaultBackground, categoryBackground) {
             @Override
             public void onSave(Map<String, List<Pair<String, Object>>> o) {
@@ -188,6 +204,11 @@ public class ConfigBuilderImpl implements ConfigBuilder {
             protected void init() {
                 super.init();
                 afterInitConsumer.accept(this);
+            }
+            
+            @Override
+            public String getFallbackCategory() {
+                return fallbackCategory;
             }
         };
         screen.setSmoothScrollingTabs(tabsSmoothScroll);

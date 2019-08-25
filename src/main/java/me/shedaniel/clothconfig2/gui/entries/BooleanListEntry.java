@@ -84,7 +84,7 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
             this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, 16777215);
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
             this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);

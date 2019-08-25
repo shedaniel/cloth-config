@@ -18,7 +18,7 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     
     public abstract T getValue();
     
-    public Optional<String> getConfigError() {
+    public final Optional<String> getConfigError() {
         if (errorSupplier != null && errorSupplier.get().isPresent())
             return errorSupplier.get();
         return getError();

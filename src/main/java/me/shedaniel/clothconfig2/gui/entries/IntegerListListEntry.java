@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListListEntry.IntegerListCell> {
     
     private int minimum, maximum;
+    private Function<Integer, Optional<String>> cellErrorSupplier;
     
     @Deprecated
     public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey) {
@@ -33,9 +34,17 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
         expended = defaultExpended;
     }
     
+    public Function<Integer, Optional<String>> getCellErrorSupplier() {
+        return cellErrorSupplier;
+    }
+    
+    public void setCellErrorSupplier(Function<Integer, Optional<String>> cellErrorSupplier) {
+        this.cellErrorSupplier = cellErrorSupplier;
+    }
+    
     @Override
     public List<Integer> getValue() {
-        return cells.stream().map(cell -> Integer.valueOf(cell.widget.getText())).collect(Collectors.toList());
+        return cells.stream().map(IntegerListCell::getValue).collect(Collectors.toList());
     }
     
     public IntegerListListEntry setMaximum(int maximum) {
@@ -72,20 +81,13 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
         
         public IntegerListCell(int value, IntegerListListEntry listListEntry) {
             this.listListEntry = listListEntry;
+            this.setErrorSupplier(() -> listListEntry.cellErrorSupplier == null ? Optional.empty() : listListEntry.getCellErrorSupplier().apply(getValue()));
             widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "") {
                 @Override
                 public void render(int int_1, int int_2, float float_1) {
                     boolean f = isFocused();
                     setFocused(isSelected);
-                    try {
-                        int i = Integer.valueOf(getText());
-                        if (i < listListEntry.minimum || i > listListEntry.maximum)
-                            widget.setEditableColor(16733525);
-                        else
-                            widget.setEditableColor(14737632);
-                    } catch (NumberFormatException ex) {
-                        widget.setEditableColor(16733525);
-                    }
+                    widget.setEditableColor(getPreferredTextColor());
                     super.render(int_1, int_2, float_1);
                     setFocused(f);
                 }
@@ -102,6 +104,14 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
                 if (!(value + "").equalsIgnoreCase(s))
                     listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
+        }
+        
+        public int getValue() {
+            try {
+                return Integer.valueOf(widget.getText());
+            } catch (NumberFormatException e) {
+                return 0;
+            }
         }
         
         @Override
@@ -132,7 +142,7 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
             this.isSelected = isSelected;
             widget.render(mouseX, mouseY, delta);
             if (isSelected && listListEntry.isEditable())
-                fill(x, y + 12, x + entryWidth - 12, y + 13, getError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
+                fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
         
         @Override

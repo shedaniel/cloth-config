@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEntry> {
     
+    protected Function<Float, Optional<String>> cellErrorSupplier;
     private Consumer<List<Float>> saveConsumer = null;
     private Function<List<Float>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
     private List<Float> value;
@@ -24,6 +25,15 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
     public FloatListBuilder(String resetButtonKey, String fieldNameKey, List<Float> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
+    }
+    
+    public Function<Float, Optional<String>> getCellErrorSupplier() {
+        return cellErrorSupplier;
+    }
+    
+    public FloatListBuilder setCellErrorSupplier(Function<Float, Optional<String>> cellErrorSupplier) {
+        this.cellErrorSupplier = cellErrorSupplier;
+        return this;
     }
     
     public FloatListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
@@ -140,6 +150,7 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
             entry.setMaximum(max);
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
+        entry.setCellErrorSupplier(cellErrorSupplier);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         entry.setAddTooltip(addTooltip);
         entry.setRemoveTooltip(removeTooltip);

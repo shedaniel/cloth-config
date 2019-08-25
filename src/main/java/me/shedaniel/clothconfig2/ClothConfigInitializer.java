@@ -35,7 +35,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
                         playZone.addEntry(entryBuilder.startBooleanToggle("Simple Boolean", false).build());
                         playZone.addEntry(entryBuilder.startStrField("Simple String", "ab").setDefaultValue(() -> "ab").build());
                         playZone.addEntry(entryBuilder.startLongSlider("Long Slider", 0, -10, 10).setDefaultValue(() -> 0l).build());
-                        playZone.addEntry(entryBuilder.startIntList("Int List", Arrays.asList(1, 6, 14, 1414)).setTooltip("this is a bad tooltip").setSaveConsumer(integers -> integers.forEach(System.out::println)).setDefaultValue(Arrays.asList(1, 6, 14, 1414)).build());
+                        playZone.addEntry(entryBuilder.startDoubleList("Double List", Arrays.asList(1d, 6d, 14d, 1414d)).setTooltip("this is a bad tooltip").setSaveConsumer(integers -> integers.forEach(System.out::println)).setCellErrorSupplier(aDouble -> aDouble == 2 ? Optional.of("2 is not accepted!") : Optional.empty()).setDefaultValue(Arrays.asList(1d, 6d, 14d, 1414d)).build());
                         playZone.addEntry(entryBuilder.startStrList("Party Member List", Arrays.asList("Tim", "Daniel", "John")).setTooltip("A list of party members.").setDefaultValue(Arrays.asList("Tim", "Daniel", "John")).build());
                         playZone.addEntry(entryBuilder.startIntField("Integer Field", 2).setErrorSupplier(integer -> {
                             if (integer == 4)
@@ -51,7 +51,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
                         ConfigCategory enumZone = builder.getOrCreateCategory("Enum Zone");
                         enumZone.setCategoryBackground(new Identifier("minecraft:textures/block/stone.png"));
                         enumZone.addEntry(entryBuilder.startEnumSelector("Enum Field", DemoEnum.class, DemoEnum.CONSTANT_2).setDefaultValue(() -> DemoEnum.CONSTANT_1).build());
-                        ConfigCategory partyZone = builder.getOrCreateCategory("Party Zone");
+                        builder.setFallbackCategory(enumZone);
                         MinecraftClient.getInstance().openScreen(builder.build());
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();

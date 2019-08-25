@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.FloatListCell> {
     
     private float minimum, maximum;
+    private Function<Float, Optional<String>> cellErrorSupplier;
     
     @Deprecated
     public FloatListListEntry(String fieldName, List<Float> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Float>> saveConsumer, Supplier<List<Float>> defaultValue, String resetButtonKey) {
@@ -33,9 +34,17 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
         expended = defaultExpended;
     }
     
+    public Function<Float, Optional<String>> getCellErrorSupplier() {
+        return cellErrorSupplier;
+    }
+    
+    public void setCellErrorSupplier(Function<Float, Optional<String>> cellErrorSupplier) {
+        this.cellErrorSupplier = cellErrorSupplier;
+    }
+    
     @Override
     public List<Float> getValue() {
-        return cells.stream().map(cell -> Float.valueOf(cell.widget.getText())).collect(Collectors.toList());
+        return cells.stream().map(FloatListCell::getValue).collect(Collectors.toList());
     }
     
     public FloatListListEntry setMaximum(float maximum) {
@@ -72,20 +81,13 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
         
         public FloatListCell(float value, FloatListListEntry listListEntry) {
             this.listListEntry = listListEntry;
+            this.setErrorSupplier(() -> listListEntry.cellErrorSupplier == null ? Optional.empty() : listListEntry.getCellErrorSupplier().apply(getValue()));
             widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "") {
                 @Override
                 public void render(int int_1, int int_2, float float_1) {
                     boolean f = isFocused();
                     setFocused(isSelected);
-                    try {
-                        float i = Float.valueOf(getText());
-                        if (i < listListEntry.minimum || i > listListEntry.maximum)
-                            widget.setEditableColor(16733525);
-                        else
-                            widget.setEditableColor(14737632);
-                    } catch (NumberFormatException ex) {
-                        widget.setEditableColor(16733525);
-                    }
+                    widget.setEditableColor(getPreferredTextColor());
                     super.render(int_1, int_2, float_1);
                     setFocused(f);
                 }
@@ -102,6 +104,14 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
                 if (!(value + "").equalsIgnoreCase(s))
                     listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
+        }
+        
+        public float getValue() {
+            try {
+                return Float.valueOf(widget.getText());
+            } catch (NumberFormatException e) {
+                return 0f;
+            }
         }
         
         @Override
@@ -132,7 +142,7 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
             this.isSelected = isSelected;
             widget.render(mouseX, mouseY, delta);
             if (isSelected && listListEntry.isEditable())
-                fill(x, y + 12, x + entryWidth - 12, y + 13, getError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
+                fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
         
         @Override
