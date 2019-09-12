@@ -18,5 +18,5 @@ jobs:
       env:
         BINTRAY_USER: shedaniel
         OSS_TOKEN: shedaniel
-        BINTRAY_KEY: $${{ secrets.BINTRAY_KEY }}
-        OSS_PASS: $${{ secrets.OSS_PASS }}
+        BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+        OSS_PASS: ${{ secrets.OSS_PASS }}
