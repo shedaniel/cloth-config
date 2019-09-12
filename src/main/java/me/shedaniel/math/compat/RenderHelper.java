@@ -5,6 +5,10 @@
 
 package me.shedaniel.math.compat;
 
+import net.minecraft.util.crash.CrashException;
+import net.minecraft.util.crash.CrashReport;
+import net.minecraft.util.crash.CrashReportSection;
+
 public class RenderHelper {
     
     static RenderSystem instance;
@@ -16,13 +20,22 @@ public class RenderHelper {
             is1_15 = true;
         } catch (ClassNotFoundException ignored) {
         }
+        if (!is1_15)
+            try {
+                instance = (RenderSystem) Class.forName("me.shedaniel.math.compat.RenderSystem1_14").newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         try {
             if (is1_15)
-                instance = (RenderSystem) Class.forName("me.shedaniel.math.compat.RenderSystem1_15").newInstance();
-            else instance = (RenderSystem) Class.forName("me.shedaniel.math.compat.RenderSystem1_14").newInstance();
+                instance = new RenderSystemClassInvoker("com.mojang.blaze3d.systems.RenderSystem");
+            else instance = new RenderSystemClassInvoker("com.mojang.blaze3d.platform.GlStateManager");
         } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(0);
+            CrashReport crashReport = CrashReport.create(e, "Creating Blaze3D Classes Compat");
+            CrashReportSection section = crashReport.addElement("Found Render System");
+            boolean finalIs1_15 = is1_15;
+            section.add("Is 1.15", () -> finalIs1_15 + "");
+            throw new CrashException(crashReport);
         }
     }
     

@@ -4,6 +4,7 @@ plugins {
     id 'maven'
     id 'signing'
     id 'com.jfrog.bintray' version '1.8.4'
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 sourceCompatibility = 1.8
@@ -123,5 +124,36 @@ publishing {
     repositories {
         // uncomment to publish to the local maven
         // mavenLocal()
+    }
+}
+
+curseforge {
+    apiKey = project.hasProperty('apiKey') ? project.property('apiKey') : System.getenv('CF_API_KEY')
+    project {
+        id = '319057'
+        releaseType = 'release'
+        addGameVersion '1.14'
+        addGameVersion '1.14.1'
+        addGameVersion '1.14.2'
+        addGameVersion '1.14.3'
+        addGameVersion '1.14.4'
+        addGameVersion '1.14-Snapshot'
+        addGameVersion '1.15-Snapshot'
+        addGameVersion 'Java 8'
+        relations {
+            requiredDependency 'fabric-api'
+        }
+        mainArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
+            displayName = "[Fabric 1.14.x, 19w34a - 19w37a] ClothConfig2-$project.version"
+        }
+        addArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar"))
+        afterEvaluate {
+            uploadTask.dependsOn("remapJar")
+            uploadTask.dependsOn("remapSourcesJar")
+        }
+    }
+    options {
+        forgeGradleIntegration = false
+        javaVersionAutoDetect = false
     }
 }

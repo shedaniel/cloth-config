@@ -7,6 +7,8 @@ package me.shedaniel.math.compat;
 
 public interface RenderSystem {
     
+    void invokeMethod(Class[] classes, Object[] objects);
+    
     void color4f(float float_1, float float_2, float float_3, float float_4);
     
     void enableBlend();
