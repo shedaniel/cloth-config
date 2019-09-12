@@ -13,10 +13,14 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Build with Gradle & Upload
+    - name: Build with Gradle & Upload to Bintray
       run: ./gradlew clean bintrayUpload
       env:
         BINTRAY_USER: shedaniel
         OSS_TOKEN: shedaniel
         BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
         OSS_PASS: ${{ secrets.OSS_PASS }}
+    - name: Build with Gradle & Upload to CurseForge
+      run: ./gradlew clean bintrayUpload
+      env:
+        CF_API_KEY: ${{ secrets.CF_API_KEY }}
