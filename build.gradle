@@ -132,20 +132,14 @@ curseforge {
     if (apiKey != null)
         project {
             id = '319057'
-            releaseType = 'release'
-            addGameVersion '1.14'
-            addGameVersion '1.14.1'
-            addGameVersion '1.14.2'
-            addGameVersion '1.14.3'
-            addGameVersion '1.14.4'
-            addGameVersion '1.14-Snapshot'
+            releaseType = 'beta'
             addGameVersion '1.15-Snapshot'
             addGameVersion 'Java 8'
             relations {
                 requiredDependency 'fabric-api'
             }
             mainArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
-                displayName = "[Fabric 1.14.x, 19w34a - 19w37a] ClothConfig2-$project.version"
+                displayName = "[Fabric 1.14.x, 19w38a - 19w38b] ClothConfig2-$project.version"
             }
             addArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar"))
             afterEvaluate {
