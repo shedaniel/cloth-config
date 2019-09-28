@@ -14,7 +14,7 @@ targetCompatibility = 1.8
 
 group = "me.shedaniel.cloth"
 archivesBaseName = "config-2"
-version = project.mod_version.contains("unstable") ? (project.mod_version + "." + buildTime()) : project.mod_version
+version = ((String) project.mod_version).contains("unstable") ? (project.mod_version + "." + buildTime()) : project.mod_version
 
 minecraft {
 }

@@ -91,7 +91,7 @@ public class StringListListEntry extends BaseListEntry<String, StringListListEnt
             widget.setWidth(entryWidth - 12);
             widget.x = x;
             widget.y = y + 1;
-            widget.setIsEditable(listListEntry.isEditable());
+            widget.setEditable(listListEntry.isEditable());
             this.isSelected = isSelected;
             widget.render(mouseX, mouseY, delta);
             if (isSelected && listListEntry.isEditable())

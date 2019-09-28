@@ -105,7 +105,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     @Override
     public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
-        Window window = MinecraftClient.getInstance().window;
+        Window window = MinecraftClient.getInstance().method_22683();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && defaultValue.get().longValue() != value.get();
         this.resetButton.y = y;
         this.sliderWidget.active = isEditable();

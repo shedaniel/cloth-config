@@ -93,8 +93,8 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
                 }
                 
                 @Override
-                public void addText(String string_1) {
-                    super.addText(stripCharacters.apply(string_1));
+                public void write(String string_1) {
+                    super.write(stripCharacters.apply(string_1));
                 }
             };
             widget.setMaxLength(999999);
@@ -138,7 +138,7 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
             widget.setWidth(entryWidth - 12);
             widget.x = x;
             widget.y = y + 1;
-            widget.setIsEditable(listListEntry.isEditable());
+            widget.setEditable(listListEntry.isEditable());
             this.isSelected = isSelected;
             widget.render(mouseX, mouseY, delta);
             if (isSelected && listListEntry.isEditable())
