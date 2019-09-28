@@ -1,9 +1,9 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.math.api.Rectangle;
-import me.shedaniel.math.compat.RenderHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.GuiLighting;
@@ -71,7 +71,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         widget.rectangle.height = 24;
         MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         GuiLighting.disable();
-        RenderHelper.color4f(1, 1, 1, 1);
+        RenderSystem.color4f(1, 1, 1, 1);
         blit(x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expended ? 9 : 0), 9, 9);
         MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(categoryName), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for(AbstractConfigListEntry entry : entries) {
