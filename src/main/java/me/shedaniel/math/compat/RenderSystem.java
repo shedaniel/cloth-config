@@ -7,7 +7,11 @@ package me.shedaniel.math.compat;
 
 public interface RenderSystem {
     
-    void invokeMethod(Class[] classes, Object[] objects);
+    default void invokeMethod(Class[] classes, Object[] objects) {
+        invokeMethod("color4f", classes, objects);
+    }
+    
+    void invokeMethod(String method, Class[] classes, Object[] objects);
     
     void color4f(float float_1, float float_2, float float_3, float float_4);
     

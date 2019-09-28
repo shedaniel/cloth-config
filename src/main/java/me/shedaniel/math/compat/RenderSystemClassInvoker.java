@@ -32,9 +32,9 @@ public class RenderSystemClassInvoker implements RenderSystem {
     }
     
     @Override
-    public void invokeMethod(Class[] classes, Object[] objects) {
+    public void invokeMethod(String method, Class[] classes, Object[] objects) {
         try {
-            getSimpleMethod("color4f", classes).invoke(null, objects);
+            getSimpleMethod(method, classes).invoke(null, objects);
         } catch (Exception e) {
             e.printStackTrace();
         }

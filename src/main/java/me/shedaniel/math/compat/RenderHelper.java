@@ -9,6 +9,10 @@ import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
 
+/**
+ * Blaze3D Wrapper for 1.14 - 19w37a
+ */
+@Deprecated
 public class RenderHelper {
     
     static RenderSystem instance;
