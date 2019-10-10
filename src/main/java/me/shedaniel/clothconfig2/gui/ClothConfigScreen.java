@@ -389,16 +389,16 @@ public abstract class ClothConfigScreen extends Screen {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
-        buffer.method_22912(tabsBounds.getMinX() + 20, tabsBounds.getMinY() + 4, 0.0D).method_22913(0, 1).color(0, 0, 0, 0).next();
-        buffer.method_22912(tabsBounds.getMaxX() - 20, tabsBounds.getMinY() + 4, 0.0D).method_22913(1, 1).color(0, 0, 0, 0).next();
-        buffer.method_22912(tabsBounds.getMaxX() - 20, tabsBounds.getMinY(), 0.0D).method_22913(1, 0).color(0, 0, 0, 255).next();
-        buffer.method_22912(tabsBounds.getMinX() + 20, tabsBounds.getMinY(), 0.0D).method_22913(0, 0).color(0, 0, 0, 255).next();
+        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMinY() + 4, 0.0D).texture(0, 1).color(0, 0, 0, 0).next();
+        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMinY() + 4, 0.0D).texture(1, 1).color(0, 0, 0, 0).next();
+        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMinY(), 0.0D).texture(1, 0).color(0, 0, 0, 255).next();
+        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMinY(), 0.0D).texture(0, 0).color(0, 0, 0, 255).next();
         tessellator.draw();
         buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
-        buffer.method_22912(tabsBounds.getMinX() + 20, tabsBounds.getMaxY(), 0.0D).method_22913(0, 1).color(0, 0, 0, 255).next();
-        buffer.method_22912(tabsBounds.getMaxX() - 20, tabsBounds.getMaxY(), 0.0D).method_22913(1, 1).color(0, 0, 0, 255).next();
-        buffer.method_22912(tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0D).method_22913(1, 0).color(0, 0, 0, 0).next();
-        buffer.method_22912(tabsBounds.getMinX() + 20, tabsBounds.getMaxY() - 4, 0.0D).method_22913(0, 0).color(0, 0, 0, 0).next();
+        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMaxY(), 0.0D).texture(0, 1).color(0, 0, 0, 255).next();
+        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMaxY(), 0.0D).texture(1, 1).color(0, 0, 0, 255).next();
+        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0D).texture(1, 0).color(0, 0, 0, 0).next();
+        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMaxY() - 4, 0.0D).texture(0, 0).color(0, 0, 0, 0).next();
         tessellator.draw();
         RenderSystem.enableTexture();
         RenderSystem.shadeModel(7424);
@@ -414,10 +414,10 @@ public abstract class ClothConfigScreen extends Screen {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         float f = 32.0F;
         buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
-        buffer.method_22912(rect.getMinX(), rect.getMaxY(), 0.0D).method_22913(rect.getMinX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();
-        buffer.method_22912(rect.getMaxX(), rect.getMaxY(), 0.0D).method_22913(rect.getMaxX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();
-        buffer.method_22912(rect.getMaxX(), rect.getMinY(), 0.0D).method_22913(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).next();
-        buffer.method_22912(rect.getMinX(), rect.getMinY(), 0.0D).method_22913(rect.getMinX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).next();
+        buffer.vertex(rect.getMinX(), rect.getMaxY(), 0.0D).texture(rect.getMinX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();
+        buffer.vertex(rect.getMaxX(), rect.getMaxY(), 0.0D).texture(rect.getMaxX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();
+        buffer.vertex(rect.getMaxX(), rect.getMinY(), 0.0D).texture(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).next();
+        buffer.vertex(rect.getMinX(), rect.getMinY(), 0.0D).texture(rect.getMinX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).next();
         tessellator.draw();
     }
     

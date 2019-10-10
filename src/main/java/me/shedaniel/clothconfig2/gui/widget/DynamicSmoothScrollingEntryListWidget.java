@@ -132,26 +132,26 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
             
             // Black Bar
             buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
-            buffer.method_22912(scrollbarPositionMinX, this.bottom, 0.0D).method_22913(0, 1).color(0, 0, 0, 255).next();
-            buffer.method_22912(scrollbarPositionMaxX, this.bottom, 0.0D).method_22913(1, 1).color(0, 0, 0, 255).next();
-            buffer.method_22912(scrollbarPositionMaxX, this.top, 0.0D).method_22913(1, 0).color(0, 0, 0, 255).next();
-            buffer.method_22912(scrollbarPositionMinX, this.top, 0.0D).method_22913(0, 0).color(0, 0, 0, 255).next();
+            buffer.vertex(scrollbarPositionMinX, this.bottom, 0.0D).texture(0, 1).color(0, 0, 0, 255).next();
+            buffer.vertex(scrollbarPositionMaxX, this.bottom, 0.0D).texture(1, 1).color(0, 0, 0, 255).next();
+            buffer.vertex(scrollbarPositionMaxX, this.top, 0.0D).texture(1, 0).color(0, 0, 0, 255).next();
+            buffer.vertex(scrollbarPositionMinX, this.top, 0.0D).texture(0, 0).color(0, 0, 0, 255).next();
             tessellator.draw();
             
             // Top
             buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
-            buffer.method_22912(scrollbarPositionMinX, minY + height, 0.0D).method_22913(0, 1).color(128, 128, 128, 255).next();
-            buffer.method_22912(scrollbarPositionMaxX, minY + height, 0.0D).method_22913(1, 1).color(128, 128, 128, 255).next();
-            buffer.method_22912(scrollbarPositionMaxX, minY, 0.0D).method_22913(1, 0).color(128, 128, 128, 255).next();
-            buffer.method_22912(scrollbarPositionMinX, minY, 0.0D).method_22913(0, 0).color(128, 128, 128, 255).next();
+            buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).texture(0, 1).color(128, 128, 128, 255).next();
+            buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).texture(1, 1).color(128, 128, 128, 255).next();
+            buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).texture(1, 0).color(128, 128, 128, 255).next();
+            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).texture(0, 0).color(128, 128, 128, 255).next();
             tessellator.draw();
             
             // Bottom
             buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
-            buffer.method_22912(scrollbarPositionMinX, (minY + height - 1), 0.0D).method_22913(0, 1).color(192, 192, 192, 255).next();
-            buffer.method_22912((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).method_22913(1, 1).color(192, 192, 192, 255).next();
-            buffer.method_22912((scrollbarPositionMaxX - 1), minY, 0.0D).method_22913(1, 0).color(192, 192, 192, 255).next();
-            buffer.method_22912(scrollbarPositionMinX, minY, 0.0D).method_22913(0, 0).color(192, 192, 192, 255).next();
+            buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).texture(0, 1).color(192, 192, 192, 255).next();
+            buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).texture(1, 1).color(192, 192, 192, 255).next();
+            buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).texture(1, 0).color(192, 192, 192, 255).next();
+            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).texture(0, 0).color(192, 192, 192, 255).next();
             tessellator.draw();
         }
     }

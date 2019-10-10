@@ -90,7 +90,7 @@ public class EnumListEntry<T extends Enum<?>> extends TooltipListEntry<T> {
     @Override
     public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
-        Window window = MinecraftClient.getInstance().method_22683();
+        Window window = MinecraftClient.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && getDefaultIndex() != this.index.get();
         this.resetButton.y = y;
         this.buttonWidget.active = isEditable();

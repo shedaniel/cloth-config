@@ -75,7 +75,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     @Override
     public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
-        Window window = MinecraftClient.getInstance().method_22683();
+        Window window = MinecraftClient.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault(textFieldWidget.getText());
         this.resetButton.y = y;
         this.textFieldWidget.setEditable(isEditable());
