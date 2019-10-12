@@ -20,7 +20,6 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Environment(EnvType.CLIENT)
 public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends AbstractParentElement implements Drawable {
@@ -42,7 +41,6 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected boolean scrolling;
     protected E selectedItem;
     protected Identifier backgroundLocation;
-    
     public DynamicEntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, Identifier backgroundLocation) {
         this.client = client;
         this.width = width;
@@ -139,9 +137,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected int getMaxScrollPosition() {
-        AtomicInteger integer = new AtomicInteger(headerHeight);
-        entries.forEach(item -> integer.addAndGet(item.getItemHeight()));
-        return integer.get();
+        int i = headerHeight;
+        for(E entry : entries)
+            i += entry.getItemHeight();
+        return i;
     }
     
     protected void clickedHeader(int int_1, int int_2) {
@@ -456,6 +455,12 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return boolean_1;
     }
     
+    public static final class SmoothScrollingSettings {
+        private SmoothScrollingSettings() {}
+        public static final double CLAMP_EXTENSION = 200;
+    }
+    
+    @SuppressWarnings("deprecation")
     @Environment(EnvType.CLIENT)
     public abstract static class Entry<E extends Entry<E>> extends DrawableHelper implements Element {
         @Deprecated DynamicEntryListWidget<E> parent;

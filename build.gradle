@@ -145,7 +145,7 @@ curseforge {
                 requiredDependency 'fabric-api'
             }
             mainArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
-                displayName = "[Fabric 1.14.x, 19w34a - 19w37a] ClothConfig2-$project.version"
+                displayName = "[Fabric 1.14.x] ClothConfig2-$project.version"
             }
             addArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar"))
             afterEvaluate {
