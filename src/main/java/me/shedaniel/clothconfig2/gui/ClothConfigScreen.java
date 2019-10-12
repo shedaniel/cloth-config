@@ -474,14 +474,6 @@ public abstract class ClothConfigScreen extends Screen {
         protected final void clearStuff() {
             this.clearItems();
         }
-        
-        @Override
-        public boolean mouseClicked(double double_1, double double_2, int int_1) {
-            boolean b = super.mouseClicked(double_1, double_2, int_1);
-            if (!scroller.isRegistered())
-                scroller.registerTick();
-            return b;
-        }
     }
     
 }

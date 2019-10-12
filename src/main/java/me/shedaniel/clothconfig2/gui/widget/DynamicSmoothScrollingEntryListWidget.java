@@ -103,17 +103,14 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
     public boolean mouseScrolled(double double_1, double double_2, double double_3) {
         if (!smoothScrolling) {
             this.scrollVelocity = 0d;
-            if (double_3 < 0)
-                scroll += 16;
-            if (double_3 > 0)
-                scroll -= 16;
+            scroll += 16 * -double_3;
             this.scroll = MathHelper.clamp(double_1, 0.0D, (double) this.getMaxScroll());
             return true;
         }
         if (scroll <= getMaxScroll() && double_3 < 0)
-            scrollVelocity += 16;
+            scrollVelocity += 16 * -double_3;
         if (scroll >= 0 && double_3 > 0)
-            scrollVelocity -= 16;
+            scrollVelocity += 16 * -double_3;
         if (!scroller.isRegistered())
             scroller.registerTick();
         return true;
