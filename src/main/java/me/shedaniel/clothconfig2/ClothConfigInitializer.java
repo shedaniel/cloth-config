@@ -88,8 +88,8 @@ public class ClothConfigInitializer implements ClientModInitializer {
             Properties properties = new Properties();
             properties.setProperty("easingMethod", easingMethod.toString());
             properties.setProperty("scrollDuration", scrollDuration + "");
-            properties.setProperty("scrollStep", scrollDuration + "");
-            properties.setProperty("bounceBackMultiplier", scrollDuration + "");
+            properties.setProperty("scrollStep", scrollStep + "");
+            properties.setProperty("bounceBackMultiplier", bounceBackMultiplier + "");
             properties.store(writer, null);
             writer.close();
         } catch (Exception e) {
