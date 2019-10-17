@@ -1,7 +1,5 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 
 import java.util.Objects;
@@ -16,9 +14,9 @@ public class SelectorBuilder<T> extends FieldBuilder<T, SelectionListEntry<T>> {
     private Function<T, Optional<String[]>> tooltipSupplier = e -> Optional.empty();
     private T value;
     private T[] valuesArray;
-    @Nullable private Function<T, String> nameProvider = null;
+    private Function<T, String> nameProvider = null;
     
-    public SelectorBuilder(String resetButtonKey, String fieldNameKey, @Nullable T[] valuesArray, @NotNull T value) {
+    public SelectorBuilder(String resetButtonKey, String fieldNameKey, T[] valuesArray, T value) {
         super(resetButtonKey, fieldNameKey);
         Objects.requireNonNull(value);
         this.valuesArray = valuesArray;
@@ -71,7 +69,7 @@ public class SelectorBuilder<T> extends FieldBuilder<T, SelectionListEntry<T>> {
         return this;
     }
     
-    public SelectorBuilder setNameProvider(@Nullable Function<T, String> enumNameProvider) {
+    public SelectorBuilder setNameProvider(Function<T, String> enumNameProvider) {
         this.nameProvider = enumNameProvider;
         return this;
     }
