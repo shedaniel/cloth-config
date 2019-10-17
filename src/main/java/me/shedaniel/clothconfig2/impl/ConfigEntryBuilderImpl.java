@@ -1,7 +1,5 @@
 package me.shedaniel.clothconfig2.impl;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.*;
@@ -98,13 +96,12 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     }
     
     @Override
-    public <T extends Enum<?>> EnumSelectorBuilder<T> startEnumSelector(String fieldNameKey, Class<T> clazz,
-            @NotNull T value) {
+    public <T extends Enum<?>> EnumSelectorBuilder<T> startEnumSelector(String fieldNameKey, Class<T> clazz, T value) {
         return new EnumSelectorBuilder<T>(resetButtonKey, fieldNameKey, clazz, value);
     }
     
     @Override
-    public <T> SelectorBuilder<T> startSelector(String fieldNameKey, @Nullable T[] valuesArray, T value) {
+    public <T> SelectorBuilder<T> startSelector(String fieldNameKey, T[] valuesArray, T value) {
         return new SelectorBuilder<T>(resetButtonKey, fieldNameKey, valuesArray, value);
     }
     

@@ -1,7 +1,5 @@
 package me.shedaniel.clothconfig2.api;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import me.shedaniel.clothconfig2.impl.ConfigEntryBuilderImpl;
 import me.shedaniel.clothconfig2.impl.builders.*;
 
@@ -39,9 +37,9 @@ public interface ConfigEntryBuilder {
     
     TextDescriptionBuilder startTextDescription(String value);
     
-    <T extends Enum<?>> EnumSelectorBuilder<T> startEnumSelector(String fieldNameKey, Class<T> clazz, @NotNull T value);
+    <T extends Enum<?>> EnumSelectorBuilder<T> startEnumSelector(String fieldNameKey, Class<T> clazz, T value);
     
-    <T> SelectorBuilder<T> startSelector(String fieldNameKey, @Nullable T[] valuesArray, @NotNull T value);
+    <T> SelectorBuilder<T> startSelector(String fieldNameKey, T[] valuesArray, T value);
     
     IntFieldBuilder startIntField(String fieldNameKey, int value);
     
