@@ -25,7 +25,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
     private static EasingMethod easingMethod = EasingMethodImpl.QUART;
     private static long scrollDuration = 1000;
     private static double scrollStep = 16;
-    private static double bounceBackMultiplier = .93;
+    private static double bounceBackMultiplier = .84;
     
     public static EasingMethod getEasingMethod() {
         return easingMethod;
@@ -50,7 +50,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
             easingMethod = EasingMethodImpl.QUART;
             scrollDuration = 1000;
             scrollStep = 16;
-            bounceBackMultiplier = .93;
+            bounceBackMultiplier = .84;
             if (!file.exists()) {
                 saveConfig();
             }
@@ -65,13 +65,13 @@ public class ClothConfigInitializer implements ClientModInitializer {
             }
             scrollDuration = Long.parseLong(properties.getProperty("scrollDuration", "1000"));
             scrollStep = Double.parseDouble(properties.getProperty("scrollStep", "16"));
-            bounceBackMultiplier = Double.parseDouble(properties.getProperty("bounceBackMultiplier", "0.93"));
+            bounceBackMultiplier = Double.parseDouble(properties.getProperty("bounceBackMultiplier1", "0.84"));
         } catch (Exception e) {
             e.printStackTrace();
             easingMethod = EasingMethodImpl.QUART;
             scrollDuration = 1000;
             scrollStep = 16;
-            bounceBackMultiplier = .93;
+            bounceBackMultiplier = .84;
             try {
                 if (file.exists())
                     file.delete();
@@ -89,7 +89,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
             properties.setProperty("easingMethod", easingMethod.toString());
             properties.setProperty("scrollDuration", scrollDuration + "");
             properties.setProperty("scrollStep", scrollStep + "");
-            properties.setProperty("bounceBackMultiplier", bounceBackMultiplier + "");
+            properties.setProperty("bounceBackMultiplier1", bounceBackMultiplier + "");
             properties.store(writer, null);
             writer.close();
         } catch (Exception e) {
@@ -97,7 +97,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
             easingMethod = EasingMethodImpl.QUART;
             scrollDuration = 1000;
             scrollStep = 16;
-            bounceBackMultiplier = .93;
+            bounceBackMultiplier = .84;
         }
     }
     
@@ -114,12 +114,12 @@ public class ClothConfigInitializer implements ClientModInitializer {
                         builder.setDefaultBackgroundTexture(new Identifier("minecraft:textures/block/oak_planks.png"));
                         ConfigCategory scrolling = builder.getOrCreateCategory("Scrolling");
                         ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
-                        scrolling.addEntry(entryBuilder.startEnumSelector("Easing Method", EasingMethodImpl.class, easingMethod instanceof EasingMethodImpl ? (EasingMethodImpl) easingMethod : EasingMethodImpl.QUART).setDefaultValue(EasingMethodImpl.QUART).setSaveConsumer(o -> easingMethod = (EasingMethod) o).build());
+                        scrolling.addEntry(entryBuilder.startSelector("Easing Method", EasingMethods.getMethods().toArray(new EasingMethod[0]), easingMethod).setDefaultValue(EasingMethodImpl.QUART).setSaveConsumer(o -> easingMethod = (EasingMethod) o).build());
                         scrolling.addEntry(entryBuilder.startLongSlider("Scroll Duration", scrollDuration, 0, 5000).setTextGetter(integer -> {
                             return integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms");
                         }).setDefaultValue(1000).setSaveConsumer(i -> scrollDuration = i).build());
                         scrolling.addEntry(entryBuilder.startDoubleField("Scroll Step", scrollStep).setDefaultValue(16).setSaveConsumer(i -> scrollStep = i).build());
-                        scrolling.addEntry(entryBuilder.startDoubleField("Bounce Multiplier", bounceBackMultiplier).setDefaultValue(0.93).setSaveConsumer(i -> bounceBackMultiplier = i).build());
+                        scrolling.addEntry(entryBuilder.startDoubleField("Bounce Multiplier", bounceBackMultiplier).setDefaultValue(0.84).setSaveConsumer(i -> bounceBackMultiplier = i).build());
                         builder.setSavingRunnable(() -> {
                             saveConfig();
                         });
