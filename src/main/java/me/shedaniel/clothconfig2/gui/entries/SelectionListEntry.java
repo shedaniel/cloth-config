@@ -2,7 +2,6 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.sun.istack.internal.Nullable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -37,20 +36,17 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Deprecated
-    public SelectionListEntry(String fieldName, T[] valuesArray, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer,
-            @Nullable Function<T, String> nameProvider) {
+    public SelectionListEntry(String fieldName, T[] valuesArray, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, String> nameProvider) {
         this(fieldName, valuesArray, value, resetButtonKey, defaultValue, saveConsumer, nameProvider, null);
     }
     
     @Deprecated
-    public SelectionListEntry(String fieldName, T[] valuesArray, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer,
-            @Nullable Function<T, String> nameProvider, Supplier<Optional<String[]>> tooltipSupplier) {
+    public SelectionListEntry(String fieldName, T[] valuesArray, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, String> nameProvider, Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, valuesArray, value, resetButtonKey, defaultValue, saveConsumer, nameProvider, tooltipSupplier, false);
     }
     
     @Deprecated
-    public SelectionListEntry(String fieldName, T[] valuesArray, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer,
-            @Nullable Function<T, String> nameProvider, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    public SelectionListEntry(String fieldName, T[] valuesArray, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, String> nameProvider, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
         if (valuesArray != null)
             this.values = ImmutableList.copyOf(valuesArray);
