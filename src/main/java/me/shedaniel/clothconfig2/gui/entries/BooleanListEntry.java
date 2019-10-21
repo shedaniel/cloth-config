@@ -94,7 +94,7 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     }
     
     public String getYesNoText(boolean bool) {
-        return bool ? "§aYes" : "§cNo";
+        return I18n.translate("text.cloth-config.boolean.value." + bool);
     }
     
     @Override

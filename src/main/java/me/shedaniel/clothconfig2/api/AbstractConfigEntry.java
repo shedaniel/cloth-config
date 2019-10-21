@@ -24,6 +24,8 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
         return getError();
     }
     
+    public void lateRender(int mouseX, int mouseY, float delta) {}
+    
     public void setErrorSupplier(Supplier<Optional<String>> errorSupplier) {
         this.errorSupplier = errorSupplier;
     }
