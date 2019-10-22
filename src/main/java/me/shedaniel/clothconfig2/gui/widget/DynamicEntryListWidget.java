@@ -13,8 +13,10 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.opengl.GL11;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -26,12 +28,12 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected static final int DRAG_OUTSIDE = -2;
     protected final MinecraftClient client;
     private final List<E> entries = new Entries();
-    protected int width;
-    protected int height;
-    protected int top;
-    protected int bottom;
-    protected int right;
-    protected int left;
+    public int width;
+    public int height;
+    public int top;
+    public int bottom;
+    public int right;
+    public int left;
     protected boolean verticallyCenter = true;
     protected int yDrag = -2;
     protected boolean visible = true;
@@ -41,6 +43,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected boolean scrolling;
     protected E selectedItem;
     protected Identifier backgroundLocation;
+    
     public DynamicEntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, Identifier backgroundLocation) {
         this.client = client;
         this.width = width;
@@ -137,10 +140,16 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected int getMaxScrollPosition() {
+        List<Integer> list = new ArrayList<>();
         int i = headerHeight;
-        for(E entry : entries)
+        for(E entry : entries) {
             i += entry.getItemHeight();
-        return i;
+            if (entry.getMorePossibleHeight() >= 0) {
+                list.add(i + entry.getMorePossibleHeight());
+            }
+        }
+        list.add(i);
+        return list.stream().max((a, b) -> Integer.compare(a, b)).orElse(0);
     }
     
     protected void clickedHeader(int int_1, int int_2) {
@@ -176,8 +185,19 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         int startY = this.top + 4 - (int) this.getScroll();
         if (this.renderSelection)
             this.renderHeader(rowLeft, startY, tessellator);
-        
+        Window window = client.window;
+        int sw = window.getWidth();
+        int sh = window.getHeight();
+        float dw = window.getScaledWidth();
+        float dh = window.getScaledHeight();
+        int x = Math.round(sw * (this.left / dw));
+        int y = Math.round(sh * (this.top / dh));
+        int ww = Math.round(sw * (this.width / dw));
+        int hh = Math.round(sh * (this.height / dh));
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        GL11.glScissor(x, sh - hh - y, ww, hh);
         this.renderList(rowLeft, startY, mouseX, mouseY, delta);
+        GL11.glDisable(GL11.GL_SCISSOR_TEST);
         RenderHelper.disableDepthTest();
         this.renderHoleBackground(0, this.top, 255, 255);
         this.renderHoleBackground(this.bottom, this.height, 255, 255);
@@ -336,6 +356,11 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     public boolean mouseScrolled(double double_1, double double_2, double double_3) {
+        for(E entry : entries) {
+            if (entry.mouseScrolled(double_1, double_2, double_3)) {
+                return true;
+            }
+        }
         this.capYPosition(this.getScroll() - double_3 * (double) (getMaxScroll() / getItemCount()) / 2.0D);
         return true;
     }
@@ -456,8 +481,9 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     public static final class SmoothScrollingSettings {
-        private SmoothScrollingSettings() {}
         public static final double CLAMP_EXTENSION = 200;
+        
+        private SmoothScrollingSettings() {}
     }
     
     @SuppressWarnings("deprecation")
@@ -483,6 +509,11 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         }
         
         public abstract int getItemHeight();
+        
+        @Deprecated
+        public int getMorePossibleHeight() {
+            return -1;
+        }
     }
     
     @Environment(EnvType.CLIENT)

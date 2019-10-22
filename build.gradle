@@ -5,6 +5,7 @@ plugins {
     id 'signing'
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version '1.64'
 }
 
 sourceCompatibility = 1.8
@@ -30,6 +31,24 @@ dependencies {
     modApi "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
+    compileOnly "com.google.code.findbugs:jsr305:3.0.2"
+}
+
+task makeChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+    file = new File("changelog.html")
+    untaggedName = "Current Version ${project.version}"
+    fromCommit = System.getenv("GITHUB_SHA")
+    toRef = "HEAD"
+    templateContent = """
+{{#tags}}
+    <h3>{{name}}</h3>
+    <ul>
+        {{#commits}}
+            <li><a href="https://github.com/mezz/JustEnoughItems/commit/{{hashFull}}">{{message}}</a> - {{authorName}}</li>
+        {{/commits}}
+    </ul>
+{{/tags}}
+"""
 }
 
 bintray {
@@ -148,7 +167,13 @@ curseforge {
                 displayName = "[Fabric 1.14.x] ClothConfig2-$project.version"
             }
             addArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar"))
+            if (System.getenv("GITHUB_SHA") != null) {
+                changelog = file("changelog.html")
+                changelogType = "html"
+            }
             afterEvaluate {
+                if (System.getenv("GITHUB_SHA") != null)
+                    uploadTask.dependsOn("makeChangelog")
                 uploadTask.dependsOn("remapJar")
                 uploadTask.dependsOn("remapSourcesJar")
             }

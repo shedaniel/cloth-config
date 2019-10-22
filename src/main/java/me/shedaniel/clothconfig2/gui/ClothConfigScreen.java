@@ -23,12 +23,14 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.Window;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.opengl.GL11;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,7 +46,7 @@ public abstract class ClothConfigScreen extends Screen {
     public int selectedTabIndex;
     public double tabsScrollVelocity = 0d;
     public double tabsScrollProgress = 0d;
-    public ListWidget listWidget;
+    public ListWidget<AbstractConfigEntry<AbstractConfigEntry>> listWidget;
     private Screen parent;
     private LinkedHashMap<String, List<AbstractConfigEntry>> tabbedEntries;
     private List<Pair<String, Integer>> tabs;
@@ -176,7 +178,7 @@ public abstract class ClothConfigScreen extends Screen {
         this.children.clear();
         this.tabButtons.clear();
         if (listWidget != null)
-            tabbedEntries.put(tabs.get(selectedTabIndex).getLeft(), listWidget.children());
+            tabbedEntries.put(tabs.get(selectedTabIndex).getLeft(), (List) listWidget.children());
         selectedTabIndex = nextTabIndex;
         children.add(listWidget = new ListWidget(minecraft, width, height, 70, height - 32, getBackgroundLocation()));
         listWidget.setSmoothScrolling(this.smoothScrollingList);
@@ -339,8 +341,19 @@ public abstract class ClothConfigScreen extends Screen {
         buttonRightTab.active = tabsScrollProgress < getTabsMaximumScrolled() - width + 40;
         renderDirtBackground(0);
         listWidget.render(int_1, int_2, float_1);
+        Window window = minecraft.window;
+        int sw = window.getWidth();
+        int sh = window.getHeight();
+        int x = Math.round(sw * (listWidget.left / (float) width));
+        int y = Math.round(sh * (listWidget.top / (float) height));
+        int ww = Math.round(sw * (listWidget.width / (float) width));
+        int hh = Math.round(sh * ((listWidget.bottom - listWidget.top) / (float) height));
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        GL11.glScissor(x, sh - hh - y, ww, hh);
+        for(AbstractConfigEntry child : listWidget.children())
+            child.lateRender(int_1, int_2, float_1);
+        GL11.glDisable(GL11.GL_SCISSOR_TEST);
         overlayBackground(tabsBounds, 32, 32, 32, 255, 255);
-        
         drawCenteredString(minecraft.textRenderer, title, width / 2, 18, -1);
         tabButtons.forEach(widget -> widget.render(int_1, int_2, float_1));
         overlayBackground(tabsLeftBounds, 64, 64, 64, 255, 255);
@@ -448,7 +461,7 @@ public abstract class ClothConfigScreen extends Screen {
         }
     }
     
-    public class ListWidget extends DynamicElementListWidget {
+    public class ListWidget<R extends DynamicElementListWidget.ElementEntry<R>> extends DynamicElementListWidget<R> {
         
         public ListWidget(MinecraftClient client, int width, int height, int top, int bottom, Identifier backgroundLocation) {
             super(client, width, height, top, bottom, backgroundLocation);
@@ -471,6 +484,28 @@ public abstract class ClothConfigScreen extends Screen {
         
         protected final void clearStuff() {
             this.clearItems();
+        }
+    
+        @Override
+        public boolean mouseClicked(double double_1, double double_2, int int_1) {
+            this.updateScrollingState(double_1, double_2, int_1);
+            if (!this.isMouseOver(double_1, double_2)) {
+                return false;
+            } else {
+                for(R entry : children()) {
+                    if (entry.mouseClicked(double_1, double_2, int_1)) {
+                        this.setFocused(entry);
+                        this.setDragging(true);
+                        return true;
+                    }
+                }
+                if (int_1 == 0) {
+                    this.clickedHeader((int) (double_1 - (double) (this.left + this.width / 2 - this.getItemWidth() / 2)), (int) (double_2 - (double) this.top) + (int) this.getScroll() - 4);
+                    return true;
+                }
+        
+                return this.scrolling;
+            }
         }
     }
     

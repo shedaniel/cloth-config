@@ -6,10 +6,14 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.clothconfig2.impl.EasingMethod.EasingMethodImpl;
 import me.shedaniel.clothconfig2.impl.EasingMethods;
+import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,7 +21,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.lang.reflect.Method;
+import java.util.Comparator;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class ClothConfigInitializer implements ClientModInitializer {
     
@@ -114,12 +120,19 @@ public class ClothConfigInitializer implements ClientModInitializer {
                         builder.setDefaultBackgroundTexture(new Identifier("minecraft:textures/block/oak_planks.png"));
                         ConfigCategory scrolling = builder.getOrCreateCategory("Scrolling");
                         ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
-                        scrolling.addEntry(entryBuilder.startSelector("Easing Method", EasingMethods.getMethods().toArray(new EasingMethod[0]), easingMethod).setDefaultValue(EasingMethodImpl.QUART).setSaveConsumer(o -> easingMethod = (EasingMethod) o).build());
+                        scrolling.addEntry(entryBuilder.startDropdownMenu("Easing Method", DropdownMenuBuilder.TopCellElementBuilder.of(easingMethod, str -> {
+                            for(EasingMethod m : EasingMethods.getMethods())
+                                if (m.toString().equals(str))
+                                    return m;
+                            return null;
+                        })).setDefaultValue(EasingMethodImpl.QUART).setSaveConsumer(o -> easingMethod = (EasingMethod) o).setSelections(EasingMethods.getMethods()).build());
                         scrolling.addEntry(entryBuilder.startLongSlider("Scroll Duration", scrollDuration, 0, 5000).setTextGetter(integer -> {
                             return integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms");
                         }).setDefaultValue(1000).setSaveConsumer(i -> scrollDuration = i).build());
                         scrolling.addEntry(entryBuilder.startDoubleField("Scroll Step", scrollStep).setDefaultValue(16).setSaveConsumer(i -> scrollStep = i).build());
                         scrolling.addEntry(entryBuilder.startDoubleField("Bounce Multiplier", bounceBackMultiplier).setDefaultValue(0.84).setSaveConsumer(i -> bounceBackMultiplier = i).build());
+                        ConfigCategory testing = builder.getOrCreateCategory("Testing");
+                        testing.addEntry(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toSet())).setSaveConsumer(item -> System.out.println("save this " + item)).build());
                         builder.setSavingRunnable(() -> {
                             saveConfig();
                         });

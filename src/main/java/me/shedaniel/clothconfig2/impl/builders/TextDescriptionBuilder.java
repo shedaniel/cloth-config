@@ -2,13 +2,14 @@ package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.TextListEntry;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public class TextDescriptionBuilder extends FieldBuilder<String, TextListEntry> {
     
     private int color = -1;
-    private Supplier<Optional<String[]>> tooltipSupplier = null;
+    @Nullable private Supplier<Optional<String[]>> tooltipSupplier = null;
     private String value;
     
     public TextDescriptionBuilder(String resetButtonKey, String fieldNameKey, String value) {

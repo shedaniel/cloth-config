@@ -4,19 +4,22 @@ import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.QueuedTooltip;
 import me.shedaniel.math.api.Point;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     
-    private Supplier<Optional<String[]>> tooltipSupplier;
+    @Nullable private Supplier<Optional<String[]>> tooltipSupplier;
     
     @Deprecated
-    public TooltipListEntry(String fieldName, Supplier<Optional<String[]>> tooltipSupplier) {
+    public TooltipListEntry(String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, tooltipSupplier, false);
     }
     
-    public TooltipListEntry(String fieldName, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    @Deprecated
+    public TooltipListEntry(String fieldName,
+            @Nullable Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, requiresRestart);
         this.tooltipSupplier = tooltipSupplier;
     }
@@ -40,11 +43,12 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
         return Optional.empty();
     }
     
+    @Nullable
     public Supplier<Optional<String[]>> getTooltipSupplier() {
         return tooltipSupplier;
     }
     
-    public void setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public void setTooltipSupplier(@Nullable Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
     }
     

@@ -2,6 +2,9 @@ package me.shedaniel.clothconfig2.impl;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry;
+import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.SelectionCellCreator;
+import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.SelectionTopCellElement;
 import me.shedaniel.clothconfig2.impl.builders.*;
 
 import java.util.List;
@@ -133,6 +136,11 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     @Override
     public LongSliderBuilder startLongSlider(String fieldNameKey, long value, long min, long max) {
         return new LongSliderBuilder(resetButtonKey, fieldNameKey, value, min, max);
+    }
+    
+    @Override
+    public <T> DropdownMenuBuilder<T> startDropdownMenu(String fieldNameKey, SelectionTopCellElement<T> topCellElement, SelectionCellCreator<T> cellCreator) {
+        return new DropdownMenuBuilder(resetButtonKey, fieldNameKey, topCellElement, cellCreator);
     }
     
 }

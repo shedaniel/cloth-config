@@ -88,9 +88,14 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     
     @Override
     public boolean mouseScrolled(double double_1, double double_2, double double_3) {
+        for(E entry : children()) {
+            if (entry.mouseScrolled(double_1, double_2, double_3)) {
+                return true;
+            }
+        }
         if (!smoothScrolling) {
             scroll += 16 * -double_3;
-            this.scroll = MathHelper.clamp(double_1, 0.0D, (double) this.getMaxScroll());
+            this.scroll = MathHelper.clamp(double_3, 0.0D, (double) this.getMaxScroll());
             return true;
         }
         offset(ClothConfigInitializer.getScrollStep() * -double_3, true);
