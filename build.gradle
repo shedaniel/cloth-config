@@ -172,8 +172,6 @@ curseforge {
                 changelogType = "html"
             }
             afterEvaluate {
-                if (System.getenv("GITHUB_SHA") != null)
-                    uploadTask.dependsOn("makeChangelog")
                 uploadTask.dependsOn("remapJar")
                 uploadTask.dependsOn("remapSourcesJar")
             }
@@ -182,4 +180,9 @@ curseforge {
         forgeGradleIntegration = false
         javaVersionAutoDetect = false
     }
+}
+
+afterExaluate {
+    if (System.getenv("GITHUB_SHA") != null)
+        tasks.curseforge319057.dependsOn("makeChangelog")
 }
