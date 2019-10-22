@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.2.4-SNAPSHOT'
+    id 'fabric-loom' version '0.2.5-20190926.073407-32'
     id 'maven-publish'
     id 'maven'
     id 'signing'
