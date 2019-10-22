@@ -182,7 +182,7 @@ curseforge {
     }
 }
 
-afterEvaluate {
-    if (System.getenv("GITHUB_SHA") != null)
-        tasks.curseforge319057.dependsOn("makeChangelog")
-}
+//afterEvaluate {
+//    if (System.getenv("GITHUB_SHA") != null)
+//        tasks.curseforge319057.dependsOn("makeChangelog")
+//}
