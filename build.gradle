@@ -37,14 +37,14 @@ dependencies {
 task makeChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
     file = new File("changelog.html")
     untaggedName = "Current Version ${project.version}"
-    fromCommit = System.getenv("GITHUB_SHA")
+    fromCommit = System.getenv("GITHUB_SHA") == null ? "2ff3d533b38a10611e14e59ffd28d1e25a4ae24b" : System.getenv("GITHUB_SHA")
     toRef = "HEAD"
     templateContent = """
 {{#tags}}
     <h3>{{name}}</h3>
     <ul>
         {{#commits}}
-            <li><a href="https://github.com/mezz/JustEnoughItems/commit/{{hashFull}}">{{message}}</a> - {{authorName}}</li>
+            <li><a href="https://github.com/shedaniel/ClothConfig/commit/{{hashFull}}">{{message}}</a> - {{authorName}}</li>
         {{/commits}}
     </ul>
 {{/tags}}
