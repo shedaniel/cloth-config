@@ -182,7 +182,7 @@ curseforge {
     }
 }
 
-afterExaluate {
+afterEvaluate {
     if (System.getenv("GITHUB_SHA") != null)
         tasks.curseforge319057.dependsOn("makeChangelog")
 }
