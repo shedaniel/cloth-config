@@ -17,5 +17,12 @@
   "text.cloth-config.list.remove": "Kustuta valitud",
   "text.cloth-config.error_cannot_save": "Viga!",
   "text.cloth-config.reset_value": "Lähtesta",
-  "text.cloth.reset_value": "Lähtesta"
+  "text.cloth.reset_value": "Lähtesta",
+  "text.cloth-config.restart_required": "Restart Required",
+  "text.cloth-config.restart_required_sub": "One of your modified settings requires Minecraft to be restarted. Do you want to proceed?",
+  "text.cloth-config.exit_minecraft": "Exit Minecraft",
+  "text.cloth-config.ignore_restart": "Ignore Restart",
+  "text.cloth-config.boolean.value.true": "§aYes",
+  "text.cloth-config.boolean.value.false": "§cNo",
+  "text.cloth-config.dropdown.value.unknown": "§cNo Suggestion"
 }
