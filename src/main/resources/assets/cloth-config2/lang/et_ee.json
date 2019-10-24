@@ -17,5 +17,12 @@
   "text.cloth-config.list.remove": "Kustuta valitud",
   "text.cloth-config.error_cannot_save": "Viga!",
   "text.cloth-config.reset_value": "Lähtesta",
-  "text.cloth.reset_value": "Lähtesta"
+  "text.cloth.reset_value": "Lähtesta",
+  "text.cloth-config.restart_required": "Nõutav on taaskäivitamine",
+  "text.cloth-config.restart_required_sub": "Üks sinu muudetud valikutest nõuab Minecrafti taaskäivitamist. Kas soovid jätkata?",
+  "text.cloth-config.exit_minecraft": "Välju Minecraftist",
+  "text.cloth-config.ignore_restart": "Ignoreeri taaskäivitust",
+  "text.cloth-config.boolean.value.true": "§aJah",
+  "text.cloth-config.boolean.value.false": "§cEi",
+  "text.cloth-config.dropdown.value.unknown": "§cSoovitusi pole"
 }

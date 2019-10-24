@@ -64,7 +64,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         Window window = MinecraftClient.getInstance().getWindow();
-        this.selectionElement.topRenderer.error = getConfigError();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && (!defaultValue.get().equals(getValue()) || getConfigError().isPresent());
         this.resetButton.y = y;
         this.selectionElement.active = isEditable();
@@ -639,7 +638,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     public static abstract class SelectionTopCellElement<R> extends AbstractParentElement {
-        @Deprecated private Optional<String> error;
         @Deprecated private DropdownBoxEntry<R> entry;
         
         public abstract R getValue();
@@ -651,7 +649,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public abstract Optional<String> getError();
         
         public final Optional<String> getConfigError() {
-            return error;
+            return entry.getConfigError();
         }
         
         public DropdownBoxEntry<R> getParent() {
@@ -659,11 +657,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         public final boolean hasConfigError() {
-            return error.isPresent();
+            return getConfigError().isPresent();
         }
         
         public final int getPreferredTextColor() {
-            return error.isPresent() ? 16733525 : 16777215;
+            return getConfigError().isPresent() ? 16733525 : 16777215;
         }
         
         public void selectFirstRecommendation() {
@@ -725,6 +723,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             textFieldWidget.setEditable(getParent().isEditable());
             textFieldWidget.setEditableColor(getPreferredTextColor());
             textFieldWidget.render(mouseX, mouseY, delta);
+            System.out.println(getConfigError());
         }
         
         @Override
