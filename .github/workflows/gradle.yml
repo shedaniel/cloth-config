@@ -1,6 +1,10 @@
 name: Java CI
 
-on: [push]
+on:
+  push:
+    branches:    
+      - v2
+      - v2-unstable
 
 jobs:
   build:
