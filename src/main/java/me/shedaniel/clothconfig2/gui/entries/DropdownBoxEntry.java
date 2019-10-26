@@ -723,7 +723,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             textFieldWidget.setIsEditable(getParent().isEditable());
             textFieldWidget.setEditableColor(getPreferredTextColor());
             textFieldWidget.render(mouseX, mouseY, delta);
-            System.out.println(getConfigError());
         }
         
         @Override
