@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+@Deprecated
 public class ConfigBuilderImpl implements ConfigBuilder {
     
     private Runnable savingRunnable;
@@ -26,15 +27,34 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean listSmoothScroll = true;
     private boolean doesProcessErrors = true;
     private boolean doesConfirmSave = true;
+    private boolean transparentBackground = false;
     private Identifier defaultBackground = DrawableHelper.BACKGROUND_LOCATION;
     private Consumer<Screen> afterInitConsumer = screen -> {};
     private Map<String, Identifier> categoryBackground = Maps.newHashMap();
     private Map<String, List<Pair<String, Object>>> dataMap = Maps.newLinkedHashMap();
     private String fallbackCategory = null;
+    private boolean alwaysShowTabs = false;
     
     @Deprecated
     public ConfigBuilderImpl() {
     
+    }
+    
+    @Override
+    public boolean isAlwaysShowTabs() {
+        return alwaysShowTabs;
+    }
+    
+    @Override
+    public ConfigBuilder setAlwaysShowTabs(boolean alwaysShowTabs) {
+        this.alwaysShowTabs = alwaysShowTabs;
+        return this;
+    }
+    
+    @Override
+    public ConfigBuilder setTransparentBackground(boolean transparentBackground) {
+        this.transparentBackground = transparentBackground;
+        return this;
     }
     
     @Override
@@ -86,20 +106,26 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     public ConfigCategory getOrCreateCategory(String categoryKey) {
         if (dataMap.containsKey(categoryKey))
             return new ConfigCategoryImpl(categoryKey, identifier -> {
+                if (transparentBackground)
+                    throw new IllegalStateException("Cannot set category background if screen is using transparent background.");
                 categoryBackground.put(categoryKey, identifier);
-            }, () -> dataMap.get(categoryKey));
+            }, () -> dataMap.get(categoryKey), () -> removeCategory(categoryKey));
         dataMap.put(categoryKey, Lists.newArrayList());
         if (fallbackCategory == null)
             fallbackCategory = categoryKey;
         return new ConfigCategoryImpl(categoryKey, identifier -> {
+            if (transparentBackground)
+                throw new IllegalStateException("Cannot set category background if screen is using transparent background.");
             categoryBackground.put(categoryKey, identifier);
-        }, () -> dataMap.get(categoryKey));
+        }, () -> dataMap.get(categoryKey), () -> removeCategory(categoryKey));
     }
     
     @Override
     public ConfigBuilder removeCategory(String category) {
         if (dataMap.containsKey(category) && fallbackCategory.equals(category))
             fallbackCategory = null;
+        if (!dataMap.containsKey(category))
+            throw new NullPointerException("Category doesn't exist!");
         dataMap.remove(category);
         return this;
     }
@@ -184,20 +210,16 @@ public class ConfigBuilderImpl implements ConfigBuilder {
         return afterInitConsumer;
     }
     
+    @SuppressWarnings("deprecation")
     @Override
     public Screen build() {
         if (dataMap.isEmpty() || fallbackCategory == null)
             throw new NullPointerException("There cannot be no categories or fallback category!");
         ClothConfigScreen screen = new ClothConfigScreen(parent, I18n.translate(title), dataMap, doesConfirmSave, doesProcessErrors, listSmoothScroll, defaultBackground, categoryBackground) {
             @Override
-            public void onSave(Map<String, List<Pair<String, Object>>> o) {
+            public void save() {
                 if (savingRunnable != null)
                     savingRunnable.run();
-            }
-            
-            @Override
-            public boolean isEditable() {
-                return editable;
             }
             
             @Override
@@ -205,13 +227,12 @@ public class ConfigBuilderImpl implements ConfigBuilder {
                 super.init();
                 afterInitConsumer.accept(this);
             }
-            
-            @Override
-            public String getFallbackCategory() {
-                return fallbackCategory;
-            }
         };
+        screen.setEditable(editable);
+        screen.setFallbackCategory(fallbackCategory);
         screen.setSmoothScrollingTabs(tabsSmoothScroll);
+        screen.setTransparentBackground(transparentBackground);
+        screen.setAlwaysShowTabs(alwaysShowTabs);
         return screen;
     }
     

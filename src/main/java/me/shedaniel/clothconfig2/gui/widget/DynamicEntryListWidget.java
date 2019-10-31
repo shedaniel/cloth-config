@@ -2,6 +2,8 @@ package me.shedaniel.clothconfig2.gui.widget;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
+import me.shedaniel.clothconfig2.api.ScissorsHandler;
+import me.shedaniel.math.api.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -13,10 +15,8 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import org.lwjgl.opengl.GL11;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -165,14 +165,8 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected void renderDecorations(int int_1, int int_2) {
     }
     
-    public void render(int mouseX, int mouseY, float delta) {
-        this.drawBackground();
-        int scrollbarPosition = this.getScrollbarPosition();
-        int int_4 = scrollbarPosition + 6;
-        RenderSystem.disableLighting();
-        RenderSystem.disableFog();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBufferBuilder();
+    @Deprecated
+    protected void renderBackBackground(BufferBuilder buffer, Tessellator tessellator) {
         this.client.getTextureManager().bindTexture(backgroundLocation);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         float float_2 = 32.0F;
@@ -182,23 +176,24 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         buffer.vertex(this.right, this.top, 0.0D).texture(this.right / 32.0F, ((this.top + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).next();
         buffer.vertex(this.left, this.top, 0.0D).texture(this.left / 32.0F, ((this.top + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).next();
         tessellator.draw();
+    }
+    
+    public void render(int mouseX, int mouseY, float delta) {
+        this.drawBackground();
+        int scrollbarPosition = this.getScrollbarPosition();
+        int int_4 = scrollbarPosition + 6;
+        RenderSystem.disableLighting();
+        RenderSystem.disableFog();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
+        renderBackBackground(buffer, tessellator);
         int rowLeft = this.getRowLeft();
         int startY = this.top + 4 - (int) this.getScroll();
         if (this.renderSelection)
             this.renderHeader(rowLeft, startY, tessellator);
-        Window window = client.getWindow();
-        int sw = window.getWidth();
-        int sh = window.getHeight();
-        float dw = window.getScaledWidth();
-        float dh = window.getScaledHeight();
-        int x = Math.round(sw * (this.left / dw));
-        int y = Math.round(sh * (this.top / dh));
-        int ww = Math.round(sw * (this.width / dw));
-        int hh = Math.round(sh * (this.height / dh));
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GL11.glScissor(x, sh - hh - y, ww, hh);
+        ScissorsHandler.INSTANCE.scissor(new Rectangle(left, top, width, bottom - top));
         this.renderList(rowLeft, startY, mouseX, mouseY, delta);
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
+        ScissorsHandler.INSTANCE.removeLastScissor();
         RenderSystem.disableDepthTest();
         this.renderHoleBackground(0, this.top, 255, 255);
         this.renderHoleBackground(this.bottom, this.height, 255, 255);

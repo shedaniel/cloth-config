@@ -15,4 +15,6 @@ public interface ConfigCategory {
     
     ConfigCategory setCategoryBackground(Identifier identifier);
     
+    void removeCategory();
+    
 }
