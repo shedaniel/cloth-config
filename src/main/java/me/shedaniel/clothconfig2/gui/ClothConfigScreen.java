@@ -394,13 +394,13 @@ public abstract class ClothConfigScreen extends Screen {
             if (errors.size() > 0) {
                 minecraft.getTextureManager().bindTexture(CONFIG_TEX);
                 RenderHelper.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-                String text = errors.size() == 1 ? errors.get(0) : I18n.translate("text.cloth-config.multi_error");
+                String text = "§c" + (errors.size() == 1 ? errors.get(0) : I18n.translate("text.cloth-config.multi_error"));
                 if (isTransparentBackground()) {
                     int stringWidth = minecraft.textRenderer.getStringWidth(text);
                     fillGradient(8, 9, 20 + stringWidth, 14 + minecraft.textRenderer.fontHeight, 0x68000000, 0x68000000);
                 }
                 blit(10, 10, 0, 54, 3, 11);
-                drawString(minecraft.textRenderer, "§c" + errors.get(0), 18, 12, -1);
+                drawString(minecraft.textRenderer, text, 18, 12, -1);
             }
         } else if (!isEditable()) {
             minecraft.getTextureManager().bindTexture(CONFIG_TEX);
@@ -411,7 +411,7 @@ public abstract class ClothConfigScreen extends Screen {
                 fillGradient(8, 9, 20 + stringWidth, 14 + minecraft.textRenderer.fontHeight, 0x68000000, 0x68000000);
             }
             blit(10, 10, 0, 54, 3, 11);
-            drawString(minecraft.textRenderer, "§c" + I18n.translate("text.cloth-config.not_editable"), 18, 12, -1);
+            drawString(minecraft.textRenderer, text, 18, 12, -1);
         }
         super.render(int_1, int_2, float_1);
         queuedTooltips.forEach(queuedTooltip -> renderTooltip(queuedTooltip.getText(), queuedTooltip.getX(), queuedTooltip.getY()));
