@@ -14,12 +14,14 @@ public class ConfigCategoryImpl implements ConfigCategory {
     
     private Supplier<List<Pair<String, Object>>> listSupplier;
     private Consumer<Identifier> backgroundConsumer;
+    private Runnable destroyCategory;
     private String categoryKey;
     
-    ConfigCategoryImpl(String categoryKey, Consumer<Identifier> backgroundConsumer, Supplier<List<Pair<String, Object>>> listSupplier) {
+    ConfigCategoryImpl(String categoryKey, Consumer<Identifier> backgroundConsumer, Supplier<List<Pair<String, Object>>> listSupplier, Runnable destroyCategory) {
         this.listSupplier = listSupplier;
         this.backgroundConsumer = backgroundConsumer;
         this.categoryKey = categoryKey;
+        this.destroyCategory = destroyCategory;
     }
     
     @Override
@@ -42,6 +44,11 @@ public class ConfigCategoryImpl implements ConfigCategory {
     public ConfigCategory setCategoryBackground(Identifier identifier) {
         backgroundConsumer.accept(identifier);
         return this;
+    }
+    
+    @Override
+    public void removeCategory() {
+        destroyCategory.run();
     }
     
 }

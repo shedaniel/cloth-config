@@ -136,6 +136,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
                         builder.setSavingRunnable(() -> {
                             saveConfig();
                         });
+                        builder.transparentBackground();
                         MinecraftClient.getInstance().openScreen(builder.build());
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();

@@ -72,7 +72,30 @@ public interface ConfigBuilder {
     
     ConfigBuilder setAfterInitConsumer(Consumer<Screen> afterInitConsumer);
     
+    default ConfigBuilder alwaysShowTabs() {
+        return setAlwaysShowTabs(true);
+    }
+    
+    boolean isAlwaysShowTabs();
+    
+    ConfigBuilder setAlwaysShowTabs(boolean alwaysShowTabs);
+    
+    ConfigBuilder setTransparentBackground(boolean transparentBackground);
+    
+    default ConfigBuilder transparentBackground() {
+        return setTransparentBackground(true);
+    }
+    
+    default ConfigBuilder solidBackground() {
+        return setTransparentBackground(false);
+    }
+    
+    @Deprecated
     default ConfigEntryBuilderImpl getEntryBuilder() {
+        return (ConfigEntryBuilderImpl) entryBuilder();
+    }
+    
+    default ConfigEntryBuilder entryBuilder() {
         return ConfigEntryBuilderImpl.create();
     }
     

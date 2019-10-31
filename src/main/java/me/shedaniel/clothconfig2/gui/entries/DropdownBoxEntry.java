@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.RunSixtyTimesEverySec;
+import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget.SmoothScrollingSettings;
 import me.shedaniel.clothconfig2.gui.widget.DynamicNewSmoothScrollingEntryListWidget.Interpolation;
 import me.shedaniel.clothconfig2.gui.widget.DynamicNewSmoothScrollingEntryListWidget.Precision;
@@ -23,7 +24,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
-import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -369,40 +369,24 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             fill(lastRectangle.x, lastRectangle.y + lastRectangle.height, lastRectangle.x + cWidth, lastRectangle.y + lastRectangle.height + last10Height + 1, -6250336);
             fill(lastRectangle.x + 1, lastRectangle.y + lastRectangle.height + 1, lastRectangle.x + cWidth - 1, lastRectangle.y + lastRectangle.height + last10Height, -16777216);
             RenderHelper.pushMatrix();
-            Window window = MinecraftClient.getInstance().window;
-            int sw = window.getWidth();
-            int sh = window.getHeight();
-            float dw = window.getScaledWidth();
-            float dh = window.getScaledHeight();
-            {
-                int yyy = Math.max(lastRectangle.y + lastRectangle.height + 1, getEntry().getParent().top);
-                int x = Math.round(sw * (lastRectangle.x / dw));
-                int y = Math.round(sh * (yyy / dh));
-                int ww = Math.round(sw * ((cWidth - 6) / dw));
-                int hh = Math.round(sh * ((Math.min(last10Height - 1 - yyy + (lastRectangle.y + lastRectangle.height + 1), getEntry().getParent().bottom - yyy)) / dh));
-                GL11.glEnable(GL11.GL_SCISSOR_TEST);
-                GL11.glScissor(x, sh - hh - y, ww, hh);
-                double yy = lastRectangle.y + lastRectangle.height - scroll;
-                for(SelectionCellElement<R> cell : currentElements) {
-                    if (yy + getCellCreator().getCellHeight() >= lastRectangle.y + lastRectangle.height && yy <= lastRectangle.y + lastRectangle.height + last10Height + 1)
-                        cell.render(mouseX, mouseY, lastRectangle.x, (int) yy, getMaxScrollPosition() > 6 ? getCellCreator().getCellWidth() - 6 : getCellCreator().getCellWidth(), getCellCreator().getCellHeight(), delta);
-                    else
-                        cell.dontRender(delta);
-                    yy += getCellCreator().getCellHeight();
-                }
-                GL11.glDisable(GL11.GL_SCISSOR_TEST);
+            
+            ScissorsHandler.INSTANCE.scissor(new Rectangle(lastRectangle.x, lastRectangle.y + lastRectangle.height + 1, cWidth - 6, last10Height - 1));
+            double yy = lastRectangle.y + lastRectangle.height - scroll;
+            for(SelectionCellElement<R> cell : currentElements) {
+                if (yy + getCellCreator().getCellHeight() >= lastRectangle.y + lastRectangle.height && yy <= lastRectangle.y + lastRectangle.height + last10Height + 1)
+                    cell.render(mouseX, mouseY, lastRectangle.x, (int) yy, getMaxScrollPosition() > 6 ? getCellCreator().getCellWidth() - 6 : getCellCreator().getCellWidth(), getCellCreator().getCellHeight(), delta);
+                else
+                    cell.dontRender(delta);
+                yy += getCellCreator().getCellHeight();
             }
+            ScissorsHandler.INSTANCE.removeLastScissor();
+            
             if (currentElements.isEmpty()) {
                 TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
                 String s = I18n.translate("text.cloth-config.dropdown.value.unknown");
                 textRenderer.drawWithShadow(s, lastRectangle.x + getCellCreator().getCellWidth() / 2 - textRenderer.getStringWidth(s) / 2, lastRectangle.y + lastRectangle.height + 3, -1);
             }
-            {
-                int y = Math.round(sh * (getEntry().getParent().top / dh));
-                int hh = Math.round(sh * ((getEntry().getParent().bottom - getEntry().getParent().top) / dh));
-                GL11.glEnable(GL11.GL_SCISSOR_TEST);
-                GL11.glScissor(0, sh - hh - y, sw, hh);
-            }
+            
             if (getMaxScrollPosition() > 6) {
                 RenderHelper.disableTexture();
                 int scrollbarPositionMinX = lastRectangle.x + getCellCreator().getCellWidth() - 6;
@@ -436,7 +420,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 tessellator.draw();
                 RenderHelper.enableTexture();
             }
-            GL11.glDisable(GL11.GL_SCISSOR_TEST);
             RenderHelper.popMatrix();
         }
         

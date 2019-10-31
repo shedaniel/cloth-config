@@ -7,37 +7,38 @@ import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.QueuedTooltip;
+import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import me.shedaniel.math.api.Rectangle;
 import me.shedaniel.math.compat.RenderHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.Window;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.MathHelper;
-import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("deprecation")
 public abstract class ClothConfigScreen extends Screen {
     
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
@@ -53,10 +54,7 @@ public abstract class ClothConfigScreen extends Screen {
     private boolean edited;
     private boolean requiresRestart;
     private boolean confirmSave;
-    private AbstractButtonWidget buttonQuit;
-    private AbstractButtonWidget buttonSave;
-    private AbstractButtonWidget buttonLeftTab;
-    private AbstractButtonWidget buttonRightTab;
+    private AbstractButtonWidget buttonQuit, buttonSave, buttonLeftTab, buttonRightTab;
     private Rectangle tabsBounds, tabsLeftBounds, tabsRightBounds;
     private String title;
     private double tabsMaximumScrolled = -1d;
@@ -66,20 +64,12 @@ public abstract class ClothConfigScreen extends Screen {
     private boolean smoothScrollingList = true;
     private Identifier defaultBackgroundLocation;
     private Map<String, Identifier> categoryBackgroundLocation;
+    private boolean transparentBackground = false;
+    private boolean editable = true;
+    @Nullable private String defaultFallbackCategory = null;
+    private boolean alwaysShowTabs = false;
     
-    public ClothConfigScreen(Screen parent, String title, Map<String, List<Pair<String, Object>>> o) {
-        this(parent, title, o, true, true);
-    }
-    
-    public ClothConfigScreen(Screen parent, String title, Map<String, List<Pair<String, Object>>> o, boolean confirmSave, boolean displayErrors) {
-        this(parent, title, o, confirmSave, displayErrors, true, DrawableHelper.BACKGROUND_LOCATION);
-    }
-    
-    public ClothConfigScreen(Screen parent, String title, Map<String, List<Pair<String, Object>>> o, boolean confirmSave, boolean displayErrors, boolean smoothScrollingList, Identifier defaultBackgroundLocation) {
-        this(parent, title, o, confirmSave, displayErrors, smoothScrollingList, defaultBackgroundLocation, Maps.newHashMap());
-    }
-    
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public ClothConfigScreen(Screen parent, String title, Map<String, List<Pair<String, Object>>> o, boolean confirmSave, boolean displayErrors, boolean smoothScrollingList, Identifier defaultBackgroundLocation, Map<String, Identifier> categoryBackgroundLocation) {
         super(new LiteralText(""));
         this.parent = parent;
@@ -120,8 +110,37 @@ public abstract class ClothConfigScreen extends Screen {
         this.categoryBackgroundLocation = categoryBackgroundLocation;
     }
     
+    public boolean isShowingTabs() {
+        return isAlwaysShowTabs() || tabs.size() > 1;
+    }
+    
+    public boolean isAlwaysShowTabs() {
+        return alwaysShowTabs;
+    }
+    
+    @Deprecated
+    public void setAlwaysShowTabs(boolean alwaysShowTabs) {
+        this.alwaysShowTabs = alwaysShowTabs;
+    }
+    
+    public boolean isTransparentBackground() {
+        return transparentBackground && MinecraftClient.getInstance().world != null;
+    }
+    
+    @Deprecated
+    public void setTransparentBackground(boolean transparentBackground) {
+        this.transparentBackground = transparentBackground;
+    }
+    
     public String getFallbackCategory() {
+        if (defaultFallbackCategory != null)
+            return defaultFallbackCategory;
         return tabs.get(0).getLeft();
+    }
+    
+    @Deprecated
+    public void setFallbackCategory(@Nullable String defaultFallbackCategory) {
+        this.defaultFallbackCategory = defaultFallbackCategory;
     }
     
     @Override
@@ -142,6 +161,7 @@ public abstract class ClothConfigScreen extends Screen {
         return smoothScrollingList;
     }
     
+    @Deprecated
     public void setSmoothScrollingList(boolean smoothScrollingList) {
         this.smoothScrollingList = smoothScrollingList;
     }
@@ -150,6 +170,7 @@ public abstract class ClothConfigScreen extends Screen {
         return smoothScrollingTabs;
     }
     
+    @Deprecated
     public void setSmoothScrollingTabs(boolean smoothScrolling) {
         this.smoothScrollingTabs = smoothScrolling;
     }
@@ -165,7 +186,6 @@ public abstract class ClothConfigScreen extends Screen {
         buttonSave.active = edited;
     }
     
-    @SuppressWarnings("deprecation")
     public void setEdited(boolean edited, boolean requiresRestart) {
         setEdited(edited);
         if (!this.requiresRestart && requiresRestart)
@@ -180,7 +200,7 @@ public abstract class ClothConfigScreen extends Screen {
         if (listWidget != null)
             tabbedEntries.put(tabs.get(selectedTabIndex).getLeft(), (List) listWidget.children());
         selectedTabIndex = nextTabIndex;
-        children.add(listWidget = new ListWidget(minecraft, width, height, 70, height - 32, getBackgroundLocation()));
+        children.add(listWidget = new ListWidget(minecraft, width, height, isShowingTabs() ? 70 : 30, height - 32, getBackgroundLocation()));
         listWidget.setSmoothScrolling(this.smoothScrollingList);
         if (tabbedEntries.size() > selectedTabIndex)
             Lists.newArrayList(tabbedEntries.values()).get(selectedTabIndex).forEach(entry -> listWidget.children().add(entry));
@@ -193,15 +213,10 @@ public abstract class ClothConfigScreen extends Screen {
         addButton(buttonSave = new AbstractPressableButtonWidget(width / 2 + 4, height - 26, 150, 20, "") {
             @Override
             public void onPress() {
-                Map<String, List<Pair<String, Object>>> map = Maps.newLinkedHashMap();
-                tabbedEntries.forEach((s, abstractListEntries) -> {
-                    List list = abstractListEntries.stream().map(entry -> new Pair(entry.getFieldName(), entry.getValue())).collect(Collectors.toList());
-                    map.put(s, list);
-                });
                 for(List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values()))
                     for(AbstractConfigEntry entry : entries)
                         entry.save();
-                onSave(map);
+                save();
                 if (requiresRestart)
                     ClothConfigScreen.this.minecraft.openScreen(new ClothRequiresRestartScreen(parent));
                 else
@@ -227,53 +242,57 @@ public abstract class ClothConfigScreen extends Screen {
             }
         });
         buttonSave.active = edited;
-        tabsBounds = new Rectangle(0, 41, width, 24);
-        tabsLeftBounds = new Rectangle(0, 41, 18, 24);
-        tabsRightBounds = new Rectangle(width - 18, 41, 18, 24);
-        children.add(buttonLeftTab = new AbstractPressableButtonWidget(4, 44, 12, 18, "") {
-            @Override
-            public void onPress() {
-                tabsScrollProgress = Integer.MIN_VALUE;
-                tabsScrollVelocity = 0d;
-                clampTabsScrolled();
+        if (isShowingTabs()) {
+            tabsBounds = new Rectangle(0, 41, width, 24);
+            tabsLeftBounds = new Rectangle(0, 41, 18, 24);
+            tabsRightBounds = new Rectangle(width - 18, 41, 18, 24);
+            children.add(buttonLeftTab = new AbstractPressableButtonWidget(4, 44, 12, 18, "") {
+                @Override
+                public void onPress() {
+                    tabsScrollProgress = Integer.MIN_VALUE;
+                    tabsScrollVelocity = 0d;
+                    clampTabsScrolled();
+                }
+        
+                @Override
+                public void renderButton(int int_1, int int_2, float float_1) {
+                    minecraft.getTextureManager().bindTexture(CONFIG_TEX);
+                    RenderHelper.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+                    int int_3 = this.getYImage(this.isHovered());
+                    RenderHelper.enableBlend();
+                    RenderHelper.blendFuncSeparate(770, 771, 0, 1);
+                    RenderHelper.blendFunc(770, 771);
+                    this.blit(x, y, 12, 18 * int_3, width, height);
+                }
+            });
+            int j = 0;
+            for(Pair<String, Integer> tab : tabs) {
+                tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getRight(), 20, I18n.translate(tab.getLeft())));
+                j++;
             }
-            
-            @Override
-            public void renderButton(int int_1, int int_2, float float_1) {
-                minecraft.getTextureManager().bindTexture(CONFIG_TEX);
-                RenderHelper.color4f(1.0F, 1.0F, 1.0F, this.alpha);
-                int int_3 = this.getYImage(this.isHovered());
-                RenderHelper.enableBlend();
-                RenderHelper.blendFuncSeparate(770, 771, 0, 1);
-                RenderHelper.blendFunc(770, 771);
-                this.blit(x, y, 12, 18 * int_3, width, height);
-            }
-        });
-        int j = 0;
-        for(Pair<String, Integer> tab : tabs) {
-            tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getRight(), 20, I18n.translate(tab.getLeft())));
-            j++;
+            tabButtons.forEach(children::add);
+            children.add(buttonRightTab = new AbstractPressableButtonWidget(width - 16, 44, 12, 18, "") {
+                @Override
+                public void onPress() {
+                    tabsScrollProgress = Integer.MAX_VALUE;
+                    tabsScrollVelocity = 0d;
+                    clampTabsScrolled();
+                }
+        
+                @Override
+                public void renderButton(int int_1, int int_2, float float_1) {
+                    minecraft.getTextureManager().bindTexture(CONFIG_TEX);
+                    RenderHelper.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+                    int int_3 = this.getYImage(this.isHovered());
+                    RenderHelper.enableBlend();
+                    RenderHelper.blendFuncSeparate(770, 771, 0, 1);
+                    RenderHelper.blendFunc(770, 771);
+                    this.blit(x, y, 0, 18 * int_3, width, height);
+                }
+            });
+        } else {
+            tabsBounds = tabsLeftBounds = tabsRightBounds = new Rectangle();
         }
-        tabButtons.forEach(children::add);
-        children.add(buttonRightTab = new AbstractPressableButtonWidget(width - 16, 44, 12, 18, "") {
-            @Override
-            public void onPress() {
-                tabsScrollProgress = Integer.MAX_VALUE;
-                tabsScrollVelocity = 0d;
-                clampTabsScrolled();
-            }
-            
-            @Override
-            public void renderButton(int int_1, int int_2, float float_1) {
-                minecraft.getTextureManager().bindTexture(CONFIG_TEX);
-                RenderHelper.color4f(1.0F, 1.0F, 1.0F, this.alpha);
-                int int_3 = this.getYImage(this.isHovered());
-                RenderHelper.enableBlend();
-                RenderHelper.blendFuncSeparate(770, 771, 0, 1);
-                RenderHelper.blendFunc(770, 771);
-                this.blit(x, y, 0, 18 * int_3, width, height);
-            }
-        });
     }
     
     @Override
@@ -294,7 +313,7 @@ public abstract class ClothConfigScreen extends Screen {
             tabs.forEach(pair -> d.addAndGet(pair.getRight() + 2));
             tabsMaximumScrolled = d.get();
         }
-        return tabsMaximumScrolled;
+        return tabsMaximumScrolled + 8;
     }
     
     public void resetTabsMaximumScrolled() {
@@ -314,53 +333,57 @@ public abstract class ClothConfigScreen extends Screen {
     
     @Override
     public void render(int int_1, int int_2, float float_1) {
-        if (smoothScrollingTabs) {
-            double change = tabsScrollVelocity * 0.2f;
-            if (change != 0) {
-                if (change > 0 && change < .2)
-                    change = .2;
-                else if (change < 0 && change > -.2)
-                    change = -.2;
-                tabsScrollProgress += change;
-                tabsScrollVelocity -= change;
-                if (change > 0 == tabsScrollVelocity < 0)
-                    tabsScrollVelocity = 0f;
+        if (isShowingTabs()) {
+            if (smoothScrollingTabs) {
+                double change = tabsScrollVelocity * 0.2f;
+                if (change != 0) {
+                    if (change > 0 && change < .2)
+                        change = .2;
+                    else if (change < 0 && change > -.2)
+                        change = -.2;
+                    tabsScrollProgress += change;
+                    tabsScrollVelocity -= change;
+                    if (change > 0 == tabsScrollVelocity < 0)
+                        tabsScrollVelocity = 0f;
+                    clampTabsScrolled();
+                }
+            } else {
+                tabsScrollProgress += tabsScrollVelocity;
+                tabsScrollVelocity = 0d;
                 clampTabsScrolled();
             }
+            int xx = 24 - (int) tabsScrollProgress;
+            for(ClothConfigTabButton tabButton : tabButtons) {
+                tabButton.x = xx;
+                xx += tabButton.getWidth() + 2;
+            }
+            buttonLeftTab.active = tabsScrollProgress > 0d;
+            buttonRightTab.active = tabsScrollProgress < getTabsMaximumScrolled() - width + 40;
+        }
+        if (isTransparentBackground()) {
+            fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
         } else {
-            tabsScrollProgress += tabsScrollVelocity;
-            tabsScrollVelocity = 0d;
-            clampTabsScrolled();
+            renderDirtBackground(0);
         }
-        int xx = 20 - (int) tabsScrollProgress;
-        for(ClothConfigTabButton tabButton : tabButtons) {
-            tabButton.x = xx;
-            xx += tabButton.getWidth() + 2;
-        }
-        buttonLeftTab.active = tabsScrollProgress > 0d;
-        buttonRightTab.active = tabsScrollProgress < getTabsMaximumScrolled() - width + 40;
-        renderDirtBackground(0);
         listWidget.render(int_1, int_2, float_1);
-        Window window = minecraft.window;
-        int sw = window.getWidth();
-        int sh = window.getHeight();
-        int x = Math.round(sw * (listWidget.left / (float) width));
-        int y = Math.round(sh * (listWidget.top / (float) height));
-        int ww = Math.round(sw * (listWidget.width / (float) width));
-        int hh = Math.round(sh * ((listWidget.bottom - listWidget.top) / (float) height));
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GL11.glScissor(x, sh - hh - y, ww, hh);
+        ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
         for(AbstractConfigEntry child : listWidget.children())
             child.lateRender(int_1, int_2, float_1);
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
-        overlayBackground(tabsBounds, 32, 32, 32, 255, 255);
-        drawCenteredString(minecraft.textRenderer, title, width / 2, 18, -1);
-        tabButtons.forEach(widget -> widget.render(int_1, int_2, float_1));
-        overlayBackground(tabsLeftBounds, 64, 64, 64, 255, 255);
-        overlayBackground(tabsRightBounds, 64, 64, 64, 255, 255);
-        drawShades();
-        buttonLeftTab.render(int_1, int_2, float_1);
-        buttonRightTab.render(int_1, int_2, float_1);
+        ScissorsHandler.INSTANCE.removeLastScissor();
+        if (isShowingTabs()) {
+            drawCenteredString(minecraft.textRenderer, title, width / 2, 18, -1);
+            Rectangle onlyInnerTabBounds = new Rectangle(tabsBounds.x + 20, tabsBounds.y, tabsBounds.width - 40, tabsBounds.height);
+            ScissorsHandler.INSTANCE.scissor(onlyInnerTabBounds);
+            if (isTransparentBackground())
+                fillGradient(onlyInnerTabBounds.x, onlyInnerTabBounds.y, onlyInnerTabBounds.getMaxX(), onlyInnerTabBounds.getMaxY(), 0x68000000, 0x68000000);
+            else
+                overlayBackground(onlyInnerTabBounds, 32, 32, 32, 255, 255);
+            tabButtons.forEach(widget -> widget.render(int_1, int_2, float_1));
+            drawTabsShades(0, isTransparentBackground() ? 120 : 255);
+            ScissorsHandler.INSTANCE.removeLastScissor();
+            buttonLeftTab.render(int_1, int_2, float_1);
+            buttonRightTab.render(int_1, int_2, float_1);
+        } else drawCenteredString(minecraft.textRenderer, title, width / 2, 12, -1);
         
         if (displayErrors && isEditable()) {
             List<String> errors = Lists.newArrayList();
@@ -371,15 +394,22 @@ public abstract class ClothConfigScreen extends Screen {
             if (errors.size() > 0) {
                 minecraft.getTextureManager().bindTexture(CONFIG_TEX);
                 RenderHelper.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+                String text = errors.size() == 1 ? errors.get(0) : I18n.translate("text.cloth-config.multi_error");
+                if (isTransparentBackground()) {
+                    int stringWidth = minecraft.textRenderer.getStringWidth(text);
+                    fillGradient(8, 9, 20 + stringWidth, 14 + minecraft.textRenderer.fontHeight, 0x68000000, 0x68000000);
+                }
                 blit(10, 10, 0, 54, 3, 11);
-                if (errors.size() == 1)
-                    drawString(minecraft.textRenderer, "§c" + errors.get(0), 18, 12, -1);
-                else
-                    drawString(minecraft.textRenderer, "§c" + I18n.translate("text.cloth-config.multi_error"), 18, 12, -1);
+                drawString(minecraft.textRenderer, "§c" + errors.get(0), 18, 12, -1);
             }
         } else if (!isEditable()) {
             minecraft.getTextureManager().bindTexture(CONFIG_TEX);
             RenderHelper.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            String text = "§c" + I18n.translate("text.cloth-config.not_editable");
+            if (isTransparentBackground()) {
+                int stringWidth = minecraft.textRenderer.getStringWidth(text);
+                fillGradient(8, 9, 20 + stringWidth, 14 + minecraft.textRenderer.fontHeight, 0x68000000, 0x68000000);
+            }
             blit(10, 10, 0, 54, 3, 11);
             drawString(minecraft.textRenderer, "§c" + I18n.translate("text.cloth-config.not_editable"), 18, 12, -1);
         }
@@ -392,7 +422,7 @@ public abstract class ClothConfigScreen extends Screen {
         queuedTooltips.add(queuedTooltip);
     }
     
-    private void drawShades() {
+    private void drawTabsShades(int lightColor, int darkColor) {
         RenderHelper.enableBlend();
         RenderHelper.blendFuncSeparate(770, 771, 0, 1);
         RenderHelper.disableAlphaTest();
@@ -401,16 +431,16 @@ public abstract class ClothConfigScreen extends Screen {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
-        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMinY() + 4, 0.0D).texture(0.0D, 1.0D).color(0, 0, 0, 0).next();
-        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMinY() + 4, 0.0D).texture(1.0D, 1.0D).color(0, 0, 0, 0).next();
-        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMinY(), 0.0D).texture(1.0D, 0.0D).color(0, 0, 0, 255).next();
-        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMinY(), 0.0D).texture(0.0D, 0.0D).color(0, 0, 0, 255).next();
+        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMinY() + 4, 0.0D).texture(0.0D, 1.0D).color(0, 0, 0, lightColor).next();
+        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMinY() + 4, 0.0D).texture(1.0D, 1.0D).color(0, 0, 0, lightColor).next();
+        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMinY(), 0.0D).texture(1.0D, 0.0D).color(0, 0, 0, darkColor).next();
+        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMinY(), 0.0D).texture(0.0D, 0.0D).color(0, 0, 0, darkColor).next();
         tessellator.draw();
         buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
-        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMaxY(), 0.0D).texture(0.0D, 1.0D).color(0, 0, 0, 255).next();
-        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMaxY(), 0.0D).texture(1.0D, 1.0D).color(0, 0, 0, 255).next();
-        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0D).texture(1.0D, 0.0D).color(0, 0, 0, 0).next();
-        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMaxY() - 4, 0.0D).texture(0.0D, 0.0D).color(0, 0, 0, 0).next();
+        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMaxY(), 0.0D).texture(0.0D, 1.0D).color(0, 0, 0, darkColor).next();
+        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMaxY(), 0.0D).texture(1.0D, 1.0D).color(0, 0, 0, darkColor).next();
+        buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0D).texture(1.0D, 0.0D).color(0, 0, 0, lightColor).next();
+        buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMaxY() - 4, 0.0D).texture(0.0D, 0.0D).color(0, 0, 0, lightColor).next();
         tessellator.draw();
         RenderHelper.enableTexture();
         RenderHelper.shadeModel(7424);
@@ -419,6 +449,8 @@ public abstract class ClothConfigScreen extends Screen {
     }
     
     protected void overlayBackground(Rectangle rect, int red, int green, int blue, int startAlpha, int endAlpha) {
+        if (isTransparentBackground())
+            return;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBufferBuilder();
         minecraft.getTextureManager().bindTexture(getBackgroundLocation());
@@ -444,10 +476,16 @@ public abstract class ClothConfigScreen extends Screen {
         return super.keyPressed(int_1, int_2, int_3);
     }
     
-    public abstract void onSave(Map<String, List<Pair<String, Object>>> o);
+    public void save() {
+    }
     
     public boolean isEditable() {
-        return true;
+        return editable;
+    }
+    
+    @Deprecated
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
     
     private class QuitSaveConsumer implements BooleanConsumer {
@@ -485,7 +523,7 @@ public abstract class ClothConfigScreen extends Screen {
         protected final void clearStuff() {
             this.clearItems();
         }
-    
+        
         @Override
         public boolean mouseClicked(double double_1, double double_2, int int_1) {
             this.updateScrollingState(double_1, double_2, int_1);
@@ -503,9 +541,24 @@ public abstract class ClothConfigScreen extends Screen {
                     this.clickedHeader((int) (double_1 - (double) (this.left + this.width / 2 - this.getItemWidth() / 2)), (int) (double_2 - (double) this.top) + (int) this.getScroll() - 4);
                     return true;
                 }
-        
+                
                 return this.scrolling;
             }
+        }
+        
+        @Override
+        protected void renderBackBackground(BufferBuilder buffer, Tessellator tessellator) {
+            if (!isTransparentBackground())
+                super.renderBackBackground(buffer, tessellator);
+            else {
+                fillGradient(left, top, right, bottom, 0x68000000, 0x68000000);
+            }
+        }
+        
+        @Override
+        protected void renderHoleBackground(int int_1, int int_2, int int_3, int int_4) {
+            if (!isTransparentBackground())
+                super.renderHoleBackground(int_1, int_2, int_3, int_4);
         }
     }
     
