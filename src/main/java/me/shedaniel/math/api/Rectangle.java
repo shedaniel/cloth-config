@@ -1,5 +1,7 @@
 package me.shedaniel.math.api;
 
+import java.util.Objects;
+
 public class Rectangle implements Cloneable {
     public int x;
     public int y;
@@ -474,5 +476,15 @@ public class Rectangle implements Cloneable {
     @Override
     public String toString() {
         return getClass().getName() + "[x=" + x + ",y=" + y + ",width=" + width + ",height=" + height + "]";
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 1;
+        result = 31 * result + x;
+        result = 31 * result + y;
+        result = 31 * result + width;
+        result = 31 * result + height;
+        return result;
     }
 }
