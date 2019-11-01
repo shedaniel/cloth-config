@@ -63,6 +63,14 @@ public class Point implements Cloneable {
     }
     
     @Override
+    public int hashCode() {
+        int result = 1;
+        result = 31 * result + x;
+        result = 31 * result + y;
+        return result;
+    }
+    
+    @Override
     public String toString() {
         return getClass().getName() + "[x=" + x + ",y=" + y + "]";
     }

@@ -54,8 +54,10 @@ public class Dimension implements Cloneable {
     
     @Override
     public int hashCode() {
-        int sum = width + height;
-        return sum * (sum + 1) / 2 + width;
+        int result = 1;
+        result = 31 * result + width;
+        result = 31 * result + height;
+        return result;
     }
     
     @Override
