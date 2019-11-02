@@ -19,22 +19,9 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     protected boolean smoothScrolling = true;
     protected long start;
     protected long duration;
-    protected RunSixtyTimesEverySec clamper = () -> {
-        target = clamp(target);
-        if (target < 0) {
-            target = target * getBounceBackMultiplier();
-        } else if (target > getMaxScroll()) {
-            target = (target - getMaxScroll()) * getBounceBackMultiplier() + getMaxScroll();
-        } else
-            unregisterClamper();
-    };
     
     public DynamicNewSmoothScrollingEntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, Identifier backgroundLocation) {
         super(client, width, height, top, bottom, backgroundLocation);
-    }
-    
-    protected void unregisterClamper() {
-        clamper.unregisterTick();
     }
     
     public final double clamp(double v) {
@@ -128,8 +115,11 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     
     private void updatePosition(float delta) {
         target = clamp(target);
-        if ((target < 0 || target > getMaxScroll()) && !clamper.isRegistered())
-            clamper.registerTick();
+        if (target < 0) {
+            target -= target * (1 - ClothConfigInitializer.getBounceBackMultiplier()) * delta / 3;
+        } else if (target > getMaxScroll()) {
+            target = (target - getMaxScroll()) * (1 - (1 - ClothConfigInitializer.getBounceBackMultiplier()) * delta / 3) + getMaxScroll();
+        }
         if (!Precision.almostEquals(scroll, target, Precision.FLOAT_EPSILON))
             scroll = (float) Interpolation.expoEase(scroll, target, Math.min((System.currentTimeMillis() - start) / ((double) duration), 1));
         else
