@@ -31,7 +31,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
     private static EasingMethod easingMethod = EasingMethodImpl.QUART;
     private static long scrollDuration = 1000;
     private static double scrollStep = 16;
-    private static double bounceBackMultiplier = .84;
+    private static double bounceBackMultiplier = .24;
     
     public static EasingMethod getEasingMethod() {
         return easingMethod;
@@ -56,7 +56,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
             easingMethod = EasingMethodImpl.QUART;
             scrollDuration = 1000;
             scrollStep = 16;
-            bounceBackMultiplier = .84;
+            bounceBackMultiplier = .24;
             if (!file.exists()) {
                 saveConfig();
             }
@@ -71,13 +71,13 @@ public class ClothConfigInitializer implements ClientModInitializer {
             }
             scrollDuration = Long.parseLong(properties.getProperty("scrollDuration", "1000"));
             scrollStep = Double.parseDouble(properties.getProperty("scrollStep", "16"));
-            bounceBackMultiplier = Double.parseDouble(properties.getProperty("bounceBackMultiplier1", "0.84"));
+            bounceBackMultiplier = Double.parseDouble(properties.getProperty("bounceBackMultiplier2", "0.24"));
         } catch (Exception e) {
             e.printStackTrace();
             easingMethod = EasingMethodImpl.QUART;
             scrollDuration = 1000;
             scrollStep = 16;
-            bounceBackMultiplier = .84;
+            bounceBackMultiplier = .24;
             try {
                 if (file.exists())
                     file.delete();
@@ -95,7 +95,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
             properties.setProperty("easingMethod", easingMethod.toString());
             properties.setProperty("scrollDuration", scrollDuration + "");
             properties.setProperty("scrollStep", scrollStep + "");
-            properties.setProperty("bounceBackMultiplier1", bounceBackMultiplier + "");
+            properties.setProperty("bounceBackMultiplier2", bounceBackMultiplier + "");
             properties.store(writer, null);
             writer.close();
         } catch (Exception e) {
@@ -103,7 +103,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
             easingMethod = EasingMethodImpl.QUART;
             scrollDuration = 1000;
             scrollStep = 16;
-            bounceBackMultiplier = .84;
+            bounceBackMultiplier = .24;
         }
     }
     
@@ -130,7 +130,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
                             return integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms");
                         }).setDefaultValue(1000).setSaveConsumer(i -> scrollDuration = i).build());
                         scrolling.addEntry(entryBuilder.startDoubleField("Scroll Step", scrollStep).setDefaultValue(16).setSaveConsumer(i -> scrollStep = i).build());
-                        scrolling.addEntry(entryBuilder.startDoubleField("Bounce Multiplier", bounceBackMultiplier).setDefaultValue(0.84).setSaveConsumer(i -> bounceBackMultiplier = i).build());
+                        scrolling.addEntry(entryBuilder.startDoubleField("Bounce Multiplier", bounceBackMultiplier).setDefaultValue(0.24).setSaveConsumer(i -> bounceBackMultiplier = i).build());
                         ConfigCategory testing = builder.getOrCreateCategory("Testing");
                         testing.addEntry(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toSet())).setSaveConsumer(item -> System.out.println("save this " + item)).build());
                         builder.setSavingRunnable(() -> {
