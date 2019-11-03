@@ -192,6 +192,19 @@ public abstract class ClothConfigScreen extends Screen {
             this.requiresRestart = requiresRestart;
     }
     
+    public void saveAll(boolean openOtherScreens) {
+        for(List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values()))
+            for(AbstractConfigEntry entry : entries)
+                entry.save();
+        save();
+        if (openOtherScreens) {
+            if (requiresRestart)
+                ClothConfigScreen.this.minecraft.openScreen(new ClothRequiresRestartScreen(parent));
+            else
+                ClothConfigScreen.this.minecraft.openScreen(parent);
+        }
+    }
+    
     @Override
     protected void init() {
         super.init();
@@ -213,14 +226,7 @@ public abstract class ClothConfigScreen extends Screen {
         addButton(buttonSave = new AbstractPressableButtonWidget(width / 2 + 4, height - 26, 150, 20, "") {
             @Override
             public void onPress() {
-                for(List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values()))
-                    for(AbstractConfigEntry entry : entries)
-                        entry.save();
-                save();
-                if (requiresRestart)
-                    ClothConfigScreen.this.minecraft.openScreen(new ClothRequiresRestartScreen(parent));
-                else
-                    ClothConfigScreen.this.minecraft.openScreen(parent);
+                saveAll(true);
             }
             
             @Override
