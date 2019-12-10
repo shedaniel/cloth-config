@@ -2,10 +2,10 @@ package me.shedaniel.clothconfig2.impl;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.SelectionCellCreator;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.SelectionTopCellElement;
 import me.shedaniel.clothconfig2.impl.builders.*;
+import net.minecraft.client.util.InputUtil;
 
 import java.util.List;
 import java.util.UUID;
@@ -136,6 +136,11 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     @Override
     public LongSliderBuilder startLongSlider(String fieldNameKey, long value, long min, long max) {
         return new LongSliderBuilder(resetButtonKey, fieldNameKey, value, min, max);
+    }
+    
+    @Override
+    public KeyCodeBuilder startKeyCodeField(String fieldNameKey, InputUtil.KeyCode value) {
+        return new KeyCodeBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override

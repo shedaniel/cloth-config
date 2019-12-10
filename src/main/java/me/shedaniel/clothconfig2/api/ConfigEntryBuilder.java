@@ -6,6 +6,9 @@ import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.SelectionTopCellEl
 import me.shedaniel.clothconfig2.impl.ConfigEntryBuilderImpl;
 import me.shedaniel.clothconfig2.impl.builders.*;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder.TopCellElementBuilder;
+import net.fabricmc.fabric.mixin.client.keybinding.KeyCodeAccessor;
+import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.util.InputUtil;
 
 import java.util.List;
 import java.util.function.Function;
@@ -57,6 +60,12 @@ public interface ConfigEntryBuilder {
     IntSliderBuilder startIntSlider(String fieldNameKey, int value, int min, int max);
     
     LongSliderBuilder startLongSlider(String fieldNameKey, long value, long min, long max);
+    
+    KeyCodeBuilder startKeyCodeField(String fieldNameKey, InputUtil.KeyCode value);
+    
+    default KeyCodeBuilder fillKeybindingField(String fieldNameKey, KeyBinding value) {
+        return startKeyCodeField(fieldNameKey, ((KeyCodeAccessor) value).getKeyCode()).setDefaultValue(value.getDefaultKeyCode());
+    }
     
     <T> DropdownMenuBuilder<T> startDropdownMenu(String fieldNameKey, SelectionTopCellElement<T> topCellElement, SelectionCellCreator<T> cellCreator);
     

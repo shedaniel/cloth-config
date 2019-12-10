@@ -6,7 +6,7 @@ import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.math.api.Rectangle;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.render.GuiLighting;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
@@ -70,7 +70,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         widget.rectangle.width = entryWidth + 19;
         widget.rectangle.height = 24;
         MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
-        GuiLighting.disable();
+        DiffuseLighting.disable();
         RenderSystem.color4f(1, 1, 1, 1);
         blit(x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expended ? 9 : 0), 9, 9);
         MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(categoryName), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);

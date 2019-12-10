@@ -10,6 +10,7 @@ import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
@@ -133,6 +134,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
                         scrolling.addEntry(entryBuilder.startDoubleField("Bounce Multiplier", bounceBackMultiplier).setDefaultValue(0.24).setSaveConsumer(i -> bounceBackMultiplier = i).build());
                         ConfigCategory testing = builder.getOrCreateCategory("Testing");
                         testing.addEntry(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toSet())).setSaveConsumer(item -> System.out.println("save this " + item)).build());
+                        testing.addEntry(entryBuilder.startKeyCodeField("Cool Key", InputUtil.UNKNOWN_KEYCODE).setDefaultValue(InputUtil.UNKNOWN_KEYCODE).build());
                         builder.setSavingRunnable(() -> {
                             saveConfig();
                         });

@@ -1,7 +1,6 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
-import me.shedaniel.clothconfig2.api.RunSixtyTimesEverySec;
 import me.shedaniel.math.api.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
 import net.minecraft.client.MinecraftClient;
@@ -10,8 +9,6 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-
-import static me.shedaniel.clothconfig2.ClothConfigInitializer.getBounceBackMultiplier;
 
 public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends DynamicEntryListWidget<E> {
     
@@ -142,7 +139,7 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
             int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.fromMouse()) ? 222 : 172;
             
             // Black Bar
-            buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
+            buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
             buffer.vertex(scrollbarPositionMinX, this.bottom, 0.0D).texture(0, 1).color(0, 0, 0, 255).next();
             buffer.vertex(scrollbarPositionMaxX, this.bottom, 0.0D).texture(1, 1).color(0, 0, 0, 255).next();
             buffer.vertex(scrollbarPositionMaxX, this.top, 0.0D).texture(1, 0).color(0, 0, 0, 255).next();
@@ -150,7 +147,7 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
             tessellator.draw();
             
             // Bottom
-            buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
+            buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
             buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).texture(0, 1).color(bottomc, bottomc, bottomc, 255).next();
             buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).texture(1, 1).color(bottomc, bottomc, bottomc, 255).next();
             buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).texture(1, 0).color(bottomc, bottomc, bottomc, 255).next();
@@ -158,7 +155,7 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
             tessellator.draw();
             
             // Top
-            buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
+            buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
             buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).texture(0, 1).color(topc, topc, topc, 255).next();
             buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).texture(1, 1).color(topc, topc, topc, 255).next();
             buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).texture(1, 0).color(topc, topc, topc, 255).next();

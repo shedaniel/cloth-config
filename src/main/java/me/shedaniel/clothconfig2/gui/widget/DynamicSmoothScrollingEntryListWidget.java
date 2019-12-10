@@ -134,7 +134,7 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
             int minY = Math.min(Math.max((int) this.getScroll() * (this.bottom - this.top - height) / maxScroll + this.top, this.top), this.bottom - height);
             
             // Black Bar
-            buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
+            buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
             buffer.vertex(scrollbarPositionMinX, this.bottom, 0.0D).texture(0, 1).color(0, 0, 0, 255).next();
             buffer.vertex(scrollbarPositionMaxX, this.bottom, 0.0D).texture(1, 1).color(0, 0, 0, 255).next();
             buffer.vertex(scrollbarPositionMaxX, this.top, 0.0D).texture(1, 0).color(0, 0, 0, 255).next();
@@ -142,7 +142,7 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
             tessellator.draw();
             
             // Top
-            buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
+            buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
             buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).texture(0, 1).color(128, 128, 128, 255).next();
             buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).texture(1, 1).color(128, 128, 128, 255).next();
             buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).texture(1, 0).color(128, 128, 128, 255).next();
@@ -150,7 +150,7 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
             tessellator.draw();
             
             // Bottom
-            buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
+            buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
             buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).texture(0, 1).color(192, 192, 192, 255).next();
             buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).texture(1, 1).color(192, 192, 192, 255).next();
             buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).texture(1, 0).color(192, 192, 192, 255).next();

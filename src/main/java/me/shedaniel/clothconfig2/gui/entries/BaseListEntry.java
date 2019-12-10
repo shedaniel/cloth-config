@@ -9,7 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.GuiLighting;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
@@ -165,7 +165,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell> extends TooltipLi
                 getScreen().queueTooltip(QueuedTooltip.create(new Point(mouseX, mouseY), tooltip.get()));
         }
         MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
-        GuiLighting.disable();
+        DiffuseLighting.disable();
         RenderSystem.color4f(1, 1, 1, 1);
         BaseListCell focused = !expended || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);

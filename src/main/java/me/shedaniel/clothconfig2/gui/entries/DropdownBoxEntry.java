@@ -401,10 +401,10 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.fromMouse()) ? 222 : 172;
                 
                 Tessellator tessellator = Tessellator.getInstance();
-                BufferBuilder buffer = tessellator.getBufferBuilder();
+                BufferBuilder buffer = tessellator.getBuffer();
                 
                 // Bottom
-                buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
+                buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
                 buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).texture(0, 1).color(bottomc, bottomc, bottomc, 255).next();
                 buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).texture(1, 1).color(bottomc, bottomc, bottomc, 255).next();
                 buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).texture(1, 0).color(bottomc, bottomc, bottomc, 255).next();
@@ -412,7 +412,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 tessellator.draw();
                 
                 // Top
-                buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
+                buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
                 buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).texture(0, 1).color(topc, topc, topc, 255).next();
                 buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).texture(1, 1).color(topc, topc, topc, 255).next();
                 buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).texture(1, 0).color(topc, topc, topc, 255).next();

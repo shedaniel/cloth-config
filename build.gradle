@@ -1,7 +1,7 @@
 import java.text.SimpleDateFormat
 
 plugins {
-    id 'fabric-loom' version '0.2.4-SNAPSHOT'
+    id 'fabric-loom' version '0.2.5-SNAPSHOT'
     id 'maven-publish'
     id 'maven'
     id 'signing'
@@ -141,7 +141,7 @@ curseforge {
     if (apiKey != null)
         project {
             id = '319057'
-            releaseType = 'beta'
+            releaseType = 'release'
             addGameVersion '1.15-Snapshot'
             addGameVersion 'Java 8'
             relations {

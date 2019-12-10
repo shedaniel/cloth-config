@@ -9,6 +9,7 @@ import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.QueuedTooltip;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
+import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import me.shedaniel.math.api.Rectangle;
 import net.minecraft.client.MinecraftClient;
@@ -23,6 +24,7 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -42,6 +44,7 @@ public abstract class ClothConfigScreen extends Screen {
     
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     private final List<QueuedTooltip> queuedTooltips = Lists.newArrayList();
+    public KeyCodeEntry focusedBinding;
     public int nextTabIndex;
     public int selectedTabIndex;
     public double tabsScrollVelocity = 0d;
@@ -435,14 +438,14 @@ public abstract class ClothConfigScreen extends Screen {
         RenderSystem.shadeModel(7425);
         RenderSystem.disableTexture();
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBufferBuilder();
-        buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
         buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMinY() + 4, 0.0D).texture(0, 1f).color(0, 0, 0, lightColor).next();
         buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMinY() + 4, 0.0D).texture(1f, 1f).color(0, 0, 0, lightColor).next();
         buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMinY(), 0.0D).texture(1f, 0).color(0, 0, 0, darkColor).next();
         buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMinY(), 0.0D).texture(0, 0).color(0, 0, 0, darkColor).next();
         tessellator.draw();
-        buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
+        buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
         buffer.vertex(tabsBounds.getMinX() + 20, tabsBounds.getMaxY(), 0.0D).texture(0, 1f).color(0, 0, 0, darkColor).next();
         buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMaxY(), 0.0D).texture(1f, 1f).color(0, 0, 0, darkColor).next();
         buffer.vertex(tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0D).texture(1f, 0).color(0, 0, 0, lightColor).next();
@@ -459,11 +462,11 @@ public abstract class ClothConfigScreen extends Screen {
         if (isTransparentBackground())
             return;
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBufferBuilder();
+        BufferBuilder buffer = tessellator.getBuffer();
         minecraft.getTextureManager().bindTexture(getBackgroundLocation());
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         float f = 32.0F;
-        buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
+        buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
         buffer.vertex(rect.getMinX(), rect.getMaxY(), 0.0D).texture(rect.getMinX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();
         buffer.vertex(rect.getMaxX(), rect.getMaxY(), 0.0D).texture(rect.getMaxX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();
         buffer.vertex(rect.getMaxX(), rect.getMinY(), 0.0D).texture(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).next();
@@ -472,7 +475,28 @@ public abstract class ClothConfigScreen extends Screen {
     }
     
     @Override
+    public boolean mouseClicked(double double_1, double double_2, int int_1) {
+        if (this.focusedBinding != null) {
+            focusedBinding.setValue(InputUtil.Type.MOUSE.createFromCode(int_1));
+            this.focusedBinding = null;
+            return true;
+        } else {
+            return super.mouseClicked(double_1, double_2, int_1);
+        }
+    }
+    
+    @Override
     public boolean keyPressed(int int_1, int int_2, int int_3) {
+        if (this.focusedBinding != null) {
+            if (int_1 == 256) {
+                focusedBinding.setValue(InputUtil.UNKNOWN_KEYCODE);
+            } else {
+                focusedBinding.setValue(InputUtil.getKeyCode(int_1, int_2));
+            }
+            
+            this.focusedBinding = null;
+            return true;
+        }
         if (int_1 == 256 && this.shouldCloseOnEsc()) {
             if (confirmSave && edited)
                 minecraft.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), I18n.translate("text.cloth-config.quit_discard"), I18n.translate("gui.cancel")));
