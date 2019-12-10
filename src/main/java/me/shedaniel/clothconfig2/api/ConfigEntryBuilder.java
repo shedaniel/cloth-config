@@ -7,6 +7,7 @@ import me.shedaniel.clothconfig2.impl.ConfigEntryBuilderImpl;
 import me.shedaniel.clothconfig2.impl.builders.*;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder.TopCellElementBuilder;
 import net.fabricmc.fabric.mixin.client.keybinding.KeyCodeAccessor;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 
@@ -64,7 +65,11 @@ public interface ConfigEntryBuilder {
     KeyCodeBuilder startKeyCodeField(String fieldNameKey, InputUtil.KeyCode value);
     
     default KeyCodeBuilder fillKeybindingField(String fieldNameKey, KeyBinding value) {
-        return startKeyCodeField(fieldNameKey, ((KeyCodeAccessor) value).getKeyCode()).setDefaultValue(value.getDefaultKeyCode());
+        return startKeyCodeField(fieldNameKey, ((KeyCodeAccessor) value).getKeyCode()).setDefaultValue(value.getDefaultKeyCode()).setSaveConsumer(code -> {
+            value.setKeyCode(code);
+            KeyBinding.updateKeysByCode();
+            MinecraftClient.getInstance().options.write();
+        });
     }
     
     <T> DropdownMenuBuilder<T> startDropdownMenu(String fieldNameKey, SelectionTopCellElement<T> topCellElement, SelectionCellCreator<T> cellCreator);
