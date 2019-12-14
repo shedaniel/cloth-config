@@ -49,12 +49,9 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
             Rectangle r = scissorsAreas.get(0).clone();
             scissorsAreas.stream().skip(1L).forEach(rectangle -> r.setBounds(r.intersects(rectangle) ? r.intersection(rectangle) : new Rectangle()));
             Window window = MinecraftClient.getInstance().getWindow();
-            int x = Math.round(window.getWidth() * (r.x / (float) window.getScaledWidth()));
-            int y = Math.round(window.getHeight() * (r.y / (float) window.getScaledHeight()));
-            int ww = Math.round(window.getWidth() * (r.width / (float) window.getScaledWidth()));
-            int hh = Math.round(window.getHeight() * ((r.height) / (float) window.getScaledHeight()));
+            double scaleFactor = window.getScaleFactor();
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
-            GL11.glScissor(x, window.getHeight() - hh - y, ww, hh);
+            GL11.glScissor((int) (r.x * scaleFactor), (int) ((window.getScaledHeight() - r.height - r.y) * scaleFactor), (int) (r.width * scaleFactor), (int) (r.height * scaleFactor));
         } else
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }

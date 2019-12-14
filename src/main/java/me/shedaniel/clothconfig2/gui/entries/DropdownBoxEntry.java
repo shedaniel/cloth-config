@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
-import me.shedaniel.clothconfig2.api.RunSixtyTimesEverySec;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget.SmoothScrollingSettings;
 import me.shedaniel.clothconfig2.gui.widget.DynamicNewSmoothScrollingEntryListWidget.Interpolation;
@@ -31,8 +30,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import static me.shedaniel.clothconfig2.ClothConfigInitializer.getBounceBackMultiplier;
 
 @SuppressWarnings("deprecation")
 public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
@@ -238,24 +235,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         protected double scroll, target;
         protected long start;
         protected long duration;
-        protected RunSixtyTimesEverySec clamper = () -> {
-            target = clamp(target);
-            if (target < 0) {
-                target = target * getBounceBackMultiplier();
-            } else if (target > getMaxScrollPosition()) {
-                target = (target - getMaxScrollPosition()) * getBounceBackMultiplier() + getMaxScrollPosition();
-            } else
-                unregisterClamper();
-        };
         
         public DefaultDropdownMenuElement(@Nonnull ImmutableList<R> selections) {
             this.selections = selections;
             this.cells = Lists.newArrayList();
             this.currentElements = Lists.newArrayList();
-        }
-        
-        protected void unregisterClamper() {
-            clamper.unregisterTick();
         }
         
         public final double clamp(double v) {
@@ -354,8 +338,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         private void updatePosition(float delta) {
             target = clamp(target);
-            if ((target < 0 || target > getMaxScrollPosition()) && !clamper.isRegistered())
-                clamper.registerTick();
+            if (target < 0) {
+                target -= target * (1 - ClothConfigInitializer.getBounceBackMultiplier()) * delta / 3;
+            } else if (target > getMaxScrollPosition()) {
+                target = (target - getMaxScrollPosition()) * (1 - (1 - ClothConfigInitializer.getBounceBackMultiplier()) * delta / 3) + getMaxScrollPosition();
+            }
             if (!Precision.almostEquals(scroll, target, Precision.FLOAT_EPSILON))
                 scroll = (float) Interpolation.expoEase(scroll, target, Math.min((System.currentTimeMillis() - start) / ((double) duration), 1));
             else
@@ -369,6 +356,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             fill(lastRectangle.x, lastRectangle.y + lastRectangle.height, lastRectangle.x + cWidth, lastRectangle.y + lastRectangle.height + last10Height + 1, -6250336);
             fill(lastRectangle.x + 1, lastRectangle.y + lastRectangle.height + 1, lastRectangle.x + cWidth - 1, lastRectangle.y + lastRectangle.height + last10Height, -16777216);
             RenderSystem.pushMatrix();
+            RenderSystem.translatef(0, 0, 300f);
             
             ScissorsHandler.INSTANCE.scissor(new Rectangle(lastRectangle.x, lastRectangle.y + lastRectangle.height + 1, cWidth - 6, last10Height - 1));
             double yy = lastRectangle.y + lastRectangle.height - scroll;
@@ -420,6 +408,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 tessellator.draw();
                 RenderSystem.enableTexture();
             }
+            RenderSystem.translatef(0, 0, -300f);
             RenderSystem.popMatrix();
         }
         

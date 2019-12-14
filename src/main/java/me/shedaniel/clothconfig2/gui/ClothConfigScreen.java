@@ -477,7 +477,10 @@ public abstract class ClothConfigScreen extends Screen {
     @Override
     public boolean mouseClicked(double double_1, double double_2, int int_1) {
         if (this.focusedBinding != null) {
-            focusedBinding.setValue(InputUtil.Type.MOUSE.createFromCode(int_1));
+            if (focusedBinding.isAllowMouse())
+                focusedBinding.setValue(InputUtil.Type.MOUSE.createFromCode(int_1));
+            else
+                focusedBinding.setValue(InputUtil.UNKNOWN_KEYCODE);
             this.focusedBinding = null;
             return true;
         } else {
@@ -488,7 +491,7 @@ public abstract class ClothConfigScreen extends Screen {
     @Override
     public boolean keyPressed(int int_1, int int_2, int int_3) {
         if (this.focusedBinding != null) {
-            if (int_1 == 256) {
+            if (int_1 == 256 || !focusedBinding.isAllowKey()) {
                 focusedBinding.setValue(InputUtil.UNKNOWN_KEYCODE);
             } else {
                 focusedBinding.setValue(InputUtil.getKeyCode(int_1, int_2));

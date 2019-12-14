@@ -15,10 +15,25 @@ public class KeyCodeBuilder extends FieldBuilder<InputUtil.KeyCode, KeyCodeEntry
     @Nullable private Consumer<InputUtil.KeyCode> saveConsumer = null;
     @Nonnull private Function<InputUtil.KeyCode, Optional<String[]>> tooltipSupplier = bool -> Optional.empty();
     private InputUtil.KeyCode value;
+    private boolean allowKey = true, allowMouse = true;
     
     public KeyCodeBuilder(String resetButtonKey, String fieldNameKey, InputUtil.KeyCode value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
+    }
+    
+    public KeyCodeBuilder setAllowKey(boolean allowKey) {
+        if (!allowMouse && !allowKey)
+            throw new IllegalArgumentException();
+        this.allowKey = allowKey;
+        return this;
+    }
+    
+    public KeyCodeBuilder setAllowMouse(boolean allowMouse) {
+        if (!allowKey && !allowMouse)
+            throw new IllegalArgumentException();
+        this.allowMouse = allowMouse;
+        return this;
     }
     
     public KeyCodeBuilder setErrorSupplier(@Nullable Function<InputUtil.KeyCode, Optional<String>> errorSupplier) {
@@ -72,6 +87,8 @@ public class KeyCodeBuilder extends FieldBuilder<InputUtil.KeyCode, KeyCodeEntry
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
+        entry.setAllowKey(allowKey);
+        entry.setAllowMouse(allowMouse);
         return entry;
     }
     
