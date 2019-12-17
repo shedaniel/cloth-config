@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.clothconfig2.impl.EasingMethod.EasingMethodImpl;
 import me.shedaniel.clothconfig2.impl.EasingMethods;
@@ -146,6 +147,21 @@ public class ClothConfigInitializer implements ClientModInitializer {
                 });
             } catch (Exception e) {
                 ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed to add test config override for ModMenu!", e);
+            }
+        }
+        if (FabricLoader.getInstance().isModLoaded("notenoughcrashes")) {
+            try {
+                Class<?> clazz = Class.forName("fudge.notenoughcrashes.api.NotEnoughCrashesApi");
+                Method method = clazz.getMethod("onEveryCrash", Runnable.class);
+                method.invoke(null, (Runnable) () -> {
+                    try {
+                        ScissorsHandler.INSTANCE.clearScissors();
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                });
+            } catch (Exception e) {
+                ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed to apply reset state to Not Enough Crashes!", e);
             }
         }
     }
