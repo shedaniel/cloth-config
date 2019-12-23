@@ -39,6 +39,9 @@ dependencies {
     modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
+    //https://github.com/natanfudge/Not-Enough-Crashes/blob/master/README.md
+    modImplementation "com.lettuce.fudge:notenoughcrashes-api:$nec_api_version"
+    include "com.lettuce.fudge:notenoughcrashes-api:$nec_api_version"
 }
 
 bintray {
