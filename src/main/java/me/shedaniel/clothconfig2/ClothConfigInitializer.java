@@ -149,21 +149,6 @@ public class ClothConfigInitializer implements ClientModInitializer {
                 ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed to add test config override for ModMenu!", e);
             }
         }
-        if (FabricLoader.getInstance().isModLoaded("notenoughcrashes")) {
-            try {
-                Class<?> clazz = Class.forName("fudge.notenoughcrashes.api.NotEnoughCrashesApi");
-                Method method = clazz.getMethod("onEveryCrash", Runnable.class);
-                method.invoke(null, (Runnable) () -> {
-                    try {
-                        ScissorsHandler.INSTANCE.clearScissors();
-                    } catch (Throwable throwable) {
-                        throwable.printStackTrace();
-                    }
-                });
-            } catch (Exception e) {
-                ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed to apply reset state to Not Enough Crashes!", e);
-            }
-        }
     }
     
 }
