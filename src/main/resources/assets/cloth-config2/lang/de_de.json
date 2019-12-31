@@ -24,5 +24,8 @@
   "text.cloth-config.ignore_restart": "Neustart ignorieren",
   "text.cloth-config.boolean.value.true": "§aJa",
   "text.cloth-config.boolean.value.false": "§cNein",
-  "text.cloth-config.dropdown.value.unknown": "§cKeine Vorschläge"
+  "text.cloth-config.dropdown.value.unknown": "§cKeine Vorschläge",
+  "modifier.cloth-config.alt": "Alt + %s",
+  "modifier.cloth-config.ctrl": "Ctrl + %s",
+  "modifier.cloth-config.shift": "Shift + %s"
 }
