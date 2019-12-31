@@ -62,7 +62,11 @@ public interface ConfigEntryBuilder {
     
     LongSliderBuilder startLongSlider(String fieldNameKey, long value, long min, long max);
     
-    KeyCodeBuilder startKeyCodeField(String fieldNameKey, InputUtil.KeyCode value);
+    KeyCodeBuilder startModifierKeyCodeField(String fieldNameKey, ModifierKeyCode value);
+    
+    default KeyCodeBuilder startKeyCodeField(String fieldNameKey, InputUtil.KeyCode value) {
+        return startModifierKeyCodeField(fieldNameKey, ModifierKeyCode.of(value, Modifier.none())).setAllowModifiers(false);
+    }
     
     default KeyCodeBuilder fillKeybindingField(String fieldNameKey, KeyBinding value) {
         return startKeyCodeField(fieldNameKey, ((KeyCodeAccessor) value).getKeyCode()).setDefaultValue(value.getDefaultKeyCode()).setSaveConsumer(code -> {

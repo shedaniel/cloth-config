@@ -2,10 +2,10 @@ package me.shedaniel.clothconfig2.impl;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.SelectionCellCreator;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.SelectionTopCellElement;
 import me.shedaniel.clothconfig2.impl.builders.*;
-import net.minecraft.client.util.InputUtil;
 
 import java.util.List;
 import java.util.UUID;
@@ -139,7 +139,7 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     }
     
     @Override
-    public KeyCodeBuilder startKeyCodeField(String fieldNameKey, InputUtil.KeyCode value) {
+    public KeyCodeBuilder startModifierKeyCodeField(String fieldNameKey, ModifierKeyCode value) {
         return new KeyCodeBuilder(resetButtonKey, fieldNameKey, value);
     }
     

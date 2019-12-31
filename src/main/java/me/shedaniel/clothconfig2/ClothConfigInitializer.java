@@ -1,14 +1,12 @@
 package me.shedaniel.clothconfig2;
 
-import me.shedaniel.clothconfig2.api.ConfigBuilder;
-import me.shedaniel.clothconfig2.api.ConfigCategory;
-import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.api.ScissorsHandler;
+import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.clothconfig2.impl.EasingMethod.EasingMethodImpl;
 import me.shedaniel.clothconfig2.impl.EasingMethods;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
@@ -27,6 +25,7 @@ import java.util.Comparator;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class ClothConfigInitializer implements ClientModInitializer {
     
     public static final Logger LOGGER = LogManager.getFormatterLogger("ClothConfig");
@@ -65,7 +64,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
             Properties properties = new Properties();
             properties.load(new FileInputStream(file));
             String easing = properties.getProperty("easingMethod", "QUART");
-            for(EasingMethod value : EasingMethods.getMethods()) {
+            for (EasingMethod value : EasingMethods.getMethods()) {
                 if (value.toString().equalsIgnoreCase(easing)) {
                     easingMethod = value;
                     break;
@@ -123,7 +122,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
                         ConfigCategory scrolling = builder.getOrCreateCategory("Scrolling");
                         ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
                         scrolling.addEntry(entryBuilder.startDropdownMenu("Easing Method", DropdownMenuBuilder.TopCellElementBuilder.of(easingMethod, str -> {
-                            for(EasingMethod m : EasingMethods.getMethods())
+                            for (EasingMethod m : EasingMethods.getMethods())
                                 if (m.toString().equals(str))
                                     return m;
                             return null;
@@ -136,6 +135,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
                         ConfigCategory testing = builder.getOrCreateCategory("Testing");
                         testing.addEntry(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toSet())).setSaveConsumer(item -> System.out.println("save this " + item)).build());
                         testing.addEntry(entryBuilder.startKeyCodeField("Cool Key", InputUtil.UNKNOWN_KEYCODE).setDefaultValue(InputUtil.UNKNOWN_KEYCODE).build());
+                        testing.addEntry(entryBuilder.startModifierKeyCodeField("Cool Modifier Key", ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).setDefaultValue(ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).build());
                         builder.setSavingRunnable(() -> {
                             saveConfig();
                         });
@@ -148,6 +148,10 @@ public class ClothConfigInitializer implements ClientModInitializer {
             } catch (Exception e) {
                 ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed to add test config override for ModMenu!", e);
             }
+            KeyBindingRegistry.INSTANCE.addCategory("Cloth Config");
+            FakeModifierKeyCodeAdder.INSTANCE.registerModifierKeyCode("Cloth Config", "unknown key lol", ModifierKeyCode.unknown(), keyCode -> {
+                System.out.println("new");
+            });
         }
     }
     

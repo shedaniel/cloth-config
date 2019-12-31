@@ -1,45 +1,49 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
+import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.Formatting;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class KeyCodeEntry extends TooltipListEntry<InputUtil.KeyCode> {
+@SuppressWarnings("DuplicatedCode")
+public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     
-    private InputUtil.KeyCode value;
+    private ModifierKeyCode value;
     private ButtonWidget buttonWidget, resetButton;
-    private Consumer<InputUtil.KeyCode> saveConsumer;
-    private Supplier<InputUtil.KeyCode> defaultValue;
+    private Consumer<ModifierKeyCode> saveConsumer;
+    private Supplier<ModifierKeyCode> defaultValue;
     private List<Element> widgets;
-    private boolean allowMouse = true, allowKey = true;
+    private boolean allowMouse = true, allowKey = true, allowModifiers = true;
     
     @Deprecated
-    public KeyCodeEntry(String fieldName, InputUtil.KeyCode value, String resetButtonKey, Supplier<InputUtil.KeyCode> defaultValue, Consumer<InputUtil.KeyCode> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    public KeyCodeEntry(String fieldName, ModifierKeyCode value, String resetButtonKey, Supplier<ModifierKeyCode> defaultValue, Consumer<ModifierKeyCode> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.value = value;
         this.buttonWidget = new ButtonWidget(0, 0, 150, 20, "", widget -> {
-            getScreen().focusedBinding = this;
+            getScreen().setFocusedBinding(this);
             getScreen().setEdited(true, isRequiresRestart());
         });
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {
             KeyCodeEntry.this.value = getDefaultValue().get();
-            getScreen().focusedBinding = null;
+            getScreen().setFocusedBinding(null);
             getScreen().setEdited(true, isRequiresRestart());
         });
         this.saveConsumer = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
+    }
+    
+    public void setAllowModifiers(boolean allowModifiers) {
+        this.allowModifiers = allowModifiers;
     }
     
     public void setAllowKey(boolean allowKey) {
@@ -50,6 +54,10 @@ public class KeyCodeEntry extends TooltipListEntry<InputUtil.KeyCode> {
         this.allowMouse = allowMouse;
     }
     
+    public boolean isAllowModifiers() {
+        return allowModifiers;
+    }
+    
     public boolean isAllowKey() {
         return allowKey;
     }
@@ -58,7 +66,7 @@ public class KeyCodeEntry extends TooltipListEntry<InputUtil.KeyCode> {
         return allowMouse;
     }
     
-    public void setValue(InputUtil.KeyCode value) {
+    public void setValue(ModifierKeyCode value) {
         this.value = value;
     }
     
@@ -69,31 +77,17 @@ public class KeyCodeEntry extends TooltipListEntry<InputUtil.KeyCode> {
     }
     
     @Override
-    public InputUtil.KeyCode getValue() {
+    public ModifierKeyCode getValue() {
         return value;
     }
     
     @Override
-    public Optional<InputUtil.KeyCode> getDefaultValue() {
+    public Optional<ModifierKeyCode> getDefaultValue() {
         return Optional.ofNullable(defaultValue).map(Supplier::get);
     }
     
     private String getLocalizedName() {
-        String string_1 = this.value.getName();
-        int int_1 = this.value.getKeyCode();
-        String string_2 = null;
-        switch (this.value.getCategory()) {
-            case KEYSYM:
-                string_2 = InputUtil.getKeycodeName(int_1);
-                break;
-            case SCANCODE:
-                string_2 = InputUtil.getScancodeName(int_1);
-                break;
-            case MOUSE:
-                String string_3 = I18n.translate(string_1);
-                string_2 = Objects.equals(string_3, string_1) ? I18n.translate(InputUtil.Type.MOUSE.getName(), int_1 + 1) : string_3;
-        }
-        return string_2 == null ? I18n.translate(string_1) : string_2;
+        return this.value.getLocalizedName();
     }
     
     @Override
@@ -105,19 +99,18 @@ public class KeyCodeEntry extends TooltipListEntry<InputUtil.KeyCode> {
         this.buttonWidget.active = isEditable();
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(getLocalizedName());
-        if (getScreen().focusedBinding == this)
+        if (getScreen().getFocusedBinding() == this)
             this.buttonWidget.setMessage(Formatting.WHITE + "> " + Formatting.YELLOW + this.buttonWidget.getMessage() + Formatting.WHITE + " <");
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(getFieldName())), y + 5, 16777215);
             this.resetButton.x = x;
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
-            this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         } else {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
-            this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         }
+        this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         resetButton.render(mouseX, mouseY, delta);
         buttonWidget.render(mouseX, mouseY, delta);
     }

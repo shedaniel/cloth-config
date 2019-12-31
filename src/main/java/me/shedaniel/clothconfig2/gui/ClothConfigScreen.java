@@ -5,10 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
-import me.shedaniel.clothconfig2.api.QueuedTooltip;
-import me.shedaniel.clothconfig2.api.ScissorsHandler;
+import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import me.shedaniel.math.api.Rectangle;
@@ -39,12 +36,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "rawtypes", "unchecked", "DuplicatedCode"})
 public abstract class ClothConfigScreen extends Screen {
     
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     private final List<QueuedTooltip> queuedTooltips = Lists.newArrayList();
-    public KeyCodeEntry focusedBinding;
+    private KeyCodeEntry focusedBinding;
     public int nextTabIndex;
     public int selectedTabIndex;
     public double tabsScrollVelocity = 0d;
@@ -81,7 +78,7 @@ public abstract class ClothConfigScreen extends Screen {
         this.defaultBackgroundLocation = defaultBackgroundLocation;
         o.forEach((tab, pairs) -> {
             List<AbstractConfigEntry> list = Lists.newArrayList();
-            for(Pair<String, Object> pair : pairs) {
+            for (Pair<String, Object> pair : pairs) {
                 if (pair.getRight() instanceof AbstractConfigListEntry) {
                     list.add((AbstractConfigListEntry) pair.getRight());
                 } else {
@@ -95,7 +92,7 @@ public abstract class ClothConfigScreen extends Screen {
         this.tabs = tabbedEntries.keySet().stream().map(s -> new Pair<>(s, textRenderer.getStringWidth(I18n.translate(s)) + 8)).collect(Collectors.toList());
         this.nextTabIndex = 0;
         this.selectedTabIndex = 0;
-        for(int i = 0; i < tabs.size(); i++) {
+        for (int i = 0; i < tabs.size(); i++) {
             Pair<String, Integer> pair = tabs.get(i);
             if (pair.getLeft().equals(getFallbackCategory())) {
                 this.nextTabIndex = i;
@@ -148,7 +145,7 @@ public abstract class ClothConfigScreen extends Screen {
     @Override
     public void tick() {
         super.tick();
-        for(Element child : children())
+        for (Element child : children())
             if (child instanceof Tickable)
                 ((Tickable) child).tick();
     }
@@ -195,8 +192,8 @@ public abstract class ClothConfigScreen extends Screen {
     }
     
     public void saveAll(boolean openOtherScreens) {
-        for(List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values()))
-            for(AbstractConfigEntry entry : entries)
+        for (List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values()))
+            for (AbstractConfigEntry entry : entries)
                 entry.save();
         save();
         if (openOtherScreens) {
@@ -235,8 +232,8 @@ public abstract class ClothConfigScreen extends Screen {
             public void render(int int_1, int int_2, float float_1) {
                 boolean hasErrors = false;
                 if (displayErrors)
-                    for(List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values())) {
-                        for(AbstractConfigEntry entry : entries)
+                    for (List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values())) {
+                        for (AbstractConfigEntry entry : entries)
                             if (entry.getConfigError().isPresent()) {
                                 hasErrors = true;
                                 break;
@@ -274,11 +271,11 @@ public abstract class ClothConfigScreen extends Screen {
                 }
             });
             int j = 0;
-            for(Pair<String, Integer> tab : tabs) {
+            for (Pair<String, Integer> tab : tabs) {
                 tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getRight(), 20, I18n.translate(tab.getLeft())));
                 j++;
             }
-            tabButtons.forEach(children::add);
+            children.addAll(tabButtons);
             children.add(buttonRightTab = new AbstractPressableButtonWidget(width - 16, 44, 12, 18, "") {
                 @Override
                 public void onPress() {
@@ -331,7 +328,7 @@ public abstract class ClothConfigScreen extends Screen {
     
     public void clampTabsScrolled() {
         int xx = 0;
-        for(ClothConfigTabButton tabButton : tabButtons)
+        for (ClothConfigTabButton tabButton : tabButtons)
             xx += tabButton.getWidth() + 2;
         if (xx > width - 40)
             tabsScrollProgress = MathHelper.clamp(tabsScrollProgress, 0, getTabsMaximumScrolled() - width + 40);
@@ -361,7 +358,7 @@ public abstract class ClothConfigScreen extends Screen {
                 clampTabsScrolled();
             }
             int xx = 24 - (int) tabsScrollProgress;
-            for(ClothConfigTabButton tabButton : tabButtons) {
+            for (ClothConfigTabButton tabButton : tabButtons) {
                 tabButton.x = xx;
                 xx += tabButton.getWidth() + 2;
             }
@@ -375,7 +372,7 @@ public abstract class ClothConfigScreen extends Screen {
         }
         listWidget.render(int_1, int_2, float_1);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
-        for(AbstractConfigEntry child : listWidget.children())
+        for (AbstractConfigEntry child : listWidget.children())
             child.lateRender(int_1, int_2, float_1);
         ScissorsHandler.INSTANCE.removeLastScissor();
         if (isShowingTabs()) {
@@ -396,8 +393,8 @@ public abstract class ClothConfigScreen extends Screen {
         
         if (displayErrors && isEditable()) {
             List<String> errors = Lists.newArrayList();
-            for(List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values()))
-                for(AbstractConfigEntry entry : entries)
+            for (List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values()))
+                for (AbstractConfigEntry entry : entries)
                     if (entry.getConfigError().isPresent())
                         errors.add(((Optional<String>) entry.getConfigError()).get());
             if (errors.size() > 0) {
@@ -474,32 +471,118 @@ public abstract class ClothConfigScreen extends Screen {
         tessellator.draw();
     }
     
+    public void setFocusedBinding(KeyCodeEntry focusedBinding) {
+        this.focusedBinding = focusedBinding;
+        if (focusedBinding != null) {
+            startedKeyCode = this.focusedBinding.getValue();
+            startedKeyCode.setKeyCodeAndModifier(InputUtil.UNKNOWN_KEYCODE, Modifier.none());
+        } else
+            startedKeyCode = null;
+    }
+    
+    public KeyCodeEntry getFocusedBinding() {
+        return focusedBinding;
+    }
+    
+    private ModifierKeyCode startedKeyCode = null;
+    
+    @Override
+    public boolean mouseReleased(double double_1, double double_2, int int_1) {
+        if (this.focusedBinding != null && this.startedKeyCode != null && !this.startedKeyCode.isUnknown() && focusedBinding.isAllowMouse()) {
+            focusedBinding.setValue(startedKeyCode);
+            setFocusedBinding(null);
+            return true;
+        }
+        return super.mouseReleased(double_1, double_2, int_1);
+    }
+    
+    @Override
+    public boolean keyReleased(int int_1, int int_2, int int_3) {
+        if (this.focusedBinding != null && this.startedKeyCode != null && focusedBinding.isAllowKey()) {
+            focusedBinding.setValue(startedKeyCode);
+            setFocusedBinding(null);
+            return true;
+        }
+        return super.keyReleased(int_1, int_2, int_3);
+    }
+    
     @Override
     public boolean mouseClicked(double double_1, double double_2, int int_1) {
-        if (this.focusedBinding != null) {
-            if (focusedBinding.isAllowMouse())
-                focusedBinding.setValue(InputUtil.Type.MOUSE.createFromCode(int_1));
-            else
-                focusedBinding.setValue(InputUtil.UNKNOWN_KEYCODE);
-            this.focusedBinding = null;
+        if (this.focusedBinding != null && this.startedKeyCode != null && focusedBinding.isAllowMouse()) {
+            if (startedKeyCode.isUnknown())
+                startedKeyCode.setKeyCode(InputUtil.Type.MOUSE.createFromCode(int_1));
+            else if (focusedBinding.isAllowModifiers()) {
+                if (startedKeyCode.getType() == InputUtil.Type.KEYSYM) {
+                    int code = startedKeyCode.getKeyCode().getKeyCode();
+                    if (MinecraftClient.IS_SYSTEM_MAC ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
+                        Modifier modifier = startedKeyCode.getModifier();
+                        startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
+                        startedKeyCode.setKeyCode(InputUtil.Type.MOUSE.createFromCode(int_1));
+                        return true;
+                    } else if (code == 344 || code == 340) {
+                        Modifier modifier = startedKeyCode.getModifier();
+                        startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
+                        startedKeyCode.setKeyCode(InputUtil.Type.MOUSE.createFromCode(int_1));
+                        return true;
+                    } else if (code == 342 || code == 346) {
+                        Modifier modifier = startedKeyCode.getModifier();
+                        startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
+                        startedKeyCode.setKeyCode(InputUtil.Type.MOUSE.createFromCode(int_1));
+                        return true;
+                    }
+                }
+            }
             return true;
         } else {
+            if (this.focusedBinding != null)
+                return true;
             return super.mouseClicked(double_1, double_2, int_1);
         }
     }
     
     @Override
     public boolean keyPressed(int int_1, int int_2, int int_3) {
-        if (this.focusedBinding != null) {
-            if (int_1 == 256 || !focusedBinding.isAllowKey()) {
-                focusedBinding.setValue(InputUtil.UNKNOWN_KEYCODE);
-            } else {
-                focusedBinding.setValue(InputUtil.getKeyCode(int_1, int_2));
+        if (this.focusedBinding != null && focusedBinding.isAllowKey()) {
+            if (startedKeyCode.isUnknown())
+                startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+            else if (focusedBinding.isAllowModifiers()) {
+                if (startedKeyCode.getType() == InputUtil.Type.KEYSYM) {
+                    int code = startedKeyCode.getKeyCode().getKeyCode();
+                    if (MinecraftClient.IS_SYSTEM_MAC ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
+                        Modifier modifier = startedKeyCode.getModifier();
+                        startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
+                        startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                        return true;
+                    } else if (code == 344 || code == 340) {
+                        Modifier modifier = startedKeyCode.getModifier();
+                        startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
+                        startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                        return true;
+                    } else if (code == 342 || code == 346) {
+                        Modifier modifier = startedKeyCode.getModifier();
+                        startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
+                        startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                        return true;
+                    }
+                }
+                if (MinecraftClient.IS_SYSTEM_MAC ? (int_1 == 343 || int_1 == 347) : (int_1 == 341 || int_1 == 345)) {
+                    Modifier modifier = startedKeyCode.getModifier();
+                    startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
+                    return true;
+                } else if (int_1 == 344 || int_1 == 340) {
+                    Modifier modifier = startedKeyCode.getModifier();
+                    startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
+                    return true;
+                } else if (int_1 == 342 || int_1 == 346) {
+                    Modifier modifier = startedKeyCode.getModifier();
+                    startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
+                    return true;
+                }
             }
-            
-            this.focusedBinding = null;
             return true;
         }
+        if (this.focusedBinding != null)
+            return true;
         if (int_1 == 256 && this.shouldCloseOnEsc()) {
             if (confirmSave && edited)
                 minecraft.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), I18n.translate("text.cloth-config.quit_discard"), I18n.translate("gui.cancel")));
@@ -529,7 +612,6 @@ public abstract class ClothConfigScreen extends Screen {
                 minecraft.openScreen(ClothConfigScreen.this);
             else
                 minecraft.openScreen(parent);
-            return;
         }
     }
     
@@ -564,7 +646,7 @@ public abstract class ClothConfigScreen extends Screen {
             if (!this.isMouseOver(double_1, double_2)) {
                 return false;
             } else {
-                for(R entry : children()) {
+                for (R entry : children()) {
                     if (entry.mouseClicked(double_1, double_2, int_1)) {
                         this.setFocused(entry);
                         this.setDragging(true);
