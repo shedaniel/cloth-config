@@ -40,8 +40,7 @@ dependencies {
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
     //https://github.com/natanfudge/Not-Enough-Crashes/blob/master/README.md
-    modImplementation "com.lettuce.fudge:notenoughcrashes-api:$nec_api_version"
-    include "com.lettuce.fudge:notenoughcrashes-api:$nec_api_version"
+    modCompileOnly "com.lettuce.fudge:notenoughcrashes:$nec_version"
 }
 
 bintray {
@@ -93,6 +92,7 @@ task javadocs(type: Javadoc) {
 
 task javadocsJar(type: Jar, dependsOn: javadocs) {
     classifier = "javadocs"
+    javadocs.failOnError false
     from javadocs.destinationDir
 }
 
