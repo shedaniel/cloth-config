@@ -148,10 +148,10 @@ public class ClothConfigInitializer implements ClientModInitializer {
             } catch (Exception e) {
                 ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed to add test config override for ModMenu!", e);
             }
-            KeyBindingRegistry.INSTANCE.addCategory("Cloth Config");
-            FakeModifierKeyCodeAdder.INSTANCE.registerModifierKeyCode("Cloth Config", "unknown key lol", ModifierKeyCode.unknown(), keyCode -> {
-                System.out.println("new");
-            });
+//            KeyBindingRegistry.INSTANCE.addCategory("Cloth Config");
+//            FakeModifierKeyCodeAdder.INSTANCE.registerModifierKeyCode("Cloth Config", "unknown key lol", ModifierKeyCode.unknown(), keyCode -> {
+//                System.out.println("new");
+//            });
         }
     }
     
