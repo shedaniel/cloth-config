@@ -1,18 +1,19 @@
 package me.shedaniel.clothconfig2.impl;
 
-import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import me.shedaniel.clothconfig2.api.FakeModifierKeyCodeAdder;
+import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import net.minecraft.client.options.KeyBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class FakeModifierKeyCodeAdderImpl implements FakeModifierKeyCodeAdder {
     private List<Entry> entryList = new ArrayList<>();
     
     @Override
-    public void registerModifierKeyCode(String category, String translationKey, ModifierKeyCode keyCode, ModifierKeyCode defaultKeyCode, Consumer<ModifierKeyCode> onChanged) {
+    public void registerModifierKeyCode(String category, String translationKey, Supplier<ModifierKeyCode> keyCode, Supplier<ModifierKeyCode> defaultKeyCode, Consumer<ModifierKeyCode> onChanged) {
         entryList.add(new Entry(category, translationKey, keyCode, defaultKeyCode, onChanged));
     }
     
@@ -20,7 +21,7 @@ public class FakeModifierKeyCodeAdderImpl implements FakeModifierKeyCodeAdder {
     public List<KeyBinding> getFakeBindings() {
         List<KeyBinding> keyBindings = new ArrayList<>();
         for (Entry entry : entryList) {
-            keyBindings.add(new FakeKeyBindings(entry.translationKey, entry.keyCode, entry.defaultKeyCode, entry.category, entry.onChanged));
+            keyBindings.add(new FakeKeyBindings(entry.translationKey, entry.keyCode.get(), entry.defaultKeyCode.get(), entry.category, entry.onChanged));
         }
         return keyBindings;
     }
@@ -28,11 +29,11 @@ public class FakeModifierKeyCodeAdderImpl implements FakeModifierKeyCodeAdder {
     private class Entry {
         private String category;
         private String translationKey;
-        private ModifierKeyCode keyCode;
-        private ModifierKeyCode defaultKeyCode;
+        private Supplier<ModifierKeyCode> keyCode;
+        private Supplier<ModifierKeyCode> defaultKeyCode;
         private Consumer<ModifierKeyCode> onChanged;
         
-        private Entry(String category, String translationKey, ModifierKeyCode keyCode, ModifierKeyCode defaultKeyCode, Consumer<ModifierKeyCode> onChanged) {
+        private Entry(String category, String translationKey, Supplier<ModifierKeyCode> keyCode, Supplier<ModifierKeyCode> defaultKeyCode, Consumer<ModifierKeyCode> onChanged) {
             this.category = category;
             this.translationKey = translationKey;
             this.keyCode = keyCode;

@@ -1,7 +1,6 @@
 package me.shedaniel.clothconfig2.impl;
 
 import me.shedaniel.clothconfig2.api.ModifierKeyCode;
-import net.fabricmc.fabric.mixin.client.keybinding.KeyCodeAccessor;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 
@@ -36,7 +35,7 @@ public class FakeKeyBindings extends KeyBinding {
     
     @Override
     public boolean equals(KeyBinding keyBinding_1) {
-        return keyCode.getKeyCode().equals(((KeyCodeAccessor) keyBinding_1).getKeyCode());
+        return false;
     }
     
     @Override
