@@ -1,5 +1,6 @@
 package me.shedaniel.clothconfig2.impl;
 
+import me.shedaniel.clothconfig2.api.Modifier;
 import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
@@ -30,6 +31,7 @@ public class FakeKeyBindings extends KeyBinding {
     @Override
     public void setKeyCode(InputUtil.KeyCode inputUtil$KeyCode_1) {
         keyCode.setKeyCode(inputUtil$KeyCode_1);
+        keyCode.setModifier(Modifier.none());
         onChanged.accept(keyCode);
     }
     
