@@ -6,7 +6,6 @@ import me.shedaniel.clothconfig2.impl.EasingMethod.EasingMethodImpl;
 import me.shedaniel.clothconfig2.impl.EasingMethods;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
@@ -21,7 +20,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -29,9 +30,9 @@ import java.util.stream.Collectors;
 public class ClothConfigInitializer implements ClientModInitializer {
     
     public static final Logger LOGGER = LogManager.getFormatterLogger("ClothConfig");
-    private static EasingMethod easingMethod = EasingMethodImpl.QUART;
-    private static long scrollDuration = 1000;
-    private static double scrollStep = 16;
+    private static EasingMethod easingMethod = EasingMethodImpl.LINEAR;
+    private static long scrollDuration = 600;
+    private static double scrollStep = 19;
     private static double bounceBackMultiplier = .24;
     
     public static EasingMethod getEasingMethod() {
@@ -54,38 +55,37 @@ public class ClothConfigInitializer implements ClientModInitializer {
         File file = new File(FabricLoader.getInstance().getConfigDirectory(), "cloth-config2/config.properties");
         try {
             file.getParentFile().mkdirs();
-            easingMethod = EasingMethodImpl.QUART;
-            scrollDuration = 1000;
-            scrollStep = 16;
+            easingMethod = EasingMethodImpl.LINEAR;
+            scrollDuration = 600;
+            scrollStep = 19;
             bounceBackMultiplier = .24;
             if (!file.exists()) {
                 saveConfig();
             }
             Properties properties = new Properties();
             properties.load(new FileInputStream(file));
-            String easing = properties.getProperty("easingMethod", "QUART");
+            String easing = properties.getProperty("easingMethod1", "LINEAR");
             for (EasingMethod value : EasingMethods.getMethods()) {
                 if (value.toString().equalsIgnoreCase(easing)) {
                     easingMethod = value;
                     break;
                 }
             }
-            scrollDuration = Long.parseLong(properties.getProperty("scrollDuration", "1000"));
-            scrollStep = Double.parseDouble(properties.getProperty("scrollStep", "16"));
+            scrollDuration = Long.parseLong(properties.getProperty("scrollDuration1", "600"));
+            scrollStep = Double.parseDouble(properties.getProperty("scrollStep1", "19"));
             bounceBackMultiplier = Double.parseDouble(properties.getProperty("bounceBackMultiplier2", "0.24"));
         } catch (Exception e) {
             e.printStackTrace();
-            easingMethod = EasingMethodImpl.QUART;
-            scrollDuration = 1000;
-            scrollStep = 16;
+            easingMethod = EasingMethodImpl.LINEAR;
+            scrollDuration = 600;
+            scrollStep = 19;
             bounceBackMultiplier = .24;
             try {
-                if (file.exists())
-                    file.delete();
+                Files.deleteIfExists(file.toPath());
             } catch (Exception ignored) {
             }
-            saveConfig();
         }
+        saveConfig();
     }
     
     private static void saveConfig() {
@@ -93,17 +93,17 @@ public class ClothConfigInitializer implements ClientModInitializer {
         try {
             FileWriter writer = new FileWriter(file, false);
             Properties properties = new Properties();
-            properties.setProperty("easingMethod", easingMethod.toString());
-            properties.setProperty("scrollDuration", scrollDuration + "");
-            properties.setProperty("scrollStep", scrollStep + "");
+            properties.setProperty("easingMethod1", easingMethod.toString());
+            properties.setProperty("scrollDuration1", scrollDuration + "");
+            properties.setProperty("scrollStep1", scrollStep + "");
             properties.setProperty("bounceBackMultiplier2", bounceBackMultiplier + "");
             properties.store(writer, null);
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
-            easingMethod = EasingMethodImpl.QUART;
-            scrollDuration = 1000;
-            scrollStep = 16;
+            easingMethod = EasingMethodImpl.LINEAR;
+            scrollDuration = 600;
+            scrollStep = 19;
             bounceBackMultiplier = .24;
         }
     }
@@ -126,19 +126,15 @@ public class ClothConfigInitializer implements ClientModInitializer {
                                 if (m.toString().equals(str))
                                     return m;
                             return null;
-                        })).setDefaultValue(EasingMethodImpl.QUART).setSaveConsumer(o -> easingMethod = (EasingMethod) o).setSelections(EasingMethods.getMethods()).build());
-                        scrolling.addEntry(entryBuilder.startLongSlider("Scroll Duration", scrollDuration, 0, 5000).setTextGetter(integer -> {
-                            return integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms");
-                        }).setDefaultValue(1000).setSaveConsumer(i -> scrollDuration = i).build());
-                        scrolling.addEntry(entryBuilder.startDoubleField("Scroll Step", scrollStep).setDefaultValue(16).setSaveConsumer(i -> scrollStep = i).build());
+                        })).setDefaultValue(EasingMethodImpl.LINEAR).setSaveConsumer(o -> easingMethod = (EasingMethod) o).setSelections(EasingMethods.getMethods()).build());
+                        scrolling.addEntry(entryBuilder.startLongSlider("Scroll Duration", scrollDuration, 0, 5000).setTextGetter(integer -> integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms")).setDefaultValue(600).setSaveConsumer(i -> scrollDuration = i).build());
+                        scrolling.addEntry(entryBuilder.startDoubleField("Scroll Step", scrollStep).setDefaultValue(19).setSaveConsumer(i -> scrollStep = i).build());
                         scrolling.addEntry(entryBuilder.startDoubleField("Bounce Multiplier", bounceBackMultiplier).setDefaultValue(0.24).setSaveConsumer(i -> bounceBackMultiplier = i).build());
                         ConfigCategory testing = builder.getOrCreateCategory("Testing");
-                        testing.addEntry(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toSet())).setSaveConsumer(item -> System.out.println("save this " + item)).build());
+                        testing.addEntry(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
                         testing.addEntry(entryBuilder.startKeyCodeField("Cool Key", InputUtil.UNKNOWN_KEYCODE).setDefaultValue(InputUtil.UNKNOWN_KEYCODE).build());
                         testing.addEntry(entryBuilder.startModifierKeyCodeField("Cool Modifier Key", ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).setDefaultValue(ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).build());
-                        builder.setSavingRunnable(() -> {
-                            saveConfig();
-                        });
+                        builder.setSavingRunnable(ClothConfigInitializer::saveConfig);
                         builder.transparentBackground();
                         MinecraftClient.getInstance().openScreen(builder.build());
                     } catch (Throwable throwable) {
@@ -148,10 +144,10 @@ public class ClothConfigInitializer implements ClientModInitializer {
             } catch (Exception e) {
                 ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed to add test config override for ModMenu!", e);
             }
-//            KeyBindingRegistry.INSTANCE.addCategory("Cloth Config");
-//            FakeModifierKeyCodeAdder.INSTANCE.registerModifierKeyCode("Cloth Config", "unknown key lol", ModifierKeyCode.unknown(), keyCode -> {
-//                System.out.println("new");
-//            });
+            //            KeyBindingRegistry.INSTANCE.addCategory("Cloth Config");
+            //            FakeModifierKeyCodeAdder.INSTANCE.registerModifierKeyCode("Cloth Config", "unknown key lol", ModifierKeyCode.unknown(), keyCode -> {
+            //                System.out.println("new");
+            //            });
         }
     }
     

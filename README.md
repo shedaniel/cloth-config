@@ -7,9 +7,10 @@ repositories {
     jcenter()
 }
 dependencies {
-    'me.shedaniel.cloth:config-2:LATEST'
+    'me.shedaniel.cloth:config-2:ABC'
 }
 ```
+
 ## APIs
 #### Config Screen v2 API
 Start by using `ConfigBuilder.create`, inside it you can do `getOrCreateCategory` to get the category instance. Do `addEntry` with the category instance to add an option.
