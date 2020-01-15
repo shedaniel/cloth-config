@@ -52,9 +52,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         this.minimum = minimum;
         this.sliderWidget = new Slider(0, 0, 152, 20, ((double) LongSliderEntry.this.value.get() - minimum) / Math.abs(maximum - minimum));
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {
-            sliderWidget.setValue((MathHelper.clamp(this.defaultValue.get(), minimum, maximum) - minimum) / (double) Math.abs(maximum - minimum));
-            this.value.set(Math.min(Math.max(this.defaultValue.get(), minimum), maximum));
-            sliderWidget.updateMessage();
+            setValue(defaultValue.get());
             getScreen().setEdited(true, isRequiresRestart());
         });
         this.sliderWidget.setMessage(textGetter.apply(LongSliderEntry.this.value.get()));
@@ -80,6 +78,13 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     @Override
     public Long getValue() {
         return value.get();
+    }
+    
+    @Deprecated
+    public void setValue(long value) {
+        sliderWidget.setValue((MathHelper.clamp(value, minimum, maximum) - minimum) / (double) Math.abs(maximum - minimum));
+        this.value.set(Math.min(Math.max(value, minimum), maximum));
+        sliderWidget.updateMessage();
     }
     
     @Override

@@ -60,6 +60,11 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         this.widgets = Lists.newArrayList(textFieldWidget, resetButton);
     }
     
+    @Deprecated
+    public void setValue(String s) {
+        textFieldWidget.setText(String.valueOf(s));
+    }
+    
     protected static void setTextFieldWidth(TextFieldWidget widget, int width) {
         widget.setWidth(width);
     }

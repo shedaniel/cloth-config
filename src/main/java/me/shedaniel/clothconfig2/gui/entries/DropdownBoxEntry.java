@@ -89,6 +89,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         return selectionElement.getValue();
     }
     
+    @Deprecated
+    public SelectionElement<T> getSelectionElement() {
+        return selectionElement;
+    }
+    
     @Override
     public Optional<T> getDefaultValue() {
         return defaultValue == null ? Optional.empty() : Optional.ofNullable(defaultValue.get());
@@ -152,7 +157,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             if (menu.isExpended())
                 menu.render(mouseX, mouseY, bounds, delta);
         }
-        
+    
+        @Deprecated
+        public SelectionTopCellElement<R> getTopRenderer() {
+            return topRenderer;
+        }
+    
         @Override
         public boolean mouseScrolled(double double_1, double double_2, double double_3) {
             if (menu.isExpended())
