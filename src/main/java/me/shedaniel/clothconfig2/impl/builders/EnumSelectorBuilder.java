@@ -34,43 +34,43 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
         return this;
     }
     
-    public EnumSelectorBuilder setSaveConsumer(Consumer<T> saveConsumer) {
+    public EnumSelectorBuilder<T> setSaveConsumer(Consumer<T> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
     }
     
-    public EnumSelectorBuilder setDefaultValue(Supplier<T> defaultValue) {
+    public EnumSelectorBuilder<T> setDefaultValue(Supplier<T> defaultValue) {
         this.defaultValue = defaultValue;
         return this;
     }
     
-    public EnumSelectorBuilder setDefaultValue(T defaultValue) {
+    public EnumSelectorBuilder<T> setDefaultValue(T defaultValue) {
         Objects.requireNonNull(defaultValue);
         this.defaultValue = () -> defaultValue;
         return this;
     }
     
-    public EnumSelectorBuilder setTooltipSupplier(Function<T, Optional<String[]>> tooltipSupplier) {
+    public EnumSelectorBuilder<T> setTooltipSupplier(Function<T, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public EnumSelectorBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public EnumSelectorBuilder<T> setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = e -> tooltipSupplier.get();
         return this;
     }
     
-    public EnumSelectorBuilder setTooltip(Optional<String[]> tooltip) {
+    public EnumSelectorBuilder<T> setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = e -> tooltip;
         return this;
     }
     
-    public EnumSelectorBuilder setTooltip(String... tooltip) {
+    public EnumSelectorBuilder<T> setTooltip(String... tooltip) {
         this.tooltipSupplier = e -> Optional.ofNullable(tooltip);
         return this;
     }
     
-    public EnumSelectorBuilder setEnumNameProvider(Function<Enum, String> enumNameProvider) {
+    public EnumSelectorBuilder<T> setEnumNameProvider(Function<Enum, String> enumNameProvider) {
         Objects.requireNonNull(enumNameProvider);
         this.enumNameProvider = enumNameProvider;
         return this;
