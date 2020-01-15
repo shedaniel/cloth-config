@@ -33,43 +33,43 @@ public class SelectorBuilder<T> extends FieldBuilder<T, SelectionListEntry<T>> {
         return this;
     }
     
-    public SelectorBuilder setSaveConsumer(Consumer<T> saveConsumer) {
+    public SelectorBuilder<T> setSaveConsumer(Consumer<T> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
     }
     
-    public SelectorBuilder setDefaultValue(Supplier<T> defaultValue) {
+    public SelectorBuilder<T> setDefaultValue(Supplier<T> defaultValue) {
         this.defaultValue = defaultValue;
         return this;
     }
     
-    public SelectorBuilder setDefaultValue(T defaultValue) {
+    public SelectorBuilder<T> setDefaultValue(T defaultValue) {
         Objects.requireNonNull(defaultValue);
         this.defaultValue = () -> defaultValue;
         return this;
     }
     
-    public SelectorBuilder setTooltipSupplier(Function<T, Optional<String[]>> tooltipSupplier) {
+    public SelectorBuilder<T> setTooltipSupplier(Function<T, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public SelectorBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public SelectorBuilder<T> setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = e -> tooltipSupplier.get();
         return this;
     }
     
-    public SelectorBuilder setTooltip(Optional<String[]> tooltip) {
+    public SelectorBuilder<T> setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = e -> tooltip;
         return this;
     }
     
-    public SelectorBuilder setTooltip(String... tooltip) {
+    public SelectorBuilder<T> setTooltip(String... tooltip) {
         this.tooltipSupplier = e -> Optional.ofNullable(tooltip);
         return this;
     }
     
-    public SelectorBuilder setNameProvider(Function<T, String> enumNameProvider) {
+    public SelectorBuilder<T> setNameProvider(Function<T, String> enumNameProvider) {
         this.nameProvider = enumNameProvider;
         return this;
     }
