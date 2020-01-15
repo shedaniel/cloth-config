@@ -35,52 +35,52 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         this.cellCreator = Objects.requireNonNull(cellCreator);
     }
     
-    public DropdownMenuBuilder setSelections(Iterable<T> selections) {
+    public DropdownMenuBuilder<T> setSelections(Iterable<T> selections) {
         this.selections = selections;
         return this;
     }
     
-    public DropdownMenuBuilder setDefaultValue(Supplier<T> defaultValue) {
+    public DropdownMenuBuilder<T> setDefaultValue(Supplier<T> defaultValue) {
         this.defaultValue = defaultValue;
         return this;
     }
     
-    public DropdownMenuBuilder setDefaultValue(T defaultValue) {
+    public DropdownMenuBuilder<T> setDefaultValue(T defaultValue) {
         this.defaultValue = () -> Objects.requireNonNull(defaultValue);
         return this;
     }
     
-    public DropdownMenuBuilder setSaveConsumer(Consumer<T> saveConsumer) {
+    public DropdownMenuBuilder<T> setSaveConsumer(Consumer<T> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
     }
     
-    public DropdownMenuBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public DropdownMenuBuilder<T> setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = str -> tooltipSupplier.get();
         return this;
     }
     
-    public DropdownMenuBuilder setTooltipSupplier(Function<T, Optional<String[]>> tooltipSupplier) {
+    public DropdownMenuBuilder<T> setTooltipSupplier(Function<T, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public DropdownMenuBuilder setTooltip(Optional<String[]> tooltip) {
+    public DropdownMenuBuilder<T> setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = str -> tooltip;
         return this;
     }
     
-    public DropdownMenuBuilder setTooltip(String... tooltip) {
+    public DropdownMenuBuilder<T> setTooltip(String... tooltip) {
         this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
         return this;
     }
     
-    public DropdownMenuBuilder requireRestart() {
+    public DropdownMenuBuilder<T> requireRestart() {
         requireRestart(true);
         return this;
     }
     
-    public DropdownMenuBuilder setErrorSupplier(Function<T, Optional<String>> errorSupplier) {
+    public DropdownMenuBuilder<T> setErrorSupplier(Function<T, Optional<String>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
