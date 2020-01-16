@@ -31,9 +31,9 @@
   "title.cloth-config.config": "Configuration de Cloth Mod Config",
   "category.cloth-config.scrolling": "Défilement",
   "category.cloth-config.testing": "Démo de configuration",
-  "option.cloth-config.scrollDuration": "Scroll Duration",
-  "option.cloth-config.scrollStep": "Scroll Step",
-  "option.cloth-config.bounceBackMultiplier": "Bounce Multiplier",
-  "option.cloth-config.setDefaultSmoothScroll": "Set Default Smooth Scroll",
-  "option.cloth-config.disableSmoothScroll": "Disable Smooth Scroll"
+  "option.cloth-config.scrollDuration": "Durée du défilement",
+  "option.cloth-config.scrollStep": "Pas du défilement",
+  "option.cloth-config.bounceBackMultiplier": "Multiplicateur du rebond",
+  "option.cloth-config.setDefaultSmoothScroll": "Définir le défilement régulier par défaut",
+  "option.cloth-config.disableSmoothScroll": "Désactiver le défilement régulier"
 }
