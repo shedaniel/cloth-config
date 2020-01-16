@@ -19,19 +19,19 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
     private Function<Integer, Optional<String>> cellErrorSupplier;
 
     @Deprecated
-    public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey) {
-        this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
+    public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey) {
+        this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
 
     @Deprecated
-    public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey, boolean requiresRestart) {
+    public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, defaultValue, integerListListEntry -> new IntegerListCell(0, integerListListEntry), saveConsumer, resetButtonKey, requiresRestart);
         this.minimum = -Integer.MAX_VALUE;
         this.maximum = Integer.MAX_VALUE;
         for (int integer : value)
             cells.add(new IntegerListCell(integer, this));
         this.widgets.addAll(cells);
-        expended = defaultExpended;
+        expanded = defaultExpanded;
     }
 
     public Function<Integer, Optional<String>> getCellErrorSupplier() {

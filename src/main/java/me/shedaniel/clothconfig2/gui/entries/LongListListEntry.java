@@ -19,19 +19,19 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
     private Function<Long, Optional<String>> cellErrorSupplier;
 
     @Deprecated
-    public LongListListEntry(String fieldName, List<Long> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, String resetButtonKey) {
-        this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
+    public LongListListEntry(String fieldName, List<Long> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, String resetButtonKey) {
+        this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
 
     @Deprecated
-    public LongListListEntry(String fieldName, List<Long> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, String resetButtonKey, boolean requiresRestart) {
+    public LongListListEntry(String fieldName, List<Long> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, String resetButtonKey, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new LongListCell(0, (LongListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
         this.minimum = -Long.MAX_VALUE;
         this.maximum = Long.MAX_VALUE;
         for (long l : value)
             cells.add(new LongListCell(l, this));
         this.widgets.addAll(cells);
-        expended = defaultExpended;
+        expanded = defaultExpanded;
     }
 
     public Function<Long, Optional<String>> getCellErrorSupplier() {

@@ -19,19 +19,19 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
     private Function<Double, Optional<String>> cellErrorSupplier;
 
     @Deprecated
-    public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey) {
-        this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
+    public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey) {
+        this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
 
     @Deprecated
-    public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey, boolean requiresRestart) {
+    public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new DoubleListCell(0d, (DoubleListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
         this.minimum = -Double.MAX_VALUE;
         this.maximum = Double.MAX_VALUE;
-        for(Double f : value)
+        for (Double f : value)
             cells.add(new DoubleListCell(f, this));
         this.widgets.addAll(cells);
-        expended = defaultExpended;
+        expanded = defaultExpanded;
     }
     
     public Function<Double, Optional<String>> getCellErrorSupplier() {

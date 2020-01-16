@@ -19,19 +19,19 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
     private Function<Float, Optional<String>> cellErrorSupplier;
 
     @Deprecated
-    public FloatListListEntry(String fieldName, List<Float> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Float>> saveConsumer, Supplier<List<Float>> defaultValue, String resetButtonKey) {
-        this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
+    public FloatListListEntry(String fieldName, List<Float> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Float>> saveConsumer, Supplier<List<Float>> defaultValue, String resetButtonKey) {
+        this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
 
     @Deprecated
-    public FloatListListEntry(String fieldName, List<Float> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Float>> saveConsumer, Supplier<List<Float>> defaultValue, String resetButtonKey, boolean requiresRestart) {
+    public FloatListListEntry(String fieldName, List<Float> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Float>> saveConsumer, Supplier<List<Float>> defaultValue, String resetButtonKey, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, defaultValue, floatListListEntry -> new FloatListCell(0, floatListListEntry), saveConsumer, resetButtonKey, requiresRestart);
         this.minimum = -Float.MAX_VALUE;
         this.maximum = Float.MAX_VALUE;
         for (float f : value)
             cells.add(new FloatListCell(f, this));
         this.widgets.addAll(cells);
-        expended = defaultExpended;
+        expanded = defaultExpanded;
     }
 
     public Function<Float, Optional<String>> getCellErrorSupplier() {

@@ -21,18 +21,13 @@ abstract class AbstractListListEntry<T, C extends AbstractListListEntry.Abstract
     protected Function<T, Optional<String>> cellErrorSupplier;
 
     @Deprecated
-    public AbstractListListEntry(String fieldName, List<T> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, String resetButtonKey) {
-        this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false, null);
-    }
-
-    @Deprecated
-    public AbstractListListEntry(String fieldName, List<T> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, String resetButtonKey, boolean requiresRestart, BiFunction<T, SELF, C> createNewCell) {
+    public AbstractListListEntry(String fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, String resetButtonKey, boolean requiresRestart, BiFunction<T, SELF, C> createNewCell) {
         super(fieldName, tooltipSupplier, defaultValue, abstractListListEntry -> createNewCell.apply(null, abstractListListEntry), saveConsumer, resetButtonKey, requiresRestart);
         this.createNewCell = createNewCell;
         for (T f : value)
             cells.add(createNewCell.apply(f, this.self()));
         this.widgets.addAll(cells);
-        expended = defaultExpended;
+        expanded = defaultExpanded;
     }
 
     public Function<T, Optional<String>> getCellErrorSupplier() {

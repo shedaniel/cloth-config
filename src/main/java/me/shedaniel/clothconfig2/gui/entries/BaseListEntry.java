@@ -32,7 +32,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     protected static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     protected final List<C> cells;
     protected final List<Element> widgets;
-    protected boolean expended;
+    protected boolean expanded;
     protected Consumer<List<T>> saveConsumer;
     protected ListLabelWidget labelWidget;
     protected AbstractButtonWidget resetWidget;
@@ -102,7 +102,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
 
     @Override
     public int getItemHeight() {
-        if (expended) {
+        if (expanded) {
             int i = 24;
             for (BaseListCell entry : cells)
                 i += entry.getCellHeight();
@@ -175,10 +175,10 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         DiffuseLighting.disable();
         RenderSystem.color4f(1, 1, 1, 1);
-        BaseListCell focused = !expended || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
+        BaseListCell focused = !expanded || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);
-        blit(x - 15, y + 4, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expended ? 9 : 0), 9, 9);
+        blit(x - 15, y + 4, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
         blit(x - 15 + 13, y + 4, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
         if (isDeleteButtonEnabled())
             blit(x - 15 + 26, y + 4, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
@@ -187,7 +187,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         resetWidget.active = isEditable() && getDefaultValue().isPresent();
         resetWidget.render(mouseX, mouseY, delta);
         MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
-        if (expended) {
+        if (expanded) {
             int yy = y + 24;
             for (BaseListCell cell : cells) {
                 cell.render(-1, yy, x + 14, entryWidth - 14, cell.getCellHeight(), mouseX, mouseY, getParent().getFocused() != null && getParent().getFocused().equals(this) && getFocused() != null && getFocused().equals(cell), delta);
@@ -208,7 +208,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
             if (resetWidget.isMouseOver(double_1, double_2)) {
                 return false;
             } else if (isInsideCreateNew(double_1, double_2)) {
-                expended = true;
+                expanded = true;
                 C cell;
                 if (insertInFront()) {
                     cells.add(0, cell = createNewInstance.apply(BaseListEntry.this.self()));
@@ -221,7 +221,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                 MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             } else if (isDeleteButtonEnabled() && isInsideDelete(double_1, double_2)) {
-                BaseListCell focused = !expended && getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
+                BaseListCell focused = !expanded && getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
                 if (focused != null) {
                     cells.remove(focused);
                     widgets.remove(focused);
@@ -230,7 +230,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                 }
                 return true;
             } else if (rectangle.contains(double_1, double_2)) {
-                expended = !expended;
+                expanded = !expanded;
                 MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             }

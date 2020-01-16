@@ -17,17 +17,17 @@ public class StringListListEntry extends BaseListEntry<String, StringListListEnt
     private Function<String, Optional<String>> cellErrorSupplier;
 
     @Deprecated
-    public StringListListEntry(String fieldName, List<String> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey) {
-        this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
+    public StringListListEntry(String fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey) {
+        this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
 
     @Deprecated
-    public StringListListEntry(String fieldName, List<String> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey, boolean requiresRestart) {
+    public StringListListEntry(String fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new StringListCell("", (StringListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
         for (String str : value)
             cells.add(new StringListCell(str, this));
         this.widgets.addAll(cells);
-        expended = defaultExpended;
+        expanded = defaultExpanded;
     }
 
     public Function<String, Optional<String>> getCellErrorSupplier() {
