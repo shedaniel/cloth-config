@@ -1,9 +1,9 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.gui.entries.BaseListEntry;
 import me.shedaniel.clothconfig2.gui.entries.LongListListEntry;
 import net.minecraft.client.resource.language.I18n;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -18,7 +18,7 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
     private List<Long> value;
     private boolean expended = false;
     private Long min = null, max = null;
-    private Function<BaseListEntry, LongListListEntry.LongListCell> createNewInstance;
+    private Function<LongListListEntry, LongListListEntry.LongListCell> createNewInstance;
     private String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
     private boolean deleteButtonEnabled = true, insertInFront = true;
     
@@ -65,8 +65,8 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
         requireRestart(true);
         return this;
     }
-    
-    public LongListBuilder setCreateNewInstance(Function<BaseListEntry, LongListListEntry.LongListCell> createNewInstance) {
+
+    public LongListBuilder setCreateNewInstance(Function<LongListListEntry, LongListListEntry.LongListCell> createNewInstance) {
         this.createNewInstance = createNewInstance;
         return this;
     }
@@ -130,7 +130,8 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
         this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }
-    
+
+    @Nonnull
     @Override
     public LongListListEntry build() {
         LongListListEntry entry = new LongListListEntry(getFieldNameKey(), value, expended, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart()) {
@@ -138,7 +139,7 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
             public boolean isDeleteButtonEnabled() {
                 return deleteButtonEnabled;
             }
-            
+
             @Override
             public boolean insertInFront() {
                 return insertInFront;

@@ -12,48 +12,53 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class StringListListEntry extends BaseListEntry<String, StringListListEntry.StringListCell> {
-    
+public class StringListListEntry extends BaseListEntry<String, StringListListEntry.StringListCell, StringListListEntry> {
+
     private Function<String, Optional<String>> cellErrorSupplier;
-    
+
     @Deprecated
     public StringListListEntry(String fieldName, List<String> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey) {
         this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
-    
+
     @Deprecated
     public StringListListEntry(String fieldName, List<String> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new StringListCell("", (StringListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
-        for(String str : value)
+        for (String str : value)
             cells.add(new StringListCell(str, this));
         this.widgets.addAll(cells);
         expended = defaultExpended;
     }
-    
+
     public Function<String, Optional<String>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
-    
+
     public void setCellErrorSupplier(Function<String, Optional<String>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
     }
-    
+
     @Override
     public List<String> getValue() {
         return cells.stream().map(cell -> cell.widget.getText()).collect(Collectors.toList());
     }
-    
+
+    @Override
+    public StringListListEntry self() {
+        return this;
+    }
+
     @Override
     protected StringListCell getFromValue(String value) {
         return new StringListCell(value, this);
     }
-    
+
     public static class StringListCell extends BaseListCell {
-        
+
         private TextFieldWidget widget;
         private boolean isSelected;
         private StringListListEntry listListEntry;
-        
+
         public StringListCell(String value, StringListListEntry listListEntry) {
             this.listListEntry = listListEntry;
             this.setErrorSupplier(() -> listListEntry.cellErrorSupplier == null ? Optional.empty() : listListEntry.getCellErrorSupplier().apply(widget.getText()));
@@ -75,17 +80,17 @@ public class StringListListEntry extends BaseListEntry<String, StringListListEnt
                     listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
         }
-        
+
         @Override
         public Optional<String> getError() {
             return Optional.empty();
         }
-        
+
         @Override
         public int getCellHeight() {
             return 20;
         }
-        
+
         @Override
         public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             widget.setWidth(entryWidth - 12);
@@ -97,12 +102,12 @@ public class StringListListEntry extends BaseListEntry<String, StringListListEnt
             if (isSelected && listListEntry.isEditable())
                 fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
-        
+
         @Override
         public List<? extends Element> children() {
             return Collections.singletonList(widget);
         }
-        
+
     }
-    
+
 }

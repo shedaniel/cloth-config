@@ -1,9 +1,9 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.gui.entries.BaseListEntry;
 import me.shedaniel.clothconfig2.gui.entries.DoubleListListEntry;
 import net.minecraft.client.resource.language.I18n;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -18,7 +18,7 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
     private List<Double> value;
     private boolean expended = false;
     private Double min = null, max = null;
-    private Function<BaseListEntry, DoubleListListEntry.DoubleListCell> createNewInstance;
+    private Function<DoubleListListEntry, DoubleListListEntry.DoubleListCell> createNewInstance;
     private String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
     private boolean deleteButtonEnabled = true, insertInFront = true;
     
@@ -65,8 +65,8 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         requireRestart(true);
         return this;
     }
-    
-    public DoubleListBuilder setCreateNewInstance(Function<BaseListEntry, DoubleListListEntry.DoubleListCell> createNewInstance) {
+
+    public DoubleListBuilder setCreateNewInstance(Function<DoubleListListEntry, DoubleListListEntry.DoubleListCell> createNewInstance) {
         this.createNewInstance = createNewInstance;
         return this;
     }
@@ -130,7 +130,8 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }
-    
+
+    @Nonnull
     @Override
     public DoubleListListEntry build() {
         DoubleListListEntry entry = new DoubleListListEntry(getFieldNameKey(), value, expended, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart()) {
@@ -138,7 +139,7 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
             public boolean isDeleteButtonEnabled() {
                 return deleteButtonEnabled;
             }
-            
+
             @Override
             public boolean insertInFront() {
                 return insertInFront;

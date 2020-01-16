@@ -13,72 +13,77 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.LongListCell> {
-    
+public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.LongListCell, LongListListEntry> {
+
     private long minimum, maximum;
     private Function<Long, Optional<String>> cellErrorSupplier;
-    
+
     @Deprecated
     public LongListListEntry(String fieldName, List<Long> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, String resetButtonKey) {
         this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
-    
+
     @Deprecated
     public LongListListEntry(String fieldName, List<Long> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, String resetButtonKey, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new LongListCell(0, (LongListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
         this.minimum = -Long.MAX_VALUE;
         this.maximum = Long.MAX_VALUE;
-        for(long l : value)
+        for (long l : value)
             cells.add(new LongListCell(l, this));
         this.widgets.addAll(cells);
         expended = defaultExpended;
     }
-    
+
     public Function<Long, Optional<String>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
-    
+
     public void setCellErrorSupplier(Function<Long, Optional<String>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
     }
-    
+
     @Override
     public List<Long> getValue() {
         return cells.stream().map(LongListCell::getValue).collect(Collectors.toList());
     }
-    
+
     public LongListListEntry setMaximum(long maximum) {
         this.maximum = maximum;
         return this;
     }
-    
+
     public LongListListEntry setMinimum(long minimum) {
         this.minimum = minimum;
         return this;
     }
-    
+
+    @Override
+    public LongListListEntry self() {
+        return this;
+    }
+
     @Override
     protected LongListCell getFromValue(Long value) {
         return new LongListCell(value, this);
     }
-    
+
     public static class LongListCell extends BaseListCell {
-        
+
         private Function<String, String> stripCharacters = s -> {
             StringBuilder stringBuilder_1 = new StringBuilder();
             char[] var2 = s.toCharArray();
             int var3 = var2.length;
-            
-            for(int var4 = 0; var4 < var3; ++var4)
+
+            for (int var4 = 0; var4 < var3; ++var4)
                 if (Character.isDigit(var2[var4]) || var2[var4] == '-')
                     stringBuilder_1.append(var2[var4]);
-            
+
             return stringBuilder_1.toString();
         };
         private TextFieldWidget widget;
         private boolean isSelected;
         private LongListListEntry listListEntry;
-        
+
         public LongListCell(long value, LongListListEntry listListEntry) {
             this.listListEntry = listListEntry;
             this.setErrorSupplier(() -> listListEntry.cellErrorSupplier == null ? Optional.empty() : listListEntry.getCellErrorSupplier().apply(getValue()));
@@ -91,7 +96,7 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
                     super.render(int_1, int_2, float_1);
                     setFocused(f);
                 }
-                
+
                 @Override
                 public void write(String string_1) {
                     super.write(stripCharacters.apply(string_1));
@@ -105,7 +110,7 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
                     listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
         }
-        
+
         public long getValue() {
             try {
                 return Long.valueOf(widget.getText());
@@ -113,7 +118,7 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
                 return 0;
             }
         }
-        
+
         @Override
         public Optional<String> getError() {
             try {
@@ -127,12 +132,12 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
             }
             return Optional.empty();
         }
-        
+
         @Override
         public int getCellHeight() {
             return 20;
         }
-        
+
         @Override
         public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             widget.setWidth(entryWidth - 12);
@@ -144,12 +149,12 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
             if (isSelected && listListEntry.isEditable())
                 fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
-        
+
         @Override
         public List<? extends Element> children() {
             return Collections.singletonList(widget);
         }
-        
+
     }
-    
+
 }

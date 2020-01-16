@@ -13,16 +13,16 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEntry.DoubleListCell> {
-    
+public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEntry.DoubleListCell, DoubleListListEntry> {
+
     private double minimum, maximum;
     private Function<Double, Optional<String>> cellErrorSupplier;
-    
+
     @Deprecated
     public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey) {
         this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
-    
+
     @Deprecated
     public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new DoubleListCell(0d, (DoubleListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
@@ -46,24 +46,29 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
     public List<Double> getValue() {
         return cells.stream().map(DoubleListCell::getValue).collect(Collectors.toList());
     }
-    
+
     public DoubleListListEntry setMaximum(Double maximum) {
         this.maximum = maximum;
         return this;
     }
-    
+
     public DoubleListListEntry setMinimum(Double minimum) {
         this.minimum = minimum;
         return this;
     }
-    
+
+    @Override
+    public DoubleListListEntry self() {
+        return this;
+    }
+
     @Override
     protected DoubleListCell getFromValue(Double value) {
         return new DoubleListCell(value, this);
     }
-    
+
     public static class DoubleListCell extends BaseListCell {
-        
+
         private Function<String, String> stripCharacters = s -> {
             StringBuilder stringBuilder_1 = new StringBuilder();
             char[] var2 = s.toCharArray();

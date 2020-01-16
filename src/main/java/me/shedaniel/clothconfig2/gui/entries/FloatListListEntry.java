@@ -13,72 +13,77 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.FloatListCell> {
-    
+public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.FloatListCell, FloatListListEntry> {
+
     private float minimum, maximum;
     private Function<Float, Optional<String>> cellErrorSupplier;
-    
+
     @Deprecated
     public FloatListListEntry(String fieldName, List<Float> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Float>> saveConsumer, Supplier<List<Float>> defaultValue, String resetButtonKey) {
         this(fieldName, value, defaultExpended, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
-    
+
     @Deprecated
     public FloatListListEntry(String fieldName, List<Float> value, boolean defaultExpended, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Float>> saveConsumer, Supplier<List<Float>> defaultValue, String resetButtonKey, boolean requiresRestart) {
-        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new FloatListCell(0, (FloatListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
+        super(fieldName, tooltipSupplier, defaultValue, floatListListEntry -> new FloatListCell(0, floatListListEntry), saveConsumer, resetButtonKey, requiresRestart);
         this.minimum = -Float.MAX_VALUE;
         this.maximum = Float.MAX_VALUE;
-        for(float f : value)
+        for (float f : value)
             cells.add(new FloatListCell(f, this));
         this.widgets.addAll(cells);
         expended = defaultExpended;
     }
-    
+
     public Function<Float, Optional<String>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
-    
+
     public void setCellErrorSupplier(Function<Float, Optional<String>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
     }
-    
+
     @Override
     public List<Float> getValue() {
         return cells.stream().map(FloatListCell::getValue).collect(Collectors.toList());
     }
-    
+
     public FloatListListEntry setMaximum(float maximum) {
         this.maximum = maximum;
         return this;
     }
-    
+
     public FloatListListEntry setMinimum(float minimum) {
         this.minimum = minimum;
         return this;
     }
-    
+
+    @Override
+    public FloatListListEntry self() {
+        return this;
+    }
+
     @Override
     protected FloatListCell getFromValue(Float value) {
         return new FloatListCell(value, this);
     }
-    
+
     public static class FloatListCell extends BaseListCell {
-        
+
         private Function<String, String> stripCharacters = s -> {
             StringBuilder stringBuilder_1 = new StringBuilder();
             char[] var2 = s.toCharArray();
             int var3 = var2.length;
-            
-            for(int var4 = 0; var4 < var3; ++var4)
+
+            for (int var4 = 0; var4 < var3; ++var4)
                 if (Character.isDigit(var2[var4]) || var2[var4] == '-' || var2[var4] == '.')
                     stringBuilder_1.append(var2[var4]);
-            
+
             return stringBuilder_1.toString();
         };
         private TextFieldWidget widget;
         private boolean isSelected;
         private FloatListListEntry listListEntry;
-        
+
         public FloatListCell(float value, FloatListListEntry listListEntry) {
             this.listListEntry = listListEntry;
             this.setErrorSupplier(() -> listListEntry.cellErrorSupplier == null ? Optional.empty() : listListEntry.getCellErrorSupplier().apply(getValue()));
@@ -91,7 +96,7 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
                     super.render(int_1, int_2, float_1);
                     setFocused(f);
                 }
-                
+
                 @Override
                 public void write(String string_1) {
                     super.write(stripCharacters.apply(string_1));
@@ -105,7 +110,7 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
                     listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
         }
-        
+
         public float getValue() {
             try {
                 return Float.valueOf(widget.getText());
@@ -113,7 +118,7 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
                 return 0f;
             }
         }
-        
+
         @Override
         public Optional<String> getError() {
             try {
@@ -127,12 +132,12 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
             }
             return Optional.empty();
         }
-        
+
         @Override
         public int getCellHeight() {
             return 20;
         }
-        
+
         @Override
         public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             widget.setWidth(entryWidth - 12);
@@ -144,12 +149,12 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
             if (isSelected && listListEntry.isEditable())
                 fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
-        
+
         @Override
         public List<? extends Element> children() {
             return Collections.singletonList(widget);
         }
-        
+
     }
-    
+
 }
