@@ -4,19 +4,20 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListListEntry.IntegerListCell, IntegerListListEntry> {
+@ApiStatus.Internal
+public class IntegerListListEntry extends AbstractListListEntry<Integer, IntegerListListEntry.IntegerListCell, IntegerListListEntry> {
 
     private int minimum, maximum;
-    private Function<Integer, Optional<String>> cellErrorSupplier;
 
     @Deprecated
     public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey) {
@@ -28,22 +29,21 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
         this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, true, true);
     }
 
-    public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
-        super(fieldName, tooltipSupplier, defaultValue, integerListListEntry -> new IntegerListCell(0, integerListListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
-        this.minimum = -Integer.MAX_VALUE;
+    public IntegerListListEntry(
+            String fieldName,
+            List<Integer> value,
+            boolean defaultExpanded,
+            Supplier<Optional<String[]>> tooltipSupplier,
+            Consumer<List<Integer>> saveConsumer,
+            Supplier<List<Integer>> defaultValue,
+            String resetButtonKey,
+            boolean requiresRestart,
+            boolean deleteButtonEnabled,
+            boolean insertInFront
+    ) {
+        super(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront, IntegerListCell::new);
+        this.minimum = Integer.MIN_VALUE;
         this.maximum = Integer.MAX_VALUE;
-        for (int integer : value)
-            cells.add(new IntegerListCell(integer, this));
-        this.widgets.addAll(cells);
-        expanded = defaultExpanded;
-    }
-
-    public Function<Integer, Optional<String>> getCellErrorSupplier() {
-        return cellErrorSupplier;
-    }
-
-    public void setCellErrorSupplier(Function<Integer, Optional<String>> cellErrorSupplier) {
-        this.cellErrorSupplier = cellErrorSupplier;
     }
 
     @Override
@@ -71,51 +71,32 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
         return new IntegerListCell(value, this);
     }
 
-    public static class IntegerListCell extends BaseListCell {
+    public static class IntegerListCell extends AbstractListListEntry.AbstractListCell<Integer, IntegerListCell, IntegerListListEntry> {
 
-        private Function<String, String> stripCharacters = s -> {
-            StringBuilder stringBuilder_1 = new StringBuilder();
-            char[] var2 = s.toCharArray();
-            int var3 = var2.length;
-
-            for (int var4 = 0; var4 < var3; ++var4)
-                if (Character.isDigit(var2[var4]) || var2[var4] == '-')
-                    stringBuilder_1.append(var2[var4]);
-
-            return stringBuilder_1.toString();
-        };
         private TextFieldWidget widget;
-        private boolean isSelected;
-        private IntegerListListEntry listListEntry;
 
-        public IntegerListCell(int value, IntegerListListEntry listListEntry) {
-            this.listListEntry = listListEntry;
-            this.setErrorSupplier(() -> listListEntry.cellErrorSupplier == null ? Optional.empty() : listListEntry.getCellErrorSupplier().apply(getValue()));
-            widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "") {
-                @Override
-                public void render(int int_1, int int_2, float float_1) {
-                    boolean f = isFocused();
-                    setFocused(isSelected);
-                    widget.setEditableColor(getPreferredTextColor());
-                    super.render(int_1, int_2, float_1);
-                    setFocused(f);
-                }
+        public IntegerListCell(Integer value, IntegerListListEntry listListEntry) {
+            super(value, listListEntry);
 
-                @Override
-                public void write(String string_1) {
-                    super.write(stripCharacters.apply(string_1));
-                }
-            };
-            widget.setMaxLength(999999);
+            if (value == null)
+                value = 0;
+            Integer finalValue = value;
+
+            this.setErrorSupplier(() -> Optional.ofNullable(listListEntry.cellErrorSupplier).flatMap(fn -> fn.apply(this.getValue())));
+            widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "");
+            widget.setTextPredicate(s -> s.chars().allMatch(c -> Character.isDigit(c) || c == '-'));
+            widget.setMaxLength(Integer.MAX_VALUE);
             widget.setHasBorder(false);
-            widget.setText(value + "");
+            widget.setText(value.toString());
             widget.setChangedListener(s -> {
-                if (!(value + "").equalsIgnoreCase(s))
-                    listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
+                widget.setEditableColor(getPreferredTextColor());
+                if (!Objects.equals(s, finalValue.toString())) {
+                    this.listListEntry.getScreen().setEdited(true, this.listListEntry.isRequiresRestart());
+                }
             });
         }
 
-        public int getValue() {
+        public Integer getValue() {
             try {
                 return Integer.valueOf(widget.getText());
             } catch (NumberFormatException e) {
@@ -126,7 +107,7 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
         @Override
         public Optional<String> getError() {
             try {
-                int i = Integer.valueOf(widget.getText());
+                int i = Integer.parseInt(widget.getText());
                 if (i > listListEntry.maximum)
                     return Optional.of(I18n.translate("text.cloth-config.error.too_large", listListEntry.maximum));
                 else if (i < listListEntry.minimum)
@@ -148,7 +129,6 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
             widget.x = x;
             widget.y = y + 1;
             widget.setEditable(listListEntry.isEditable());
-            this.isSelected = isSelected;
             widget.render(mouseX, mouseY, delta);
             if (isSelected && listListEntry.isEditable())
                 fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);

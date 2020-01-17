@@ -3,18 +3,18 @@ package me.shedaniel.clothconfig2.gui.entries;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class StringListListEntry extends BaseListEntry<String, StringListListEntry.StringListCell, StringListListEntry> {
-
-    private Function<String, Optional<String>> cellErrorSupplier;
+@ApiStatus.Internal
+public class StringListListEntry extends AbstractListListEntry<String, StringListListEntry.StringListCell, StringListListEntry> {
 
     @Deprecated
     public StringListListEntry(String fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey) {
@@ -27,19 +27,7 @@ public class StringListListEntry extends BaseListEntry<String, StringListListEnt
     }
 
     public StringListListEntry(String fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
-        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new StringListCell("", baseListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
-        for (String str : value)
-            cells.add(new StringListCell(str, this));
-        this.widgets.addAll(cells);
-        expanded = defaultExpanded;
-    }
-
-    public Function<String, Optional<String>> getCellErrorSupplier() {
-        return cellErrorSupplier;
-    }
-
-    public void setCellErrorSupplier(Function<String, Optional<String>> cellErrorSupplier) {
-        this.cellErrorSupplier = cellErrorSupplier;
+        super(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront, StringListCell::new);
     }
 
     @Override
@@ -57,32 +45,33 @@ public class StringListListEntry extends BaseListEntry<String, StringListListEnt
         return new StringListCell(value, this);
     }
 
-    public static class StringListCell extends BaseListCell {
+    public static class StringListCell extends AbstractListListEntry.AbstractListCell<String, StringListCell, StringListListEntry> {
 
         private TextFieldWidget widget;
-        private boolean isSelected;
-        private StringListListEntry listListEntry;
 
         public StringListCell(String value, StringListListEntry listListEntry) {
-            this.listListEntry = listListEntry;
-            this.setErrorSupplier(() -> listListEntry.cellErrorSupplier == null ? Optional.empty() : listListEntry.getCellErrorSupplier().apply(widget.getText()));
-            widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "") {
-                @Override
-                public void render(int int_1, int int_2, float float_1) {
-                    boolean f = isFocused();
-                    setFocused(isSelected);
-                    widget.setEditableColor(getPreferredTextColor());
-                    super.render(int_1, int_2, float_1);
-                    setFocused(f);
-                }
-            };
-            widget.setMaxLength(999999);
+            super(value, listListEntry);
+
+            if (value == null)
+                value = "";
+            String finalValue = value;
+
+            this.setErrorSupplier(() -> Optional.ofNullable(listListEntry.cellErrorSupplier).flatMap(fn -> fn.apply(this.getValue())));
+            widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "");
+            widget.setMaxLength(Integer.MAX_VALUE);
             widget.setHasBorder(false);
             widget.setText(value);
             widget.setChangedListener(s -> {
-                if (!value.contentEquals(s))
-                    listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
+                widget.setEditableColor(getPreferredTextColor());
+                if (!Objects.equals(s, finalValue)) {
+                    this.listListEntry.getScreen().setEdited(true, this.listListEntry.isRequiresRestart());
+                }
             });
+        }
+
+        @Override
+        public String getValue() {
+            return widget.getText();
         }
 
         @Override
@@ -101,7 +90,6 @@ public class StringListListEntry extends BaseListEntry<String, StringListListEnt
             widget.x = x;
             widget.y = y + 1;
             widget.setEditable(listListEntry.isEditable());
-            this.isSelected = isSelected;
             widget.render(mouseX, mouseY, delta);
             if (isSelected && listListEntry.isEditable())
                 fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
