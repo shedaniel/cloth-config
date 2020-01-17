@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * This class represents config entry lists that use one {@link TextFieldWidget} per entry.
@@ -41,6 +42,11 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             BiFunction<T, SELF, C> createNewCell
     ) {
         super(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront, createNewCell);
+    }
+
+    @Override
+    public List<T> getValue() {
+        return cells.stream().map(C::getValue).collect(Collectors.toList());
     }
 
     /**
