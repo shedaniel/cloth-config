@@ -25,7 +25,11 @@ public class LongListListEntry extends BaseListEntry<Long, LongListListEntry.Lon
 
     @Deprecated
     public LongListListEntry(String fieldName, List<Long> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, String resetButtonKey, boolean requiresRestart) {
-        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new LongListCell(0, (LongListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
+        this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, true, true);
+    }
+
+    public LongListListEntry(String fieldName, List<Long> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new LongListCell(0, baseListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
         this.minimum = -Long.MAX_VALUE;
         this.maximum = Long.MAX_VALUE;
         for (long l : value)

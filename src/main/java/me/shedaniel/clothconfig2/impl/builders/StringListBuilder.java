@@ -113,7 +113,7 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
     @NotNull
     @Override
     public StringListListEntry build() {
-        StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart());
+        StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart(), deleteButtonEnabled, insertInFront);
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
         entry.setCellErrorSupplier(cellErrorSupplier);

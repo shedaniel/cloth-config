@@ -134,17 +134,7 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
     @NotNull
     @Override
     public IntegerListListEntry build() {
-        IntegerListListEntry entry = new IntegerListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart()) {
-            @Override
-            public boolean isDeleteButtonEnabled() {
-                return deleteButtonEnabled;
-            }
-
-            @Override
-            public boolean insertInFront() {
-                return insertInFront;
-            }
-        };
+        IntegerListListEntry entry = new IntegerListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart(), deleteButtonEnabled, insertInFront);
         if (min != null)
             entry.setMinimum(min);
         if (max != null)

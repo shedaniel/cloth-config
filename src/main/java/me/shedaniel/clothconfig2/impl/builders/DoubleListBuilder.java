@@ -134,17 +134,7 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
     @NotNull
     @Override
     public DoubleListListEntry build() {
-        DoubleListListEntry entry = new DoubleListListEntry(getFieldNameKey(), value, expended, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart()) {
-            @Override
-            public boolean isDeleteButtonEnabled() {
-                return deleteButtonEnabled;
-            }
-
-            @Override
-            public boolean insertInFront() {
-                return insertInFront;
-            }
-        };
+        DoubleListListEntry entry = new DoubleListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), requireRestart, deleteButtonEnabled, insertInFront);
         if (min != null)
             entry.setMinimum(min);
         if (max != null)

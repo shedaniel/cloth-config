@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry> {
-    
+
     protected Function<Long, Optional<String>> cellErrorSupplier;
     private Consumer<List<Long>> saveConsumer = null;
     private Function<List<Long>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
@@ -21,41 +21,41 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
     private Function<LongListListEntry, LongListListEntry.LongListCell> createNewInstance;
     private String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
     private boolean deleteButtonEnabled = true, insertInFront = true;
-    
+
     public LongListBuilder(String resetButtonKey, String fieldNameKey, List<Long> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
-    
+
     public Function<Long, Optional<String>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
-    
+
     public LongListBuilder setCellErrorSupplier(Function<Long, Optional<String>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
         return this;
     }
-    
+
     public LongListBuilder setErrorSupplier(Function<List<Long>, Optional<String>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
-    
+
     public LongListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
         this.deleteButtonEnabled = deleteButtonEnabled;
         return this;
     }
-    
+
     public LongListBuilder setInsertInFront(boolean insertInFront) {
         this.insertInFront = insertInFront;
         return this;
     }
-    
+
     public LongListBuilder setAddButtonTooltip(String addTooltip) {
         this.addTooltip = addTooltip;
         return this;
     }
-    
+
     public LongListBuilder setRemoveButtonTooltip(String removeTooltip) {
         this.removeTooltip = removeTooltip;
         return this;
@@ -85,37 +85,37 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
         this.defaultValue = defaultValue;
         return this;
     }
-    
+
     public LongListBuilder setMin(long min) {
         this.min = min;
         return this;
     }
-    
+
     public LongListBuilder setMax(long max) {
         this.max = max;
         return this;
     }
-    
+
     public LongListBuilder removeMin() {
         this.min = null;
         return this;
     }
-    
+
     public LongListBuilder removeMax() {
         this.max = null;
         return this;
     }
-    
+
     public LongListBuilder setDefaultValue(List<Long> defaultValue) {
         this.defaultValue = () -> defaultValue;
         return this;
     }
-    
+
     public LongListBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = list -> tooltipSupplier.get();
         return this;
     }
-    
+
     public LongListBuilder setTooltipSupplier(Function<List<Long>, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
@@ -134,17 +134,7 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
     @NotNull
     @Override
     public LongListListEntry build() {
-        LongListListEntry entry = new LongListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart()) {
-            @Override
-            public boolean isDeleteButtonEnabled() {
-                return deleteButtonEnabled;
-            }
-
-            @Override
-            public boolean insertInFront() {
-                return insertInFront;
-            }
-        };
+        LongListListEntry entry = new LongListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart(), deleteButtonEnabled, insertInFront);
         if (min != null)
             entry.setMinimum(min);
         if (max != null)
@@ -159,5 +149,5 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
-    
+
 }

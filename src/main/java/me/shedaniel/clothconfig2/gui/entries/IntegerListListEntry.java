@@ -25,7 +25,11 @@ public class IntegerListListEntry extends BaseListEntry<Integer, IntegerListList
 
     @Deprecated
     public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey, boolean requiresRestart) {
-        super(fieldName, tooltipSupplier, defaultValue, integerListListEntry -> new IntegerListCell(0, integerListListEntry), saveConsumer, resetButtonKey, requiresRestart);
+        this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, true, true);
+    }
+
+    public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+        super(fieldName, tooltipSupplier, defaultValue, integerListListEntry -> new IntegerListCell(0, integerListListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
         this.minimum = -Integer.MAX_VALUE;
         this.maximum = Integer.MAX_VALUE;
         for (int integer : value)

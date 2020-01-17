@@ -134,17 +134,7 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
     @NotNull
     @Override
     public FloatListListEntry build() {
-        FloatListListEntry entry = new FloatListListEntry(getFieldNameKey(), value, expended, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart()) {
-            @Override
-            public boolean isDeleteButtonEnabled() {
-                return deleteButtonEnabled;
-            }
-
-            @Override
-            public boolean insertInFront() {
-                return insertInFront;
-            }
-        };
+        FloatListListEntry entry = new FloatListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart(), deleteButtonEnabled, insertInFront);
         if (min != null)
             entry.setMinimum(min);
         if (max != null)

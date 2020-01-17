@@ -25,7 +25,11 @@ public class FloatListListEntry extends BaseListEntry<Float, FloatListListEntry.
 
     @Deprecated
     public FloatListListEntry(String fieldName, List<Float> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Float>> saveConsumer, Supplier<List<Float>> defaultValue, String resetButtonKey, boolean requiresRestart) {
-        super(fieldName, tooltipSupplier, defaultValue, floatListListEntry -> new FloatListCell(0, floatListListEntry), saveConsumer, resetButtonKey, requiresRestart);
+        this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, true, true);
+    }
+
+    public FloatListListEntry(String fieldName, List<Float> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Float>> saveConsumer, Supplier<List<Float>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+        super(fieldName, tooltipSupplier, defaultValue, floatListListEntry -> new FloatListCell(0, floatListListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
         this.minimum = -Float.MAX_VALUE;
         this.maximum = Float.MAX_VALUE;
         for (float f : value)

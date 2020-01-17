@@ -14,6 +14,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,12 +28,15 @@ import java.util.function.Supplier;
  * @param <SELF> the "curiously recurring template pattern" type parameter
  * @implNote See <a href="https://stackoverflow.com/questions/7354740/is-there-a-way-to-refer-to-the-current-type-with-a-type-variable">Is there a way to refer to the current type with a type variable?</href> on Stack Overflow.
  */
+@ApiStatus.Internal
 public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends BaseListEntry<T, C, SELF>> extends TooltipListEntry<List<T>> {
 
     protected static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     protected final List<C> cells;
     protected final List<Element> widgets;
     protected boolean expanded;
+    protected boolean deleteButtonEnabled;
+    protected boolean insertInFront;
     protected Consumer<List<T>> saveConsumer;
     protected ListLabelWidget labelWidget;
     protected AbstractButtonWidget resetWidget;
@@ -45,8 +49,15 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, false);
     }
 
+    @Deprecated
     public BaseListEntry(String fieldName, Supplier<Optional<String[]>> tooltipSupplier, Supplier<List<T>> defaultValue, Function<SELF, C> createNewInstance, Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart) {
+        this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, requiresRestart, true, true);
+    }
+
+    public BaseListEntry(String fieldName, Supplier<Optional<String[]>> tooltipSupplier, Supplier<List<T>> defaultValue, Function<SELF, C> createNewInstance, Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, tooltipSupplier, requiresRestart);
+        this.deleteButtonEnabled = deleteButtonEnabled;
+        this.insertInFront = insertInFront;
         this.cells = Lists.newArrayList();
         this.labelWidget = new ListLabelWidget();
         this.widgets = Lists.newArrayList(labelWidget);
@@ -66,7 +77,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     public abstract SELF self();
 
     public boolean isDeleteButtonEnabled() {
-        return true;
+        return deleteButtonEnabled;
     }
 
     protected abstract C getFromValue(T value);
@@ -197,7 +208,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
 
     public boolean insertInFront() {
-        return true;
+        return insertInFront;
     }
 
     public class ListLabelWidget implements Element {

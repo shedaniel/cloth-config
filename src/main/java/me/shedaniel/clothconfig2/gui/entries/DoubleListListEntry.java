@@ -25,7 +25,11 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
 
     @Deprecated
     public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey, boolean requiresRestart) {
-        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new DoubleListCell(0d, (DoubleListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
+        this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, true, true);
+    }
+
+    public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new DoubleListCell(0d, (DoubleListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
         this.minimum = -Double.MAX_VALUE;
         this.maximum = Double.MAX_VALUE;
         for (Double f : value)

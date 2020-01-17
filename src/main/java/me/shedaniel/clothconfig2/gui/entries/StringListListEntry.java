@@ -23,7 +23,11 @@ public class StringListListEntry extends BaseListEntry<String, StringListListEnt
 
     @Deprecated
     public StringListListEntry(String fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey, boolean requiresRestart) {
-        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new StringListCell("", (StringListListEntry) baseListEntry), saveConsumer, resetButtonKey, requiresRestart);
+        this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, true, true);
+    }
+
+    public StringListListEntry(String fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+        super(fieldName, tooltipSupplier, defaultValue, baseListEntry -> new StringListCell("", baseListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
         for (String str : value)
             cells.add(new StringListCell(str, this));
         this.widgets.addAll(cells);
