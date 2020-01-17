@@ -1,5 +1,8 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -14,15 +17,26 @@ import java.util.stream.Collectors;
  * @param <SELF> the "curiously recurring template pattern" type parameter
  * @see BaseListEntry
  */
-abstract class AbstractListListEntry<T, C extends AbstractListListEntry.AbstractListCell<T, C, SELF>, SELF extends AbstractListListEntry<T, C, SELF>>
+@ApiStatus.Internal
+public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.AbstractListCell<T, C, SELF>, SELF extends AbstractListListEntry<T, C, SELF>>
         extends BaseListEntry<T, C, SELF> {
 
     protected final BiFunction<T, SELF, C> createNewCell;
     protected Function<T, Optional<String>> cellErrorSupplier;
 
-    @Deprecated
-    public AbstractListListEntry(String fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, String resetButtonKey, boolean requiresRestart, BiFunction<T, SELF, C> createNewCell) {
-        super(fieldName, tooltipSupplier, defaultValue, abstractListListEntry -> createNewCell.apply(null, abstractListListEntry), saveConsumer, resetButtonKey, requiresRestart);
+    public AbstractListListEntry(
+            String fieldName,
+            List<T> value,
+            boolean defaultExpanded,
+            Supplier<Optional<String[]>> tooltipSupplier,
+            Consumer<List<T>> saveConsumer,
+            Supplier<List<T>> defaultValue,
+            String resetButtonKey,
+            boolean requiresRestart,
+            boolean deleteButtonEnabled,
+            boolean insertInFront,
+            BiFunction<T, SELF, C> createNewCell) {
+        super(fieldName, tooltipSupplier, defaultValue, abstractListListEntry -> createNewCell.apply(null, abstractListListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
         this.createNewCell = createNewCell;
         for (T f : value)
             cells.add(createNewCell.apply(f, this.self()));
@@ -54,12 +68,11 @@ abstract class AbstractListListEntry<T, C extends AbstractListListEntry.Abstract
      * @param <OUTER_SELF>> the "curiously recurring template pattern" type parameter for the outer class
      * @see AbstractListListEntry
      */
-    static abstract class AbstractListCell<T, SELF extends AbstractListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractListListEntry<T, SELF, OUTER_SELF>> extends BaseListCell {
-        protected final T value;
-        protected final AbstractListListEntry<T, SELF, OUTER_SELF> listListEntry;
+    @ApiStatus.Internal
+    public static abstract class AbstractListCell<T, SELF extends AbstractListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractListListEntry<T, SELF, OUTER_SELF>> extends BaseListCell {
+        protected final OUTER_SELF listListEntry;
 
-        public AbstractListCell(T value, AbstractListListEntry<T, SELF, OUTER_SELF> listListEntry) {
-            this.value = value;
+        public AbstractListCell(@Nullable T value, OUTER_SELF listListEntry) {
             this.listListEntry = listListEntry;
         }
 
