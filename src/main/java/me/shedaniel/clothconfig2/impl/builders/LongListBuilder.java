@@ -2,8 +2,8 @@ package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.LongListListEntry;
 import net.minecraft.client.resource.language.I18n;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -16,7 +16,7 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
     private Consumer<List<Long>> saveConsumer = null;
     private Function<List<Long>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
     private List<Long> value;
-    private boolean expended = false;
+    private boolean expanded = false;
     private Long min = null, max = null;
     private Function<LongListListEntry, LongListListEntry.LongListCell> createNewInstance;
     private String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
@@ -60,7 +60,7 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
         this.removeTooltip = removeTooltip;
         return this;
     }
-    
+
     public LongListBuilder requireRestart() {
         requireRestart(true);
         return this;
@@ -70,17 +70,17 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
         this.createNewInstance = createNewInstance;
         return this;
     }
-    
-    public LongListBuilder setExpended(boolean expended) {
-        this.expended = expended;
+
+    public LongListBuilder setExpanded(boolean expanded) {
+        this.expanded = expanded;
         return this;
     }
-    
+
     public LongListBuilder setSaveConsumer(Consumer<List<Long>> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;
     }
-    
+
     public LongListBuilder setDefaultValue(Supplier<List<Long>> defaultValue) {
         this.defaultValue = defaultValue;
         return this;
@@ -120,21 +120,21 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
-    
+
     public LongListBuilder setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = list -> tooltip;
         return this;
     }
-    
+
     public LongListBuilder setTooltip(String... tooltip) {
         this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public LongListListEntry build() {
-        LongListListEntry entry = new LongListListEntry(getFieldNameKey(), value, expended, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart()) {
+        LongListListEntry entry = new LongListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart()) {
             @Override
             public boolean isDeleteButtonEnabled() {
                 return deleteButtonEnabled;

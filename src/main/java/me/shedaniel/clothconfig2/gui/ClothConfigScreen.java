@@ -28,8 +28,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,9 +65,10 @@ public abstract class ClothConfigScreen extends Screen {
     private Map<String, Identifier> categoryBackgroundLocation;
     private boolean transparentBackground = false;
     private boolean editable = true;
-    @Nullable private String defaultFallbackCategory = null;
+    @Nullable
+    private String defaultFallbackCategory = null;
     private boolean alwaysShowTabs = false;
-    
+
     @Deprecated
     public ClothConfigScreen(Screen parent, String title, Map<String, List<Pair<String, Object>>> o, boolean confirmSave, boolean displayErrors, boolean smoothScrollingList, Identifier defaultBackgroundLocation, Map<String, Identifier> categoryBackgroundLocation) {
         super(new LiteralText(""));

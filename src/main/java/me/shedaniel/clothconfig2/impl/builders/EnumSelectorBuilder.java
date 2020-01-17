@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -64,18 +65,19 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
         this.tooltipSupplier = e -> tooltip;
         return this;
     }
-    
+
     public EnumSelectorBuilder<T> setTooltip(String... tooltip) {
         this.tooltipSupplier = e -> Optional.ofNullable(tooltip);
         return this;
     }
-    
+
     public EnumSelectorBuilder<T> setEnumNameProvider(Function<Enum, String> enumNameProvider) {
         Objects.requireNonNull(enumNameProvider);
         this.enumNameProvider = enumNameProvider;
         return this;
     }
-    
+
+    @NotNull
     @Override
     public EnumListEntry<T> build() {
         EnumListEntry<T> entry = new EnumListEntry<>(getFieldNameKey(), clazz, value, getResetButtonKey(), defaultValue, saveConsumer, enumNameProvider, null, isRequireRestart());
@@ -84,5 +86,5 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
-    
+
 }

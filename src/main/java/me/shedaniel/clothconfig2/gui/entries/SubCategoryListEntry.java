@@ -16,20 +16,20 @@ import java.util.List;
 import java.util.Optional;
 
 public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigListEntry>> {
-    
+
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     private String categoryName;
     private List<AbstractConfigListEntry> entries;
     private CategoryLabelWidget widget;
     private List<Element> children;
-    private boolean expended;
-    
+    private boolean expanded;
+
     @Deprecated
-    public SubCategoryListEntry(String categoryName, List<AbstractConfigListEntry> entries, boolean defaultExpended) {
+    public SubCategoryListEntry(String categoryName, List<AbstractConfigListEntry> entries, boolean defaultExpanded) {
         super(categoryName, null);
         this.categoryName = categoryName;
         this.entries = entries;
-        this.expended = defaultExpended;
+        this.expanded = defaultExpanded;
         this.widget = new CategoryLabelWidget();
         this.children = Lists.newArrayList(widget);
         this.children.addAll(entries);
@@ -72,15 +72,15 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         DiffuseLighting.disable();
         RenderSystem.color4f(1, 1, 1, 1);
-        blit(x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expended ? 9 : 0), 9, 9);
+        blit(x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
         MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(categoryName), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for(AbstractConfigListEntry entry : entries) {
             entry.setParent(getParent());
             entry.setScreen(getScreen());
         }
-        if (expended) {
+        if (expanded) {
             int yy = y + 24;
-            for(AbstractConfigListEntry entry : entries) {
+            for (AbstractConfigListEntry entry : entries) {
                 entry.render(-1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isSelected, delta);
                 yy += entry.getItemHeight();
             }
@@ -98,9 +98,9 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     
     @Override
     public int getItemHeight() {
-        if (expended) {
+        if (expanded) {
             int i = 24;
-            for(AbstractConfigListEntry entry : entries)
+            for (AbstractConfigListEntry entry : entries)
                 i += entry.getItemHeight();
             return i;
         }
@@ -135,7 +135,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         @Override
         public boolean mouseClicked(double double_1, double double_2, int int_1) {
             if (rectangle.contains(double_1, double_2)) {
-                expended = !expended;
+                expanded = !expanded;
                 MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             }

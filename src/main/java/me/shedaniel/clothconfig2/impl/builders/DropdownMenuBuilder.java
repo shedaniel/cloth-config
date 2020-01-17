@@ -13,8 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,18 +74,18 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
         return this;
     }
-    
+
     public DropdownMenuBuilder<T> requireRestart() {
         requireRestart(true);
         return this;
     }
-    
+
     public DropdownMenuBuilder<T> setErrorSupplier(Function<T, Optional<String>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
-    
-    @Nonnull
+
+    @NotNull
     @Override
     public DropdownBoxEntry<T> build() {
         DropdownBoxEntry<T> entry = new DropdownBoxEntry<T>(getFieldNameKey(), getResetButtonKey(), null, isRequireRestart(), defaultValue, saveConsumer, selections, topCellElement, cellCreator);
@@ -94,7 +94,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
-    
+
     public static class TopCellElementBuilder {
         public static final Function<String, Identifier> IDENTIFIER_FUNCTION = str -> {
             try {

@@ -2,8 +2,8 @@ package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.FloatListListEntry;
 import net.minecraft.client.resource.language.I18n;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -16,7 +16,7 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
     private Consumer<List<Float>> saveConsumer = null;
     private Function<List<Float>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
     private List<Float> value;
-    private boolean expended = false;
+    private boolean expanded = false;
     private Float min = null, max = null;
     private Function<FloatListListEntry, FloatListListEntry.FloatListCell> createNewInstance;
     private String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
@@ -71,8 +71,8 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         return this;
     }
 
-    public FloatListBuilder setExpended(boolean expended) {
-        this.expended = expended;
+    public FloatListBuilder setExpanded(boolean expanded) {
+        this.expanded = expanded;
         return this;
     }
 
@@ -131,7 +131,7 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public FloatListListEntry build() {
         FloatListListEntry entry = new FloatListListEntry(getFieldNameKey(), value, expended, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart()) {

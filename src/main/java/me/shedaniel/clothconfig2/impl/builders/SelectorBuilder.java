@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -63,17 +64,18 @@ public class SelectorBuilder<T> extends FieldBuilder<T, SelectionListEntry<T>> {
         this.tooltipSupplier = e -> tooltip;
         return this;
     }
-    
+
     public SelectorBuilder<T> setTooltip(String... tooltip) {
         this.tooltipSupplier = e -> Optional.ofNullable(tooltip);
         return this;
     }
-    
+
     public SelectorBuilder<T> setNameProvider(Function<T, String> enumNameProvider) {
         this.nameProvider = enumNameProvider;
         return this;
     }
-    
+
+    @NotNull
     @Override
     public SelectionListEntry<T> build() {
         SelectionListEntry<T> entry = new SelectionListEntry<>(getFieldNameKey(), valuesArray, value, getResetButtonKey(), defaultValue, saveConsumer, nameProvider, null, isRequireRestart());
@@ -82,5 +84,5 @@ public class SelectorBuilder<T> extends FieldBuilder<T, SelectionListEntry<T>> {
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
-    
+
 }

@@ -33,15 +33,15 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
         this.widgets.addAll(cells);
         expanded = defaultExpanded;
     }
-    
+
     public Function<Double, Optional<String>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
-    
+
     public void setCellErrorSupplier(Function<Double, Optional<String>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
     }
-    
+
     @Override
     public List<Double> getValue() {
         return cells.stream().map(DoubleListCell::getValue).collect(Collectors.toList());
@@ -73,17 +73,17 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
             StringBuilder stringBuilder_1 = new StringBuilder();
             char[] var2 = s.toCharArray();
             int var3 = var2.length;
-            
-            for(int var4 = 0; var4 < var3; ++var4)
+
+            for (int var4 = 0; var4 < var3; ++var4)
                 if (Character.isDigit(var2[var4]) || var2[var4] == '-' || var2[var4] == '.')
                     stringBuilder_1.append(var2[var4]);
-            
+
             return stringBuilder_1.toString();
         };
         private TextFieldWidget widget;
         private boolean isSelected;
         private DoubleListListEntry listListEntry;
-        
+
         public DoubleListCell(double value, DoubleListListEntry listListEntry) {
             this.listListEntry = listListEntry;
             this.setErrorSupplier(() -> listListEntry.cellErrorSupplier == null ? Optional.empty() : listListEntry.getCellErrorSupplier().apply(getValue()));
@@ -96,7 +96,7 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
                     super.render(int_1, int_2, Double_1);
                     setFocused(f);
                 }
-                
+
                 @Override
                 public void write(String string_1) {
                     super.write(stripCharacters.apply(string_1));
@@ -110,7 +110,7 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
                     listListEntry.getScreen().setEdited(true, listListEntry.isRequiresRestart());
             });
         }
-        
+
         public double getValue() {
             try {
                 return Double.valueOf(widget.getText());
@@ -118,7 +118,7 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
                 return 0d;
             }
         }
-        
+
         @Override
         public Optional<String> getError() {
             try {
@@ -132,12 +132,12 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
             }
             return Optional.empty();
         }
-        
+
         @Override
         public int getCellHeight() {
             return 20;
         }
-        
+
         @Override
         public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             widget.setWidth(entryWidth - 12);
@@ -149,12 +149,12 @@ public class DoubleListListEntry extends BaseListEntry<Double, DoubleListListEnt
             if (isSelected && listListEntry.isEditable())
                 fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
-        
+
         @Override
         public List<? extends Element> children() {
             return Collections.singletonList(widget);
         }
-        
+
     }
-    
+
 }

@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -54,17 +55,18 @@ public class StringFieldBuilder extends FieldBuilder<String, StringListEntry> {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
-    
+
     public StringFieldBuilder setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = str -> tooltip;
         return this;
     }
-    
+
     public StringFieldBuilder setTooltip(String... tooltip) {
         this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
         return this;
     }
-    
+
+    @NotNull
     @Override
     public StringListEntry build() {
         StringListEntry entry = new StringListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
@@ -73,5 +75,5 @@ public class StringFieldBuilder extends FieldBuilder<String, StringListEntry> {
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
-    
+
 }

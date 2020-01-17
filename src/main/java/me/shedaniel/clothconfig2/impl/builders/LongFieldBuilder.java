@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.LongListEntry;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -73,17 +74,18 @@ public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
         this.max = max;
         return this;
     }
-    
+
     public LongFieldBuilder removeMin() {
         this.min = null;
         return this;
     }
-    
+
     public LongFieldBuilder removeMax() {
         this.max = null;
         return this;
     }
-    
+
+    @NotNull
     @Override
     public LongListEntry build() {
         LongListEntry entry = new LongListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());

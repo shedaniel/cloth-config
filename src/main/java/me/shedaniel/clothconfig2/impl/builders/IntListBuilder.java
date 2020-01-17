@@ -2,8 +2,8 @@ package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.IntegerListListEntry;
 import net.minecraft.client.resource.language.I18n;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -16,7 +16,7 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
     private Consumer<List<Integer>> saveConsumer = null;
     private Function<List<Integer>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
     private List<Integer> value;
-    private boolean expended = false;
+    private boolean expanded = false;
     private Integer min = null, max = null;
     private Function<IntegerListListEntry, IntegerListListEntry.IntegerListCell> createNewInstance;
     private String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
@@ -71,8 +71,8 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
         return this;
     }
 
-    public IntListBuilder setExpended(boolean expended) {
-        this.expended = expended;
+    public IntListBuilder setExpanded(boolean expanded) {
+        this.expanded = expanded;
         return this;
     }
 
@@ -131,10 +131,10 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public IntegerListListEntry build() {
-        IntegerListListEntry entry = new IntegerListListEntry(getFieldNameKey(), value, expended, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart()) {
+        IntegerListListEntry entry = new IntegerListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart()) {
             @Override
             public boolean isDeleteButtonEnabled() {
                 return deleteButtonEnabled;

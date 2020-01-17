@@ -7,8 +7,8 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -120,7 +120,7 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     }
     
     public static interface Translatable {
-        @Nonnull
+        @NotNull
         String getKey();
     }
     

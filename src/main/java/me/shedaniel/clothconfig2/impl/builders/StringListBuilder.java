@@ -2,6 +2,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.StringListListEntry;
 import net.minecraft.client.resource.language.I18n;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +16,7 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
     private Consumer<List<String>> saveConsumer = null;
     private Function<List<String>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
     private List<String> value;
-    private boolean expended = false;
+    private boolean expanded = false;
     private Function<StringListListEntry, StringListListEntry.StringListCell> createNewInstance;
     private String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
     private boolean deleteButtonEnabled = true, insertInFront = true;
@@ -69,8 +70,8 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
         return this;
     }
 
-    public StringListBuilder setExpended(boolean expended) {
-        this.expended = expended;
+    public StringListBuilder setExpanded(boolean expanded) {
+        this.expanded = expanded;
         return this;
     }
 
@@ -109,9 +110,10 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
         return this;
     }
 
+    @NotNull
     @Override
     public StringListListEntry build() {
-        StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, expended, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart());
+        StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart());
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
         entry.setCellErrorSupplier(cellErrorSupplier);

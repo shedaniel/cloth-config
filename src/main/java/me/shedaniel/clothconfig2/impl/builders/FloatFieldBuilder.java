@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.FloatListEntry;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -73,17 +74,18 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
         this.max = max;
         return this;
     }
-    
+
     public FloatFieldBuilder removeMin() {
         this.min = null;
         return this;
     }
-    
+
     public FloatFieldBuilder removeMax() {
         this.max = null;
         return this;
     }
-    
+
+    @NotNull
     @Override
     public FloatListEntry build() {
         FloatListEntry entry = new FloatListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
