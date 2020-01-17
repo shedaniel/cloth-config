@@ -267,7 +267,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
                         testing.addEntry(entryBuilder.startKeyCodeField("Cool Key", InputUtil.UNKNOWN_KEYCODE).setDefaultValue(InputUtil.UNKNOWN_KEYCODE).build());
                         testing.addEntry(entryBuilder.startModifierKeyCodeField("Cool Modifier Key", ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).setDefaultValue(ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).build());
                         testing.addEntry(
-                                entryBuilder.startDoubleList("A list of Doubles", new ArrayList<>())
+                                entryBuilder.startDoubleList("A list of Doubles", Arrays.asList(1.0, 2.0))
                                         .setDefaultValue(Arrays.asList(1.0, 2.0))
                                         .build()
                         );
