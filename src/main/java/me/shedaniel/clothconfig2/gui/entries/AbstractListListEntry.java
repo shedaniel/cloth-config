@@ -75,6 +75,7 @@ public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.A
 
         public AbstractListCell(@Nullable T value, OUTER_SELF listListEntry) {
             this.listListEntry = listListEntry;
+            this.setErrorSupplier(() -> Optional.ofNullable(listListEntry.cellErrorSupplier).flatMap(cellErrorFn -> cellErrorFn.apply(this.getValue())));
         }
 
         public abstract T getValue();

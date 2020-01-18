@@ -61,7 +61,6 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             final T finalValue = substituteDefault(value);
 
             widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "");
-            this.setErrorSupplier(() -> Optional.ofNullable(listListEntry.cellErrorSupplier).flatMap(cellErrorFn -> cellErrorFn.apply(this.getValue())));
             widget.setTextPredicate(this::isValidText);
             widget.setMaxLength(Integer.MAX_VALUE);
             widget.setHasBorder(false);
