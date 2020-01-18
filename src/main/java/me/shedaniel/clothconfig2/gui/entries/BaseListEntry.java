@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * @param <T>    the configuration object type
@@ -129,14 +130,16 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
 
     @Override
     public Optional<String> getError() {
-        String error = null;
-        for (BaseListCell entry : cells)
-            if (entry.getConfigError().isPresent()) {
-                if (error != null)
-                    return Optional.ofNullable(I18n.translate("text.cloth-config.multi_error"));
-                return Optional.ofNullable((String) entry.getConfigError().get());
-            }
-        return Optional.ofNullable(error);
+        List<String> errors = cells.stream()
+                .map(C::getConfigError)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+
+        if (errors.size() > 1)
+            return Optional.of(I18n.translate("text.cloth-config.multi_error"));
+        else
+            return errors.stream().findFirst();
     }
 
     @Override
