@@ -54,7 +54,7 @@ public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.A
 
     @Override
     public List<T> getValue() {
-        return cells.stream().map(AbstractListCell::getValue).collect(Collectors.toList());
+        return cells.stream().map(C::getValue).collect(Collectors.toList());
     }
 
     @Override
@@ -69,7 +69,8 @@ public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.A
      * @see AbstractListListEntry
      */
     @ApiStatus.Internal
-    public static abstract class AbstractListCell<T, SELF extends AbstractListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractListListEntry<T, SELF, OUTER_SELF>> extends BaseListCell {
+    public static abstract class AbstractListCell<T, SELF extends AbstractListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractListListEntry<T, SELF, OUTER_SELF>>
+            extends BaseListCell {
         protected final OUTER_SELF listListEntry;
 
         public AbstractListCell(@Nullable T value, OUTER_SELF listListEntry) {

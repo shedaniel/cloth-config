@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * This class represents config entry lists that use one {@link TextFieldWidget} per entry.
@@ -44,11 +43,6 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         super(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront, createNewCell);
     }
 
-    @Override
-    public List<T> getValue() {
-        return cells.stream().map(C::getValue).collect(Collectors.toList());
-    }
-
     /**
      * @param <T>           the configuration object type
      * @param <SELF>        the "curiously recurring template pattern" type parameter for this class
@@ -56,7 +50,8 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
      * @see AbstractTextFieldListListEntry
      */
     @ApiStatus.Internal
-    public static abstract class AbstractTextFieldListCell<T, SELF extends AbstractTextFieldListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractTextFieldListListEntry<T, SELF, OUTER_SELF>> extends AbstractListListEntry.AbstractListCell<T, SELF, OUTER_SELF> {
+    public static abstract class AbstractTextFieldListCell<T, SELF extends AbstractTextFieldListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractTextFieldListListEntry<T, SELF, OUTER_SELF>>
+            extends AbstractListListEntry.AbstractListCell<T, SELF, OUTER_SELF> {
 
         protected TextFieldWidget widget;
 
