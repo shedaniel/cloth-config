@@ -1,21 +1,17 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @ApiStatus.Internal
-public class FloatListListEntry extends AbstractListListEntry<Float, FloatListListEntry.FloatListCell, FloatListListEntry> {
+public class FloatListListEntry extends AbstractTextFieldListListEntry<Float, FloatListListEntry.FloatListCell, FloatListListEntry> {
 
     private float minimum, maximum;
 
@@ -46,11 +42,6 @@ public class FloatListListEntry extends AbstractListListEntry<Float, FloatListLi
         this.maximum = Float.POSITIVE_INFINITY;
     }
 
-    @Override
-    public List<Float> getValue() {
-        return cells.stream().map(FloatListCell::getValue).collect(Collectors.toList());
-    }
-
     public FloatListListEntry setMaximum(float maximum) {
         this.maximum = maximum;
         return this;
@@ -66,34 +57,24 @@ public class FloatListListEntry extends AbstractListListEntry<Float, FloatListLi
         return this;
     }
 
-    @Override
-    protected FloatListCell getFromValue(Float value) {
-        return new FloatListCell(value, this);
-    }
-
-    public static class FloatListCell extends AbstractListListEntry.AbstractListCell<Float, FloatListCell, FloatListListEntry> {
-
-        private TextFieldWidget widget;
+    public static class FloatListCell extends AbstractTextFieldListListEntry.AbstractTextFieldListCell<Float, FloatListCell, FloatListListEntry> {
 
         public FloatListCell(Float value, FloatListListEntry listListEntry) {
             super(value, listListEntry);
+        }
 
+        @Nullable
+        @Override
+        protected Float substituteDefault(@Nullable Float value) {
             if (value == null)
-                value = 0f;
-            Float finalValue = value;
+                return 0f;
+            else
+                return value;
+        }
 
-            this.setErrorSupplier(() -> Optional.ofNullable(listListEntry.cellErrorSupplier).flatMap(fn -> fn.apply(this.getValue())));
-            widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "");
-            widget.setTextPredicate(s -> s.chars().allMatch(c -> Character.isDigit(c) || c == '-' || c == '.'));
-            widget.setMaxLength(Integer.MAX_VALUE);
-            widget.setHasBorder(false);
-            widget.setText(value.toString());
-            widget.setChangedListener(s -> {
-                widget.setEditableColor(getPreferredTextColor());
-                if (!Objects.equals(s, finalValue.toString())) {
-                    this.listListEntry.getScreen().setEdited(true, this.listListEntry.isRequiresRestart());
-                }
-            });
+        @Override
+        protected boolean isValidText(@NotNull String text) {
+            return text.chars().allMatch(c -> Character.isDigit(c) || c == '-' || c == '.');
         }
 
         public Float getValue() {
@@ -117,28 +98,5 @@ public class FloatListListEntry extends AbstractListListEntry<Float, FloatListLi
             }
             return Optional.empty();
         }
-
-        @Override
-        public int getCellHeight() {
-            return 20;
-        }
-
-        @Override
-        public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-            widget.setWidth(entryWidth - 12);
-            widget.x = x;
-            widget.y = y + 1;
-            widget.setEditable(listListEntry.isEditable());
-            widget.render(mouseX, mouseY, delta);
-            if (isSelected && listListEntry.isEditable())
-                fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
-        }
-
-        @Override
-        public List<? extends Element> children() {
-            return Collections.singletonList(widget);
-        }
-
     }
-
 }
