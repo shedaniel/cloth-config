@@ -15,6 +15,8 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,29 +35,35 @@ import java.util.stream.Collectors;
 public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends BaseListEntry<T, C, SELF>> extends TooltipListEntry<List<T>> {
 
     protected static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
+    @NotNull
     protected final List<C> cells;
+    @NotNull
     protected final List<Element> widgets;
     protected boolean expanded;
     protected boolean deleteButtonEnabled;
     protected boolean insertInFront;
+    @Nullable
     protected Consumer<List<T>> saveConsumer;
     protected ListLabelWidget labelWidget;
     protected AbstractButtonWidget resetWidget;
+    @NotNull
     protected Function<SELF, C> createNewInstance;
+    @NotNull
     protected Supplier<List<T>> defaultValue;
+    @Nullable
     protected String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
 
     @Deprecated
-    public BaseListEntry(String fieldName, Supplier<Optional<String[]>> tooltipSupplier, Supplier<List<T>> defaultValue, Function<SELF, C> createNewInstance, Consumer<List<T>> saveConsumer, String resetButtonKey) {
+    public BaseListEntry(@NotNull String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, String resetButtonKey) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, false);
     }
 
     @Deprecated
-    public BaseListEntry(String fieldName, Supplier<Optional<String[]>> tooltipSupplier, Supplier<List<T>> defaultValue, Function<SELF, C> createNewInstance, Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart) {
+    public BaseListEntry(@NotNull String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, requiresRestart, true, true);
     }
 
-    public BaseListEntry(String fieldName, Supplier<Optional<String[]>> tooltipSupplier, Supplier<List<T>> defaultValue, Function<SELF, C> createNewInstance, Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+    public BaseListEntry(@NotNull String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.deleteButtonEnabled = deleteButtonEnabled;
         this.insertInFront = insertInFront;
@@ -83,27 +91,30 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
 
     protected abstract C getFromValue(T value);
 
+    @NotNull
     public Function<SELF, C> getCreateNewInstance() {
         return createNewInstance;
     }
 
-    public void setCreateNewInstance(Function<SELF, C> createNewInstance) {
+    public void setCreateNewInstance(@NotNull Function<SELF, C> createNewInstance) {
         this.createNewInstance = createNewInstance;
     }
 
+    @Nullable
     public String getAddTooltip() {
         return addTooltip;
     }
 
-    public void setAddTooltip(String addTooltip) {
+    public void setAddTooltip(@Nullable String addTooltip) {
         this.addTooltip = addTooltip;
     }
 
+    @Nullable
     public String getRemoveTooltip() {
         return removeTooltip;
     }
 
-    public void setRemoveTooltip(String removeTooltip) {
+    public void setRemoveTooltip(@Nullable String removeTooltip) {
         this.removeTooltip = removeTooltip;
     }
 
