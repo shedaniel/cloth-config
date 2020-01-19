@@ -246,8 +246,9 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                 MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             } else if (isDeleteButtonEnabled() && isInsideDelete(double_1, double_2)) {
-                BaseListCell focused = !expanded && getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
-                if (focused != null) {
+                Element focused = getFocused();
+                if (expanded && focused instanceof BaseListCell) {
+                    //noinspection SuspiciousMethodCalls
                     cells.remove(focused);
                     widgets.remove(focused);
                     getScreen().setEdited(true, isRequiresRestart());
