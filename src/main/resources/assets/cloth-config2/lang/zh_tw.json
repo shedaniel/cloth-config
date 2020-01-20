@@ -24,5 +24,16 @@
   "text.cloth-config.ignore_restart": "忽略重啟",
   "text.cloth-config.boolean.value.true": "§a是",
   "text.cloth-config.boolean.value.false": "§c否",
-  "text.cloth-config.dropdown.value.unknown": "§c沒有建議項"
+  "text.cloth-config.dropdown.value.unknown": "§c沒有建議項",
+  "modifier.cloth-config.alt": "Alt + %s",
+  "modifier.cloth-config.ctrl": "Ctrl + %s",
+  "modifier.cloth-config.shift": "Shift + %s",
+  "title.cloth-config.config": "Cloth Mod Config Config",
+  "category.cloth-config.scrolling": "Scrolling",
+  "category.cloth-config.testing": "Config Demo",
+  "option.cloth-config.scrollDuration": "Scroll Duration",
+  "option.cloth-config.scrollStep": "Scroll Step",
+  "option.cloth-config.bounceBackMultiplier": "Bounce Multiplier",
+  "option.cloth-config.setDefaultSmoothScroll": "Set Default Smooth Scroll",
+  "option.cloth-config.disableSmoothScroll": "Disable Smooth Scroll"
 }
