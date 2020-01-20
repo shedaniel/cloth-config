@@ -1,33 +1,20 @@
 package me.shedaniel.math.api;
 
-public class Dimension implements Cloneable {
-    public int width;
-    public int height;
-    
+public class Dimension extends me.shedaniel.math.Dimension {
     public Dimension() {
-        this(0, 0);
+        super();
     }
     
     public Dimension(Dimension d) {
-        this(d.width, d.height);
+        super(d);
+    }
+    
+    public Dimension(me.shedaniel.math.Dimension d) {
+        super(d);
     }
     
     public Dimension(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
-    
-    public int getWidth() {
-        return width;
-    }
-    
-    public int getHeight() {
-        return height;
-    }
-    
-    public void setSize(double width, double height) {
-        this.width = (int) Math.ceil(width);
-        this.height = (int) Math.ceil(height);
+        super(width, height);
     }
     
     public Dimension getSize() {
@@ -36,37 +23,5 @@ public class Dimension implements Cloneable {
     
     public void setSize(Dimension d) {
         setSize(d.width, d.height);
-    }
-    
-    public void setSize(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Dimension) {
-            Dimension d = (Dimension) obj;
-            return (width == d.width) && (height == d.height);
-        }
-        return false;
-    }
-    
-    @Override
-    public int hashCode() {
-        int result = 1;
-        result = 31 * result + width;
-        result = 31 * result + height;
-        return result;
-    }
-    
-    @Override
-    public String toString() {
-        return getClass().getName() + "[width=" + width + ",height=" + height + "]";
-    }
-    
-    @Override
-    public Dimension clone() {
-        return getSize();
     }
 }

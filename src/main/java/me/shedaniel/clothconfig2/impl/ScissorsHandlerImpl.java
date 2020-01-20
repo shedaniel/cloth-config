@@ -14,9 +14,9 @@ import java.util.Collections;
 import java.util.List;
 
 public final class ScissorsHandlerImpl implements ScissorsHandler {
-
+    
     @Deprecated public static final ScissorsHandler INSTANCE = new ScissorsHandlerImpl();
-
+    
     static {
         Executor.runIf(() -> FabricLoader.getInstance().isModLoaded("notenoughcrashes"), () -> () -> {
             fudge.notenoughcrashes.api.NotEnoughCrashesApi.onEveryCrash(() -> {
@@ -28,37 +28,37 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
             });
         });
     }
-
+    
     private List<Rectangle> scissorsAreas;
-
+    
     public ScissorsHandlerImpl() {
         this.scissorsAreas = Lists.newArrayList();
     }
-
+    
     @Override
     public void clearScissors() {
         scissorsAreas.clear();
         applyScissors();
     }
-
+    
     @Override
     public List<Rectangle> getScissorsAreas() {
         return Collections.unmodifiableList(scissorsAreas);
     }
-
+    
     @Override
     public void scissor(Rectangle rectangle) {
         scissorsAreas.add(rectangle);
         applyScissors();
     }
-
+    
     @Override
     public void removeLastScissor() {
         if (!scissorsAreas.isEmpty())
             scissorsAreas.remove(scissorsAreas.size() - 1);
         applyScissors();
     }
-
+    
     @Override
     public void applyScissors() {
         if (!scissorsAreas.isEmpty()) {

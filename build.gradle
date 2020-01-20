@@ -37,6 +37,8 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_version}"
     modApi "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "me.shedaniel.cloth:basic-math:0.3.0"
+    include "me.shedaniel.cloth:basic-math:0.3.0"
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
     //https://github.com/natanfudge/Not-Enough-Crashes/blob/master/README.md
