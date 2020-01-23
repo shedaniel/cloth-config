@@ -7,6 +7,7 @@ plugins {
     id 'signing'
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id 'java-library'
 }
 
 repositories {
@@ -49,6 +50,9 @@ dependencies {
 
     modApi "net.fabricmc:fabric-loader:${project.loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    modApi "me.shedaniel.cloth:basic-math:0.3.0"
+    include "me.shedaniel.cloth:basic-math:0.3.0"
 
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
 

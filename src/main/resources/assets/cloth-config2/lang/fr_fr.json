@@ -27,5 +27,13 @@
   "text.cloth-config.dropdown.value.unknown": "§cAucune suggestion",
   "modifier.cloth-config.alt": "Alt + %s",
   "modifier.cloth-config.ctrl": "Ctrl + %s",
-  "modifier.cloth-config.shift": "Maj. + %s"
+  "modifier.cloth-config.shift": "Maj. + %s",
+  "title.cloth-config.config": "Configuration de Cloth Mod Config",
+  "category.cloth-config.scrolling": "Défilement",
+  "category.cloth-config.testing": "Démo de configuration",
+  "option.cloth-config.scrollDuration": "Durée du défilement",
+  "option.cloth-config.scrollStep": "Pas du défilement",
+  "option.cloth-config.bounceBackMultiplier": "Multiplicateur du rebond",
+  "option.cloth-config.setDefaultSmoothScroll": "Définir le défilement régulier par défaut",
+  "option.cloth-config.disableSmoothScroll": "Désactiver le défilement régulier"
 }
