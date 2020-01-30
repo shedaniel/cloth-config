@@ -391,7 +391,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             if (currentElements.isEmpty()) {
                 TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
                 String s = I18n.translate("text.cloth-config.dropdown.value.unknown");
-                textRenderer.drawWithShadow(s, lastRectangle.x + getCellCreator().getCellWidth() / 2 - textRenderer.getStringWidth(s) / 2, lastRectangle.y + lastRectangle.height + 3, -1);
+                textRenderer.drawWithShadow(s, lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.getStringWidth(s) / 2f, lastRectangle.y + lastRectangle.height + 3, -1);
             }
 
             if (getMaxScrollPosition() > 6) {
@@ -451,7 +451,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 } else if (double_2 > (double) lastRectangle.y + lastRectangle.height + getHeight()) {
                     scrollTo(getMaxScrollPosition(), false);
                 } else {
-                    double double_5 = (double) Math.max(1, this.getMaxScrollPosition());
+                    double double_5 = Math.max(1, this.getMaxScrollPosition());
                     int int_2 = getHeight();
                     int int_3 = MathHelper.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
                     double double_6 = Math.max(1.0D, double_5 / (double) (int_2 - int_3));

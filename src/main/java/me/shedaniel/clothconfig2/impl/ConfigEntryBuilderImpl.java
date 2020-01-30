@@ -100,12 +100,12 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     
     @Override
     public <T extends Enum<?>> EnumSelectorBuilder<T> startEnumSelector(String fieldNameKey, Class<T> clazz, T value) {
-        return new EnumSelectorBuilder<T>(resetButtonKey, fieldNameKey, clazz, value);
+        return new EnumSelectorBuilder<>(resetButtonKey, fieldNameKey, clazz, value);
     }
     
     @Override
     public <T> SelectorBuilder<T> startSelector(String fieldNameKey, T[] valuesArray, T value) {
-        return new SelectorBuilder<T>(resetButtonKey, fieldNameKey, valuesArray, value);
+        return new SelectorBuilder<>(resetButtonKey, fieldNameKey, valuesArray, value);
     }
     
     @Override
@@ -145,7 +145,7 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     
     @Override
     public <T> DropdownMenuBuilder<T> startDropdownMenu(String fieldNameKey, SelectionTopCellElement<T> topCellElement, SelectionCellCreator<T> cellCreator) {
-        return new DropdownMenuBuilder(resetButtonKey, fieldNameKey, topCellElement, cellCreator);
+        return new DropdownMenuBuilder<>(resetButtonKey, fieldNameKey, topCellElement, cellCreator);
     }
     
 }

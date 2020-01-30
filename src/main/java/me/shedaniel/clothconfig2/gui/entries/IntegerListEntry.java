@@ -14,10 +14,10 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
         StringBuilder stringBuilder_1 = new StringBuilder();
         char[] var2 = s.toCharArray();
         int var3 = var2.length;
-        
-        for(int var4 = 0; var4 < var3; ++var4)
-            if (Character.isDigit(var2[var4]) || var2[var4] == '-')
-                stringBuilder_1.append(var2[var4]);
+    
+        for (char c : var2)
+            if (Character.isDigit(c) || c == '-')
+                stringBuilder_1.append(c);
         
         return stringBuilder_1.toString();
     };
@@ -58,7 +58,7 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
     @Override
     protected void textFieldPreRender(TextFieldWidget widget) {
         try {
-            double i = Integer.valueOf(textFieldWidget.getText());
+            double i = Integer.parseInt(textFieldWidget.getText());
             if (i < minimum || i > maximum)
                 widget.setEditableColor(16733525);
             else
@@ -70,7 +70,7 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
     
     @Override
     protected boolean isMatchDefault(String text) {
-        return getDefaultValue().isPresent() ? text.equals(defaultValue.get().toString()) : false;
+        return getDefaultValue().isPresent() && text.equals(defaultValue.get().toString());
     }
     
     @Override
@@ -101,7 +101,7 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
     @Override
     public Optional<String> getError() {
         try {
-            int i = Integer.valueOf(textFieldWidget.getText());
+            int i = Integer.parseInt(textFieldWidget.getText());
             if (i > maximum)
                 return Optional.of(I18n.translate("text.cloth-config.error.too_large", maximum));
             else if (i < minimum)

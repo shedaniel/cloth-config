@@ -14,10 +14,10 @@ public class LongListEntry extends TextFieldListEntry<Long> {
         StringBuilder stringBuilder_1 = new StringBuilder();
         char[] var2 = s.toCharArray();
         int var3 = var2.length;
-        
-        for(int var4 = 0; var4 < var3; ++var4)
-            if (Character.isDigit(var2[var4]) || var2[var4] == '-')
-                stringBuilder_1.append(var2[var4]);
+    
+        for (char c : var2)
+            if (Character.isDigit(c) || c == '-')
+                stringBuilder_1.append(c);
         
         return stringBuilder_1.toString();
     };
@@ -57,7 +57,7 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     @Override
     protected void textFieldPreRender(TextFieldWidget widget) {
         try {
-            double i = Long.valueOf(textFieldWidget.getText());
+            double i = Long.parseLong(textFieldWidget.getText());
             if (i < minimum || i > maximum)
                 widget.setEditableColor(16733525);
             else
@@ -75,7 +75,7 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     
     @Override
     protected boolean isMatchDefault(String text) {
-        return getDefaultValue().isPresent() ? text.equals(defaultValue.get().toString()) : false;
+        return getDefaultValue().isPresent() && text.equals(defaultValue.get().toString());
     }
     
     public LongListEntry setMinimum(long minimum) {
@@ -100,7 +100,7 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     @Override
     public Optional<String> getError() {
         try {
-            long i = Long.valueOf(textFieldWidget.getText());
+            long i = Long.parseLong(textFieldWidget.getText());
             if (i > maximum)
                 return Optional.of(I18n.translate("text.cloth-config.error.too_large", maximum));
             else if (i < minimum)

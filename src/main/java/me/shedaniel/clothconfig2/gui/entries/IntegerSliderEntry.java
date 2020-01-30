@@ -114,13 +114,12 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(getFieldName())), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.sliderWidget.x = x + resetButton.getWidth() + 1;
-            this.sliderWidget.setWidth(150 - resetButton.getWidth() - 2);
         } else {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.sliderWidget.x = x + entryWidth - 150;
-            this.sliderWidget.setWidth(150 - resetButton.getWidth() - 2);
         }
+        this.sliderWidget.setWidth(150 - resetButton.getWidth() - 2);
         resetButton.render(mouseX, mouseY, delta);
         sliderWidget.render(mouseX, mouseY, delta);
     }

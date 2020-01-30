@@ -18,22 +18,22 @@ public class EnumListEntry<T extends Enum<?>> extends SelectionListEntry<T> {
     
     @Deprecated
     public EnumListEntry(String fieldName, Class<T> clazz, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer) {
-        super(fieldName, clazz.getEnumConstants(), value, resetButtonKey, defaultValue, saveConsumer, v -> DEFAULT_NAME_PROVIDER.apply(v));
+        super(fieldName, clazz.getEnumConstants(), value, resetButtonKey, defaultValue, saveConsumer, DEFAULT_NAME_PROVIDER::apply);
     }
     
     @Deprecated
     public EnumListEntry(String fieldName, Class<T> clazz, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<Enum, String> enumNameProvider) {
-        super(fieldName, clazz.getEnumConstants(), value, resetButtonKey, defaultValue, saveConsumer, v -> enumNameProvider.apply(v), null);
+        super(fieldName, clazz.getEnumConstants(), value, resetButtonKey, defaultValue, saveConsumer, enumNameProvider::apply, null);
     }
     
     @Deprecated
     public EnumListEntry(String fieldName, Class<T> clazz, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<Enum, String> enumNameProvider, Supplier<Optional<String[]>> tooltipSupplier) {
-        super(fieldName, clazz.getEnumConstants(), value, resetButtonKey, defaultValue, saveConsumer, v -> enumNameProvider.apply(v), tooltipSupplier, false);
+        super(fieldName, clazz.getEnumConstants(), value, resetButtonKey, defaultValue, saveConsumer, enumNameProvider::apply, tooltipSupplier, false);
     }
     
     @Deprecated
     public EnumListEntry(String fieldName, Class<T> clazz, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<Enum, String> enumNameProvider, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
-        super(fieldName, clazz.getEnumConstants(), value, resetButtonKey, defaultValue, saveConsumer, v -> enumNameProvider.apply(v), tooltipSupplier, requiresRestart);
+        super(fieldName, clazz.getEnumConstants(), value, resetButtonKey, defaultValue, saveConsumer, enumNameProvider::apply, tooltipSupplier, requiresRestart);
     }
     
 }

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@SuppressWarnings("deprecation")
 @Environment(EnvType.CLIENT)
 public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends AbstractParentElement implements Drawable {
     protected static final int DRAG_OUTSIDE = -2;
@@ -92,7 +91,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected E getItem(int index) {
-        return (E) this.children().get(index);
+        return this.children().get(index);
     }
     
     protected int addItem(E item) {
@@ -123,7 +122,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                 break;
             }
         }
-        return mouseX < (double) this.getScrollbarPosition() && mouseX >= minX && mouseX <= maxX && itemIndex >= 0 && currentY >= 0 && itemIndex < this.getItemCount() ? (E) this.children().get(itemIndex) : null;
+        return mouseX < (double) this.getScrollbarPosition() && mouseX >= minX && mouseX <= maxX && itemIndex >= 0 && currentY >= 0 && itemIndex < this.getItemCount() ? this.children().get(itemIndex) : null;
     }
     
     public void updateSize(int width, int height, int top, int bottom) {
@@ -150,7 +149,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             }
         }
         list.add(i);
-        return list.stream().max((a, b) -> Integer.compare(a, b)).orElse(0);
+        return list.stream().max(Integer::compare).orElse(0);
     }
     
     protected void clickedHeader(int int_1, int int_2) {
@@ -178,6 +177,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         tessellator.draw();
     }
     
+    @SuppressWarnings("deprecation")
     public void render(int mouseX, int mouseY, float delta) {
         this.drawBackground();
         int scrollbarPosition = this.getScrollbarPosition();
@@ -224,9 +224,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         RenderSystem.disableBlend();
     }
     
+    @SuppressWarnings("deprecation")
     protected void renderScrollBar(Tessellator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
         if (maxScroll > 0) {
-            int int_9 = (int) (((this.bottom - this.top) * (this.bottom - this.top)) / this.getMaxScrollPosition());
+            int int_9 = ((this.bottom - this.top) * (this.bottom - this.top)) / this.getMaxScrollPosition();
             int_9 = MathHelper.clamp(int_9, 32, this.bottom - this.top - 8);
             int int_10 = (int) this.getScroll() * (this.bottom - this.top - int_9) / maxScroll + this.top;
             if (int_10 < this.top) {
@@ -255,7 +256,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected void centerScrollOn(E item) {
-        double d = (this.bottom - this.top) / -2;
+        double d = (this.bottom - this.top) / -2d;
         for(int i = 0; i < this.children().indexOf(item) && i < this.getItemCount(); i++)
             d += getItem(i).getItemHeight();
         this.capYPosition(d);
@@ -281,7 +282,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     public void capYPosition(double double_1) {
-        this.scroll = MathHelper.clamp(double_1, 0.0D, (double) this.getMaxScroll());
+        this.scroll = MathHelper.clamp(double_1, 0.0D, this.getMaxScroll());
     }
     
     protected int getMaxScroll() {
@@ -336,9 +337,9 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             if (double_2 < (double) this.top) {
                 this.capYPosition(0.0D);
             } else if (double_2 > (double) this.bottom) {
-                this.capYPosition((double) this.getMaxScroll());
+                this.capYPosition(this.getMaxScroll());
             } else {
-                double double_5 = (double) Math.max(1, this.getMaxScroll());
+                double double_5 = Math.max(1, this.getMaxScroll());
                 int int_2 = this.bottom - this.top;
                 int int_3 = MathHelper.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
                 double double_6 = Math.max(1.0D, double_5 / (double) (int_2 - int_3));
@@ -379,7 +380,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         if (!this.children().isEmpty()) {
             int int_2 = this.children().indexOf(this.getSelectedItem());
             int int_3 = MathHelper.clamp(int_2 + int_1, 0, this.getItemCount() - 1);
-            E itemListWidget$Item_1 = (E) this.children().get(int_3);
+            E itemListWidget$Item_1 = this.children().get(int_3);
             this.selectItem(itemListWidget$Item_1);
             this.ensureVisible(itemListWidget$Item_1);
         }
@@ -410,17 +411,17 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                 float float_2 = this.isFocused() ? 1.0F : 0.5F;
                 RenderSystem.color4f(float_2, float_2, float_2, 1.0F);
                 buffer.begin(7, VertexFormats.POSITION);
-                buffer.vertex((double) itemMinX, (double) (itemY + itemHeight + 2), 0.0D).next();
-                buffer.vertex((double) itemMaxX, (double) (itemY + itemHeight + 2), 0.0D).next();
-                buffer.vertex((double) itemMaxX, (double) (itemY - 2), 0.0D).next();
-                buffer.vertex((double) itemMinX, (double) (itemY - 2), 0.0D).next();
+                buffer.vertex(itemMinX, itemY + itemHeight + 2, 0.0D).next();
+                buffer.vertex(itemMaxX, itemY + itemHeight + 2, 0.0D).next();
+                buffer.vertex(itemMaxX, itemY - 2, 0.0D).next();
+                buffer.vertex(itemMinX, itemY - 2, 0.0D).next();
                 tessellator.draw();
                 RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
                 buffer.begin(7, VertexFormats.POSITION);
-                buffer.vertex((double) (itemMinX + 1), (double) (itemY + itemHeight + 1), 0.0D).next();
-                buffer.vertex((double) (itemMaxX - 1), (double) (itemY + itemHeight + 1), 0.0D).next();
-                buffer.vertex((double) (itemMaxX - 1), (double) (itemY - 1), 0.0D).next();
-                buffer.vertex((double) (itemMinX + 1), (double) (itemY - 1), 0.0D).next();
+                buffer.vertex(itemMinX + 1, itemY + itemHeight + 1, 0.0D).next();
+                buffer.vertex(itemMaxX - 1, itemY + itemHeight + 1, 0.0D).next();
+                buffer.vertex(itemMaxX - 1, itemY - 1, 0.0D).next();
+                buffer.vertex(itemMinX + 1, itemY - 1, 0.0D).next();
                 tessellator.draw();
                 RenderSystem.enableTexture();
             }
@@ -428,7 +429,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             int y = this.getRowTop(renderIndex);
             int x = this.getRowLeft();
             DiffuseLighting.disable();
-            item.render(renderIndex, y, x, itemWidth, itemHeight, int_3, int_4, this.isMouseOver((double) int_3, (double) int_4) && Objects.equals(this.getItemAtPosition((double) int_3, (double) int_4), item), float_1);
+            item.render(renderIndex, y, x, itemWidth, itemHeight, int_3, int_4, this.isMouseOver(int_3, int_4) && Objects.equals(this.getItemAtPosition(int_3, int_4), item), float_1);
         }
         
     }
@@ -448,29 +449,30 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return false;
     }
     
+    @SuppressWarnings("deprecation")
     protected void renderHoleBackground(int int_1, int int_2, int int_3, int int_4) {
-        Tessellator tessellator_1 = Tessellator.getInstance();
-        BufferBuilder bufferBuilder_1 = tessellator_1.getBuffer();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
         this.client.getTextureManager().bindTexture(backgroundLocation);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         float float_1 = 32.0F;
-        bufferBuilder_1.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-        bufferBuilder_1.vertex((double) this.left, (double) int_2, 0.0D).texture(0, ((float) int_2 / 32.0F)).color(64, 64, 64, int_4).next();
-        bufferBuilder_1.vertex((double) (this.left + this.width), (double) int_2, 0.0D).texture(((float) this.width / 32.0F), ((float) int_2 / 32.0F)).color(64, 64, 64, int_4).next();
-        bufferBuilder_1.vertex((double) (this.left + this.width), (double) int_1, 0.0D).texture(((float) this.width / 32.0F), ((float) int_1 / 32.0F)).color(64, 64, 64, int_3).next();
-        bufferBuilder_1.vertex((double) this.left, (double) int_1, 0.0D).texture(0, ((float) int_1 / 32.0F)).color(64, 64, 64, int_3).next();
-        tessellator_1.draw();
+        buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+        buffer.vertex(this.left, int_2, 0.0D).texture(0, ((float) int_2 / 32.0F)).color(64, 64, 64, int_4).next();
+        buffer.vertex(this.left + this.width, int_2, 0.0D).texture(((float) this.width / 32.0F), ((float) int_2 / 32.0F)).color(64, 64, 64, int_4).next();
+        buffer.vertex(this.left + this.width, int_1, 0.0D).texture(((float) this.width / 32.0F), ((float) int_1 / 32.0F)).color(64, 64, 64, int_3).next();
+        buffer.vertex(this.left, int_1, 0.0D).texture(0, ((float) int_1 / 32.0F)).color(64, 64, 64, int_3).next();
+        tessellator.draw();
     }
     
     protected E remove(int int_1) {
-        E itemListWidget$Item_1 = (E) this.entries.get(int_1);
-        return this.removeEntry((E) this.entries.get(int_1)) ? itemListWidget$Item_1 : null;
+        E itemListWidget$Item_1 = this.entries.get(int_1);
+        return this.removeEntry(this.entries.get(int_1)) ? itemListWidget$Item_1 : null;
     }
     
     protected boolean removeEntry(E itemListWidget$Item_1) {
         boolean boolean_1 = this.entries.remove(itemListWidget$Item_1);
         if (boolean_1 && itemListWidget$Item_1 == this.getSelectedItem()) {
-            this.selectItem((E) null);
+            this.selectItem(null);
         }
         
         return boolean_1;
@@ -482,7 +484,6 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         private SmoothScrollingSettings() {}
     }
     
-    @SuppressWarnings("deprecation")
     @Environment(EnvType.CLIENT)
     public abstract static class Entry<E extends Entry<E>> extends DrawableHelper implements Element {
         @Deprecated DynamicEntryListWidget<E> parent;
@@ -527,7 +528,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         
         @Override
         public E get(int int_1) {
-            return (E) this.items.get(int_1);
+            return this.items.get(int_1);
         }
         
         @Override
@@ -536,15 +537,13 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         }
         
         @Override
-        @SuppressWarnings("deprecation")
         public E set(int int_1, E itemListWidget$Item_1) {
-            E itemListWidget$Item_2 = (E) this.items.set(int_1, itemListWidget$Item_1);
+            E itemListWidget$Item_2 = this.items.set(int_1, itemListWidget$Item_1);
             itemListWidget$Item_1.parent = DynamicEntryListWidget.this;
             return itemListWidget$Item_2;
         }
         
         @Override
-        @SuppressWarnings("deprecation")
         public void add(int int_1, E itemListWidget$Item_1) {
             this.items.add(int_1, itemListWidget$Item_1);
             itemListWidget$Item_1.parent = DynamicEntryListWidget.this;
@@ -552,7 +551,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         
         @Override
         public E remove(int int_1) {
-            return (E) this.items.remove(int_1);
+            return this.items.remove(int_1);
         }
     }
 }

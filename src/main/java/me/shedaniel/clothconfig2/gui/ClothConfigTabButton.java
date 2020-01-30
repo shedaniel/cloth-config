@@ -4,8 +4,8 @@ import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 
 public class ClothConfigTabButton extends AbstractPressableButtonWidget {
     
-    private int index = -1;
-    private ClothConfigScreen screen;
+    private final int index;
+    private final ClothConfigScreen screen;
     
     public ClothConfigTabButton(ClothConfigScreen screen, int index, int int_1, int int_2, int int_3, int int_4, String string_1) {
         super(int_1, int_2, int_3, int_4, string_1);

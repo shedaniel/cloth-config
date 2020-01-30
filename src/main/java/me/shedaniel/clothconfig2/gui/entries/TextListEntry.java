@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class TextListEntry extends TooltipListEntry {
+public class TextListEntry extends TooltipListEntry<Object> {
     
     private int savedWidth = -1;
     private int color;
@@ -37,8 +37,8 @@ public class TextListEntry extends TooltipListEntry {
         this.savedWidth = entryWidth;
         int yy = y + 4;
         List<String> strings = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(text, savedWidth);
-        for(int i = 0; i < strings.size(); i++) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(strings.get(i), x, yy, color);
+        for (String string : strings) {
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(string, x, yy, color);
             yy += MinecraftClient.getInstance().textRenderer.fontHeight + 3;
         }
     }

@@ -41,7 +41,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
 
     @Override
     public boolean isRequiresRestart() {
-        for (AbstractConfigListEntry entry : entries)
+        for (AbstractConfigListEntry<?> entry : entries)
             if (entry.isRequiresRestart())
                 return true;
         return false;

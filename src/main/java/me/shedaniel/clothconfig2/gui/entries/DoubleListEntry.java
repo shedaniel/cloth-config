@@ -58,7 +58,7 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
     @Override
     protected void textFieldPreRender(TextFieldWidget widget) {
         try {
-            double i = Double.valueOf(textFieldWidget.getText());
+            double i = Double.parseDouble(textFieldWidget.getText());
             if (i < minimum || i > maximum)
                 widget.setEditableColor(16733525);
             else
@@ -70,7 +70,7 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
     
     @Override
     protected boolean isMatchDefault(String text) {
-        return getDefaultValue().isPresent() ? text.equals(defaultValue.get().toString()) : false;
+        return getDefaultValue().isPresent() && text.equals(defaultValue.get().toString());
     }
     
     @Override
@@ -101,7 +101,7 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
     @Override
     public Optional<String> getError() {
         try {
-            double i = Double.valueOf(textFieldWidget.getText());
+            double i = Double.parseDouble(textFieldWidget.getText());
             if (i > maximum)
                 return Optional.of(I18n.translate("text.cloth-config.error.too_large", maximum));
             else if (i < minimum)

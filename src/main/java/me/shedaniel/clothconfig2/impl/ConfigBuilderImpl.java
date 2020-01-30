@@ -134,8 +134,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     public ConfigBuilder removeCategoryIfExists(String category) {
         if (dataMap.containsKey(category) && fallbackCategory.equals(category))
             fallbackCategory = null;
-        if (dataMap.containsKey(category))
-            dataMap.remove(category);
+        dataMap.remove(category);
         return this;
     }
     
@@ -210,7 +209,6 @@ public class ConfigBuilderImpl implements ConfigBuilder {
         return afterInitConsumer;
     }
     
-    @SuppressWarnings("deprecation")
     @Override
     public Screen build() {
         if (dataMap.isEmpty() || fallbackCategory == null)

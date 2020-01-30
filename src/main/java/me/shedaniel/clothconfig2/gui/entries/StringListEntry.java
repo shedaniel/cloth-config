@@ -43,7 +43,7 @@ public class StringListEntry extends TextFieldListEntry<String> {
     
     @Override
     protected boolean isMatchDefault(String text) {
-        return getDefaultValue().isPresent() ? text.equals(getDefaultValue().get()) : false;
+        return getDefaultValue().isPresent() && text.equals(getDefaultValue().get());
     }
     
 }

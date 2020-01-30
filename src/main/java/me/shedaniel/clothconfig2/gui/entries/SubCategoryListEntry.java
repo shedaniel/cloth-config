@@ -74,13 +74,13 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         RenderSystem.color4f(1, 1, 1, 1);
         blit(x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
         MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(categoryName), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
-        for(AbstractConfigListEntry entry : entries) {
+        for(AbstractConfigListEntry<?> entry : entries) {
             entry.setParent(getParent());
             entry.setScreen(getScreen());
         }
         if (expanded) {
             int yy = y + 24;
-            for (AbstractConfigListEntry entry : entries) {
+            for (AbstractConfigListEntry<?> entry : entries) {
                 entry.render(-1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isSelected, delta);
                 yy += entry.getItemHeight();
             }
@@ -100,7 +100,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     public int getItemHeight() {
         if (expanded) {
             int i = 24;
-            for (AbstractConfigListEntry entry : entries)
+            for (AbstractConfigListEntry<?> entry : entries)
                 i += entry.getItemHeight();
             return i;
         }
@@ -120,11 +120,11 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public Optional<String> getError() {
         String error = null;
-        for(AbstractConfigListEntry entry : entries)
+        for(AbstractConfigListEntry<?> entry : entries)
             if (entry.getError().isPresent()) {
                 if (error != null)
                     return Optional.ofNullable(I18n.translate("text.cloth-config.multi_error"));
-                return Optional.ofNullable((String) entry.getError().get());
+                return entry.getError();
             }
         return Optional.ofNullable(error);
     }

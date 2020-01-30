@@ -7,6 +7,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@ApiStatus.Internal
 public class SelectionListEntry<T> extends TooltipListEntry<T> {
     
     private ImmutableList<T> values;
@@ -99,13 +101,12 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(getFieldName())), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
-            this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         } else {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
-            this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         }
+        this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         resetButton.render(mouseX, mouseY, delta);
         buttonWidget.render(mouseX, mouseY, delta);
     }
@@ -119,7 +120,7 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
         return widgets;
     }
     
-    public static interface Translatable {
+    public interface Translatable {
         @NotNull
         String getKey();
     }

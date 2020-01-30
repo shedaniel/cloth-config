@@ -89,13 +89,12 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(getFieldName())), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.textFieldWidget.x = x + resetButton.getWidth();
-            setTextFieldWidth(textFieldWidget, 148 - resetButton.getWidth() - 4);
         } else {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.textFieldWidget.x = x + entryWidth - 148;
-            setTextFieldWidth(textFieldWidget, 148 - resetButton.getWidth() - 4);
         }
+        setTextFieldWidth(textFieldWidget, 148 - resetButton.getWidth() - 4);
         resetButton.render(mouseX, mouseY, delta);
         textFieldWidget.render(mouseX, mouseY, delta);
     }

@@ -68,22 +68,22 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
         if (smoothScrolling)
             this.scroll = double_1;
         else
-            this.scroll = MathHelper.clamp(double_1, 0.0D, (double) this.getMaxScroll());
+            this.scroll = MathHelper.clamp(double_1, 0.0D, this.getMaxScroll());
     }
     
     @Override
     public boolean mouseDragged(double double_1, double double_2, int int_1, double double_3, double double_4) {
         if (!smoothScrolling)
             return super.mouseDragged(double_1, double_2, int_1, double_3, double_4);
-        if (this.getFocused() != null && this.isDragging() && int_1 == 0 ? this.getFocused().mouseDragged(double_1, double_2, int_1, double_3, double_4) : false) {
+        if ((this.getFocused() != null && this.isDragging() && int_1 == 0) && this.getFocused().mouseDragged(double_1, double_2, int_1, double_3, double_4)) {
             return true;
         } else if (int_1 == 0 && this.scrolling) {
             if (double_2 < (double) this.top) {
                 this.capYPosition(0.0D);
             } else if (double_2 > (double) this.bottom) {
-                this.capYPosition((double) this.getMaxScroll());
+                this.capYPosition(this.getMaxScroll());
             } else {
-                double double_5 = (double) Math.max(1, this.getMaxScroll());
+                double double_5 = Math.max(1, this.getMaxScroll());
                 int int_2 = this.bottom - this.top;
                 int int_3 = MathHelper.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
                 double double_6 = Math.max(1.0D, double_5 / (double) (int_2 - int_3));
@@ -110,7 +110,7 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
         if (!smoothScrolling) {
             this.scrollVelocity = 0d;
             scroll += 16 * -double_3;
-            this.scroll = MathHelper.clamp(double_1, 0.0D, (double) this.getMaxScroll());
+            this.scroll = MathHelper.clamp(double_1, 0.0D, this.getMaxScroll());
             return true;
         }
         if (scroll <= getMaxScroll() && double_3 < 0)
@@ -128,7 +128,7 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
         if (!smoothScrolling)
             super.renderScrollBar(tessellator, buffer, maxScroll, scrollbarPositionMinX, scrollbarPositionMaxX);
         else if (maxScroll > 0) {
-            int height = (int) (((this.bottom - this.top) * (this.bottom - this.top)) / this.getMaxScrollPosition());
+            int height = ((this.bottom - this.top) * (this.bottom - this.top)) / this.getMaxScrollPosition();
             height = MathHelper.clamp(height, 32, this.bottom - this.top - 8);
             height -= Math.min((scroll < 0 ? (int) -scroll : scroll > getMaxScroll() ? (int) scroll - getMaxScroll() : 0), height * .75);
             int minY = Math.min(Math.max((int) this.getScroll() * (this.bottom - this.top - height) / maxScroll + this.top, this.top), this.bottom - height);

@@ -73,7 +73,7 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         Window window = MinecraftClient.getInstance().getWindow();
-        this.resetButton.active = isEditable() && getDefaultValue().isPresent() && defaultValue.get().booleanValue() != bool.get();
+        this.resetButton.active = isEditable() && getDefaultValue().isPresent() && defaultValue.get() != bool.get();
         this.resetButton.y = y;
         this.buttonWidget.active = isEditable();
         this.buttonWidget.y = y;
@@ -82,13 +82,12 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(getFieldName())), y + 5, 16777215);
             this.resetButton.x = x;
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
-            this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         } else {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
-            this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         }
+        this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         resetButton.render(mouseX, mouseY, delta);
         buttonWidget.render(mouseX, mouseY, delta);
     }

@@ -19,8 +19,7 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = targetCompatibility = 1.8
 
 group = "me.shedaniel.cloth"
 archivesBaseName = "config-2"
@@ -56,7 +55,7 @@ dependencies {
 
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
 
-    modImplementation "com.lettuce.fudge:notenoughcrashes-api:1.0.0"
+    modApi "com.lettuce.fudge:notenoughcrashes-api:1.0.0"
     include "com.lettuce.fudge:notenoughcrashes-api:1.0.0"
     modRuntime "com.lettuce.fudge:notenoughcrashes:$nec_version"
 }
@@ -127,26 +126,6 @@ publishing {
             groupId 'me.shedaniel.cloth'
             artifactId 'config-2'
             version = project.version
-            pom.withXml {
-                def root = asNode()
-                root.appendNode('description', 'Cloth Config API for Minecraft')
-                root.appendNode('name', 'config-2')
-                root.appendNode('url', 'https://github.com/shedaniel/ClothConfig')
-                root.appendNode('packaging', 'jar')
-                def license = root.appendNode('licenses').appendNode('license')
-                license.appendNode('name', 'Unlicense')
-                license.appendNode('url', 'http://unlicense.org')
-                license.appendNode('distribution', 'repo')
-                def developers = root.appendNode('developers')
-                def shedaniel = developers.appendNode('developer')
-                shedaniel.appendNode('id', 'shedaniel')
-                shedaniel.appendNode('name', 'shedaniel')
-                shedaniel.appendNode('email', 'daniel@shedaniel.me')
-                def scm = root.appendNode('scm')
-                scm.appendNode('url', "https://github.com/shedaniel/ClothConfig")
-                scm.appendNode('connection', "scm:git:git://github.com/shedaniel/ClothConfig.git")
-                scm.appendNode('developerConnection', "scm:git:ssh://github.com:shedaniel/ClothConfig.git")
-            }
         }
     }
 
@@ -163,14 +142,17 @@ curseforge {
         project {
             id = '319057'
             releaseType = 'release'
+            addGameVersion '1.15'
             addGameVersion '1.15.1'
+            addGameVersion '1.15.2'
+            addGameVersion '1.15-Snapshot'
             addGameVersion 'Fabric'
             addGameVersion 'Java 8'
             relations {
                 requiredDependency 'fabric-api'
             }
             mainArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
-                displayName = "[Fabric ${project.minecraft_version}] ClothConfig2-$project.version"
+                displayName = "[Fabric 1.15.x] ClothConfig2-$project.version"
             }
             addArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar"))
             afterEvaluate {

@@ -63,6 +63,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, requiresRestart, true, true);
     }
 
+    @Deprecated
     public BaseListEntry(@NotNull String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.deleteButtonEnabled = deleteButtonEnabled;
