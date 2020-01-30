@@ -14,7 +14,7 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
         StringBuilder stringBuilder_1 = new StringBuilder();
         char[] var2 = s.toCharArray();
         int var3 = var2.length;
-    
+        
         for (char c : var2)
             if (Character.isDigit(c) || c == '-')
                 stringBuilder_1.append(c);

@@ -48,6 +48,22 @@ public class Modifier {
         return Modifier.of(Screen.hasAltDown(), Screen.hasControlDown(), Screen.hasShiftDown());
     }
     
+    private static short setFlag(short base, short flag, boolean val) {
+        return val ? setFlag(base, flag) : removeFlag(base, flag);
+    }
+    
+    private static short setFlag(short base, short flag) {
+        return (short) (base | flag);
+    }
+    
+    private static short removeFlag(short base, short flag) {
+        return (short) (base & (~flag));
+    }
+    
+    private static boolean getFlag(short base, short flag) {
+        return (base & flag) != 0;
+    }
+    
     /**
      * Compares this object with the current pressed keys
      *
@@ -120,22 +136,6 @@ public class Modifier {
     @Override
     public int hashCode() {
         return Objects.hash(value);
-    }
-    
-    private static short setFlag(short base, short flag, boolean val) {
-        return val ? setFlag(base, flag) : removeFlag(base, flag);
-    }
-    
-    private static short setFlag(short base, short flag) {
-        return (short) (base | flag);
-    }
-    
-    private static short removeFlag(short base, short flag) {
-        return (short) (base & (~flag));
-    }
-    
-    private static boolean getFlag(short base, short flag) {
-        return (base & flag) != 0;
     }
     
 }

@@ -74,17 +74,17 @@ public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
         this.tooltipSupplier = d -> tooltipSupplier.get();
         return this;
     }
-
+    
     public DoubleFieldBuilder setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = d -> tooltip;
         return this;
     }
-
+    
     public DoubleFieldBuilder setTooltip(String... tooltip) {
         this.tooltipSupplier = d -> Optional.ofNullable(tooltip);
         return this;
     }
-
+    
     @NotNull
     @Override
     public DoubleListEntry build() {

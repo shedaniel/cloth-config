@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import com.google.common.collect.Lists;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SubCategoryListEntry;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -34,22 +35,28 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
-
+    
     public SubCategoryBuilder setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = list -> tooltip;
         return this;
     }
-
+    
     public SubCategoryBuilder setTooltip(String... tooltip) {
         this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }
-
+    
     public SubCategoryBuilder setExpanded(boolean expanded) {
         this.expanded = expanded;
         return this;
     }
-
+    
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
+    public SubCategoryBuilder setExpended(boolean expanded) {
+        return setExpanded(expanded);
+    }
+    
     @NotNull
     @Override
     public SubCategoryListEntry build() {
@@ -57,7 +64,7 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         return entry;
     }
-
+    
     @Override
     public int size() {
         return entries.size();

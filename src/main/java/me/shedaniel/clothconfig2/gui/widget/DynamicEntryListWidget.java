@@ -114,7 +114,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         int currentY = MathHelper.floor(mouseY - (double) this.top) - this.headerHeight + (int) this.getScroll() - 4;
         int itemY = 0;
         int itemIndex = -1;
-        for(int i = 0; i < entries.size(); i++) {
+        for (int i = 0; i < entries.size(); i++) {
             E item = getItem(i);
             itemY += item.getItemHeight();
             if (itemY > currentY) {
@@ -142,7 +142,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected int getMaxScrollPosition() {
         List<Integer> list = new ArrayList<>();
         int i = headerHeight;
-        for(E entry : entries) {
+        for (E entry : entries) {
             i += entry.getItemHeight();
             if (entry.getMorePossibleHeight() >= 0) {
                 list.add(i + entry.getMorePossibleHeight());
@@ -257,7 +257,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     protected void centerScrollOn(E item) {
         double d = (this.bottom - this.top) / -2d;
-        for(int i = 0; i < this.children().indexOf(item) && i < this.getItemCount(); i++)
+        for (int i = 0; i < this.children().indexOf(item) && i < this.getItemCount(); i++)
             d += getItem(i).getItemHeight();
         this.capYPosition(d);
     }
@@ -353,7 +353,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     public boolean mouseScrolled(double double_1, double double_2, double double_3) {
-        for(E entry : entries) {
+        for (E entry : entries) {
             if (entry.mouseScrolled(double_1, double_2, double_3)) {
                 return true;
             }
@@ -396,10 +396,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         
-        for(int renderIndex = 0; renderIndex < itemCount; ++renderIndex) {
+        for (int renderIndex = 0; renderIndex < itemCount; ++renderIndex) {
             E item = this.getItem(renderIndex);
             int itemY = startY + headerHeight;
-            for(int i = 0; i < entries.size() && i < renderIndex; i++)
+            for (int i = 0; i < entries.size() && i < renderIndex; i++)
                 itemY += entries.get(i).getItemHeight();
             int itemHeight = item.getItemHeight() - 4;
             int itemWidth = this.getItemWidth();
@@ -440,7 +440,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     protected int getRowTop(int index) {
         int integer = top + 4 - (int) this.getScroll() + headerHeight;
-        for(int i = 0; i < entries.size() && i < index; i++)
+        for (int i = 0; i < entries.size() && i < index; i++)
             integer += entries.get(i).getItemHeight();
         return integer;
     }

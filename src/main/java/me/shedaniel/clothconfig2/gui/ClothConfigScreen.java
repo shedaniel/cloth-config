@@ -41,12 +41,12 @@ public abstract class ClothConfigScreen extends Screen {
     
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     private final List<QueuedTooltip> queuedTooltips = Lists.newArrayList();
-    private KeyCodeEntry focusedBinding;
     public int nextTabIndex;
     public int selectedTabIndex;
     public double tabsScrollVelocity = 0d;
     public double tabsScrollProgress = 0d;
     public ListWidget<AbstractConfigEntry<AbstractConfigEntry>> listWidget;
+    private KeyCodeEntry focusedBinding;
     private Screen parent;
     private LinkedHashMap<String, List<AbstractConfigEntry>> tabbedEntries;
     private List<Pair<String, Integer>> tabs;
@@ -65,10 +65,10 @@ public abstract class ClothConfigScreen extends Screen {
     private Map<String, Identifier> categoryBackgroundLocation;
     private boolean transparentBackground = false;
     private boolean editable = true;
-    @Nullable
-    private String defaultFallbackCategory = null;
+    @Nullable private String defaultFallbackCategory = null;
     private boolean alwaysShowTabs = false;
-
+    private ModifierKeyCode startedKeyCode = null;
+    
     @Deprecated
     public ClothConfigScreen(Screen parent, String title, Map<String, List<Pair<String, Object>>> o, boolean confirmSave, boolean displayErrors, boolean smoothScrollingList, Identifier defaultBackgroundLocation, Map<String, Identifier> categoryBackgroundLocation) {
         super(new LiteralText(""));
@@ -472,6 +472,10 @@ public abstract class ClothConfigScreen extends Screen {
         tessellator.draw();
     }
     
+    public KeyCodeEntry getFocusedBinding() {
+        return focusedBinding;
+    }
+    
     public void setFocusedBinding(KeyCodeEntry focusedBinding) {
         this.focusedBinding = focusedBinding;
         if (focusedBinding != null) {
@@ -480,12 +484,6 @@ public abstract class ClothConfigScreen extends Screen {
         } else
             startedKeyCode = null;
     }
-    
-    public KeyCodeEntry getFocusedBinding() {
-        return focusedBinding;
-    }
-    
-    private ModifierKeyCode startedKeyCode = null;
     
     @Override
     public boolean mouseReleased(double double_1, double double_2, int int_1) {

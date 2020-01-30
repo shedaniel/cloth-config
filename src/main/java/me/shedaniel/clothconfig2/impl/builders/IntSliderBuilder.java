@@ -71,17 +71,17 @@ public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> 
         this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
         return this;
     }
-
+    
     public IntSliderBuilder setMax(int max) {
         this.max = max;
         return this;
     }
-
+    
     public IntSliderBuilder setMin(int min) {
         this.min = min;
         return this;
     }
-
+    
     @NotNull
     @Override
     public IntegerSliderEntry build() {

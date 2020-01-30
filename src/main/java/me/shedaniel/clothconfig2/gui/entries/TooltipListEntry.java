@@ -9,18 +9,16 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
-
-    @Nullable
-    private Supplier<Optional<String[]>> tooltipSupplier;
-
+    
+    @Nullable private Supplier<Optional<String[]>> tooltipSupplier;
+    
     @Deprecated
     public TooltipListEntry(String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, tooltipSupplier, false);
     }
-
+    
     @Deprecated
-    public TooltipListEntry(String fieldName,
-                            @Nullable Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    public TooltipListEntry(String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, requiresRestart);
         this.tooltipSupplier = tooltipSupplier;
     }

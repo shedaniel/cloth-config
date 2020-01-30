@@ -12,57 +12,46 @@ import java.util.function.Supplier;
 
 @ApiStatus.Internal
 public class IntegerListListEntry extends AbstractTextFieldListListEntry<Integer, IntegerListListEntry.IntegerListCell, IntegerListListEntry> {
-
+    
     private int minimum, maximum;
-
+    
     @Deprecated
     public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey) {
         this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
-
+    
     @Deprecated
     public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey, boolean requiresRestart) {
         this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, true, true);
     }
-
-    public IntegerListListEntry(
-            String fieldName,
-            List<Integer> value,
-            boolean defaultExpanded,
-            Supplier<Optional<String[]>> tooltipSupplier,
-            Consumer<List<Integer>> saveConsumer,
-            Supplier<List<Integer>> defaultValue,
-            String resetButtonKey,
-            boolean requiresRestart,
-            boolean deleteButtonEnabled,
-            boolean insertInFront
-    ) {
+    
+    public IntegerListListEntry(String fieldName, List<Integer> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Integer>> saveConsumer, Supplier<List<Integer>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront, IntegerListCell::new);
         this.minimum = Integer.MIN_VALUE;
         this.maximum = Integer.MAX_VALUE;
     }
-
+    
     public IntegerListListEntry setMaximum(int maximum) {
         this.maximum = maximum;
         return this;
     }
-
+    
     public IntegerListListEntry setMinimum(int minimum) {
         this.minimum = minimum;
         return this;
     }
-
+    
     @Override
     public IntegerListListEntry self() {
         return this;
     }
-
+    
     public static class IntegerListCell extends AbstractTextFieldListListEntry.AbstractTextFieldListCell<Integer, IntegerListCell, IntegerListListEntry> {
-
+        
         public IntegerListCell(Integer value, IntegerListListEntry listListEntry) {
             super(value, listListEntry);
         }
-
+        
         @Nullable
         @Override
         protected Integer substituteDefault(@Nullable Integer value) {
@@ -71,12 +60,12 @@ public class IntegerListListEntry extends AbstractTextFieldListListEntry<Integer
             else
                 return value;
         }
-
+        
         @Override
         protected boolean isValidText(@NotNull String text) {
             return text.chars().allMatch(c -> Character.isDigit(c) || c == '-');
         }
-
+        
         public Integer getValue() {
             try {
                 return Integer.valueOf(widget.getText());
@@ -84,7 +73,7 @@ public class IntegerListListEntry extends AbstractTextFieldListListEntry<Integer
                 return 0;
             }
         }
-
+        
         @Override
         public Optional<String> getError() {
             try {
@@ -99,5 +88,5 @@ public class IntegerListListEntry extends AbstractTextFieldListListEntry<Integer
             return Optional.empty();
         }
     }
-
+    
 }

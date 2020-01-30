@@ -74,17 +74,17 @@ public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
         this.max = max;
         return this;
     }
-
+    
     public IntFieldBuilder removeMin() {
         this.min = null;
         return this;
     }
-
+    
     public IntFieldBuilder removeMax() {
         this.max = null;
         return this;
     }
-
+    
     @NotNull
     @Override
     public IntegerListEntry build() {

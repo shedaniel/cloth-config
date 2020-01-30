@@ -33,36 +33,30 @@ import java.util.stream.Collectors;
  */
 @ApiStatus.Internal
 public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends BaseListEntry<T, C, SELF>> extends TooltipListEntry<List<T>> {
-
+    
     protected static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
-    @NotNull
-    protected final List<C> cells;
-    @NotNull
-    protected final List<Element> widgets;
+    @NotNull protected final List<C> cells;
+    @NotNull protected final List<Element> widgets;
     protected boolean expanded;
     protected boolean deleteButtonEnabled;
     protected boolean insertInFront;
-    @Nullable
-    protected Consumer<List<T>> saveConsumer;
+    @Nullable protected Consumer<List<T>> saveConsumer;
     protected ListLabelWidget labelWidget;
     protected AbstractButtonWidget resetWidget;
-    @NotNull
-    protected Function<SELF, C> createNewInstance;
-    @NotNull
-    protected Supplier<List<T>> defaultValue;
-    @Nullable
-    protected String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
-
+    @NotNull protected Function<SELF, C> createNewInstance;
+    @NotNull protected Supplier<List<T>> defaultValue;
+    @Nullable protected String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
+    
     @Deprecated
     public BaseListEntry(@NotNull String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, String resetButtonKey) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, false);
     }
-
+    
     @Deprecated
     public BaseListEntry(@NotNull String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, requiresRestart, true, true);
     }
-
+    
     @Deprecated
     public BaseListEntry(@NotNull String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, tooltipSupplier, requiresRestart);
@@ -83,47 +77,47 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         this.createNewInstance = createNewInstance;
         this.defaultValue = defaultValue;
     }
-
+    
     public abstract SELF self();
-
+    
     public boolean isDeleteButtonEnabled() {
         return deleteButtonEnabled;
     }
-
+    
     protected abstract C getFromValue(T value);
-
+    
     @NotNull
     public Function<SELF, C> getCreateNewInstance() {
         return createNewInstance;
     }
-
+    
     public void setCreateNewInstance(@NotNull Function<SELF, C> createNewInstance) {
         this.createNewInstance = createNewInstance;
     }
-
+    
     @Nullable
     public String getAddTooltip() {
         return addTooltip;
     }
-
+    
     public void setAddTooltip(@Nullable String addTooltip) {
         this.addTooltip = addTooltip;
     }
-
+    
     @Nullable
     public String getRemoveTooltip() {
         return removeTooltip;
     }
-
+    
     public void setRemoveTooltip(@Nullable String removeTooltip) {
         this.removeTooltip = removeTooltip;
     }
-
+    
     @Override
     public Optional<List<T>> getDefaultValue() {
         return Optional.ofNullable(defaultValue.get());
     }
-
+    
     @Override
     public int getItemHeight() {
         if (expanded) {
@@ -134,32 +128,28 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         }
         return 24;
     }
-
+    
     @Override
     public List<? extends Element> children() {
         return widgets;
     }
-
+    
     @Override
     public Optional<String> getError() {
-        List<String> errors = cells.stream()
-                .map(C::getConfigError)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-
+        List<String> errors = cells.stream().map(C::getConfigError).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+        
         if (errors.size() > 1)
             return Optional.of(I18n.translate("text.cloth-config.multi_error"));
         else
             return errors.stream().findFirst();
     }
-
+    
     @Override
     public void save() {
         if (saveConsumer != null)
             saveConsumer.accept(getValue());
     }
-
+    
     @Override
     public boolean isMouseInside(int mouseX, int mouseY, int x, int y, int entryWidth, int entryHeight) {
         labelWidget.rectangle.x = x - 15;
@@ -168,15 +158,15 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         labelWidget.rectangle.height = 24;
         return labelWidget.rectangle.contains(mouseX, mouseY) && getParent().isMouseOver(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY);
     }
-
+    
     protected boolean isInsideCreateNew(double mouseX, double mouseY) {
         return mouseX >= labelWidget.rectangle.x + 12 && mouseY >= labelWidget.rectangle.y + 3 && mouseX <= labelWidget.rectangle.x + 12 + 11 && mouseY <= labelWidget.rectangle.y + 3 + 11;
     }
-
+    
     protected boolean isInsideDelete(double mouseX, double mouseY) {
         return isDeleteButtonEnabled() && mouseX >= labelWidget.rectangle.x + 25 && mouseY >= labelWidget.rectangle.y + 3 && mouseX <= labelWidget.rectangle.x + 25 + 11 && mouseY <= labelWidget.rectangle.y + 3 + 11;
     }
-
+    
     public Optional<String[]> getTooltip(int mouseX, int mouseY) {
         if (addTooltip != null && isInsideCreateNew(mouseX, mouseY))
             return Optional.of(new String[]{addTooltip});
@@ -186,7 +176,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
             return getTooltipSupplier().get();
         return Optional.empty();
     }
-
+    
     @Override
     public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         labelWidget.rectangle.x = x - 19;
@@ -221,14 +211,14 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
             }
         }
     }
-
+    
     public boolean insertInFront() {
         return insertInFront;
     }
-
+    
     public class ListLabelWidget implements Element {
         protected Rectangle rectangle = new Rectangle();
-
+        
         @Override
         public boolean mouseClicked(double double_1, double double_2, int int_1) {
             if (resetWidget.isMouseOver(double_1, double_2)) {
@@ -264,5 +254,5 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
             return false;
         }
     }
-
+    
 }

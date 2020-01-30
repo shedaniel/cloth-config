@@ -13,19 +13,17 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> {
-
-    @Nullable
-    private Consumer<ModifierKeyCode> saveConsumer = null;
-    @NotNull
-    private Function<ModifierKeyCode, Optional<String[]>> tooltipSupplier = bool -> Optional.empty();
+    
+    @Nullable private Consumer<ModifierKeyCode> saveConsumer = null;
+    @NotNull private Function<ModifierKeyCode, Optional<String[]>> tooltipSupplier = bool -> Optional.empty();
     private ModifierKeyCode value;
     private boolean allowKey = true, allowMouse = true, allowModifiers = true;
-
+    
     public KeyCodeBuilder(String resetButtonKey, String fieldNameKey, ModifierKeyCode value) {
         super(resetButtonKey, fieldNameKey);
         this.value = ModifierKeyCode.copyOf(value);
     }
-
+    
     public KeyCodeBuilder setAllowModifiers(boolean allowModifiers) {
         this.allowModifiers = allowModifiers;
         if (!allowModifiers)
@@ -78,40 +76,40 @@ public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> 
         this.defaultValue = defaultValue;
         return this;
     }
-
+    
     public KeyCodeBuilder setDefaultValue(InputUtil.KeyCode defaultValue) {
         return setDefaultValue(ModifierKeyCode.of(defaultValue, Modifier.none()));
     }
-
+    
     public KeyCodeBuilder setDefaultValue(ModifierKeyCode defaultValue) {
         this.defaultValue = () -> defaultValue;
         return this;
     }
-
+    
     public KeyCodeBuilder setTooltipSupplier(@NotNull Function<InputUtil.KeyCode, Optional<String[]>> tooltipSupplier) {
         return setModifierTooltipSupplier(keyCode -> tooltipSupplier.apply(keyCode.getKeyCode()));
     }
-
+    
     public KeyCodeBuilder setModifierTooltipSupplier(@NotNull Function<ModifierKeyCode, Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
-
+    
     public KeyCodeBuilder setTooltipSupplier(@NotNull Supplier<Optional<String[]>> tooltipSupplier) {
         this.tooltipSupplier = bool -> tooltipSupplier.get();
         return this;
     }
-
+    
     public KeyCodeBuilder setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = bool -> tooltip;
         return this;
     }
-
+    
     public KeyCodeBuilder setTooltip(@Nullable String... tooltip) {
         this.tooltipSupplier = bool -> Optional.ofNullable(tooltip);
         return this;
     }
-
+    
     @NotNull
     @Override
     public KeyCodeEntry build() {

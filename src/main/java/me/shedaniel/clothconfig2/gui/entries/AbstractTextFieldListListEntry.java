@@ -24,25 +24,12 @@ import java.util.function.Supplier;
  * @see AbstractListListEntry
  */
 @ApiStatus.Internal
-public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFieldListListEntry.AbstractTextFieldListCell<T, C, SELF>, SELF extends AbstractTextFieldListListEntry<T, C, SELF>>
-        extends AbstractListListEntry<T, C, SELF> {
-
-    public AbstractTextFieldListListEntry(
-            String fieldName,
-            List<T> value,
-            boolean defaultExpanded,
-            Supplier<Optional<String[]>> tooltipSupplier,
-            Consumer<List<T>> saveConsumer,
-            Supplier<List<T>> defaultValue,
-            String resetButtonKey,
-            boolean requiresRestart,
-            boolean deleteButtonEnabled,
-            boolean insertInFront,
-            BiFunction<T, SELF, C> createNewCell
-    ) {
+public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFieldListListEntry.AbstractTextFieldListCell<T, C, SELF>, SELF extends AbstractTextFieldListListEntry<T, C, SELF>> extends AbstractListListEntry<T, C, SELF> {
+    
+    public AbstractTextFieldListListEntry(String fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, SELF, C> createNewCell) {
         super(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront, createNewCell);
     }
-
+    
     /**
      * @param <T>           the configuration object type
      * @param <SELF>        the "curiously recurring template pattern" type parameter for this class
@@ -50,16 +37,15 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
      * @see AbstractTextFieldListListEntry
      */
     @ApiStatus.Internal
-    public static abstract class AbstractTextFieldListCell<T, SELF extends AbstractTextFieldListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractTextFieldListListEntry<T, SELF, OUTER_SELF>>
-            extends AbstractListListEntry.AbstractListCell<T, SELF, OUTER_SELF> {
-
+    public static abstract class AbstractTextFieldListCell<T, SELF extends AbstractTextFieldListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractTextFieldListListEntry<T, SELF, OUTER_SELF>> extends AbstractListListEntry.AbstractListCell<T, SELF, OUTER_SELF> {
+        
         protected TextFieldWidget widget;
-
+        
         public AbstractTextFieldListCell(@Nullable T value, OUTER_SELF listListEntry) {
             super(value, listListEntry);
-
+            
             final T finalValue = substituteDefault(value);
-
+            
             widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "");
             widget.setTextPredicate(this::isValidText);
             widget.setMaxLength(Integer.MAX_VALUE);
@@ -72,7 +58,7 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
                 }
             });
         }
-
+        
         /**
          * Allows subclasses to substitute default values.
          *
@@ -81,7 +67,7 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
          */
         @Nullable
         protected abstract T substituteDefault(@Nullable T value);
-
+        
         /**
          * Tests if the text entered is valid. If not, the text is not changed.
          *
@@ -89,12 +75,12 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
          * @return {@code true} if the text may be changed, {@code false} to prevent the change
          */
         protected abstract boolean isValidText(@NotNull String text);
-
+        
         @Override
         public int getCellHeight() {
             return 20;
         }
-
+        
         @Override
         public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             widget.setWidth(entryWidth - 12);
@@ -105,11 +91,11 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             if (isSelected && listListEntry.isEditable())
                 fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
-
+        
         @Override
         public List<? extends Element> children() {
             return Collections.singletonList(widget);
         }
     }
-
+    
 }

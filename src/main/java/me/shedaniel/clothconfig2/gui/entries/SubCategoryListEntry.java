@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigListEntry>> {
-
+    
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     private String categoryName;
     private List<AbstractConfigListEntry> entries;
     private CategoryLabelWidget widget;
     private List<Element> children;
     private boolean expanded;
-
+    
     @Deprecated
     public SubCategoryListEntry(String categoryName, List<AbstractConfigListEntry> entries, boolean defaultExpanded) {
         super(categoryName, null);
@@ -37,7 +37,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     
     @Override
     public boolean isRequiresRestart() {
-        for(AbstractConfigListEntry entry : entries)
+        for (AbstractConfigListEntry entry : entries)
             if (entry.isRequiresRestart())
                 return true;
         return false;
@@ -74,7 +74,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         RenderSystem.color4f(1, 1, 1, 1);
         blit(x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
         MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(categoryName), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
-        for(AbstractConfigListEntry<?> entry : entries) {
+        for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent(getParent());
             entry.setScreen(getScreen());
         }
@@ -120,7 +120,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public Optional<String> getError() {
         String error = null;
-        for(AbstractConfigListEntry<?> entry : entries)
+        for (AbstractConfigListEntry<?> entry : entries)
             if (entry.getError().isPresent()) {
                 if (error != null)
                     return Optional.ofNullable(I18n.translate("text.cloth-config.multi_error"));

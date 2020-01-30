@@ -65,18 +65,18 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
         this.tooltipSupplier = e -> tooltip;
         return this;
     }
-
+    
     public EnumSelectorBuilder<T> setTooltip(String... tooltip) {
         this.tooltipSupplier = e -> Optional.ofNullable(tooltip);
         return this;
     }
-
+    
     public EnumSelectorBuilder<T> setEnumNameProvider(Function<Enum, String> enumNameProvider) {
         Objects.requireNonNull(enumNameProvider);
         this.enumNameProvider = enumNameProvider;
         return this;
     }
-
+    
     @NotNull
     @Override
     public EnumListEntry<T> build() {
@@ -86,5 +86,5 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
-
+    
 }

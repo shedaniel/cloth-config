@@ -55,17 +55,17 @@ public class TextFieldBuilder extends FieldBuilder<String, StringListEntry> {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
-
+    
     public TextFieldBuilder setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = str -> tooltip;
         return this;
     }
-
+    
     public TextFieldBuilder setTooltip(String... tooltip) {
         this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
         return this;
     }
-
+    
     @NotNull
     @Override
     public StringListEntry build() {
@@ -75,5 +75,5 @@ public class TextFieldBuilder extends FieldBuilder<String, StringListEntry> {
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
-
+    
 }

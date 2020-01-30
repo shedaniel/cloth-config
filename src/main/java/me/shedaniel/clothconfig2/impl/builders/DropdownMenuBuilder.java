@@ -74,17 +74,17 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
         return this;
     }
-
+    
     public DropdownMenuBuilder<T> requireRestart() {
         requireRestart(true);
         return this;
     }
-
+    
     public DropdownMenuBuilder<T> setErrorSupplier(Function<T, Optional<String>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
-
+    
     @NotNull
     @Override
     public DropdownBoxEntry<T> build() {
@@ -94,7 +94,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
-
+    
     public static class TopCellElementBuilder {
         public static final Function<String, Identifier> IDENTIFIER_FUNCTION = str -> {
             try {
@@ -136,7 +136,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
             return null;
         };
         private static final ItemStack BARRIER = new ItemStack(Items.BARRIER);
-    
+        
         public static <T> SelectionTopCellElement<T> of(T value, Function<String, T> toObjectFunction) {
             return of(value, toObjectFunction, Object::toString);
         }

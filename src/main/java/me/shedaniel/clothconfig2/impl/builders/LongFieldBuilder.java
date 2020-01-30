@@ -74,17 +74,17 @@ public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
         this.max = max;
         return this;
     }
-
+    
     public LongFieldBuilder removeMin() {
         this.min = null;
         return this;
     }
-
+    
     public LongFieldBuilder removeMax() {
         this.max = null;
         return this;
     }
-
+    
     @NotNull
     @Override
     public LongListEntry build() {

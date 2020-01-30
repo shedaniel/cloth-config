@@ -18,24 +18,12 @@ import java.util.stream.Collectors;
  * @see BaseListEntry
  */
 @ApiStatus.Internal
-public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.AbstractListCell<T, C, SELF>, SELF extends AbstractListListEntry<T, C, SELF>>
-        extends BaseListEntry<T, C, SELF> {
-
+public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.AbstractListCell<T, C, SELF>, SELF extends AbstractListListEntry<T, C, SELF>> extends BaseListEntry<T, C, SELF> {
+    
     protected final BiFunction<T, SELF, C> createNewCell;
     protected Function<T, Optional<String>> cellErrorSupplier;
-
-    public AbstractListListEntry(
-            String fieldName,
-            List<T> value,
-            boolean defaultExpanded,
-            Supplier<Optional<String[]>> tooltipSupplier,
-            Consumer<List<T>> saveConsumer,
-            Supplier<List<T>> defaultValue,
-            String resetButtonKey,
-            boolean requiresRestart,
-            boolean deleteButtonEnabled,
-            boolean insertInFront,
-            BiFunction<T, SELF, C> createNewCell) {
+    
+    public AbstractListListEntry(String fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, SELF, C> createNewCell) {
         super(fieldName, tooltipSupplier, defaultValue, abstractListListEntry -> createNewCell.apply(null, abstractListListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
         this.createNewCell = createNewCell;
         for (T f : value)
@@ -43,25 +31,25 @@ public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.A
         this.widgets.addAll(cells);
         expanded = defaultExpanded;
     }
-
+    
     public Function<T, Optional<String>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
-
+    
     public void setCellErrorSupplier(Function<T, Optional<String>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
     }
-
+    
     @Override
     public List<T> getValue() {
         return cells.stream().map(C::getValue).collect(Collectors.toList());
     }
-
+    
     @Override
     protected C getFromValue(T value) {
         return createNewCell.apply(value, this.self());
     }
-
+    
     /**
      * @param <T>           the configuration object type
      * @param <SELF>        the "curiously recurring template pattern" type parameter for this class
@@ -69,17 +57,16 @@ public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.A
      * @see AbstractListListEntry
      */
     @ApiStatus.Internal
-    public static abstract class AbstractListCell<T, SELF extends AbstractListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractListListEntry<T, SELF, OUTER_SELF>>
-            extends BaseListCell {
+    public static abstract class AbstractListCell<T, SELF extends AbstractListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractListListEntry<T, SELF, OUTER_SELF>> extends BaseListCell {
         protected final OUTER_SELF listListEntry;
-
+        
         public AbstractListCell(@Nullable T value, OUTER_SELF listListEntry) {
             this.listListEntry = listListEntry;
             this.setErrorSupplier(() -> Optional.ofNullable(listListEntry.cellErrorSupplier).flatMap(cellErrorFn -> cellErrorFn.apply(this.getValue())));
         }
-
+        
         public abstract T getValue();
-
+        
     }
-
+    
 }

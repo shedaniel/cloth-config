@@ -15,7 +15,7 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
         char[] var2 = s.toCharArray();
         int var3 = var2.length;
         
-        for(int var4 = 0; var4 < var3; ++var4)
+        for (int var4 = 0; var4 < var3; ++var4)
             if (Character.isDigit(var2[var4]) || var2[var4] == '-' || var2[var4] == '.')
                 stringBuilder_1.append(var2[var4]);
         

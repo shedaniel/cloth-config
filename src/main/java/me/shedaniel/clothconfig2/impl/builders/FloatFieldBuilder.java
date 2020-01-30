@@ -74,17 +74,17 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
         this.max = max;
         return this;
     }
-
+    
     public FloatFieldBuilder removeMin() {
         this.min = null;
         return this;
     }
-
+    
     public FloatFieldBuilder removeMax() {
         this.max = null;
         return this;
     }
-
+    
     @NotNull
     @Override
     public FloatListEntry build() {

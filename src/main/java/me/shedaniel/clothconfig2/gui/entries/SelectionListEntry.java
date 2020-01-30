@@ -121,8 +121,7 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     }
     
     public interface Translatable {
-        @NotNull
-        String getKey();
+        @NotNull String getKey();
     }
     
 }

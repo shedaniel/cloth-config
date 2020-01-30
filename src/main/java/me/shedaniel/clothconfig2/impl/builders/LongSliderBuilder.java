@@ -61,18 +61,18 @@ public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
         this.tooltipSupplier = i -> tooltipSupplier.get();
         return this;
     }
-
+    
     public LongSliderBuilder setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = i -> tooltip;
         return this;
     }
-
+    
     public LongSliderBuilder setTooltip(String... tooltip) {
         this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
         return this;
     }
-
-
+    
+    
     @NotNull
     @Override
     public LongSliderEntry build() {

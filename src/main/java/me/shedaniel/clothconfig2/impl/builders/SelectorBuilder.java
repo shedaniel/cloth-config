@@ -64,17 +64,17 @@ public class SelectorBuilder<T> extends FieldBuilder<T, SelectionListEntry<T>> {
         this.tooltipSupplier = e -> tooltip;
         return this;
     }
-
+    
     public SelectorBuilder<T> setTooltip(String... tooltip) {
         this.tooltipSupplier = e -> Optional.ofNullable(tooltip);
         return this;
     }
-
+    
     public SelectorBuilder<T> setNameProvider(Function<T, String> enumNameProvider) {
         this.nameProvider = enumNameProvider;
         return this;
     }
-
+    
     @NotNull
     @Override
     public SelectionListEntry<T> build() {
@@ -84,5 +84,5 @@ public class SelectorBuilder<T> extends FieldBuilder<T, SelectionListEntry<T>> {
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
     }
-
+    
 }

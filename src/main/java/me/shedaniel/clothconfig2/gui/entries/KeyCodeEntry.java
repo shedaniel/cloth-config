@@ -42,32 +42,28 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
     }
     
-    public void setAllowModifiers(boolean allowModifiers) {
-        this.allowModifiers = allowModifiers;
-    }
-    
-    public void setAllowKey(boolean allowKey) {
-        this.allowKey = allowKey;
-    }
-    
-    public void setAllowMouse(boolean allowMouse) {
-        this.allowMouse = allowMouse;
-    }
-    
     public boolean isAllowModifiers() {
         return allowModifiers;
+    }
+    
+    public void setAllowModifiers(boolean allowModifiers) {
+        this.allowModifiers = allowModifiers;
     }
     
     public boolean isAllowKey() {
         return allowKey;
     }
     
+    public void setAllowKey(boolean allowKey) {
+        this.allowKey = allowKey;
+    }
+    
     public boolean isAllowMouse() {
         return allowMouse;
     }
     
-    public void setValue(ModifierKeyCode value) {
-        this.value = value;
+    public void setAllowMouse(boolean allowMouse) {
+        this.allowMouse = allowMouse;
     }
     
     @Override
@@ -79,6 +75,10 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     @Override
     public ModifierKeyCode getValue() {
         return value;
+    }
+    
+    public void setValue(ModifierKeyCode value) {
+        this.value = value;
     }
     
     @Override

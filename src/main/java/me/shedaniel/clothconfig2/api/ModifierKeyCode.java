@@ -6,13 +6,29 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 
 public interface ModifierKeyCode {
+    static ModifierKeyCode of(InputUtil.KeyCode keyCode, Modifier modifier) {
+        return new ModifierKeyCodeImpl().setKeyCodeAndModifier(keyCode, modifier);
+    }
+    
+    static ModifierKeyCode copyOf(ModifierKeyCode code) {
+        return of(code.getKeyCode(), code.getModifier());
+    }
+    
+    static ModifierKeyCode unknown() {
+        return of(InputUtil.UNKNOWN_KEYCODE, Modifier.none());
+    }
+    
     InputUtil.KeyCode getKeyCode();
+    
+    ModifierKeyCode setKeyCode(InputUtil.KeyCode keyCode);
     
     default InputUtil.Type getType() {
         return getKeyCode().getCategory();
     }
     
     Modifier getModifier();
+    
+    ModifierKeyCode setModifier(Modifier modifier);
     
     default boolean matchesMouse(int button) {
         return !isUnknown() && getType() == InputUtil.Type.MOUSE && getKeyCode().getKeyCode() == button && getModifier().matchesCurrent();
@@ -46,10 +62,6 @@ public interface ModifierKeyCode {
         return !isUnknown() && getType() == InputUtil.Type.KEYSYM && getModifier().matchesCurrent() && InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), getKeyCode().getKeyCode());
     }
     
-    ModifierKeyCode setKeyCode(InputUtil.KeyCode keyCode);
-    
-    ModifierKeyCode setModifier(Modifier modifier);
-    
     default ModifierKeyCode setKeyCodeAndModifier(InputUtil.KeyCode keyCode, Modifier modifier) {
         setKeyCode(keyCode);
         setModifier(modifier);
@@ -58,18 +70,6 @@ public interface ModifierKeyCode {
     
     default ModifierKeyCode clearModifier() {
         return setModifier(Modifier.none());
-    }
-    
-    static ModifierKeyCode of(InputUtil.KeyCode keyCode, Modifier modifier) {
-        return new ModifierKeyCodeImpl().setKeyCodeAndModifier(keyCode, modifier);
-    }
-    
-    static ModifierKeyCode copyOf(ModifierKeyCode code) {
-        return of(code.getKeyCode(), code.getModifier());
-    }
-    
-    static ModifierKeyCode unknown() {
-        return of(InputUtil.UNKNOWN_KEYCODE, Modifier.none());
     }
     
     String toString();

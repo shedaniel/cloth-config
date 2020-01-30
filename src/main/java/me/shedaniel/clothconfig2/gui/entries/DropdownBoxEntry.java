@@ -33,22 +33,14 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("deprecation")
 public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
-
+    
     protected ButtonWidget resetButton;
     protected SelectionElement<T> selectionElement;
-    @NotNull
-    private Supplier<T> defaultValue;
-    @Nullable
-    private Consumer<T> saveConsumer;
-
+    @NotNull private Supplier<T> defaultValue;
+    @Nullable private Consumer<T> saveConsumer;
+    
     @Deprecated
-    public DropdownBoxEntry(String fieldName,
-                            @NotNull String resetButtonKey,
-                            @Nullable Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart,
-                            @Nullable Supplier<T> defaultValue,
-                            @Nullable Consumer<T> saveConsumer,
-                            @Nullable Iterable<T> selections,
-                            @NotNull SelectionTopCellElement<T> topRenderer, @NotNull SelectionCellCreator<T> cellCreator) {
+    public DropdownBoxEntry(String fieldName, @NotNull String resetButtonKey, @Nullable Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart, @Nullable Supplier<T> defaultValue, @Nullable Consumer<T> saveConsumer, @Nullable Iterable<T> selections, @NotNull SelectionTopCellElement<T> topRenderer, @NotNull SelectionCellCreator<T> cellCreator) {
         super(I18n.translate(fieldName), tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.saveConsumer = saveConsumer;
@@ -58,7 +50,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         });
         this.selectionElement = new SelectionElement(this, new Rectangle(0, 0, 150, 20), new DefaultDropdownMenuElement(selections == null ? ImmutableList.of() : ImmutableList.copyOf(selections)), topRenderer, cellCreator);
     }
-
+    
     @Override
     public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
@@ -80,58 +72,58 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         resetButton.render(mouseX, mouseY, delta);
         selectionElement.render(mouseX, mouseY, delta);
     }
-
+    
     @NotNull
     public ImmutableList<T> getSelections() {
         return selectionElement.menu.getSelections();
     }
-
+    
     @Override
     public T getValue() {
         return selectionElement.getValue();
     }
-
+    
     @Deprecated
     public SelectionElement<T> getSelectionElement() {
         return selectionElement;
     }
-
+    
     @Override
     public Optional<T> getDefaultValue() {
         return defaultValue == null ? Optional.empty() : Optional.ofNullable(defaultValue.get());
     }
-
+    
     @Override
     public void save() {
         if (saveConsumer != null)
             saveConsumer.accept(getValue());
     }
-
+    
     @Override
     public List<? extends Element> children() {
         return Lists.newArrayList(selectionElement, resetButton);
     }
-
+    
     @Override
     public Optional<String> getError() {
         return selectionElement.topRenderer.getError();
     }
-
+    
     @Override
     public void lateRender(int mouseX, int mouseY, float delta) {
         selectionElement.lateRender(mouseX, mouseY, delta);
     }
-
+    
     @Override
     public int getMorePossibleHeight() {
         return selectionElement.getMorePossibleHeight();
     }
-
+    
     @Override
     public boolean mouseScrolled(double double_1, double double_2, double double_3) {
         return selectionElement.mouseScrolled(double_1, double_2, double_3);
     }
-
+    
     public static class SelectionElement<R> extends AbstractParentElement implements Drawable {
         protected Rectangle bounds;
         protected boolean active;
@@ -139,7 +131,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         protected DropdownBoxEntry<R> entry;
         protected DropdownMenuElement<R> menu;
         protected boolean dontReFocus = false;
-
+        
         public SelectionElement(DropdownBoxEntry<R> entry, Rectangle bounds, DropdownMenuElement<R> menu, SelectionTopCellElement<R> topRenderer, SelectionCellCreator<R> cellCreator) {
             this.bounds = bounds;
             this.entry = entry;
@@ -150,7 +142,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             this.topRenderer = Objects.requireNonNull(topRenderer);
             this.topRenderer.entry = entry;
         }
-
+        
         @Override
         public void render(int mouseX, int mouseY, float delta) {
             fill(bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height, -6250336);
@@ -159,39 +151,39 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             if (menu.isExpanded())
                 menu.render(mouseX, mouseY, bounds, delta);
         }
-
+        
         @Deprecated
         public SelectionTopCellElement<R> getTopRenderer() {
             return topRenderer;
         }
-
+        
         @Override
         public boolean mouseScrolled(double double_1, double double_2, double double_3) {
             if (menu.isExpanded())
                 return menu.mouseScrolled(double_1, double_2, double_3);
             return false;
         }
-
+        
         public void lateRender(int mouseX, int mouseY, float delta) {
             if (menu.isExpanded())
                 menu.lateRender(mouseX, mouseY, delta);
         }
-
+        
         public int getMorePossibleHeight() {
             if (menu.isExpanded())
                 return menu.getHeight();
             return -1;
         }
-
+        
         public R getValue() {
             return topRenderer.getValue();
         }
-
+        
         @Override
         public List<? extends Element> children() {
             return Lists.newArrayList(topRenderer, menu);
         }
-
+        
         @Override
         public boolean mouseClicked(double double_1, double double_2, int int_1) {
             dontReFocus = false;
@@ -203,82 +195,75 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             return b;
         }
     }
-
+    
     public static abstract class DropdownMenuElement<R> extends AbstractParentElement {
-        @Deprecated
-        @NotNull
-        private SelectionCellCreator<R> cellCreator;
-        @Deprecated
-        @NotNull
-        private DropdownBoxEntry<R> entry;
-
+        @Deprecated @NotNull private SelectionCellCreator<R> cellCreator;
+        @Deprecated @NotNull private DropdownBoxEntry<R> entry;
+        
         @NotNull
         public SelectionCellCreator<R> getCellCreator() {
             return cellCreator;
         }
-
+        
         @NotNull
         public final DropdownBoxEntry<R> getEntry() {
             return entry;
         }
-
+        
         @NotNull
         public abstract ImmutableList<R> getSelections();
-
+        
         public abstract void initCells();
-
+        
         public abstract void render(int mouseX, int mouseY, Rectangle rectangle, float delta);
-
+        
         public abstract void lateRender(int mouseX, int mouseY, float delta);
-
+        
         public abstract int getHeight();
-
+        
         public final boolean isExpanded() {
             return (getEntry().selectionElement.getFocused() == getEntry().selectionElement.topRenderer || getEntry().selectionElement.getFocused() == getEntry().selectionElement.menu) && getEntry().getFocused() == getEntry().selectionElement && getEntry().getParent().getFocused() == getEntry();
         }
-
+        
         @Override
         public abstract List<SelectionCellElement<R>> children();
     }
-
+    
     public static class DefaultDropdownMenuElement<R> extends DropdownMenuElement<R> {
-        @NotNull
-        protected ImmutableList<R> selections;
-        @NotNull
-        protected List<SelectionCellElement<R>> cells;
-        @NotNull
-        protected List<SelectionCellElement<R>> currentElements;
+        @NotNull protected ImmutableList<R> selections;
+        @NotNull protected List<SelectionCellElement<R>> cells;
+        @NotNull protected List<SelectionCellElement<R>> currentElements;
         protected String lastSearchKeyword = "";
         protected Rectangle lastRectangle;
         protected boolean scrolling;
         protected double scroll, target;
         protected long start;
         protected long duration;
-
+        
         public DefaultDropdownMenuElement(@NotNull ImmutableList<R> selections) {
             this.selections = selections;
             this.cells = Lists.newArrayList();
             this.currentElements = Lists.newArrayList();
         }
-
+        
         public final double clamp(double v) {
             return MathHelper.clamp(v, -SmoothScrollingSettings.CLAMP_EXTENSION, getMaxScrollPosition() + SmoothScrollingSettings.CLAMP_EXTENSION);
         }
-
+        
         public double getMaxScroll() {
             return getCellCreator().getCellHeight() * currentElements.size();
         }
-
+        
         protected double getMaxScrollPosition() {
             return Math.max(0, this.getMaxScroll() - (getHeight()));
         }
-
+        
         @Override
         @NotNull
         public ImmutableList<R> getSelections() {
             return selections;
         }
-
+        
         @Override
         public void initCells() {
             for (R selection : getSelections()) {
@@ -289,7 +274,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             }
             search();
         }
-
+        
         public void search() {
             currentElements.clear();
             String keyword = this.lastSearchKeyword.toLowerCase();
@@ -304,11 +289,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             }
             scrollTo(0, false);
         }
-
+        
         protected int editDistance(String s1, String s2) {
             s1 = s1.toLowerCase();
             s2 = s2.toLowerCase();
-
+            
             int[] costs = new int[s2.length() + 1];
             for (int i = 0; i <= s1.length(); i++) {
                 int lastValue = i;
@@ -330,7 +315,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             }
             return costs[s2.length()];
         }
-
+        
         protected double similarity(String s1, String s2) {
             String longer = s1, shorter = s2;
             if (s1.length() < s2.length()) { // longer should always have greater length
@@ -343,7 +328,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             }
             return (longerLength - editDistance(longer, shorter)) / (double) longerLength;
         }
-
+        
         @Override
         public void render(int mouseX, int mouseY, Rectangle rectangle, float delta) {
             if (!getEntry().selectionElement.topRenderer.getSearchTerm().equals(lastSearchKeyword)) {
@@ -354,7 +339,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             lastRectangle = rectangle.clone();
             lastRectangle.translate(0, -1);
         }
-
+        
         private void updatePosition(float delta) {
             target = clamp(target);
             if (target < 0) {
@@ -367,7 +352,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             else
                 scroll = target;
         }
-
+        
         @Override
         public void lateRender(int mouseX, int mouseY, float delta) {
             int last10Height = getHeight();
@@ -376,7 +361,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             fill(lastRectangle.x + 1, lastRectangle.y + lastRectangle.height + 1, lastRectangle.x + cWidth - 1, lastRectangle.y + lastRectangle.height + last10Height, -16777216);
             RenderSystem.pushMatrix();
             RenderSystem.translatef(0, 0, 300f);
-
+            
             ScissorsHandler.INSTANCE.scissor(new Rectangle(lastRectangle.x, lastRectangle.y + lastRectangle.height + 1, cWidth - 6, last10Height - 1));
             double yy = lastRectangle.y + lastRectangle.height - scroll;
             for (SelectionCellElement<R> cell : currentElements) {
@@ -387,13 +372,13 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 yy += getCellCreator().getCellHeight();
             }
             ScissorsHandler.INSTANCE.removeLastScissor();
-
+            
             if (currentElements.isEmpty()) {
                 TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
                 String s = I18n.translate("text.cloth-config.dropdown.value.unknown");
                 textRenderer.drawWithShadow(s, lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.getStringWidth(s) / 2f, lastRectangle.y + lastRectangle.height + 3, -1);
             }
-
+            
             if (getMaxScrollPosition() > 6) {
                 RenderSystem.disableTexture();
                 int scrollbarPositionMinX = lastRectangle.x + getCellCreator().getCellWidth() - 6;
@@ -403,13 +388,13 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 height -= Math.min((scroll < 0 ? (int) -scroll : scroll > getMaxScrollPosition() ? (int) scroll - getMaxScrollPosition() : 0), height * .95);
                 height = Math.max(10, height);
                 int minY = (int) Math.min(Math.max((int) scroll * (last10Height - height) / getMaxScrollPosition() + (lastRectangle.y + lastRectangle.height + 1), (lastRectangle.y + lastRectangle.height + 1)), (lastRectangle.y + lastRectangle.height + 1 + last10Height) - height);
-
+                
                 int bottomc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.fromMouse()) ? 168 : 128;
                 int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.fromMouse()) ? 222 : 172;
-
+                
                 Tessellator tessellator = Tessellator.getInstance();
                 BufferBuilder buffer = tessellator.getBuffer();
-
+                
                 // Bottom
                 buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
                 buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).texture(0, 1).color(bottomc, bottomc, bottomc, 255).next();
@@ -417,7 +402,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).texture(1, 0).color(bottomc, bottomc, bottomc, 255).next();
                 buffer.vertex(scrollbarPositionMinX, minY, 0.0D).texture(0, 0).color(bottomc, bottomc, bottomc, 255).next();
                 tessellator.draw();
-
+                
                 // Top
                 buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
                 buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).texture(0, 1).color(topc, topc, topc, 255).next();
@@ -430,17 +415,17 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             RenderSystem.translatef(0, 0, -300f);
             RenderSystem.popMatrix();
         }
-
+        
         @Override
         public int getHeight() {
             return Math.max(Math.min(getCellCreator().getDropBoxMaxHeight(), (int) getMaxScroll()), 14);
         }
-
+        
         @Override
         public boolean isMouseOver(double mouseX, double mouseY) {
             return isExpanded() && mouseX >= lastRectangle.x && mouseX <= lastRectangle.x + getCellCreator().getCellWidth() && mouseY >= lastRectangle.y + lastRectangle.height && mouseY <= lastRectangle.y + lastRectangle.height + getHeight() + 1;
         }
-
+        
         @Override
         public boolean mouseDragged(double double_1, double double_2, int int_1, double double_3, double double_4) {
             if (!isExpanded())
@@ -462,7 +447,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             }
             return false;
         }
-
+        
         @Override
         public boolean mouseScrolled(double mouseX, double mouseY, double double_3) {
             if (isMouseOver(mouseX, mouseY)) {
@@ -471,11 +456,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             }
             return false;
         }
-
+        
         protected void updateScrollingState(double double_1, double double_2, int int_1) {
             this.scrolling = isExpanded() && lastRectangle != null && int_1 == 0 && double_1 >= (double) lastRectangle.x + getCellCreator().getCellWidth() - 6 && double_1 < (double) (lastRectangle.x + getCellCreator().getCellWidth());
         }
-
+        
         @Override
         public boolean mouseClicked(double double_1, double double_2, int int_1) {
             if (!isExpanded())
@@ -483,91 +468,89 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             updateScrollingState(double_1, double_2, int_1);
             return super.mouseClicked(double_1, double_2, int_1) || scrolling;
         }
-
+        
         public void offset(double value, boolean animated) {
             scrollTo(target + value, animated);
         }
-
+        
         public void scrollTo(double value, boolean animated) {
             scrollTo(value, animated, ClothConfigInitializer.getScrollDuration());
         }
-
+        
         public void scrollTo(double value, boolean animated, long duration) {
             target = clamp(value);
-
+            
             if (animated) {
                 start = System.currentTimeMillis();
                 this.duration = duration;
             } else
                 scroll = target;
         }
-
+        
         @Override
         public List<SelectionCellElement<R>> children() {
             return currentElements;
         }
     }
-
+    
     public static abstract class SelectionCellCreator<R> {
         public abstract SelectionCellElement<R> create(R selection);
-
+        
         public abstract int getCellHeight();
-
+        
         public abstract int getDropBoxMaxHeight();
-
+        
         public int getCellWidth() {
             return 132;
         }
     }
-
+    
     public static class DefaultSelectionCellCreator<R> extends SelectionCellCreator<R> {
         protected Function<R, String> toStringFunction;
-
+        
         public DefaultSelectionCellCreator(Function<R, String> toStringFunction) {
             this.toStringFunction = toStringFunction;
         }
-
+        
         public DefaultSelectionCellCreator() {
             this(Object::toString);
         }
-
+        
         @Override
         public SelectionCellElement<R> create(R selection) {
             return new DefaultSelectionCellElement<>(selection, toStringFunction);
         }
-
+        
         @Override
         public int getCellHeight() {
             return 14;
         }
-
+        
         @Override
         public int getDropBoxMaxHeight() {
             return getCellHeight() * 7;
         }
     }
-
+    
     public static abstract class SelectionCellElement<R> extends AbstractParentElement {
-        @Deprecated
-        @NotNull
-        private DropdownBoxEntry<R> entry;
-
+        @Deprecated @NotNull private DropdownBoxEntry<R> entry;
+        
         @NotNull
         public final DropdownBoxEntry<R> getEntry() {
             return entry;
         }
-
+        
         public abstract void render(int mouseX, int mouseY, int x, int y, int width, int height, float delta);
-
+        
         public abstract void dontRender(float delta);
-
+        
         @Nullable
         public abstract String getSearchKey();
-
+        
         @Nullable
         public abstract R getSelection();
     }
-
+    
     public static class DefaultSelectionCellElement<R> extends SelectionCellElement<R> {
         protected R r;
         protected int x;
@@ -576,12 +559,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         protected int height;
         protected boolean rendering;
         protected Function<R, String> toStringFunction;
-
+        
         public DefaultSelectionCellElement(R r, Function<R, String> toStringFunction) {
             this.r = r;
             this.toStringFunction = toStringFunction;
         }
-
+        
         @Override
         public void render(int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
             rendering = true;
@@ -594,29 +577,29 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 fill(x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
             MinecraftClient.getInstance().textRenderer.drawWithShadow(toStringFunction.apply(r), x + 6, y + 3, b ? 16777215 : 8947848);
         }
-
+        
         @Override
         public void dontRender(float delta) {
             rendering = false;
         }
-
+        
         @Nullable
         @Override
         public String getSearchKey() {
             return toStringFunction.apply(r);
         }
-
+        
         @Nullable
         @Override
         public R getSelection() {
             return r;
         }
-
+        
         @Override
         public List<? extends Element> children() {
             return Collections.emptyList();
         }
-
+        
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int int_1) {
             boolean b = rendering && mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
@@ -629,35 +612,34 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             return false;
         }
     }
-
+    
     public static abstract class SelectionTopCellElement<R> extends AbstractParentElement {
-        @Deprecated
-        private DropdownBoxEntry<R> entry;
-
+        @Deprecated private DropdownBoxEntry<R> entry;
+        
         public abstract R getValue();
-
+        
         public abstract void setValue(R value);
-
+        
         public abstract String getSearchTerm();
-
+        
         public abstract Optional<String> getError();
-
+        
         public final Optional<String> getConfigError() {
             return entry.getConfigError();
         }
-
+        
         public DropdownBoxEntry<R> getParent() {
             return entry;
         }
-
+        
         public final boolean hasConfigError() {
             return getConfigError().isPresent();
         }
-
+        
         public final int getPreferredTextColor() {
             return getConfigError().isPresent() ? 16733525 : 16777215;
         }
-
+        
         public void selectFirstRecommendation() {
             List<SelectionCellElement<R>> children = getParent().selectionElement.menu.children();
             for (SelectionCellElement<R> child : children) {
@@ -668,16 +650,16 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 }
             }
         }
-
+        
         public abstract void render(int mouseX, int mouseY, int x, int y, int width, int height, float delta);
     }
-
+    
     public static class DefaultSelectionTopCellElement<R> extends SelectionTopCellElement<R> {
         protected TextFieldWidget textFieldWidget;
         protected Function<String, R> toObjectFunction;
         protected Function<R, String> toStringFunction;
         protected R value;
-
+        
         public DefaultSelectionTopCellElement(R value, Function<String, R> toObjectFunction, Function<R, String> toStringFunction) {
             this.value = Objects.requireNonNull(value);
             this.toObjectFunction = Objects.requireNonNull(toObjectFunction);
@@ -690,7 +672,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                     super.render(int_1, int_2, float_1);
                     setFocused(f);
                 }
-
+                
                 @Override
                 public boolean keyPressed(int int_1, int int_2, int int_3) {
                     if (int_1 == 257 || int_1 == 335) {
@@ -708,7 +690,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                     getParent().getScreen().setEdited(true, getParent().isRequiresRestart());
             });
         }
-
+        
         @Override
         public void render(int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
             textFieldWidget.x = x + 4;
@@ -718,32 +700,32 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             textFieldWidget.setEditableColor(getPreferredTextColor());
             textFieldWidget.render(mouseX, mouseY, delta);
         }
-
+        
         @Override
         public R getValue() {
             if (hasConfigError())
                 return value;
             return toObjectFunction.apply(textFieldWidget.getText());
         }
-
+        
         @Override
         public void setValue(R value) {
             textFieldWidget.setText(toStringFunction.apply(value));
             textFieldWidget.setCursor(0);
         }
-
+        
         @Override
         public String getSearchTerm() {
             return textFieldWidget.getText();
         }
-
+        
         @Override
         public Optional<String> getError() {
             if (toObjectFunction.apply(textFieldWidget.getText()) != null)
                 return Optional.empty();
             return Optional.of("Invalid Value!");
         }
-
+        
         @Override
         public List<? extends Element> children() {
             return Collections.singletonList(textFieldWidget);
