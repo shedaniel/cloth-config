@@ -1,7 +1,7 @@
 import java.text.SimpleDateFormat
 
 plugins {
-    id 'fabric-loom' version '0.2.5-SNAPSHOT'
+    id 'fabric-loom' version '0.2.6-SNAPSHOT'
     id 'maven-publish'
     id 'maven'
     id 'signing'
@@ -10,12 +10,21 @@ plugins {
     id 'java-library'
 }
 
+repositories {
+    maven {
+        name = 'Fabric'
+        url = 'https://maven.fabricmc.net/'
+    }
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = "me.shedaniel.cloth"
 archivesBaseName = "config-2"
-version = ((String) project.mod_version).contains("unstable") ? (project.mod_version + "." + buildTime()) : project.mod_version
+version = (project.mod_version as String).contains("unstable") ? (project.mod_version + "." + buildTime()) : project.mod_version as String
 
 minecraft {
 }
@@ -34,16 +43,22 @@ static def buildTime() {
 }
 
 dependencies {
+    compileOnly 'org.jetbrains:annotations:18.0.0'
+
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_version}"
-    modApi "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+
+    modApi "net.fabricmc:fabric-loader:${project.loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
     modApi "me.shedaniel.cloth:basic-math:0.3.0"
     include "me.shedaniel.cloth:basic-math:0.3.0"
+
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
-    compileOnly "com.google.code.findbugs:jsr305:3.0.2"
-    //https://github.com/natanfudge/Not-Enough-Crashes/blob/master/README.md
-    modCompileOnly "com.lettuce.fudge:notenoughcrashes:$nec_version"
+
+    modImplementation "com.lettuce.fudge:notenoughcrashes-api:1.0.0"
+    include "com.lettuce.fudge:notenoughcrashes-api:1.0.0"
+    modRuntime "com.lettuce.fudge:notenoughcrashes:$nec_version"
 }
 
 bintray {
@@ -148,7 +163,8 @@ curseforge {
         project {
             id = '319057'
             releaseType = 'release'
-            addGameVersion '1.15-Snapshot'
+            addGameVersion '1.15.1'
+            addGameVersion 'Fabric'
             addGameVersion 'Java 8'
             relations {
                 requiredDependency 'fabric-api'

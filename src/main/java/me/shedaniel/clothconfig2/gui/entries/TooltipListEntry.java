@@ -3,23 +3,24 @@ package me.shedaniel.clothconfig2.gui.entries;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.QueuedTooltip;
 import me.shedaniel.math.api.Point;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
-    
-    @Nullable private Supplier<Optional<String[]>> tooltipSupplier;
-    
+
+    @Nullable
+    private Supplier<Optional<String[]>> tooltipSupplier;
+
     @Deprecated
     public TooltipListEntry(String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, tooltipSupplier, false);
     }
-    
+
     @Deprecated
     public TooltipListEntry(String fieldName,
-            @Nullable Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+                            @Nullable Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, requiresRestart);
         this.tooltipSupplier = tooltipSupplier;
     }

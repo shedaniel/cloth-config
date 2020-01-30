@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import com.google.common.collect.Lists;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SubCategoryListEntry;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
@@ -12,7 +13,7 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
     
     private List<AbstractConfigListEntry> entries;
     private Function<List<AbstractConfigListEntry>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
-    private boolean expended = false;
+    private boolean expanded = false;
     
     public SubCategoryBuilder(String resetButtonKey, String fieldNameKey) {
         super(resetButtonKey, fieldNameKey);
@@ -33,29 +34,30 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
-    
+
     public SubCategoryBuilder setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = list -> tooltip;
         return this;
     }
-    
+
     public SubCategoryBuilder setTooltip(String... tooltip) {
         this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }
-    
-    public SubCategoryBuilder setExpended(boolean expended) {
-        this.expended = expended;
+
+    public SubCategoryBuilder setExpanded(boolean expanded) {
+        this.expanded = expanded;
         return this;
     }
-    
+
+    @NotNull
     @Override
     public SubCategoryListEntry build() {
-        SubCategoryListEntry entry = new SubCategoryListEntry(getFieldNameKey(), entries, expended);
+        SubCategoryListEntry entry = new SubCategoryListEntry(getFieldNameKey(), entries, expanded);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         return entry;
     }
-    
+
     @Override
     public int size() {
         return entries.size();

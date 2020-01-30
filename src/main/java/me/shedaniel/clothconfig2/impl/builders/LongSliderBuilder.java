@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.LongSliderEntry;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -60,18 +61,19 @@ public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
         this.tooltipSupplier = i -> tooltipSupplier.get();
         return this;
     }
-    
+
     public LongSliderBuilder setTooltip(Optional<String[]> tooltip) {
         this.tooltipSupplier = i -> tooltip;
         return this;
     }
-    
+
     public LongSliderBuilder setTooltip(String... tooltip) {
         this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
         return this;
     }
-    
-    
+
+
+    @NotNull
     @Override
     public LongSliderEntry build() {
         LongSliderEntry entry = new LongSliderEntry(getFieldNameKey(), min, max, value, saveConsumer, getResetButtonKey(), defaultValue, null, isRequireRestart());
