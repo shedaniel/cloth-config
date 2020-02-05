@@ -1,10 +1,11 @@
 package me.shedaniel.clothconfig2.impl;
 
 import com.google.common.collect.Lists;
-import fudge.notenoughcrashes.api.MinecraftCrashes;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
+import me.shedaniel.math.api.Executor;
 import me.shedaniel.math.api.Rectangle;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Window;
 import org.lwjgl.opengl.GL11;
@@ -17,11 +18,17 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
     @Deprecated public static final ScissorsHandler INSTANCE = new ScissorsHandlerImpl();
     
     static {
-        MinecraftCrashes.onEveryCrash(() -> {
+        Executor.runIf(() -> FabricLoader.getInstance().isModLoaded("notenoughcrashes"), () -> () -> {
             try {
-                ScissorsHandler.INSTANCE.clearScissors();
-            } catch (Throwable t) {
-                ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed clear scissors on game crash!", t);
+                Class.forName("fudge.notenoughcrashes.api.NotEnoughCrashesApi").getDeclaredMethod("onEveryCrash", Runnable.class).invoke(null, (Runnable) () -> {
+                    try {
+                        ScissorsHandler.INSTANCE.clearScissors();
+                    } catch (Throwable t) {
+                        ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed clear scissors on game crash!", t);
+                    }
+                });
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
             }
         });
     }

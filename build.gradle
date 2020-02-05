@@ -55,8 +55,6 @@ dependencies {
 
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
 
-    modApi "com.lettuce.fudge:notenoughcrashes-api:1.0.0"
-    include "com.lettuce.fudge:notenoughcrashes-api:1.0.0"
     modRuntime "com.lettuce.fudge:notenoughcrashes:$nec_version"
 }
 
