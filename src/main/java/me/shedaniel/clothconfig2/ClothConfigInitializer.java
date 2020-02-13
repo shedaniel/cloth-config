@@ -15,6 +15,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.resource.language.I18n;
@@ -55,7 +56,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
         } else
             target[0] = clamp(target[0], maxScroll, 0);
         if (!Precision.almostEquals(scroll, target[0], Precision.FLOAT_EPSILON))
-            return expoEase(scroll, target[0], Math.min((System.currentTimeMillis() - start) / duration, 1));
+            return expoEase(scroll, target[0], Math.min((System.currentTimeMillis() - start) / duration * delta * 3, 1));
         else
             return target[0];
     }
@@ -91,7 +92,6 @@ public class ClothConfigInitializer implements ClientModInitializer {
     private static void loadConfig() {
         File file = new File(FabricLoader.getInstance().getConfigDirectory(), "cloth-config2/config.properties");
         try {
-            //noinspection ResultOfMethodCallIgnored
             file.getParentFile().mkdirs();
             easingMethod = EasingMethodImpl.LINEAR;
             scrollDuration = 600;
@@ -155,123 +155,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
                 Method method = clazz.getMethod("addConfigOverride", String.class, Runnable.class);
                 method.invoke(null, "cloth-config2", (Runnable) () -> {
                     try {
-                        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(MinecraftClient.getInstance().currentScreen).setTitle("title.cloth-config.config");
-                        builder.setDefaultBackgroundTexture(new Identifier("minecraft:textures/block/oak_planks.png"));
-                        ConfigCategory scrolling = builder.getOrCreateCategory("category.cloth-config.scrolling");
-                        ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
-                        DropdownBoxEntry<EasingMethod> easingMethodEntry = entryBuilder.startDropdownMenu("Easing Method", DropdownMenuBuilder.TopCellElementBuilder.of(easingMethod, str -> {
-                            for (EasingMethod m : EasingMethods.getMethods())
-                                if (m.toString().equals(str))
-                                    return m;
-                            return null;
-                        })).setDefaultValue(EasingMethodImpl.LINEAR).setSaveConsumer(o -> easingMethod = o).setSelections(EasingMethods.getMethods()).build();
-                        LongSliderEntry scrollDurationEntry = entryBuilder.startLongSlider("option.cloth-config.scrollDuration", scrollDuration, 0, 5000).setTextGetter(integer -> integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms")).setDefaultValue(600).setSaveConsumer(i -> scrollDuration = i).build();
-                        DoubleListEntry scrollStepEntry = entryBuilder.startDoubleField("option.cloth-config.scrollStep", scrollStep).setDefaultValue(19).setSaveConsumer(i -> scrollStep = i).build();
-                        LongSliderEntry bounceMultiplierEntry = entryBuilder.startLongSlider("option.cloth-config.bounceBackMultiplier", (long) (bounceBackMultiplier * 1000), -10, 750).setTextGetter(integer -> integer < 0 ? "Value: Disabled" : String.format("Value: %s", integer / 1000d)).setDefaultValue(240).setSaveConsumer(i -> bounceBackMultiplier = i / 1000d).build();
-                        
-                        scrolling.addEntry(new TooltipListEntry<Object>(I18n.translate("option.cloth-config.setDefaultSmoothScroll"), null) {
-                            int width = 220;
-                            private AbstractButtonWidget buttonWidget = new AbstractPressableButtonWidget(0, 0, 0, 20, getFieldName()) {
-                                @Override
-                                public void onPress() {
-                                    easingMethodEntry.getSelectionElement().getTopRenderer().setValue(EasingMethodImpl.LINEAR);
-                                    scrollDurationEntry.setValue(600);
-                                    scrollStepEntry.setValue("19.0");
-                                    bounceMultiplierEntry.setValue(240);
-                                    getScreen().setEdited(true, isRequiresRestart());
-                                }
-                            };
-                            private List<AbstractButtonWidget> children = ImmutableList.of(buttonWidget);
-                            
-                            @Override
-                            public Object getValue() {
-                                return null;
-                            }
-                            
-                            @Override
-                            public Optional<Object> getDefaultValue() {
-                                return Optional.empty();
-                            }
-                            
-                            @Override
-                            public void save() {
-                            }
-                            
-                            @Override
-                            public List<? extends Element> children() {
-                                return children;
-                            }
-                            
-                            @Override
-                            public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-                                super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
-                                Window window = MinecraftClient.getInstance().getWindow();
-                                this.buttonWidget.active = this.isEditable();
-                                this.buttonWidget.y = y;
-                                this.buttonWidget.x = x + entryWidth / 2 - width / 2;
-                                this.buttonWidget.setWidth(width);
-                                this.buttonWidget.render(mouseX, mouseY, delta);
-                            }
-                        });
-                        
-                        scrolling.addEntry(new TooltipListEntry<Object>(I18n.translate("option.cloth-config.disableSmoothScroll"), null) {
-                            int width = 220;
-                            private AbstractButtonWidget buttonWidget = new AbstractPressableButtonWidget(0, 0, 0, 20, getFieldName()) {
-                                @Override
-                                public void onPress() {
-                                    easingMethodEntry.getSelectionElement().getTopRenderer().setValue(EasingMethodImpl.NONE);
-                                    scrollDurationEntry.setValue(0);
-                                    scrollStepEntry.setValue("16.0");
-                                    bounceMultiplierEntry.setValue(-10);
-                                    getScreen().setEdited(true, isRequiresRestart());
-                                }
-                            };
-                            private List<AbstractButtonWidget> children = ImmutableList.of(buttonWidget);
-                            
-                            @Override
-                            public Object getValue() {
-                                return null;
-                            }
-                            
-                            @Override
-                            public Optional<Object> getDefaultValue() {
-                                return Optional.empty();
-                            }
-                            
-                            @Override
-                            public void save() {
-                            }
-                            
-                            @Override
-                            public List<? extends Element> children() {
-                                return children;
-                            }
-                            
-                            @Override
-                            public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-                                super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
-                                Window window = MinecraftClient.getInstance().getWindow();
-                                this.buttonWidget.active = this.isEditable();
-                                this.buttonWidget.y = y;
-                                this.buttonWidget.x = x + entryWidth / 2 - width / 2;
-                                this.buttonWidget.setWidth(width);
-                                this.buttonWidget.render(mouseX, mouseY, delta);
-                            }
-                        });
-                        scrolling.addEntry(easingMethodEntry);
-                        scrolling.addEntry(scrollDurationEntry);
-                        scrolling.addEntry(scrollStepEntry);
-                        scrolling.addEntry(bounceMultiplierEntry);
-                        ConfigCategory testing = builder.getOrCreateCategory("category.cloth-config.testing");
-                        testing.addEntry(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
-                        testing.addEntry(entryBuilder.startKeyCodeField("Cool Key", InputUtil.UNKNOWN_KEYCODE).setDefaultValue(InputUtil.UNKNOWN_KEYCODE).build());
-                        testing.addEntry(entryBuilder.startModifierKeyCodeField("Cool Modifier Key", ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).setDefaultValue(ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).build());
-                        testing.addEntry(entryBuilder.startDoubleList("A list of Doubles", Arrays.asList(1d, 2d, 3d)).setDefaultValue(Arrays.asList(1d, 2d, 3d)).build());
-                        testing.addEntry(entryBuilder.startLongList("A list of Longs", Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).build());
-                        testing.addEntry(entryBuilder.startStrList("A list of Strings", Arrays.asList("abc", "xyz")).setDefaultValue(Arrays.asList("abc", "xyz")).build());
-                        builder.setSavingRunnable(ClothConfigInitializer::saveConfig);
-                        builder.transparentBackground();
-                        MinecraftClient.getInstance().openScreen(builder.build());
+                        MinecraftClient.getInstance().openScreen(getConfigBuilderWithDemo().build());
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();
                     }
@@ -279,11 +163,134 @@ public class ClothConfigInitializer implements ClientModInitializer {
             } catch (Exception e) {
                 ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed to add test config override for ModMenu!", e);
             }
-            //            KeyBindingRegistry.INSTANCE.addCategory("Cloth Config");
-            //            FakeModifierKeyCodeAdder.INSTANCE.registerModifierKeyCode("Cloth Config", "unknown key lol", ModifierKeyCode.unknown(), keyCode -> {
-            //                System.out.println("new");
-            //            });
         }
+    }
+    
+    @SuppressWarnings("deprecation")
+    public static ConfigBuilder getConfigBuilder() {
+        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(MinecraftClient.getInstance().currentScreen).setTitle("title.cloth-config.config");
+        builder.setDefaultBackgroundTexture(new Identifier("minecraft:textures/block/oak_planks.png"));
+        ConfigCategory scrolling = builder.getOrCreateCategory("category.cloth-config.scrolling");
+        ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
+        DropdownBoxEntry<EasingMethod> easingMethodEntry = entryBuilder.startDropdownMenu("Easing Method", DropdownMenuBuilder.TopCellElementBuilder.of(easingMethod, str -> {
+            for (EasingMethod m : EasingMethods.getMethods())
+                if (m.toString().equals(str))
+                    return m;
+            return null;
+        })).setDefaultValue(EasingMethodImpl.LINEAR).setSaveConsumer(o -> easingMethod = o).setSelections(EasingMethods.getMethods()).build();
+        LongSliderEntry scrollDurationEntry = entryBuilder.startLongSlider("option.cloth-config.scrollDuration", scrollDuration, 0, 5000).setTextGetter(integer -> integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms")).setDefaultValue(600).setSaveConsumer(i -> scrollDuration = i).build();
+        DoubleListEntry scrollStepEntry = entryBuilder.startDoubleField("option.cloth-config.scrollStep", scrollStep).setDefaultValue(19).setSaveConsumer(i -> scrollStep = i).build();
+        LongSliderEntry bounceMultiplierEntry = entryBuilder.startLongSlider("option.cloth-config.bounceBackMultiplier", (long) (bounceBackMultiplier * 1000), -10, 750).setTextGetter(integer -> integer < 0 ? "Value: Disabled" : String.format("Value: %s", integer / 1000d)).setDefaultValue(240).setSaveConsumer(i -> bounceBackMultiplier = i / 1000d).build();
+    
+        scrolling.addEntry(new TooltipListEntry<Object>(I18n.translate("option.cloth-config.setDefaultSmoothScroll"), null) {
+            final int width = 220;
+            private final AbstractButtonWidget buttonWidget = new AbstractPressableButtonWidget(0, 0, 0, 20, getFieldName()) {
+                @Override
+                public void onPress() {
+                    easingMethodEntry.getSelectionElement().getTopRenderer().setValue(EasingMethodImpl.LINEAR);
+                    scrollDurationEntry.setValue(600);
+                    scrollStepEntry.setValue("19.0");
+                    bounceMultiplierEntry.setValue(240);
+                    getScreen().setEdited(true, isRequiresRestart());
+                }
+            };
+            private final List<AbstractButtonWidget> children = ImmutableList.of(buttonWidget);
+        
+            @Override
+            public Object getValue() {
+                return null;
+            }
+        
+            @Override
+            public Optional<Object> getDefaultValue() {
+                return Optional.empty();
+            }
+        
+            @Override
+            public void save() {
+            }
+        
+            @Override
+            public List<? extends Element> children() {
+                return children;
+            }
+        
+            @Override
+            public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+                super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+                Window window = MinecraftClient.getInstance().getWindow();
+                this.buttonWidget.active = this.isEditable();
+                this.buttonWidget.y = y;
+                this.buttonWidget.x = x + entryWidth / 2 - width / 2;
+                this.buttonWidget.setWidth(width);
+                this.buttonWidget.render(mouseX, mouseY, delta);
+            }
+        });
+    
+        scrolling.addEntry(new TooltipListEntry<Object>(I18n.translate("option.cloth-config.disableSmoothScroll"), null) {
+            final int width = 220;
+            private final AbstractButtonWidget buttonWidget = new AbstractPressableButtonWidget(0, 0, 0, 20, getFieldName()) {
+                @Override
+                public void onPress() {
+                    easingMethodEntry.getSelectionElement().getTopRenderer().setValue(EasingMethodImpl.NONE);
+                    scrollDurationEntry.setValue(0);
+                    scrollStepEntry.setValue("16.0");
+                    bounceMultiplierEntry.setValue(-10);
+                    getScreen().setEdited(true, isRequiresRestart());
+                }
+            };
+            private final List<AbstractButtonWidget> children = ImmutableList.of(buttonWidget);
+        
+            @Override
+            public Object getValue() {
+                return null;
+            }
+        
+            @Override
+            public Optional<Object> getDefaultValue() {
+                return Optional.empty();
+            }
+        
+            @Override
+            public void save() {
+            }
+        
+            @Override
+            public List<? extends Element> children() {
+                return children;
+            }
+        
+            @Override
+            public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+                super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+                Window window = MinecraftClient.getInstance().getWindow();
+                this.buttonWidget.active = this.isEditable();
+                this.buttonWidget.y = y;
+                this.buttonWidget.x = x + entryWidth / 2 - width / 2;
+                this.buttonWidget.setWidth(width);
+                this.buttonWidget.render(mouseX, mouseY, delta);
+            }
+        });
+        scrolling.addEntry(easingMethodEntry);
+        scrolling.addEntry(scrollDurationEntry);
+        scrolling.addEntry(scrollStepEntry);
+        scrolling.addEntry(bounceMultiplierEntry);
+        builder.setSavingRunnable(ClothConfigInitializer::saveConfig);
+        builder.transparentBackground();
+        return builder;
+    }
+    
+    public static ConfigBuilder getConfigBuilderWithDemo() {
+        ConfigBuilder builder = getConfigBuilder();
+        ConfigEntryBuilder entryBuilder = builder.entryBuilder();
+        ConfigCategory testing = builder.getOrCreateCategory("category.cloth-config.testing");
+        testing.addEntry(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
+        testing.addEntry(entryBuilder.startKeyCodeField("Cool Key", InputUtil.UNKNOWN_KEYCODE).setDefaultValue(InputUtil.UNKNOWN_KEYCODE).build());
+        testing.addEntry(entryBuilder.startModifierKeyCodeField("Cool Modifier Key", ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).setDefaultValue(ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).build());
+        testing.addEntry(entryBuilder.startDoubleList("A list of Doubles", Arrays.asList(1d, 2d, 3d)).setDefaultValue(Arrays.asList(1d, 2d, 3d)).build());
+        testing.addEntry(entryBuilder.startLongList("A list of Longs", Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).build());
+        testing.addEntry(entryBuilder.startStrList("A list of Strings", Arrays.asList("abc", "xyz")).setDefaultValue(Arrays.asList("abc", "xyz")).build());
+        return builder;
     }
     
     public static class Precision {
