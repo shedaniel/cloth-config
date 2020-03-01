@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.LongListEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -8,11 +10,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
     
     private Consumer<Long> saveConsumer = null;
     private Function<Long, Optional<String[]>> tooltipSupplier = l -> Optional.empty();
-    private long value;
+    private final long value;
     private Long min = null, max = null;
     
     public LongFieldBuilder(String resetButtonKey, String fieldNameKey, long value) {

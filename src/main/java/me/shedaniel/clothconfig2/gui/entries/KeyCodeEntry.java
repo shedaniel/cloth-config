@@ -2,6 +2,8 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
 import me.shedaniel.clothconfig2.api.ModifierKeyCode;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -15,6 +17,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @SuppressWarnings("DuplicatedCode")
+@Environment(EnvType.CLIENT)
 public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     
     private ModifierKeyCode value;
@@ -34,7 +37,7 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
             getScreen().setEdited(true, isRequiresRestart());
         });
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {
-            KeyCodeEntry.this.value = getDefaultValue().get();
+            KeyCodeEntry.this.value = getDefaultValue().orElse(null);
             getScreen().setFocusedBinding(null);
             getScreen().setEdited(true, isRequiresRestart());
         });

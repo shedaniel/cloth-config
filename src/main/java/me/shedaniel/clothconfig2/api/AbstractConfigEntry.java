@@ -2,10 +2,13 @@ package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> {
     private ClothConfigScreen screen;
     private Supplier<Optional<String>> errorSupplier;

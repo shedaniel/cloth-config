@@ -2,6 +2,7 @@ package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.clothconfig2.impl.RunSixtyTimesEverySecImpl;
 
+@Deprecated
 public interface RunSixtyTimesEverySec {
     
     void run();

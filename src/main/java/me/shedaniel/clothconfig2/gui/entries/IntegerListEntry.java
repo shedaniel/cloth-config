@@ -1,5 +1,7 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 
@@ -8,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class IntegerListEntry extends TextFieldListEntry<Integer> {
     
     private static Function<String, String> stripCharacters = s -> {

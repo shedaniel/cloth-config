@@ -10,6 +10,8 @@ import me.shedaniel.clothconfig2.gui.widget.DynamicNewSmoothScrollingEntryListWi
 import me.shedaniel.clothconfig2.gui.widget.DynamicNewSmoothScrollingEntryListWidget.Precision;
 import me.shedaniel.math.api.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.AbstractParentElement;
@@ -32,6 +34,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("deprecation")
+@Environment(EnvType.CLIENT)
 public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     
     protected ButtonWidget resetButton;
@@ -48,7 +51,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             selectionElement.topRenderer.setValue(defaultValue.get());
             getScreen().setEdited(true, isRequiresRestart());
         });
-        this.selectionElement = new SelectionElement(this, new Rectangle(0, 0, 150, 20), new DefaultDropdownMenuElement(selections == null ? ImmutableList.of() : ImmutableList.copyOf(selections)), topRenderer, cellCreator);
+        this.selectionElement = new SelectionElement<>(this, new Rectangle(0, 0, 150, 20), new DefaultDropdownMenuElement<>(selections == null ? ImmutableList.of() : ImmutableList.copyOf(selections)), topRenderer, cellCreator);
     }
     
     @Override
@@ -284,7 +287,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                     currentElements.add(cell);
             }
             if (!keyword.isEmpty()) {
-                Comparator<SelectionCellElement> c = Comparator.comparingDouble(i -> i.getSearchKey() == null ? Double.MAX_VALUE : similarity(i.getSearchKey(), keyword));
+                Comparator<SelectionCellElement<?>> c = Comparator.comparingDouble(i -> i.getSearchKey() == null ? Double.MAX_VALUE : similarity(i.getSearchKey(), keyword));
                 currentElements.sort(c.reversed());
             }
             scrollTo(0, false);

@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
 import me.shedaniel.clothconfig2.api.RunSixtyTimesEverySec;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
@@ -9,6 +11,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 @Deprecated
+@Environment(EnvType.CLIENT)
 public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends DynamicEntryListWidget<E> {
     
     protected double scrollVelocity;
@@ -122,7 +125,6 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
         return true;
     }
     
-    @SuppressWarnings("deprecation")
     @Override
     protected void renderScrollBar(Tessellator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
         if (!smoothScrolling)

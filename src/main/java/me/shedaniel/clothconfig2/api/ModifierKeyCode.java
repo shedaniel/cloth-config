@@ -2,9 +2,12 @@ package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.clothconfig2.impl.ModifierKeyCodeImpl;
 import me.shedaniel.clothconfig2.mixin.MouseHooks;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 
+@Environment(EnvType.CLIENT)
 public interface ModifierKeyCode {
     static ModifierKeyCode of(InputUtil.KeyCode keyCode, Modifier modifier) {
         return new ModifierKeyCodeImpl().setKeyCodeAndModifier(keyCode, modifier);

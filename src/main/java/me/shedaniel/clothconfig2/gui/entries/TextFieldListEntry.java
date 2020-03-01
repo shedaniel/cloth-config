@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     
     protected TextFieldWidget textFieldWidget;

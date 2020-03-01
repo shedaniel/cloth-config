@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -9,12 +11,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, EnumListEntry<T>> {
     
     private Consumer<T> saveConsumer = null;
     private Function<T, Optional<String[]>> tooltipSupplier = e -> Optional.empty();
-    private T value;
-    private Class<T> clazz;
+    private final T value;
+    private final Class<T> clazz;
     private Function<Enum, String> enumNameProvider = EnumListEntry.DEFAULT_NAME_PROVIDER;
     
     public EnumSelectorBuilder(String resetButtonKey, String fieldNameKey, Class<T> clazz, T value) {

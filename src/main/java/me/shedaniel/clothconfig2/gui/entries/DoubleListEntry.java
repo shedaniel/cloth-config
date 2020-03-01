@@ -1,5 +1,7 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 
@@ -8,16 +10,17 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class DoubleListEntry extends TextFieldListEntry<Double> {
     
     private static Function<String, String> stripCharacters = s -> {
         StringBuilder stringBuilder_1 = new StringBuilder();
         char[] var2 = s.toCharArray();
         int var3 = var2.length;
-        
-        for (int var4 = 0; var4 < var3; ++var4)
-            if (Character.isDigit(var2[var4]) || var2[var4] == '-' || var2[var4] == '.')
-                stringBuilder_1.append(var2[var4]);
+    
+        for (char c : var2)
+            if (Character.isDigit(c) || c == '-' || c == '.')
+                stringBuilder_1.append(c);
         
         return stringBuilder_1.toString();
     };

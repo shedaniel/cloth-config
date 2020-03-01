@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.StringListListEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -11,12 +13,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class StringListBuilder extends FieldBuilder<List<String>, StringListListEntry> {
     
     private Function<String, Optional<String>> cellErrorSupplier;
     private Consumer<List<String>> saveConsumer = null;
     private Function<List<String>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
-    private List<String> value;
+    private final List<String> value;
     private boolean expanded = false;
     private Function<StringListListEntry, StringListListEntry.StringListCell> createNewInstance;
     private String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");

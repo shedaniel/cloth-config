@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -13,13 +15,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class BooleanListEntry extends TooltipListEntry<Boolean> {
     
-    private AtomicBoolean bool;
-    private ButtonWidget buttonWidget, resetButton;
-    private Consumer<Boolean> saveConsumer;
-    private Supplier<Boolean> defaultValue;
-    private List<Element> widgets;
+    private final AtomicBoolean bool;
+    private final ButtonWidget buttonWidget;
+    private final ButtonWidget resetButton;
+    private final Consumer<Boolean> saveConsumer;
+    private final Supplier<Boolean> defaultValue;
+    private final List<Element> widgets;
     
     @Deprecated
     public BooleanListEntry(String fieldName, boolean bool, Consumer<Boolean> saveConsumer) {

@@ -1,7 +1,10 @@
 package me.shedaniel.clothconfig2.gui;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 
+@Environment(EnvType.CLIENT)
 public class ClothConfigTabButton extends AbstractPressableButtonWidget {
     
     private final int index;

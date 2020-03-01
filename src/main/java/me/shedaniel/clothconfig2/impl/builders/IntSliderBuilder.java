@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.IntegerSliderEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -8,11 +10,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> {
     
     private Consumer<Integer> saveConsumer = null;
     private Function<Integer, Optional<String[]>> tooltipSupplier = i -> Optional.empty();
-    private int value, max, min;
+    private final int value;
+    private int max;
+    private int min;
     private Function<Integer, String> textGetter = null;
     
     public IntSliderBuilder(String resetButtonKey, String fieldNameKey, int value, int min, int max) {

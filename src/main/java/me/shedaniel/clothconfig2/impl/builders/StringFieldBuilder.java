@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -9,11 +11,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class StringFieldBuilder extends FieldBuilder<String, StringListEntry> {
     
     private Consumer<String> saveConsumer = null;
     private Function<String, Optional<String[]>> tooltipSupplier = str -> Optional.empty();
-    private String value;
+    private final String value;
     
     public StringFieldBuilder(String resetButtonKey, String fieldNameKey, String value) {
         super(resetButtonKey, fieldNameKey);

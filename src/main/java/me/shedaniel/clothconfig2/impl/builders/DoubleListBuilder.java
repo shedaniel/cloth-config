@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.DoubleListListEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -11,12 +13,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListListEntry> {
     
     protected Function<Double, Optional<String>> cellErrorSupplier;
     private Consumer<List<Double>> saveConsumer = null;
     private Function<List<Double>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
-    private List<Double> value;
+    private final List<Double> value;
     private boolean expanded = false;
     private Double min = null, max = null;
     private Function<DoubleListListEntry, DoubleListListEntry.DoubleListCell> createNewInstance;

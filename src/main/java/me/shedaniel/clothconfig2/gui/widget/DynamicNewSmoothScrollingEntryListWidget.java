@@ -3,6 +3,8 @@ package me.shedaniel.clothconfig2.gui.widget;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.math.api.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
@@ -13,6 +15,7 @@ import net.minecraft.util.math.MathHelper;
 import static me.shedaniel.clothconfig2.ClothConfigInitializer.clamp;
 import static me.shedaniel.clothconfig2.ClothConfigInitializer.handleScrollingPosition;
 
+@Environment(EnvType.CLIENT)
 public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends DynamicEntryListWidget<E> {
     
     protected double target;

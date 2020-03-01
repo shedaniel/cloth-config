@@ -2,6 +2,8 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry.NestedListCell;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Element;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +19,7 @@ import java.util.function.Supplier;
  * @param <T>     the configuration object type
  * @param <INNER> the type of the inner config entry
  */
+@Environment(EnvType.CLIENT)
 public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<T>> extends AbstractListListEntry<T, NestedListCell<T, INNER>, NestedListListEntry<T, INNER>> {
     
     @ApiStatus.Internal

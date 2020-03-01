@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,11 +11,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry> {
     
     @Nullable private Consumer<Boolean> saveConsumer = null;
     @NotNull private Function<Boolean, Optional<String[]>> tooltipSupplier = bool -> Optional.empty();
-    private boolean value;
+    private final boolean value;
     @Nullable private Function<Boolean, String> yesNoTextSupplier = null;
     
     public BooleanToggleBuilder(String resetButtonKey, String fieldNameKey, boolean value) {

@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.FloatListEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -8,11 +10,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
     
     private Consumer<Float> saveConsumer = null;
     private Function<Float, Optional<String[]>> tooltipSupplier = f -> Optional.empty();
-    private float value;
+    private final float value;
     private Float min = null, max = null;
     
     public FloatFieldBuilder(String resetButtonKey, String fieldNameKey, float value) {

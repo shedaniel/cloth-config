@@ -3,6 +3,8 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.api.Modifier;
 import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.util.InputUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,11 +14,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> {
     
     @Nullable private Consumer<ModifierKeyCode> saveConsumer = null;
     @NotNull private Function<ModifierKeyCode, Optional<String[]>> tooltipSupplier = bool -> Optional.empty();
-    private ModifierKeyCode value;
+    private final ModifierKeyCode value;
     private boolean allowKey = true, allowMouse = true, allowModifiers = true;
     
     public KeyCodeBuilder(String resetButtonKey, String fieldNameKey, ModifierKeyCode value) {

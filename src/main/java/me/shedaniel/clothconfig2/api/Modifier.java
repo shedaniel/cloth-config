@@ -1,5 +1,7 @@
 package me.shedaniel.clothconfig2.api;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.Objects;
@@ -10,6 +12,7 @@ import java.util.Objects;
  *
  * @author Siphalor
  */
+@Environment(EnvType.CLIENT)
 public class Modifier {
     private short value;
     

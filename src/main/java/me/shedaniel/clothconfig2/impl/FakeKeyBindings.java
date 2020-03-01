@@ -2,17 +2,20 @@ package me.shedaniel.clothconfig2.impl;
 
 import me.shedaniel.clothconfig2.api.Modifier;
 import me.shedaniel.clothconfig2.api.ModifierKeyCode;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 
 import java.util.UUID;
 import java.util.function.Consumer;
 
+@Environment(EnvType.CLIENT)
 public class FakeKeyBindings extends KeyBinding {
-    private UUID uuid;
-    private ModifierKeyCode keyCode;
-    private ModifierKeyCode defaultKeyCode;
-    private Consumer<ModifierKeyCode> onChanged;
+    private final UUID uuid;
+    private final ModifierKeyCode keyCode;
+    private final ModifierKeyCode defaultKeyCode;
+    private final Consumer<ModifierKeyCode> onChanged;
     
     public FakeKeyBindings(String key, ModifierKeyCode keyCode, ModifierKeyCode defaultKeyCode, String category, Consumer<ModifierKeyCode> onChanged) {
         super(UUID.randomUUID().toString(), InputUtil.Type.KEYSYM, -1, category);

@@ -6,7 +6,7 @@ public interface EasingMethod {
     
     double apply(double v);
     
-    public enum EasingMethodImpl implements EasingMethod {
+    enum EasingMethodImpl implements EasingMethod {
         NONE(v -> 1.0),
         LINEAR(v -> v),
         EXPO(v -> ((v == 1.0) ? 1 : 1 * (-Math.pow(2, -10 * v) + 1))),
@@ -17,7 +17,7 @@ public interface EasingMethod {
         QUINTIC(v -> ((v = v - 1) * v * v * v * v + 1)),
         CIRC(v -> Math.sqrt(1 - (v = v - 1) * v));
         
-        private Function<Double, Double> function;
+        private final Function<Double, Double> function;
         
         EasingMethodImpl(Function<Double, Double> function) {
             this.function = function;

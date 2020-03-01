@@ -1,10 +1,13 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.AbstractParentElement;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public abstract class BaseListCell extends AbstractParentElement {
     
     private Supplier<Optional<String>> errorSupplier;

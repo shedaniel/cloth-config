@@ -18,6 +18,6 @@ public class EasingMethods {
     }
     
     public static List<EasingMethod> getMethods() {
-        return Collections.unmodifiableList(new ArrayList<>(METHODS));
+        return Collections.unmodifiableList(METHODS);
     }
 }

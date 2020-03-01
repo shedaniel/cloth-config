@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.LongListListEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -11,12 +13,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry> {
     
     protected Function<Long, Optional<String>> cellErrorSupplier;
     private Consumer<List<Long>> saveConsumer = null;
     private Function<List<Long>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
-    private List<Long> value;
+    private final List<Long> value;
     private boolean expanded = false;
     private Long min = null, max = null;
     private Function<LongListListEntry, LongListListEntry.LongListCell> createNewInstance;

@@ -9,6 +9,8 @@ import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import me.shedaniel.math.api.Rectangle;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -37,6 +39,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"deprecation", "rawtypes", "unchecked", "DuplicatedCode"})
+@Environment(EnvType.CLIENT)
 public abstract class ClothConfigScreen extends Screen {
     
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
@@ -44,25 +47,25 @@ public abstract class ClothConfigScreen extends Screen {
     public int nextTabIndex;
     public int selectedTabIndex;
     public double tabsScrollVelocity = 0d;
-    public double tabsScrollProgress = 0d;
+    public double tabsScrollProgress;
     public ListWidget<AbstractConfigEntry<AbstractConfigEntry>> listWidget;
     private KeyCodeEntry focusedBinding;
-    private Screen parent;
-    private LinkedHashMap<String, List<AbstractConfigEntry>> tabbedEntries;
-    private List<Pair<String, Integer>> tabs;
+    private final Screen parent;
+    private final LinkedHashMap<String, List<AbstractConfigEntry>> tabbedEntries;
+    private final List<Pair<String, Integer>> tabs;
     private boolean edited;
     private boolean requiresRestart;
-    private boolean confirmSave;
+    private final boolean confirmSave;
     private AbstractButtonWidget buttonQuit, buttonSave, buttonLeftTab, buttonRightTab;
     private Rectangle tabsBounds, tabsLeftBounds, tabsRightBounds;
-    private String title;
+    private final String title;
     private double tabsMaximumScrolled = -1d;
-    private boolean displayErrors;
-    private List<ClothConfigTabButton> tabButtons;
+    private final boolean displayErrors;
+    private final List<ClothConfigTabButton> tabButtons;
     private boolean smoothScrollingTabs = true;
-    private boolean smoothScrollingList = true;
-    private Identifier defaultBackgroundLocation;
-    private Map<String, Identifier> categoryBackgroundLocation;
+    private boolean smoothScrollingList;
+    private final Identifier defaultBackgroundLocation;
+    private final Map<String, Identifier> categoryBackgroundLocation;
     private boolean transparentBackground = false;
     private boolean editable = true;
     @Nullable private String defaultFallbackCategory = null;

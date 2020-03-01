@@ -3,6 +3,8 @@ package me.shedaniel.clothconfig2.impl.builders;
 import com.google.common.collect.Lists;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SubCategoryListEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,9 +12,10 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntry> implements List<AbstractConfigListEntry> {
     
-    private List<AbstractConfigListEntry> entries;
+    private final List<AbstractConfigListEntry> entries;
     private Function<List<AbstractConfigListEntry>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
     private boolean expanded = false;
     
@@ -81,7 +84,7 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
     }
     
     @Override
-    public Iterator<AbstractConfigListEntry> iterator() {
+    public @NotNull Iterator<AbstractConfigListEntry> iterator() {
         return entries.iterator();
     }
     
@@ -106,17 +109,17 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
     }
     
     @Override
-    public boolean containsAll(Collection<?> c) {
+    public boolean containsAll(@NotNull Collection<?> c) {
         return entries.containsAll(c);
     }
     
     @Override
-    public boolean addAll(Collection<? extends AbstractConfigListEntry> c) {
+    public boolean addAll(@NotNull Collection<? extends AbstractConfigListEntry> c) {
         return entries.addAll(c);
     }
     
     @Override
-    public boolean addAll(int index, Collection<? extends AbstractConfigListEntry> c) {
+    public boolean addAll(int index, @NotNull Collection<? extends AbstractConfigListEntry> c) {
         return entries.addAll(index, c);
     }
     
@@ -166,17 +169,17 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
     }
     
     @Override
-    public ListIterator<AbstractConfigListEntry> listIterator() {
+    public @NotNull ListIterator<AbstractConfigListEntry> listIterator() {
         return entries.listIterator();
     }
     
     @Override
-    public ListIterator<AbstractConfigListEntry> listIterator(int index) {
+    public @NotNull ListIterator<AbstractConfigListEntry> listIterator(int index) {
         return entries.listIterator(index);
     }
     
     @Override
-    public List<AbstractConfigListEntry> subList(int fromIndex, int toIndex) {
+    public @NotNull List<AbstractConfigListEntry> subList(int fromIndex, int toIndex) {
         return entries.subList(fromIndex, toIndex);
     }
     

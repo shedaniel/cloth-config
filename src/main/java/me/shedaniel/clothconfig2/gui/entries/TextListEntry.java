@@ -1,5 +1,7 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class TextListEntry extends TooltipListEntry<Object> {
     
     private int savedWidth = -1;

@@ -1,8 +1,11 @@
 package me.shedaniel.math.impl;
 
 import me.shedaniel.math.api.Point;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 
+@Environment(EnvType.CLIENT)
 public class PointHelper {
     public static Point fromMouse() {
         MinecraftClient client = MinecraftClient.getInstance();

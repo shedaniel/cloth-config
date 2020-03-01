@@ -6,6 +6,8 @@ import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.SelectionTopCellEl
 import me.shedaniel.clothconfig2.impl.ConfigEntryBuilderImpl;
 import me.shedaniel.clothconfig2.impl.builders.*;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder.TopCellElementBuilder;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.mixin.client.keybinding.KeyCodeAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
@@ -14,6 +16,7 @@ import net.minecraft.client.util.InputUtil;
 import java.util.List;
 import java.util.function.Function;
 
+@Environment(EnvType.CLIENT)
 public interface ConfigEntryBuilder {
     
     static ConfigEntryBuilder create() {

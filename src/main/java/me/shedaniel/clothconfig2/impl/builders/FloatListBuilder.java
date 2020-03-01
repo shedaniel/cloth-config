@@ -1,6 +1,8 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.gui.entries.FloatListListEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -11,12 +13,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEntry> {
     
     protected Function<Float, Optional<String>> cellErrorSupplier;
     private Consumer<List<Float>> saveConsumer = null;
     private Function<List<Float>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
-    private List<Float> value;
+    private final List<Float> value;
     private boolean expanded = false;
     private Float min = null, max = null;
     private Function<FloatListListEntry, FloatListListEntry.FloatListCell> createNewInstance;

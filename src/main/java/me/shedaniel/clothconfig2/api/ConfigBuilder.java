@@ -2,15 +2,18 @@ package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.clothconfig2.impl.ConfigBuilderImpl;
 import me.shedaniel.clothconfig2.impl.ConfigEntryBuilderImpl;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.Identifier;
 
 import java.util.function.Consumer;
 
+@Environment(EnvType.CLIENT)
 public interface ConfigBuilder {
     
     @SuppressWarnings("deprecation")
-    public static ConfigBuilder create() {
+    static ConfigBuilder create() {
         return new ConfigBuilderImpl();
     }
     
@@ -18,7 +21,7 @@ public interface ConfigBuilder {
      * @deprecated Use {@link ConfigBuilder#create()}
      */
     @Deprecated
-    public static ConfigBuilder create(Screen parent, String title) {
+    static ConfigBuilder create(Screen parent, String title) {
         return create().setParentScreen(parent).setTitle(title);
     }
     
