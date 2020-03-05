@@ -1,8 +1,10 @@
 package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.clothconfig2.impl.RunSixtyTimesEverySecImpl;
+import org.jetbrains.annotations.ApiStatus;
 
 @Deprecated
+@ApiStatus.ScheduledForRemoval
 public interface RunSixtyTimesEverySec {
     
     void run();

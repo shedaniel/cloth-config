@@ -55,7 +55,7 @@ dependencies {
 
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
 
-    modRuntime "com.lettuce.fudge:notenoughcrashes:$nec_version"
+//    modRuntime "com.lettuce.fudge:notenoughcrashes:$nec_version"
 }
 
 bintray {
