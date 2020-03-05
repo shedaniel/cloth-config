@@ -1,7 +1,7 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
-import me.shedaniel.math.api.Rectangle;
+import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -122,8 +122,8 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
             height = Math.max(10, height);
             int minY = Math.min(Math.max((int) this.getScroll() * (this.bottom - this.top - height) / maxScroll + this.top, this.top), this.bottom - height);
             
-            int bottomc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.fromMouse()) ? 168 : 128;
-            int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.fromMouse()) ? 222 : 172;
+            int bottomc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 168 : 128;
+            int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 222 : 172;
             
             // Black Bar
             buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);

@@ -3,7 +3,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.api.QueuedTooltip;
-import me.shedaniel.math.api.Point;
+import me.shedaniel.math.Point;
 import me.shedaniel.math.api.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

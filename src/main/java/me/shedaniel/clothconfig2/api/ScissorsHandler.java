@@ -17,6 +17,10 @@ public interface ScissorsHandler {
     
     void scissor(Rectangle rectangle);
     
+    default void scissor(me.shedaniel.math.Rectangle rectangle) {
+        scissor(new Rectangle(rectangle));
+    }
+    
     void removeLastScissor();
     
     void applyScissors();

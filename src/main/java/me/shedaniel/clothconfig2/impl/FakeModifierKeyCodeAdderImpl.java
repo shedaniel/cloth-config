@@ -4,9 +4,11 @@ import me.shedaniel.clothconfig2.api.FakeModifierKeyCodeAdder;
 import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.options.KeyBinding;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -22,6 +24,8 @@ public class FakeModifierKeyCodeAdderImpl implements FakeModifierKeyCodeAdder {
     
     @Override
     public List<KeyBinding> getFakeBindings() {
+        if (FabricLoader.getInstance().isModLoaded("amecs"))
+            return Collections.emptyList();
         List<KeyBinding> keyBindings = new ArrayList<>();
         for (Entry entry : entryList) {
             keyBindings.add(new FakeKeyBindings(entry.translationKey, entry.keyCode.get(), entry.defaultKeyCode.get(), entry.category, entry.onChanged));

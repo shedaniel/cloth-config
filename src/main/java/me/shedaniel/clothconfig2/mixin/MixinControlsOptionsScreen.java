@@ -23,7 +23,7 @@ public class MixinControlsOptionsScreen extends GameOptionsScreen {
         super(screen_1, gameOptions_1, text_1);
     }
     
-    @Inject(method = "init", at = @At("HEAD"))
+    @Inject(method = "init()V", at = @At("HEAD"))
     private void initHead(CallbackInfo info) {
         List<KeyBinding> newKeysAll = new ArrayList<>();
         KeyBinding[] var3 = minecraft.options.keysAll;
@@ -38,7 +38,7 @@ public class MixinControlsOptionsScreen extends GameOptionsScreen {
         ((GameOptionsHooks) minecraft.options).cloth_setKeysAll(newKeysAll.toArray(new KeyBinding[0]));
     }
     
-    @Inject(method = "init", at = @At("RETURN"))
+    @Inject(method = "init()V", at = @At("RETURN"))
     private void initReturn(CallbackInfo info) {
         List<KeyBinding> newKeysAll = new ArrayList<>();
         KeyBinding[] var3 = minecraft.options.keysAll;

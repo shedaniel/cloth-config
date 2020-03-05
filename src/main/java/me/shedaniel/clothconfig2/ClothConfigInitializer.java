@@ -14,10 +14,10 @@ import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.impl.client.keybinding.KeyBindingRegistryImpl;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.resource.language.I18n;
@@ -167,6 +167,15 @@ public class ClothConfigInitializer implements ClientModInitializer {
                 ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed to add test config override for ModMenu!", e);
             }
         }
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            try {
+                KeyBindingRegistryImpl.INSTANCE.addCategory("Cloth Test Keybinds");
+                FakeModifierKeyCodeAdder.INSTANCE.registerModifierKeyCode("Cloth Test Keybinds", "Keybind 1",
+                        ModifierKeyCode::unknown, ModifierKeyCode::unknown, System.out::println);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        }
     }
     
     @SuppressWarnings("deprecation")
@@ -184,7 +193,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
         LongSliderEntry scrollDurationEntry = entryBuilder.startLongSlider("option.cloth-config.scrollDuration", scrollDuration, 0, 5000).setTextGetter(integer -> integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms")).setDefaultValue(600).setSaveConsumer(i -> scrollDuration = i).build();
         DoubleListEntry scrollStepEntry = entryBuilder.startDoubleField("option.cloth-config.scrollStep", scrollStep).setDefaultValue(19).setSaveConsumer(i -> scrollStep = i).build();
         LongSliderEntry bounceMultiplierEntry = entryBuilder.startLongSlider("option.cloth-config.bounceBackMultiplier", (long) (bounceBackMultiplier * 1000), -10, 750).setTextGetter(integer -> integer < 0 ? "Value: Disabled" : String.format("Value: %s", integer / 1000d)).setDefaultValue(240).setSaveConsumer(i -> bounceBackMultiplier = i / 1000d).build();
-    
+        
         scrolling.addEntry(new TooltipListEntry<Object>(I18n.translate("option.cloth-config.setDefaultSmoothScroll"), null) {
             final int width = 220;
             private final AbstractButtonWidget buttonWidget = new AbstractPressableButtonWidget(0, 0, 0, 20, getFieldName()) {
@@ -198,26 +207,26 @@ public class ClothConfigInitializer implements ClientModInitializer {
                 }
             };
             private final List<AbstractButtonWidget> children = ImmutableList.of(buttonWidget);
-        
+            
             @Override
             public Object getValue() {
                 return null;
             }
-        
+            
             @Override
             public Optional<Object> getDefaultValue() {
                 return Optional.empty();
             }
-        
+            
             @Override
             public void save() {
             }
-        
+            
             @Override
             public List<? extends Element> children() {
                 return children;
             }
-        
+            
             @Override
             public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
                 super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
@@ -229,7 +238,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
                 this.buttonWidget.render(mouseX, mouseY, delta);
             }
         });
-    
+        
         scrolling.addEntry(new TooltipListEntry<Object>(I18n.translate("option.cloth-config.disableSmoothScroll"), null) {
             final int width = 220;
             private final AbstractButtonWidget buttonWidget = new AbstractPressableButtonWidget(0, 0, 0, 20, getFieldName()) {
@@ -243,26 +252,26 @@ public class ClothConfigInitializer implements ClientModInitializer {
                 }
             };
             private final List<AbstractButtonWidget> children = ImmutableList.of(buttonWidget);
-        
+            
             @Override
             public Object getValue() {
                 return null;
             }
-        
+            
             @Override
             public Optional<Object> getDefaultValue() {
                 return Optional.empty();
             }
-        
+            
             @Override
             public void save() {
             }
-        
+            
             @Override
             public List<? extends Element> children() {
                 return children;
             }
-        
+            
             @Override
             public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
                 super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
