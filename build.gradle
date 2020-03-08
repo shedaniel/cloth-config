@@ -50,8 +50,8 @@ dependencies {
     modApi "net.fabricmc:fabric-loader:${project.loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modApi "me.shedaniel.cloth:basic-math:0.3.0"
-    include "me.shedaniel.cloth:basic-math:0.3.0"
+    modApi "me.shedaniel.cloth:basic-math:0.4.1"
+    include "me.shedaniel.cloth:basic-math:0.4.1"
 
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
 
