@@ -1,5 +1,6 @@
 {
   "text.cloth-config.save_and_done": "Änderungen speichern",
+  "text.cloth-config.apply": "Apply Changes",
   "text.cloth-config.quit_config": "Änderungen nicht gespeichert",
   "text.cloth-config.quit_config_sure": "Sind Sie sicher, dass Sie die Bearbeitung beenden möchten? Änderungen werden nicht gespeichert!",
   "text.cloth-config.cancel_discard": "Änderungen verwerfen und abbrechen",
