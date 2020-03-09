@@ -56,7 +56,7 @@ public abstract class ClothConfigScreen extends Screen {
     private boolean edited;
     private boolean requiresRestart;
     private final boolean confirmSave;
-    private AbstractButtonWidget buttonQuit, buttonSave, buttonLeftTab, buttonRightTab;
+    private AbstractButtonWidget quitButton, saveButton, applyButton, buttonLeftTab, buttonRightTab;
     private Rectangle tabsBounds, tabsLeftBounds, tabsRightBounds;
     private final String title;
     private double tabsMaximumScrolled = -1d;
@@ -185,8 +185,8 @@ public abstract class ClothConfigScreen extends Screen {
     @Deprecated
     public void setEdited(boolean edited) {
         this.edited = edited;
-        buttonQuit.setMessage(edited ? I18n.translate("text.cloth-config.cancel_discard") : I18n.translate("gui.cancel"));
-        buttonSave.active = edited;
+        quitButton.setMessage(edited ? I18n.translate("text.cloth-config.cancel_discard") : I18n.translate("gui.cancel"));
+        saveButton.active = edited;
     }
     
     public void setEdited(boolean edited, boolean requiresRestart) {
@@ -200,6 +200,8 @@ public abstract class ClothConfigScreen extends Screen {
             for (AbstractConfigEntry entry : entries)
                 entry.save();
         save();
+        setEdited(false);
+        requiresRestart = false;
         if (openOtherScreens) {
             if (requiresRestart)
                 ClothConfigScreen.this.minecraft.openScreen(new ClothRequiresRestartScreen(parent));
@@ -220,13 +222,14 @@ public abstract class ClothConfigScreen extends Screen {
         listWidget.setSmoothScrolling(this.smoothScrollingList);
         if (tabbedEntries.size() > selectedTabIndex)
             Lists.newArrayList(tabbedEntries.values()).get(selectedTabIndex).forEach(entry -> listWidget.children().add(entry));
-        addButton(buttonQuit = new ButtonWidget(width / 2 - 154, height - 26, 150, 20, edited ? I18n.translate("text.cloth-config.cancel_discard") : I18n.translate("gui.cancel"), widget -> {
+        int buttonWidths = (width - 50 - 12) / 3;
+        addButton(quitButton = new ButtonWidget(25, height - 26, buttonWidths, 20, edited ? I18n.translate("text.cloth-config.cancel_discard") : I18n.translate("gui.cancel"), widget -> {
             if (confirmSave && edited)
                 minecraft.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), I18n.translate("text.cloth-config.quit_discard"), I18n.translate("gui.cancel")));
             else
                 minecraft.openScreen(parent);
         }));
-        addButton(buttonSave = new AbstractPressableButtonWidget(width / 2 + 4, height - 26, 150, 20, "") {
+        addButton(saveButton = new AbstractPressableButtonWidget(25 + 6 + buttonWidths, height - 26, buttonWidths, 20, "") {
             @Override
             public void onPress() {
                 saveAll(true);
@@ -250,7 +253,19 @@ public abstract class ClothConfigScreen extends Screen {
                 super.render(int_1, int_2, float_1);
             }
         });
-        buttonSave.active = edited;
+        addButton(applyButton = new AbstractPressableButtonWidget(25 + (6 + buttonWidths) * 2, height - 26, buttonWidths, 20, I18n.translate("text.cloth-config.apply")) {
+            @Override
+            public void onPress() {
+                saveAll(false);
+            }
+            
+            @Override
+            public void render(int int_1, int int_2, float float_1) {
+                active = saveButton.active;
+                super.render(int_1, int_2, float_1);
+            }
+        });
+        saveButton.active = edited;
         if (isShowingTabs()) {
             tabsBounds = new Rectangle(0, 41, width, 24);
             tabsLeftBounds = new Rectangle(0, 41, 18, 24);
