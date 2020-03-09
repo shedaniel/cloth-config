@@ -1,5 +1,6 @@
 {
   "text.cloth-config.save_and_done": "Сохранить изменения",
+  "text.cloth-config.apply": "Apply Changes",
   "text.cloth-config.quit_config": "Изменения не сохранены",
   "text.cloth-config.quit_config_sure": "Вы уверены, что хотите выйти из редактирования настроек? Изменения не будут сохранены!",
   "text.cloth-config.cancel_discard": "Вернуться и отменить изменения",

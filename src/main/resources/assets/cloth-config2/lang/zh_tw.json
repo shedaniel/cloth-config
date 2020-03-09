@@ -1,5 +1,6 @@
 {
-  "text.cloth-config.save_and_done": "完成",
+  "text.cloth-config.save_and_done": "保存并退出",
+  "text.cloth-config.apply": "套用變更",
   "text.cloth-config.quit_config": "更改尚未保存",
   "text.cloth-config.quit_config_sure": "您確定要取消編輯嗎？更改將不會被保存！",
   "text.cloth-config.cancel_discard": "放棄變更",
@@ -28,12 +29,12 @@
   "modifier.cloth-config.alt": "Alt + %s",
   "modifier.cloth-config.ctrl": "Ctrl + %s",
   "modifier.cloth-config.shift": "Shift + %s",
-  "title.cloth-config.config": "Cloth Mod Config Config",
-  "category.cloth-config.scrolling": "Scrolling",
-  "category.cloth-config.testing": "Config Demo",
-  "option.cloth-config.scrollDuration": "Scroll Duration",
-  "option.cloth-config.scrollStep": "Scroll Step",
-  "option.cloth-config.bounceBackMultiplier": "Bounce Multiplier",
-  "option.cloth-config.setDefaultSmoothScroll": "Set Default Smooth Scroll",
-  "option.cloth-config.disableSmoothScroll": "Disable Smooth Scroll"
+  "title.cloth-config.config": "Cloth Mod Config 設定",
+  "category.cloth-config.scrolling": "滑動",
+  "category.cloth-config.testing": "設定試用",
+  "option.cloth-config.scrollDuration": "滑動持續時間",
+  "option.cloth-config.scrollStep": "滑動距離",
+  "option.cloth-config.bounceBackMultiplier": "反彈乘數",
+  "option.cloth-config.setDefaultSmoothScroll": "設置預設滑動",
+  "option.cloth-config.disableSmoothScroll": "禁用滑動"
 }
