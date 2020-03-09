@@ -1,5 +1,6 @@
 {
   "text.cloth-config.save_and_done": "Salvesta muutused",
+  "text.cloth-config.apply": "Apply Changes",
   "text.cloth-config.quit_config": "Muutused on salvestamata",
   "text.cloth-config.quit_config_sure": "Kas soovid kindlasti seadistuste muutmisest väljuda? Sinu muutusi ei salvestata!",
   "text.cloth-config.cancel_discard": "Loobu ja tühista muutused",

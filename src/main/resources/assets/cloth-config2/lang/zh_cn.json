@@ -1,5 +1,6 @@
 {
   "text.cloth-config.save_and_done": "完成",
+  "text.cloth-config.apply": "Apply Changes",
   "text.cloth-config.quit_config": "更改尚未保存",
   "text.cloth-config.quit_config_sure": "您确定要取消编辑吗？更改将不会被保存！",
   "text.cloth-config.cancel_discard": "放弃变更",
