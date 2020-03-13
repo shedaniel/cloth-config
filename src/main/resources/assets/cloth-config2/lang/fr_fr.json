@@ -1,6 +1,6 @@
 {
   "text.cloth-config.save_and_done": "Sauvegarder",
-  "text.cloth-config.apply": "Apply Changes",
+  "text.cloth-config.apply": "Appliquer les modifications",
   "text.cloth-config.quit_config": "Modifications non sauvegardées",
   "text.cloth-config.quit_config_sure": "Voulez-vous quitter l'écran de configuration? Les modifications ne seront pas sauvegardées!",
   "text.cloth-config.cancel_discard": "Annuler les modifications",
