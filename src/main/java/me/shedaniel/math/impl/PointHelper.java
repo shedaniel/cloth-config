@@ -1,6 +1,6 @@
 package me.shedaniel.math.impl;
 
-import me.shedaniel.math.api.Point;
+import me.shedaniel.math.Point;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;

@@ -1,5 +1,12 @@
 package me.shedaniel.math.api;
 
+import org.jetbrains.annotations.ApiStatus;
+
+/**
+ * @deprecated Use {@link me.shedaniel.math.Dimension}
+ */
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class Dimension extends me.shedaniel.math.Dimension {
     public Dimension() {
         super();

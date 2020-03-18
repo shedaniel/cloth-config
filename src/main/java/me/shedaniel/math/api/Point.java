@@ -1,5 +1,12 @@
 package me.shedaniel.math.api;
 
+import org.jetbrains.annotations.ApiStatus;
+
+/**
+ * @deprecated Use {@link me.shedaniel.math.Point}
+ */
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class Point extends me.shedaniel.math.Point {
     public Point() {
         super();

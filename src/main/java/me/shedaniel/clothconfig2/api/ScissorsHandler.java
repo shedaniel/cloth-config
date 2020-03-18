@@ -1,7 +1,7 @@
 package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.clothconfig2.impl.ScissorsHandlerImpl;
-import me.shedaniel.math.api.Rectangle;
+import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -16,10 +16,6 @@ public interface ScissorsHandler {
     List<Rectangle> getScissorsAreas();
     
     void scissor(Rectangle rectangle);
-    
-    default void scissor(me.shedaniel.math.Rectangle rectangle) {
-        scissor(new Rectangle(rectangle));
-    }
     
     void removeLastScissor();
     

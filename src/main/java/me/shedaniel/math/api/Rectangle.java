@@ -1,5 +1,12 @@
 package me.shedaniel.math.api;
 
+import org.jetbrains.annotations.ApiStatus;
+
+/**
+ * @deprecated Use {@link me.shedaniel.math.Rectangle}
+ */
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class Rectangle extends me.shedaniel.math.Rectangle {
     public Rectangle() {
         super();
