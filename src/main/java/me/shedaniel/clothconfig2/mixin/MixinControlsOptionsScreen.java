@@ -26,7 +26,7 @@ public class MixinControlsOptionsScreen extends GameOptionsScreen {
     @Inject(method = "init()V", at = @At("HEAD"))
     private void initHead(CallbackInfo info) {
         List<KeyBinding> newKeysAll = new ArrayList<>();
-        KeyBinding[] var3 = minecraft.options.keysAll;
+        KeyBinding[] var3 = client.options.keysAll;
         
         for (KeyBinding binding : var3) {
             if (!(binding instanceof FakeKeyBindings)) {
@@ -35,18 +35,18 @@ public class MixinControlsOptionsScreen extends GameOptionsScreen {
         }
         
         newKeysAll.addAll(FakeModifierKeyCodeAdder.INSTANCE.getFakeBindings());
-        ((GameOptionsHooks) minecraft.options).cloth_setKeysAll(newKeysAll.toArray(new KeyBinding[0]));
+        ((GameOptionsHooks) client.options).cloth_setKeysAll(newKeysAll.toArray(new KeyBinding[0]));
     }
     
     @Inject(method = "init()V", at = @At("RETURN"))
     private void initReturn(CallbackInfo info) {
         List<KeyBinding> newKeysAll = new ArrayList<>();
-        KeyBinding[] var3 = minecraft.options.keysAll;
+        KeyBinding[] var3 = client.options.keysAll;
         for (KeyBinding binding : var3) {
             if (!(binding instanceof FakeKeyBindings)) {
                 newKeysAll.add(binding);
             }
         }
-        ((GameOptionsHooks) minecraft.options).cloth_setKeysAll(newKeysAll.toArray(new KeyBinding[0]));
+        ((GameOptionsHooks) client.options).cloth_setKeysAll(newKeysAll.toArray(new KeyBinding[0]));
     }
 }

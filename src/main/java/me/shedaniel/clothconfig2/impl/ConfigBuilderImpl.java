@@ -31,7 +31,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean doesProcessErrors = true;
     private boolean doesConfirmSave = true;
     private boolean transparentBackground = false;
-    private Identifier defaultBackground = DrawableHelper.BACKGROUND_LOCATION;
+    private Identifier defaultBackground = DrawableHelper.BACKGROUND_TEXTURE;
     private Consumer<Screen> afterInitConsumer = screen -> {};
     private final Map<String, Identifier> categoryBackground = Maps.newHashMap();
     private final Map<String, List<Pair<String, Object>>> dataMap = Maps.newLinkedHashMap();

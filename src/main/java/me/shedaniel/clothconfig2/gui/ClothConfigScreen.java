@@ -204,9 +204,9 @@ public abstract class ClothConfigScreen extends Screen {
         requiresRestart = false;
         if (openOtherScreens) {
             if (requiresRestart)
-                ClothConfigScreen.this.minecraft.openScreen(new ClothRequiresRestartScreen(parent));
+                ClothConfigScreen.this.client.openScreen(new ClothRequiresRestartScreen(parent));
             else
-                ClothConfigScreen.this.minecraft.openScreen(parent);
+                ClothConfigScreen.this.client.openScreen(parent);
         }
     }
     
@@ -218,16 +218,16 @@ public abstract class ClothConfigScreen extends Screen {
         if (listWidget != null)
             tabbedEntries.put(tabs.get(selectedTabIndex).getLeft(), (List) listWidget.children());
         selectedTabIndex = nextTabIndex;
-        children.add(listWidget = new ListWidget(minecraft, width, height, isShowingTabs() ? 70 : 30, height - 32, getBackgroundLocation()));
+        children.add(listWidget = new ListWidget(client, width, height, isShowingTabs() ? 70 : 30, height - 32, getBackgroundLocation()));
         listWidget.setSmoothScrolling(this.smoothScrollingList);
         if (tabbedEntries.size() > selectedTabIndex)
             Lists.newArrayList(tabbedEntries.values()).get(selectedTabIndex).forEach(entry -> listWidget.children().add(entry));
         int buttonWidths = (width - 50 - 12) / 3;
         addButton(quitButton = new ButtonWidget(25, height - 26, buttonWidths, 20, edited ? I18n.translate("text.cloth-config.cancel_discard") : I18n.translate("gui.cancel"), widget -> {
             if (confirmSave && edited)
-                minecraft.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), I18n.translate("text.cloth-config.quit_discard"), I18n.translate("gui.cancel")));
+                client.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), I18n.translate("text.cloth-config.quit_discard"), I18n.translate("gui.cancel")));
             else
-                minecraft.openScreen(parent);
+                client.openScreen(parent);
         }));
         addButton(saveButton = new AbstractPressableButtonWidget(25 + 6 + buttonWidths, height - 26, buttonWidths, 20, "") {
             @Override
@@ -280,13 +280,13 @@ public abstract class ClothConfigScreen extends Screen {
                 
                 @Override
                 public void renderButton(int int_1, int int_2, float float_1) {
-                    minecraft.getTextureManager().bindTexture(CONFIG_TEX);
+                    client.getTextureManager().bindTexture(CONFIG_TEX);
                     RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
                     int int_3 = this.getYImage(this.isHovered());
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
-                    this.blit(x, y, 12, 18 * int_3, width, height);
+                    this.drawTexture(x, y, 12, 18 * int_3, width, height);
                 }
             });
             int j = 0;
@@ -305,13 +305,13 @@ public abstract class ClothConfigScreen extends Screen {
                 
                 @Override
                 public void renderButton(int int_1, int int_2, float float_1) {
-                    minecraft.getTextureManager().bindTexture(CONFIG_TEX);
+                    client.getTextureManager().bindTexture(CONFIG_TEX);
                     RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
                     int int_3 = this.getYImage(this.isHovered());
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
-                    this.blit(x, y, 0, 18 * int_3, width, height);
+                    this.drawTexture(x, y, 0, 18 * int_3, width, height);
                 }
             });
         } else {
@@ -395,7 +395,7 @@ public abstract class ClothConfigScreen extends Screen {
             child.lateRender(int_1, int_2, float_1);
         ScissorsHandler.INSTANCE.removeLastScissor();
         if (isShowingTabs()) {
-            drawCenteredString(minecraft.textRenderer, title, width / 2, 18, -1);
+            drawCenteredString(client.textRenderer, title, width / 2, 18, -1);
             Rectangle onlyInnerTabBounds = new Rectangle(tabsBounds.x + 20, tabsBounds.y, tabsBounds.width - 40, tabsBounds.height);
             ScissorsHandler.INSTANCE.scissor(onlyInnerTabBounds);
             if (isTransparentBackground())
@@ -408,7 +408,7 @@ public abstract class ClothConfigScreen extends Screen {
             buttonLeftTab.render(int_1, int_2, float_1);
             buttonRightTab.render(int_1, int_2, float_1);
         } else
-            drawCenteredString(minecraft.textRenderer, title, width / 2, 12, -1);
+            drawCenteredString(client.textRenderer, title, width / 2, 12, -1);
         
         if (displayErrors && isEditable()) {
             List<String> errors = Lists.newArrayList();
@@ -417,26 +417,26 @@ public abstract class ClothConfigScreen extends Screen {
                     if (entry.getConfigError().isPresent())
                         errors.add(((Optional<String>) entry.getConfigError()).get());
             if (errors.size() > 0) {
-                minecraft.getTextureManager().bindTexture(CONFIG_TEX);
+                client.getTextureManager().bindTexture(CONFIG_TEX);
                 RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
                 String text = "§c" + (errors.size() == 1 ? errors.get(0) : I18n.translate("text.cloth-config.multi_error"));
                 if (isTransparentBackground()) {
-                    int stringWidth = minecraft.textRenderer.getStringWidth(text);
-                    fillGradient(8, 9, 20 + stringWidth, 14 + minecraft.textRenderer.fontHeight, 0x68000000, 0x68000000);
+                    int stringWidth = client.textRenderer.getStringWidth(text);
+                    fillGradient(8, 9, 20 + stringWidth, 14 + client.textRenderer.fontHeight, 0x68000000, 0x68000000);
                 }
-                blit(10, 10, 0, 54, 3, 11);
-                drawString(minecraft.textRenderer, text, 18, 12, -1);
+                drawTexture(10, 10, 0, 54, 3, 11);
+                drawString(client.textRenderer, text, 18, 12, -1);
             }
         } else if (!isEditable()) {
-            minecraft.getTextureManager().bindTexture(CONFIG_TEX);
+            client.getTextureManager().bindTexture(CONFIG_TEX);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             String text = "§c" + I18n.translate("text.cloth-config.not_editable");
             if (isTransparentBackground()) {
-                int stringWidth = minecraft.textRenderer.getStringWidth(text);
-                fillGradient(8, 9, 20 + stringWidth, 14 + minecraft.textRenderer.fontHeight, 0x68000000, 0x68000000);
+                int stringWidth = client.textRenderer.getStringWidth(text);
+                fillGradient(8, 9, 20 + stringWidth, 14 + client.textRenderer.fontHeight, 0x68000000, 0x68000000);
             }
-            blit(10, 10, 0, 54, 3, 11);
-            drawString(minecraft.textRenderer, text, 18, 12, -1);
+            drawTexture(10, 10, 0, 54, 3, 11);
+            drawString(client.textRenderer, text, 18, 12, -1);
         }
         super.render(int_1, int_2, float_1);
         queuedTooltips.forEach(queuedTooltip -> renderTooltip(queuedTooltip.getText(), queuedTooltip.getX(), queuedTooltip.getY()));
@@ -479,7 +479,7 @@ public abstract class ClothConfigScreen extends Screen {
             return;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        minecraft.getTextureManager().bindTexture(getBackgroundLocation());
+        client.getTextureManager().bindTexture(getBackgroundLocation());
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         float f = 32.0F;
         buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
@@ -602,9 +602,9 @@ public abstract class ClothConfigScreen extends Screen {
             return true;
         if (int_1 == 256 && this.shouldCloseOnEsc()) {
             if (confirmSave && edited)
-                minecraft.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), I18n.translate("text.cloth-config.quit_discard"), I18n.translate("gui.cancel")));
+                client.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), I18n.translate("text.cloth-config.quit_discard"), I18n.translate("gui.cancel")));
             else
-                minecraft.openScreen(parent);
+                client.openScreen(parent);
             return true;
         }
         return super.keyPressed(int_1, int_2, int_3);
@@ -626,9 +626,9 @@ public abstract class ClothConfigScreen extends Screen {
         @Override
         public void accept(boolean t) {
             if (!t)
-                minecraft.openScreen(ClothConfigScreen.this);
+                client.openScreen(ClothConfigScreen.this);
             else
-                minecraft.openScreen(parent);
+                client.openScreen(parent);
         }
     }
     
