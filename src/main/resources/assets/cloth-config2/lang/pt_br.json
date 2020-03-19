@@ -3,7 +3,7 @@
   "text.cloth-config.apply": "Aplicar alterações",
   "text.cloth-config.quit_config": "As alterações não foram guardadas",
   "text.cloth-config.quit_config_sure": "Tem certeza que deseja sair da edição? As alterações não serão guardadas!",
-  "text.cloth-config.cancel_discard": "Cancel & Discard Changes",
+  "text.cloth-config.cancel_discard": "Descartar alterações",
   "text.cloth-config.quit_discard": "Sair e descartar alterações",
   "text.cloth-config.config": "Configuração",
   "text.cloth-config.multi_error": "Múltiplos problemas!",
