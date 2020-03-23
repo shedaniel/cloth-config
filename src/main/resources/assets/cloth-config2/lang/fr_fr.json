@@ -33,7 +33,7 @@
   "category.cloth-config.scrolling": "Défilement",
   "category.cloth-config.testing": "Démo de configuration",
   "option.cloth-config.scrollDuration": "Durée de défilement",
-  "option.cloth-config.scrollStep": "Cran, de défilement",
+  "option.cloth-config.scrollStep": "Pas du défilement",
   "option.cloth-config.bounceBackMultiplier": "Multiplicateur du rebond",
   "option.cloth-config.setDefaultSmoothScroll": "Définir le défilement régulier par défaut",
   "option.cloth-config.disableSmoothScroll": "Désactiver le défilement régulier"
