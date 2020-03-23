@@ -44,7 +44,9 @@ public interface ConfigEntryBuilder {
     BooleanToggleBuilder startBooleanToggle(String fieldNameKey, boolean value);
     
     StringFieldBuilder startStrField(String fieldNameKey, String value);
-    
+
+    ColorFieldBuilder startColorField(String fieldNameKey, int value);
+
     TextFieldBuilder startTextField(String fieldNameKey, String value);
     
     TextDescriptionBuilder startTextDescription(String value);
