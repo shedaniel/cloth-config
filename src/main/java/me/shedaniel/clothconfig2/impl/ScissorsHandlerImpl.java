@@ -70,7 +70,9 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
     public void applyScissors() {
         if (!scissorsAreas.isEmpty()) {
             Rectangle r = scissorsAreas.get(0).clone();
-            scissorsAreas.stream().skip(1L).forEach(rectangle -> r.setBounds(r.intersects(rectangle) ? r.intersection(rectangle) : new Rectangle()));
+            for (int i = 1; i < scissorsAreas.size(); i++) {
+                r.setBounds(r.intersection(scissorsAreas.get(i)));
+            }
             Window window = MinecraftClient.getInstance().getWindow();
             double scaleFactor = window.getScaleFactor();
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
