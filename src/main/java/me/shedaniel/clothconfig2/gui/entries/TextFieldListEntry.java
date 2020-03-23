@@ -53,7 +53,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         textFieldWidget.setMaxLength(999999);
         textFieldWidget.setText(String.valueOf(original));
         textFieldWidget.setChangedListener(s -> {
-            if (!original.equals(s))
+            if (getScreen() != null && !original.equals(s))
                 getScreen().setEdited(true, isRequiresRestart());
         });
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {

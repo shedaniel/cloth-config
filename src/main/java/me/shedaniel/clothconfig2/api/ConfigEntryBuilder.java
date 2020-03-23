@@ -45,6 +45,12 @@ public interface ConfigEntryBuilder {
     
     StringFieldBuilder startStrField(String fieldNameKey, String value);
     
+    ColorFieldBuilder startColorField(String fieldNameKey, int value);
+    
+    default ColorFieldBuilder startAlphaColorField(String fieldNameKey, int value) {
+        return startColorField(fieldNameKey, value).setAlphaMode(true);
+    }
+    
     TextFieldBuilder startTextField(String fieldNameKey, String value);
     
     TextDescriptionBuilder startTextDescription(String value);

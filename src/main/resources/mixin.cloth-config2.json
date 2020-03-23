@@ -3,13 +3,7 @@
   "package": "me.shedaniel.clothconfig2.mixin",
   "minVersion": "0.7.11",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [],
-  "client": [
-    "MixinControlsOptionsScreen",
-    "MixinGameOptions",
-    "MixinKeyBinding",
-    "MouseHooks"
-  ],
+  "client": ["ButtonWidgetHooks", "MixinControlsOptionsScreen", "MixinGameOptions", "MixinKeyBinding", "MouseHooks"],
   "injectors": {
     "defaultRequire": 1
   }

@@ -1,7 +1,7 @@
 import java.text.SimpleDateFormat
 
 plugins {
-    id 'fabric-loom' version '0.2.6-SNAPSHOT'
+    id 'fabric-loom' version '0.2.7-SNAPSHOT'
     id 'maven-publish'
     id 'maven'
     id 'signing'
@@ -23,7 +23,7 @@ sourceCompatibility = targetCompatibility = 1.8
 
 group = "me.shedaniel.cloth"
 archivesBaseName = "config-2"
-version = (project.mod_version as String).contains("unstable") ? (project.mod_version + "." + buildTime()) : project.mod_version as String
+version = project.mod_version
 
 minecraft {
 }
@@ -33,12 +33,6 @@ processResources {
         expand 'version': project.version
     }
     inputs.property "version", project.version
-}
-
-static def buildTime() {
-    def df = new SimpleDateFormat("yyyyMMddHHmm")
-    df.setTimeZone(TimeZone.getTimeZone("UTC"))
-    return df.format(new Date())
 }
 
 dependencies {
@@ -55,7 +49,7 @@ dependencies {
 
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
 
-    modRuntime "com.lettuce.fudge:notenoughcrashes:$nec_version"
+//    modRuntime "com.lettuce.fudge:notenoughcrashes:$nec_version"
 }
 
 bintray {

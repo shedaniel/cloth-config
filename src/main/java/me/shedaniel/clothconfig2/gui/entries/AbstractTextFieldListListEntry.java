@@ -56,7 +56,7 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             widget.setText(Objects.toString(finalValue));
             widget.setChangedListener(s -> {
                 widget.setEditableColor(getPreferredTextColor());
-                if (!Objects.equals(s, Objects.toString(finalValue))) {
+                if (listListEntry.getScreen() != null && !Objects.equals(s, Objects.toString(finalValue))) {
                     this.listListEntry.getScreen().setEdited(true, this.listListEntry.isRequiresRestart());
                 }
             });

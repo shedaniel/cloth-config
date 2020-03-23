@@ -689,7 +689,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             textFieldWidget.setMaxLength(999999);
             textFieldWidget.setText(toStringFunction.apply(value));
             textFieldWidget.setChangedListener(s -> {
-                if (!toStringFunction.apply(value).equals(s))
+                if (getParent() != null && getParent().getScreen() != null && !toStringFunction.apply(value).equals(s))
                     getParent().getScreen().setEdited(true, getParent().isRequiresRestart());
             });
         }

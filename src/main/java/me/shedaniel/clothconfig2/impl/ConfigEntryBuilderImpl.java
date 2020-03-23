@@ -90,6 +90,11 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     public StringFieldBuilder startStrField(String fieldNameKey, String value) {
         return new StringFieldBuilder(resetButtonKey, fieldNameKey, value);
     }
+
+    @Override
+    public ColorFieldBuilder startColorField(String fieldNameKey, int value) {
+        return new ColorFieldBuilder(resetButtonKey, fieldNameKey, value);
+    }
     
     @Override
     public TextFieldBuilder startTextField(String fieldNameKey, String value) {
