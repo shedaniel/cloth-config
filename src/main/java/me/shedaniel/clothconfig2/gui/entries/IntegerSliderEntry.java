@@ -10,6 +10,7 @@ import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,21 +31,25 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     private Function<Integer, String> textGetter = integer -> String.format("Value: %d", integer);
     private List<Element> widgets;
     
+    @ApiStatus.Internal
     @Deprecated
     public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, Consumer<Integer> saveConsumer) {
         this(fieldName, minimum, maximum, value, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer) {
         this(fieldName, minimum, maximum, value, resetButtonKey, defaultValue, saveConsumer, null);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, minimum, maximum, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);

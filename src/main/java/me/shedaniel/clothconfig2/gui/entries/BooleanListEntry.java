@@ -8,6 +8,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,21 +26,25 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     private final Supplier<Boolean> defaultValue;
     private final List<Element> widgets;
     
+    @ApiStatus.Internal
     @Deprecated
     public BooleanListEntry(String fieldName, boolean bool, Consumer<Boolean> saveConsumer) {
         this(fieldName, bool, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public BooleanListEntry(String fieldName, boolean bool, String resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer) {
         this(fieldName, bool, resetButtonKey, defaultValue, saveConsumer, null);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public BooleanListEntry(String fieldName, boolean bool, String resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, bool, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public BooleanListEntry(String fieldName, boolean bool, String resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);

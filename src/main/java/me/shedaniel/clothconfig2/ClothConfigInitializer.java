@@ -11,6 +11,7 @@ import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.clothconfig2.impl.EasingMethod.EasingMethodImpl;
 import me.shedaniel.clothconfig2.impl.EasingMethods;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
+import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -293,8 +294,10 @@ public class ClothConfigInitializer implements ClientModInitializer {
         testing.addEntry(entryBuilder.startDoubleList("A list of Doubles", Arrays.asList(1d, 2d, 3d)).setDefaultValue(Arrays.asList(1d, 2d, 3d)).build());
         testing.addEntry(entryBuilder.startLongList("A list of Longs", Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).build());
         testing.addEntry(entryBuilder.startStrList("A list of Strings", Arrays.asList("abc", "xyz")).setDefaultValue(Arrays.asList("abc", "xyz")).build());
-        testing.addEntry(entryBuilder.startColorField("A color field", 0x00ffff).setDefaultValue(0x00ffff).build());
-        testing.addEntry(entryBuilder.startColorField("An alpha color field", 0xff00ffff).setDefaultValue(0xff00ffff).setAlphaMode(true).build());
+        SubCategoryBuilder colors = entryBuilder.startSubCategory("Colors").setExpanded(true);
+        colors.add(entryBuilder.startColorField("A color field", 0x00ffff).setDefaultValue(0x00ffff).build());
+        colors.add(entryBuilder.startColorField("An alpha color field", 0xff00ffff).setDefaultValue(0xff00ffff).setAlphaMode(true).build());
+        testing.addEntry(colors.build());
         return builder;
     }
     

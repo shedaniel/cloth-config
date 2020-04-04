@@ -429,9 +429,13 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             int y = this.getRowTop(renderIndex);
             int x = this.getRowLeft();
             DiffuseLighting.disable();
-            item.render(renderIndex, y, x, itemWidth, itemHeight, int_3, int_4, this.isMouseOver(int_3, int_4) && Objects.equals(this.getItemAtPosition(int_3, int_4), item), float_1);
+            renderItem(item, renderIndex, y, x, itemWidth, itemHeight, int_3, int_4, this.isMouseOver(int_3, int_4) && Objects.equals(this.getItemAtPosition(int_3, int_4), item), float_1);
         }
         
+    }
+    
+    protected void renderItem(E item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        item.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
     }
     
     protected int getRowLeft() {

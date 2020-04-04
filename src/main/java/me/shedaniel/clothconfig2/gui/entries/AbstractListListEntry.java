@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
  * @param <SELF> the "curiously recurring template pattern" type parameter
  * @see BaseListEntry
  */
-@ApiStatus.Internal
 @Environment(EnvType.CLIENT)
 public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.AbstractListCell<T, C, SELF>, SELF extends AbstractListListEntry<T, C, SELF>> extends BaseListEntry<T, C, SELF> {
     
     protected final BiFunction<T, SELF, C> createNewCell;
     protected Function<T, Optional<String>> cellErrorSupplier;
     
+    @ApiStatus.Internal
     public AbstractListListEntry(String fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, SELF, C> createNewCell) {
         super(fieldName, tooltipSupplier, defaultValue, abstractListListEntry -> createNewCell.apply(null, abstractListListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
         this.createNewCell = createNewCell;

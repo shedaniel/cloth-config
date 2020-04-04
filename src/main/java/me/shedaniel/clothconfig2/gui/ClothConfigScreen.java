@@ -633,7 +633,6 @@ public abstract class ClothConfigScreen extends Screen {
     }
     
     public class ListWidget<R extends DynamicElementListWidget.ElementEntry<R>> extends DynamicElementListWidget<R> {
-        
         public ListWidget(MinecraftClient client, int width, int height, int top, int bottom, Identifier backgroundLocation) {
             super(client, width, height, top, bottom, backgroundLocation);
             visible = false;
@@ -655,6 +654,13 @@ public abstract class ClothConfigScreen extends Screen {
         
         protected final void clearStuff() {
             this.clearItems();
+        }
+        
+        @Override
+        protected void renderItem(R item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+            if (item instanceof AbstractConfigEntry)
+                ((AbstractConfigEntry) item).updateSelected(isSelected);
+            super.renderItem(item, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         }
         
         @Override

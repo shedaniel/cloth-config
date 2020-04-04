@@ -32,4 +32,6 @@ public abstract class BaseListCell extends AbstractParentElement {
     
     public abstract void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta);
     
+    public void updateSelected(boolean isSelected) {}
+    
 }

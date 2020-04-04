@@ -31,6 +31,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     private boolean expanded;
     
     @ApiStatus.Internal
+    @Deprecated
     public MultiElementListEntry(String categoryName, T object, List<AbstractConfigListEntry<?>> entries, boolean defaultExpanded) {
         super(categoryName, null);
         this.categoryName = categoryName;

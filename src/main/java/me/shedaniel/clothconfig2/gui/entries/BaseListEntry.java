@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
  * @param <SELF> the "curiously recurring template pattern" type parameter
  * @implNote See <a href="https://stackoverflow.com/questions/7354740/is-there-a-way-to-refer-to-the-current-type-with-a-type-variable">Is there a way to refer to the current type with a type variable?</href> on Stack Overflow.
  */
-@ApiStatus.Internal
 @Environment(EnvType.CLIENT)
 public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends BaseListEntry<T, C, SELF>> extends TooltipListEntry<List<T>> {
     
@@ -50,16 +49,19 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     @NotNull protected Supplier<List<T>> defaultValue;
     @Nullable protected String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
     
+    @ApiStatus.Internal
     @Deprecated
     public BaseListEntry(@NotNull String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, String resetButtonKey) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, false);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public BaseListEntry(@NotNull String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, requiresRestart, true, true);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public BaseListEntry(@NotNull String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, tooltipSupplier, requiresRestart);
@@ -212,6 +214,13 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                 cell.render(-1, yy, x + 14, entryWidth - 14, cell.getCellHeight(), mouseX, mouseY, getParent().getFocused() != null && getParent().getFocused().equals(this) && getFocused() != null && getFocused().equals(cell), delta);
                 yy += cell.getCellHeight();
             }
+        }
+    }
+    
+    @Override
+    public void updateSelected(boolean isSelected) {
+        for (C cell : cells) {
+            cell.updateSelected(isSelected && getFocused() == cell && expanded);
         }
     }
     

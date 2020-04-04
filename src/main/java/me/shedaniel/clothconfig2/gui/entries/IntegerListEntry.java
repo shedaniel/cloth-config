@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -27,11 +28,13 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
     private int minimum, maximum;
     private Consumer<Integer> saveConsumer;
     
+    @ApiStatus.Internal
     @Deprecated
     public IntegerListEntry(String fieldName, Integer value, Consumer<Integer> saveConsumer) {
         this(fieldName, value, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public IntegerListEntry(String fieldName, Integer value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
@@ -40,11 +43,13 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
         this.saveConsumer = saveConsumer;
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public IntegerListEntry(String fieldName, Integer value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public IntegerListEntry(String fieldName, Integer value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);

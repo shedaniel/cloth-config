@@ -47,6 +47,8 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
         return screen;
     }
     
+    public void updateSelected(boolean isSelected) {}
+    
     @Deprecated
     public final void setScreen(ClothConfigScreen screen) {
         this.screen = screen;
