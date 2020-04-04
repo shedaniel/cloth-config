@@ -15,6 +15,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -116,8 +117,15 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
+    public void updateSelected(boolean isSelected) {
+        for (AbstractConfigListEntry<?> entry : entries) {
+            entry.updateSelected(expanded && isSelected && getFocused() == entry);
+        }
+    }
+    
+    @Override
     public List<? extends Element> children() {
-        return children;
+        return expanded ? children : Collections.singletonList(widget);
     }
     
     @Override

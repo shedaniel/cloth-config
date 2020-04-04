@@ -20,6 +20,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -136,6 +137,11 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     
     @Override
     public List<? extends Element> children() {
+        if (!expanded) {
+            List<Element> elements = new ArrayList<>(widgets);
+            elements.removeAll(cells);
+            return elements;
+        }
         return widgets;
     }
     

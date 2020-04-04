@@ -14,6 +14,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -119,7 +120,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     
     @Override
     public List<? extends Element> children() {
-        return children;
+        return expanded ? children : Collections.singletonList(widget);
     }
     
     @Override
