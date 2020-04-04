@@ -84,9 +84,16 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         if (expanded) {
             int yy = y + 24;
             for (AbstractConfigListEntry<?> entry : entries) {
-                entry.render(-1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isSelected, delta);
+                entry.render(-1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isSelected && getFocused() == entry, delta);
                 yy += entry.getItemHeight();
             }
+        }
+    }
+    
+    @Override
+    public void updateSelected(boolean isSelected) {
+        for (AbstractConfigListEntry<?> entry : entries) {
+            entry.updateSelected(expanded && isSelected && getFocused() == entry);
         }
     }
     

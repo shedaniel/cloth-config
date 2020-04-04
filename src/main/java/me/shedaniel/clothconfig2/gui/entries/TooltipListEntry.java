@@ -5,6 +5,7 @@ import me.shedaniel.clothconfig2.api.QueuedTooltip;
 import me.shedaniel.math.Point;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -15,11 +16,13 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     
     @Nullable private Supplier<Optional<String[]>> tooltipSupplier;
     
+    @ApiStatus.Internal
     @Deprecated
     public TooltipListEntry(String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, tooltipSupplier, false);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public TooltipListEntry(String fieldName, @Nullable Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, requiresRestart);

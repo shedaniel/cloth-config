@@ -25,6 +25,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +43,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     @NotNull private Supplier<T> defaultValue;
     @Nullable private Consumer<T> saveConsumer;
     
+    @ApiStatus.Internal
     @Deprecated
     public DropdownBoxEntry(String fieldName, @NotNull String resetButtonKey, @Nullable Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart, @Nullable Supplier<T> defaultValue, @Nullable Consumer<T> saveConsumer, @Nullable Iterable<T> selections, @NotNull SelectionTopCellElement<T> topRenderer, @NotNull SelectionCellCreator<T> cellCreator) {
         super(I18n.translate(fieldName), tooltipSupplier, requiresRestart);

@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -27,11 +28,13 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     private long minimum, maximum;
     private Consumer<Long> saveConsumer;
     
+    @ApiStatus.Internal
     @Deprecated
     public LongListEntry(String fieldName, Long value, Consumer<Long> saveConsumer) {
         this(fieldName, value, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public LongListEntry(String fieldName, Long value, String resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
@@ -40,11 +43,14 @@ public class LongListEntry extends TextFieldListEntry<Long> {
         this.saveConsumer = saveConsumer;
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public LongListEntry(String fieldName, Long value, String resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
+    @ApiStatus.Internal
+    @Deprecated
     public LongListEntry(String fieldName, Long value, String resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
         this.minimum = -Long.MAX_VALUE;

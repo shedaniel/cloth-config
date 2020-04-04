@@ -9,6 +9,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,15 +23,22 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     protected Supplier<T> defaultValue;
     protected T original;
     protected List<Element> widgets;
+    private boolean isSelected = false;
     
+    @ApiStatus.Internal
+    @Deprecated
     protected TextFieldListEntry(String fieldName, T original, String resetButtonKey, Supplier<T> defaultValue) {
         this(fieldName, original, resetButtonKey, defaultValue, null);
     }
     
+    @ApiStatus.Internal
+    @Deprecated
     protected TextFieldListEntry(String fieldName, T original, String resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, original, resetButtonKey, defaultValue, tooltipSupplier, false);
     }
     
+    @ApiStatus.Internal
+    @Deprecated
     protected TextFieldListEntry(String fieldName, T original, String resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier);
         this.defaultValue = defaultValue;
@@ -39,7 +47,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
             @Override
             public void render(int int_1, int int_2, float float_1) {
                 boolean f = isFocused();
-                setFocused(TextFieldListEntry.this.getParent().getFocused() == TextFieldListEntry.this && TextFieldListEntry.this.getFocused() == this);
+                setFocused(isSelected);
                 textFieldPreRender(this);
                 super.render(int_1, int_2, float_1);
                 setFocused(f);
@@ -78,6 +86,11 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     
     protected void textFieldPreRender(TextFieldWidget widget) {
     
+    }
+    
+    @Override
+    public void updateSelected(boolean isSelected) {
+        this.isSelected = isSelected;
     }
     
     @Override

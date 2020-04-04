@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@ApiStatus.Internal
 @Environment(EnvType.CLIENT)
 public class SelectionListEntry<T> extends TooltipListEntry<T> {
     
@@ -31,26 +30,31 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     private List<Element> widgets;
     private Function<T, String> nameProvider;
     
+    @ApiStatus.Internal
     @Deprecated
     public SelectionListEntry(String fieldName, T[] valuesArray, T value, Consumer<T> saveConsumer) {
         this(fieldName, valuesArray, value, "text.cloth-config.reset_value", null, saveConsumer);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public SelectionListEntry(String fieldName, T[] valuesArray, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer) {
         this(fieldName, valuesArray, value, resetButtonKey, defaultValue, saveConsumer, null);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public SelectionListEntry(String fieldName, T[] valuesArray, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, String> nameProvider) {
         this(fieldName, valuesArray, value, resetButtonKey, defaultValue, saveConsumer, nameProvider, null);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public SelectionListEntry(String fieldName, T[] valuesArray, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, String> nameProvider, Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, valuesArray, value, resetButtonKey, defaultValue, saveConsumer, nameProvider, tooltipSupplier, false);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public SelectionListEntry(String fieldName, T[] valuesArray, T value, String resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, String> nameProvider, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);

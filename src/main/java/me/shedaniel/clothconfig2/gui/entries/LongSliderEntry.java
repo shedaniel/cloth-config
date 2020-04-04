@@ -10,6 +10,7 @@ import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,21 +31,25 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     private Function<Long, String> textGetter = value -> String.format("Value: %d", value);
     private List<Element> widgets;
     
+    @ApiStatus.Internal
     @Deprecated
     public LongSliderEntry(String fieldName, long minimum, long maximum, long value, Consumer<Long> saveConsumer) {
         this(fieldName, minimum, maximum, value, saveConsumer, "text.cloth-config.reset_value", null);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public LongSliderEntry(String fieldName, long minimum, long maximum, long value, Consumer<Long> saveConsumer, String resetButtonKey, Supplier<Long> defaultValue) {
         this(fieldName, minimum, maximum, value, saveConsumer, resetButtonKey, defaultValue, null);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public LongSliderEntry(String fieldName, long minimum, long maximum, long value, Consumer<Long> saveConsumer, String resetButtonKey, Supplier<Long> defaultValue, Supplier<Optional<String[]>> tooltipSupplier) {
         this(fieldName, minimum, maximum, value, saveConsumer, resetButtonKey, defaultValue, tooltipSupplier, false);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public LongSliderEntry(String fieldName, long minimum, long maximum, long value, Consumer<Long> saveConsumer, String resetButtonKey, Supplier<Long> defaultValue, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);

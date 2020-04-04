@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,16 +18,19 @@ public class TextListEntry extends TooltipListEntry<Object> {
     private int color;
     private String text;
     
+    @ApiStatus.Internal
     @Deprecated
     public TextListEntry(String fieldName, String text) {
         this(fieldName, text, -1);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public TextListEntry(String fieldName, String text, int color) {
         this(fieldName, text, color, null);
     }
     
+    @ApiStatus.Internal
     @Deprecated
     public TextListEntry(String fieldName, String text, int color, Supplier<Optional<String[]>> tooltipSupplier) {
         super(fieldName, tooltipSupplier);
