@@ -14,7 +14,7 @@
   "text.cloth-config.error.not_valid_number_double": "Não é um número válido! (Double)",
   "text.cloth-config.error.too_large": "Muito Grande! (Máximo: %d)",
   "text.cloth-config.error.too_small": "Muito pequeno! (Mínimo: %d)",
-  "text.cloth-config.error.color.no_alpha_allowed": "No Alpha Allowed!",
+  "text.cloth-config.error.color.no_alpha_allowed": "Transparência não permitida!",
   "text.cloth-config.error.color.invalid_alpha": "Not a valid value! (Alpha)",
   "text.cloth-config.error.color.invalid_red": "Not a valid value! (Red)",
   "text.cloth-config.error.color.invalid_green": "Not a valid value! (Green)",
