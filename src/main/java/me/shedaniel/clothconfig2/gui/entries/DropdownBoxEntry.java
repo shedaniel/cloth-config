@@ -34,6 +34,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static me.shedaniel.clothconfig2.ClothConfigInitializer.handleScrollingPosition;
+
 @SuppressWarnings("deprecation")
 @Environment(EnvType.CLIENT)
 public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
@@ -76,6 +78,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         this.selectionElement.bounds.width = 150 - resetButton.getWidth() - 4;
         resetButton.render(mouseX, mouseY, delta);
         selectionElement.render(mouseX, mouseY, delta);
+    }
+    
+    @Override
+    public void updateSelected(boolean isSelected) {
+        selectionElement.topRenderer.isSelected = isSelected;
+        selectionElement.menu.isSelected = isSelected;
     }
     
     @NotNull
@@ -204,6 +212,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     public static abstract class DropdownMenuElement<R> extends AbstractParentElement {
         @Deprecated @NotNull private SelectionCellCreator<R> cellCreator;
         @Deprecated @NotNull private DropdownBoxEntry<R> entry;
+        private boolean isSelected;
         
         @NotNull
         public SelectionCellCreator<R> getCellCreator() {
@@ -227,7 +236,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public abstract int getHeight();
         
         public final boolean isExpanded() {
-            return (getEntry().selectionElement.getFocused() == getEntry().selectionElement.topRenderer || getEntry().selectionElement.getFocused() == getEntry().selectionElement.menu) && getEntry().getFocused() == getEntry().selectionElement && getEntry().getParent().getFocused() == getEntry();
+            return isSelected && this.getEntry().getFocused() == this.getEntry().selectionElement;
         }
         
         @Override
@@ -249,10 +258,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             this.selections = selections;
             this.cells = Lists.newArrayList();
             this.currentElements = Lists.newArrayList();
-        }
-        
-        public final double clamp(double v) {
-            return MathHelper.clamp(v, -SmoothScrollingSettings.CLAMP_EXTENSION, getMaxScrollPosition() + SmoothScrollingSettings.CLAMP_EXTENSION);
         }
         
         public double getMaxScroll() {
@@ -346,16 +351,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         private void updatePosition(float delta) {
-            target = clamp(target);
-            if (target < 0) {
-                target -= target * (1 - ClothConfigInitializer.getBounceBackMultiplier()) * delta / 3;
-            } else if (target > getMaxScrollPosition()) {
-                target = (target - getMaxScrollPosition()) * (1 - (1 - ClothConfigInitializer.getBounceBackMultiplier()) * delta / 3) + getMaxScrollPosition();
-            }
-            if (!Precision.almostEquals(scroll, target, Precision.FLOAT_EPSILON))
-                scroll = (float) Interpolation.expoEase(scroll, target, Math.min((System.currentTimeMillis() - start) / ((double) duration), 1));
-            else
-                scroll = target;
+            double[] target = {this.target};
+            scroll = handleScrollingPosition(target, scroll, getMaxScroll(), delta, start, duration);
+            this.target = target[0];
         }
         
         @Override
@@ -483,7 +481,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         public void scrollTo(double value, boolean animated, long duration) {
-            target = clamp(value);
+            target = ClothConfigInitializer.clamp(value, getMaxScrollPosition());
             
             if (animated) {
                 start = System.currentTimeMillis();
@@ -620,6 +618,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     
     public static abstract class SelectionTopCellElement<R> extends AbstractParentElement {
         @Deprecated private DropdownBoxEntry<R> entry;
+        protected boolean isSelected = false;
         
         public abstract R getValue();
         
@@ -672,10 +671,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             textFieldWidget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 148, 18, "") {
                 @Override
                 public void render(int int_1, int int_2, float float_1) {
-                    boolean f = isFocused();
-                    setFocused(DefaultSelectionTopCellElement.this.getParent().getParent().getFocused() == DefaultSelectionTopCellElement.this.getParent() && DefaultSelectionTopCellElement.this.getParent().getFocused() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.getFocused() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.getFocused() == this);
+                    setFocused(isSelected && DefaultSelectionTopCellElement.this.getParent().getFocused() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.getFocused() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.getFocused() == this);
                     super.render(int_1, int_2, float_1);
-                    setFocused(f);
                 }
                 
                 @Override

@@ -43,13 +43,20 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
     public static abstract class AbstractTextFieldListCell<T, SELF extends AbstractTextFieldListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractTextFieldListListEntry<T, SELF, OUTER_SELF>> extends AbstractListListEntry.AbstractListCell<T, SELF, OUTER_SELF> {
         
         protected TextFieldWidget widget;
+        private boolean isSelected;
         
         public AbstractTextFieldListCell(@Nullable T value, OUTER_SELF listListEntry) {
             super(value, listListEntry);
             
             final T finalValue = substituteDefault(value);
             
-            widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "");
+            widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "") {
+                @Override
+                public void render(int mouseX, int mouseY, float delta) {
+                    setFocused(isSelected);
+                    super.render(mouseX, mouseY, delta);
+                }
+            };
             widget.setTextPredicate(this::isValidText);
             widget.setMaxLength(Integer.MAX_VALUE);
             widget.setHasBorder(false);
@@ -61,7 +68,12 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
                 }
             });
         }
-        
+    
+        @Override
+        public void updateSelected(boolean isSelected) {
+            this.isSelected = isSelected;
+        }
+    
         /**
          * Allows subclasses to substitute default values.
          *

@@ -46,11 +46,11 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         this.textFieldWidget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 148, 18, "") {
             @Override
             public void render(int int_1, int int_2, float float_1) {
-                boolean f = isFocused();
+//                boolean f = isFocused();
                 setFocused(isSelected);
                 textFieldPreRender(this);
                 super.render(int_1, int_2, float_1);
-                setFocused(f);
+//                setFocused(f);
             }
             
             @Override
