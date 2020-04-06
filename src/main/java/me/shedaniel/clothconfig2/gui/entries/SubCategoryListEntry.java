@@ -14,6 +14,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -67,8 +68,8 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     }
     
     @Override
-    public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-        super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+    public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+        super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         widget.rectangle.x = x - 19;
         widget.rectangle.y = y;
         widget.rectangle.width = entryWidth + 19;
@@ -85,7 +86,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         if (expanded) {
             int yy = y + 24;
             for (AbstractConfigListEntry<?> entry : entries) {
-                entry.render(-1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isSelected && getFocused() == entry, delta);
+                entry.render(-1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered && getFocused() == entry, delta);
                 yy += entry.getItemHeight();
             }
         }
@@ -96,6 +97,31 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.updateSelected(expanded && isSelected && getFocused() == entry);
         }
+    }
+    
+    @Override
+    public void lateRender(int mouseX, int mouseY, float delta) {
+        if (expanded) {
+            for (AbstractConfigListEntry<?> entry : entries) {
+                entry.lateRender(mouseX, mouseY, delta);
+            }
+        }
+    }
+    
+    @SuppressWarnings("deprecation")
+    @Override
+    public int getMorePossibleHeight() {
+        if (!expanded) return -1;
+        List<Integer> list = new ArrayList<>();
+        int i = 24;
+        for (AbstractConfigListEntry<?> entry : entries) {
+            i += entry.getItemHeight();
+            if (entry.getMorePossibleHeight() >= 0) {
+                list.add(i + entry.getMorePossibleHeight());
+            }
+        }
+        list.add(i);
+        return list.stream().max(Integer::compare).orElse(0) - getItemHeight();
     }
     
     @Override

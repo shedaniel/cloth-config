@@ -495,7 +495,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         public Entry() {
         }
         
-        public abstract void render(int var1, int var2, int var3, int var4, int var5, int var6, int var7, boolean var8, float var9);
+        public abstract void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta);
         
         public boolean isMouseOver(double double_1, double double_2) {
             return Objects.equals(this.parent.getItemAtPosition(double_1, double_2), this);

@@ -659,7 +659,7 @@ public abstract class ClothConfigScreen extends Screen {
         @Override
         protected void renderItem(R item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             if (item instanceof AbstractConfigEntry)
-                ((AbstractConfigEntry) item).updateSelected(isSelected);
+                ((AbstractConfigEntry) item).updateSelected(getFocused() == item);
             super.renderItem(item, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         }
         

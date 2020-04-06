@@ -15,6 +15,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -92,6 +93,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
             for (AbstractConfigListEntry<?> entry : entries) {
                 entry.render(-1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isSelected, delta);
                 yy += entry.getItemHeight();
+                yy += Math.max(0, entry.getMorePossibleHeight());
             }
         }
     }
@@ -121,6 +123,31 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.updateSelected(expanded && isSelected && getFocused() == entry);
         }
+    }
+    
+    @Override
+    public void lateRender(int mouseX, int mouseY, float delta) {
+        if (expanded) {
+            for (AbstractConfigListEntry<?> entry : entries) {
+                entry.lateRender(mouseX, mouseY, delta);
+            }
+        }
+    }
+    
+    @SuppressWarnings("deprecation")
+    @Override
+    public int getMorePossibleHeight() {
+        if (!expanded) return -1;
+        List<Integer> list = new ArrayList<>();
+        int i = 24;
+        for (AbstractConfigListEntry<?> entry : entries) {
+            i += entry.getItemHeight();
+            if (entry.getMorePossibleHeight() >= 0) {
+                list.add(i + entry.getMorePossibleHeight());
+            }
+        }
+        list.add(i);
+        return list.stream().max(Integer::compare).orElse(0) - getItemHeight();
     }
     
     @Override
