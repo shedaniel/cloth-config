@@ -1,0 +1,13 @@
+modLoader="javafml"
+loaderVersion="[29,)"
+issueTrackerURL="https://github.com/shedaniel/ClothConfig/issues/"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/cloth-config-forge/"
+logoFile="icon.png"
+authors="shedaniel"
+[[mods]]
+modId="cloth-config2"
+version="3.0"
+displayName="Cloth Config v2 API"
+description='''
+An API for config screens.
+'''
