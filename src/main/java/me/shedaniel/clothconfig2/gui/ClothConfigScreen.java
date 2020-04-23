@@ -567,7 +567,7 @@ public abstract class ClothConfigScreen extends Screen {
     
     @Override
     public boolean keyPressed(int int_1, int int_2, int int_3) {
-        if (this.focusedBinding != null && focusedBinding.isAllowKey()) {
+        if (this.focusedBinding != null && (focusedBinding.isAllowKey() || int_1 == 256)) {
             if (int_1 != 256) {
                 if (startedKeyCode.isUnknown())
                     startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
