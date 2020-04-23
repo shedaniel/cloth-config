@@ -9,9 +9,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
@@ -23,14 +25,14 @@ import java.util.Optional;
 public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigListEntry>> {
     
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
-    private String categoryName;
+    private Text categoryName;
     private List<AbstractConfigListEntry> entries;
     private CategoryLabelWidget widget;
     private List<Element> children;
     private boolean expanded;
     
     @Deprecated
-    public SubCategoryListEntry(String categoryName, List<AbstractConfigListEntry> entries, boolean defaultExpanded) {
+    public SubCategoryListEntry(Text categoryName, List<AbstractConfigListEntry> entries, boolean defaultExpanded) {
         super(categoryName, null);
         this.categoryName = categoryName;
         this.entries = entries;
@@ -50,10 +52,10 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     
     @Override
     public void setRequiresRestart(boolean requiresRestart) {
-    
+        
     }
     
-    public String getCategoryName() {
+    public Text getCategoryName() {
         return categoryName;
     }
     
@@ -68,8 +70,8 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     }
     
     @Override
-    public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         widget.rectangle.x = x - 19;
         widget.rectangle.y = y;
         widget.rectangle.width = entryWidth + 19;
@@ -77,8 +79,8 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         DiffuseLighting.disable();
         RenderSystem.color4f(1, 1, 1, 1);
-        drawTexture(x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(categoryName), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        drawTexture(matrices, x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
+        MinecraftClient.getInstance().textRenderer.method_27517(matrices, categoryName, x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent(getParent());
             entry.setScreen(getScreen());
@@ -86,7 +88,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         if (expanded) {
             int yy = y + 24;
             for (AbstractConfigListEntry<?> entry : entries) {
-                entry.render(-1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered && getFocused() == entry, delta);
+                entry.render(matrices, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered && getFocused() == entry, delta);
                 yy += entry.getItemHeight();
             }
         }
@@ -100,10 +102,10 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     }
     
     @Override
-    public void lateRender(int mouseX, int mouseY, float delta) {
+    public void lateRender(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (expanded) {
             for (AbstractConfigListEntry<?> entry : entries) {
-                entry.lateRender(mouseX, mouseY, delta);
+                entry.lateRender(matrices, mouseX, mouseY, delta);
             }
         }
     }
@@ -155,12 +157,12 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     }
     
     @Override
-    public Optional<String> getError() {
-        String error = null;
+    public Optional<Text> getError() {
+        Text error = null;
         for (AbstractConfigListEntry<?> entry : entries)
             if (entry.getError().isPresent()) {
                 if (error != null)
-                    return Optional.ofNullable(I18n.translate("text.cloth-config.multi_error"));
+                    return Optional.ofNullable(new TranslatableText("text.cloth-config.multi_error"));
                 return entry.getError();
             }
         return Optional.ofNullable(error);

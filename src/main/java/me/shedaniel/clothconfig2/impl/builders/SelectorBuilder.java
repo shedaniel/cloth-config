@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -15,19 +16,19 @@ import java.util.function.Supplier;
 public class SelectorBuilder<T> extends FieldBuilder<T, SelectionListEntry<T>> {
     
     private Consumer<T> saveConsumer = null;
-    private Function<T, Optional<String[]>> tooltipSupplier = e -> Optional.empty();
+    private Function<T, Optional<Text[]>> tooltipSupplier = e -> Optional.empty();
     private final T value;
     private final T[] valuesArray;
-    private Function<T, String> nameProvider = null;
+    private Function<T, Text> nameProvider = null;
     
-    public SelectorBuilder(String resetButtonKey, String fieldNameKey, T[] valuesArray, T value) {
+    public SelectorBuilder(Text resetButtonKey, Text fieldNameKey, T[] valuesArray, T value) {
         super(resetButtonKey, fieldNameKey);
         Objects.requireNonNull(value);
         this.valuesArray = valuesArray;
         this.value = value;
     }
     
-    public SelectorBuilder<T> setErrorSupplier(Function<T, Optional<String>> errorSupplier) {
+    public SelectorBuilder<T> setErrorSupplier(Function<T, Optional<Text>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -53,27 +54,27 @@ public class SelectorBuilder<T> extends FieldBuilder<T, SelectionListEntry<T>> {
         return this;
     }
     
-    public SelectorBuilder<T> setTooltipSupplier(Function<T, Optional<String[]>> tooltipSupplier) {
+    public SelectorBuilder<T> setTooltipSupplier(Function<T, Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public SelectorBuilder<T> setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public SelectorBuilder<T> setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = e -> tooltipSupplier.get();
         return this;
     }
     
-    public SelectorBuilder<T> setTooltip(Optional<String[]> tooltip) {
+    public SelectorBuilder<T> setTooltip(Optional<Text[]> tooltip) {
         this.tooltipSupplier = e -> tooltip;
         return this;
     }
     
-    public SelectorBuilder<T> setTooltip(String... tooltip) {
+    public SelectorBuilder<T> setTooltip(Text... tooltip) {
         this.tooltipSupplier = e -> Optional.ofNullable(tooltip);
         return this;
     }
     
-    public SelectorBuilder<T> setNameProvider(Function<T, String> enumNameProvider) {
+    public SelectorBuilder<T> setNameProvider(Function<T, Text> enumNameProvider) {
         this.nameProvider = enumNameProvider;
         return this;
     }

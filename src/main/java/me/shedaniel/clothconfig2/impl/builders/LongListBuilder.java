@@ -3,7 +3,8 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.LongListListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,31 +17,31 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry> {
     
-    protected Function<Long, Optional<String>> cellErrorSupplier;
+    protected Function<Long, Optional<Text>> cellErrorSupplier;
     private Consumer<List<Long>> saveConsumer = null;
-    private Function<List<Long>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
+    private Function<List<Long>, Optional<Text[]>> tooltipSupplier = list -> Optional.empty();
     private final List<Long> value;
     private boolean expanded = false;
     private Long min = null, max = null;
     private Function<LongListListEntry, LongListListEntry.LongListCell> createNewInstance;
-    private String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
+    private Text addTooltip = new TranslatableText("text.cloth-config.list.add"), removeTooltip = new TranslatableText("text.cloth-config.list.remove");
     private boolean deleteButtonEnabled = true, insertInFront = true;
     
-    public LongListBuilder(String resetButtonKey, String fieldNameKey, List<Long> value) {
+    public LongListBuilder(Text resetButtonKey, Text fieldNameKey, List<Long> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
-    public Function<Long, Optional<String>> getCellErrorSupplier() {
+    public Function<Long, Optional<Text>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
     
-    public LongListBuilder setCellErrorSupplier(Function<Long, Optional<String>> cellErrorSupplier) {
+    public LongListBuilder setCellErrorSupplier(Function<Long, Optional<Text>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
         return this;
     }
     
-    public LongListBuilder setErrorSupplier(Function<List<Long>, Optional<String>> errorSupplier) {
+    public LongListBuilder setErrorSupplier(Function<List<Long>, Optional<Text>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -55,12 +56,12 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
         return this;
     }
     
-    public LongListBuilder setAddButtonTooltip(String addTooltip) {
+    public LongListBuilder setAddButtonTooltip(Text addTooltip) {
         this.addTooltip = addTooltip;
         return this;
     }
     
-    public LongListBuilder setRemoveButtonTooltip(String removeTooltip) {
+    public LongListBuilder setRemoveButtonTooltip(Text removeTooltip) {
         this.removeTooltip = removeTooltip;
         return this;
     }
@@ -121,22 +122,22 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
         return this;
     }
     
-    public LongListBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public LongListBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = list -> tooltipSupplier.get();
         return this;
     }
     
-    public LongListBuilder setTooltipSupplier(Function<List<Long>, Optional<String[]>> tooltipSupplier) {
+    public LongListBuilder setTooltipSupplier(Function<List<Long>, Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public LongListBuilder setTooltip(Optional<String[]> tooltip) {
+    public LongListBuilder setTooltip(Optional<Text[]> tooltip) {
         this.tooltipSupplier = list -> tooltip;
         return this;
     }
     
-    public LongListBuilder setTooltip(String... tooltip) {
+    public LongListBuilder setTooltip(Text... tooltip) {
         this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }

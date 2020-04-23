@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.api;
 
 import com.google.common.collect.Lists;
 import me.shedaniel.math.Point;
-import org.jetbrains.annotations.ApiStatus;
+import net.minecraft.text.Text;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,33 +10,19 @@ import java.util.List;
 public class QueuedTooltip {
     
     private Point location;
-    private List<String> text;
+    private List<Text> text;
     
-    private QueuedTooltip(Point location, List<String> text) {
+    private QueuedTooltip(Point location, List<Text> text) {
         this.location = location;
         this.text = Collections.unmodifiableList(text);
     }
     
-    public static QueuedTooltip create(me.shedaniel.math.api.Point location, List<String> text) {
+    public static QueuedTooltip create(Point location, List<Text> text) {
         return new QueuedTooltip(location, text);
     }
     
-    public static QueuedTooltip create(me.shedaniel.math.api.Point location, String... text) {
+    public static QueuedTooltip create(Point location, Text... text) {
         return QueuedTooltip.create(location, Lists.newArrayList(text));
-    }
-    
-    public static QueuedTooltip create(Point location, List<String> text) {
-        return new QueuedTooltip(location, text);
-    }
-    
-    public static QueuedTooltip create(Point location, String... text) {
-        return QueuedTooltip.create(location, Lists.newArrayList(text));
-    }
-    
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public me.shedaniel.math.api.Point getLocation() {
-        return new me.shedaniel.math.api.Point(getPoint());
     }
     
     public Point getPoint() {
@@ -44,14 +30,14 @@ public class QueuedTooltip {
     }
     
     public int getX() {
-        return getLocation().x;
+        return location.x;
     }
     
     public int getY() {
-        return getLocation().y;
+        return location.y;
     }
     
-    public List<String> getText() {
+    public List<Text> getText() {
         return text;
     }
     

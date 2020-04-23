@@ -7,8 +7,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -30,15 +33,15 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     
     @ApiStatus.Internal
     @Deprecated
-    public KeyCodeEntry(String fieldName, ModifierKeyCode value, String resetButtonKey, Supplier<ModifierKeyCode> defaultValue, Consumer<ModifierKeyCode> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    public KeyCodeEntry(Text fieldName, ModifierKeyCode value, Text resetButtonKey, Supplier<ModifierKeyCode> defaultValue, Consumer<ModifierKeyCode> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.value = value;
-        this.buttonWidget = new ButtonWidget(0, 0, 150, 20, "", widget -> {
+        this.buttonWidget = new ButtonWidget(0, 0, 150, 20, NarratorManager.EMPTY, widget -> {
             getScreen().setFocusedBinding(this);
             getScreen().setEdited(true, isRequiresRestart());
         });
-        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {
+        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.method_27525(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             KeyCodeEntry.this.value = getDefaultValue().orElse(null);
             getScreen().setFocusedBinding(null);
             getScreen().setEdited(true, isRequiresRestart());
@@ -91,13 +94,13 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
         return Optional.ofNullable(defaultValue).map(Supplier::get);
     }
     
-    private String getLocalizedName() {
+    private Text getLocalizedName() {
         return this.value.getLocalizedName();
     }
     
     @Override
-    public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-        super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         Window window = MinecraftClient.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !getDefaultValue().get().equals(value);
         this.resetButton.y = y;
@@ -105,19 +108,19 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(getLocalizedName());
         if (getScreen().getFocusedBinding() == this)
-            this.buttonWidget.setMessage(Formatting.WHITE + "> " + Formatting.YELLOW + this.buttonWidget.getMessage() + Formatting.WHITE + " <");
+            this.buttonWidget.setMessage(new LiteralText(Formatting.WHITE + "> " + Formatting.YELLOW + this.buttonWidget.getMessage() + Formatting.WHITE + " <"));
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(getFieldName())), y + 5, 16777215);
+            MinecraftClient.getInstance().textRenderer.method_27517(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.method_27525(getFieldName()), y + 5, 16777215);
             this.resetButton.x = x;
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.method_27517(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
         }
         this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
-        resetButton.render(mouseX, mouseY, delta);
-        buttonWidget.render(mouseX, mouseY, delta);
+        resetButton.render(matrices, mouseX, mouseY, delta);
+        buttonWidget.render(matrices, mouseX, mouseY, delta);
     }
     
     @Override

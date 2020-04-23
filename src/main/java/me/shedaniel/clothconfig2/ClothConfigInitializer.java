@@ -21,11 +21,13 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
@@ -181,21 +183,21 @@ public class ClothConfigInitializer implements ClientModInitializer {
     
     @SuppressWarnings("deprecation")
     public static ConfigBuilder getConfigBuilder() {
-        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(MinecraftClient.getInstance().currentScreen).setTitle("title.cloth-config.config");
+        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(MinecraftClient.getInstance().currentScreen).setTitle(new TranslatableText("title.cloth-config.config"));
         builder.setDefaultBackgroundTexture(new Identifier("minecraft:textures/block/oak_planks.png"));
-        ConfigCategory scrolling = builder.getOrCreateCategory("category.cloth-config.scrolling");
+        ConfigCategory scrolling = builder.getOrCreateCategory(new TranslatableText("category.cloth-config.scrolling"));
         ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
-        DropdownBoxEntry<EasingMethod> easingMethodEntry = entryBuilder.startDropdownMenu("Easing Method", DropdownMenuBuilder.TopCellElementBuilder.of(easingMethod, str -> {
+        DropdownBoxEntry<EasingMethod> easingMethodEntry = entryBuilder.startDropdownMenu(new LiteralText("Easing Method"), DropdownMenuBuilder.TopCellElementBuilder.of(easingMethod, str -> {
             for (EasingMethod m : EasingMethods.getMethods())
                 if (m.toString().equals(str))
                     return m;
             return null;
         })).setDefaultValue(EasingMethodImpl.LINEAR).setSaveConsumer(o -> easingMethod = o).setSelections(EasingMethods.getMethods()).build();
-        LongSliderEntry scrollDurationEntry = entryBuilder.startLongSlider("option.cloth-config.scrollDuration", scrollDuration, 0, 5000).setTextGetter(integer -> integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms")).setDefaultValue(600).setSaveConsumer(i -> scrollDuration = i).build();
-        DoubleListEntry scrollStepEntry = entryBuilder.startDoubleField("option.cloth-config.scrollStep", scrollStep).setDefaultValue(19).setSaveConsumer(i -> scrollStep = i).build();
-        LongSliderEntry bounceMultiplierEntry = entryBuilder.startLongSlider("option.cloth-config.bounceBackMultiplier", (long) (bounceBackMultiplier * 1000), -10, 750).setTextGetter(integer -> integer < 0 ? "Value: Disabled" : String.format("Value: %s", integer / 1000d)).setDefaultValue(240).setSaveConsumer(i -> bounceBackMultiplier = i / 1000d).build();
+        LongSliderEntry scrollDurationEntry = entryBuilder.startLongSlider(new TranslatableText("option.cloth-config.scrollDuration"), scrollDuration, 0, 5000).setTextGetter(integer -> new LiteralText(integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms"))).setDefaultValue(600).setSaveConsumer(i -> scrollDuration = i).build();
+        DoubleListEntry scrollStepEntry = entryBuilder.startDoubleField(new TranslatableText("option.cloth-config.scrollStep"), scrollStep).setDefaultValue(19).setSaveConsumer(i -> scrollStep = i).build();
+        LongSliderEntry bounceMultiplierEntry = entryBuilder.startLongSlider(new TranslatableText("option.cloth-config.bounceBackMultiplier"), (long) (bounceBackMultiplier * 1000), -10, 750).setTextGetter(integer -> new LiteralText(integer < 0 ? "Value: Disabled" : String.format("Value: %s", integer / 1000d))).setDefaultValue(240).setSaveConsumer(i -> bounceBackMultiplier = i / 1000d).build();
         
-        scrolling.addEntry(new TooltipListEntry<Object>(I18n.translate("option.cloth-config.setDefaultSmoothScroll"), null) {
+        scrolling.addEntry(new TooltipListEntry<Object>(new TranslatableText("option.cloth-config.setDefaultSmoothScroll"), null) {
             final int width = 220;
             private final AbstractButtonWidget buttonWidget = new AbstractPressableButtonWidget(0, 0, 0, 20, getFieldName()) {
                 @Override
@@ -229,18 +231,18 @@ public class ClothConfigInitializer implements ClientModInitializer {
             }
             
             @Override
-            public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-                super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+            public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+                super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
                 Window window = MinecraftClient.getInstance().getWindow();
                 this.buttonWidget.active = this.isEditable();
                 this.buttonWidget.y = y;
                 this.buttonWidget.x = x + entryWidth / 2 - width / 2;
                 this.buttonWidget.setWidth(width);
-                this.buttonWidget.render(mouseX, mouseY, delta);
+                this.buttonWidget.render(matrices, mouseX, mouseY, delta);
             }
         });
         
-        scrolling.addEntry(new TooltipListEntry<Object>(I18n.translate("option.cloth-config.disableSmoothScroll"), null) {
+        scrolling.addEntry(new TooltipListEntry<Object>(new TranslatableText("option.cloth-config.disableSmoothScroll"), null) {
             final int width = 220;
             private final AbstractButtonWidget buttonWidget = new AbstractPressableButtonWidget(0, 0, 0, 20, getFieldName()) {
                 @Override
@@ -274,14 +276,14 @@ public class ClothConfigInitializer implements ClientModInitializer {
             }
             
             @Override
-            public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-                super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+            public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+                super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
                 Window window = MinecraftClient.getInstance().getWindow();
                 this.buttonWidget.active = this.isEditable();
                 this.buttonWidget.y = y;
                 this.buttonWidget.x = x + entryWidth / 2 - width / 2;
                 this.buttonWidget.setWidth(width);
-                this.buttonWidget.render(mouseX, mouseY, delta);
+                this.buttonWidget.render(matrices, mouseX, mouseY, delta);
             }
         });
         scrolling.addEntry(easingMethodEntry);
@@ -296,21 +298,21 @@ public class ClothConfigInitializer implements ClientModInitializer {
     public static ConfigBuilder getConfigBuilderWithDemo() {
         ConfigBuilder builder = getConfigBuilder();
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-        ConfigCategory testing = builder.getOrCreateCategory("category.cloth-config.testing");
+        ConfigCategory testing = builder.getOrCreateCategory(new TranslatableText("category.cloth-config.testing"));
 //        testing.addEntry(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
-        testing.addEntry(entryBuilder.startKeyCodeField("Cool Key", InputUtil.UNKNOWN_KEYCODE).setDefaultValue(InputUtil.UNKNOWN_KEYCODE).build());
-        testing.addEntry(entryBuilder.startModifierKeyCodeField("Cool Modifier Key", ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).setDefaultValue(ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).build());
-        testing.addEntry(entryBuilder.startDoubleList("A list of Doubles", Arrays.asList(1d, 2d, 3d)).setDefaultValue(Arrays.asList(1d, 2d, 3d)).build());
-        testing.addEntry(entryBuilder.startLongList("A list of Longs", Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).build());
-        testing.addEntry(entryBuilder.startStrList("A list of Strings", Arrays.asList("abc", "xyz")).setDefaultValue(Arrays.asList("abc", "xyz")).build());
-        SubCategoryBuilder colors = entryBuilder.startSubCategory("Colors").setExpanded(true);
-        colors.add(entryBuilder.startColorField("A color field", 0x00ffff).setDefaultValue(0x00ffff).build());
-        colors.add(entryBuilder.startColorField("An alpha color field", 0xff00ffff).setDefaultValue(0xff00ffff).setAlphaMode(true).build());
-        colors.add(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
-        colors.add(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
-        colors.add(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
-        colors.add(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
-        colors.add(entryBuilder.startDropdownMenu("lol apple", DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
+        testing.addEntry(entryBuilder.startKeyCodeField(new LiteralText("Cool Key"), InputUtil.UNKNOWN_KEYCODE).setDefaultValue(InputUtil.UNKNOWN_KEYCODE).build());
+        testing.addEntry(entryBuilder.startModifierKeyCodeField(new LiteralText("Cool Modifier Key"), ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).setDefaultValue(ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).build());
+        testing.addEntry(entryBuilder.startDoubleList(new LiteralText("A list of Doubles"), Arrays.asList(1d, 2d, 3d)).setDefaultValue(Arrays.asList(1d, 2d, 3d)).build());
+        testing.addEntry(entryBuilder.startLongList(new LiteralText("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).build());
+        testing.addEntry(entryBuilder.startStrList(new LiteralText("A list of Strings"), Arrays.asList("abc", "xyz")).setDefaultValue(Arrays.asList("abc", "xyz")).build());
+        SubCategoryBuilder colors = entryBuilder.startSubCategory(new LiteralText("Colors")).setExpanded(true);
+        colors.add(entryBuilder.startColorField(new LiteralText("A color field"), 0x00ffff).setDefaultValue(0x00ffff).build());
+        colors.add(entryBuilder.startColorField(new LiteralText("An alpha color field"), 0xff00ffff).setDefaultValue(0xff00ffff).setAlphaMode(true).build());
+        colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
+        colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
+        colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
+        colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
+        colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
         testing.addEntry(colors.build());
         return builder;
     }

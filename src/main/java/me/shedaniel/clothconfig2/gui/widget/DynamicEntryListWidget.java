@@ -15,8 +15,10 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -155,30 +157,32 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected void clickedHeader(int int_1, int int_2) {
     }
     
-    protected void renderHeader(int int_1, int int_2, Tessellator tessellator) {
+    protected void renderHeader(MatrixStack matrices, int rowLeft, int startY, Tessellator tessellator) {
     }
     
     protected void drawBackground() {
     }
     
-    protected void renderDecorations(int int_1, int int_2) {
+    protected void renderDecorations(MatrixStack matrices, int mouseX, int mouseY) {
     }
     
     @Deprecated
-    protected void renderBackBackground(BufferBuilder buffer, Tessellator tessellator) {
+    protected void renderBackBackground(MatrixStack matrices, BufferBuilder buffer, Tessellator tessellator) {
         this.client.getTextureManager().bindTexture(backgroundLocation);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        Matrix4f matrix = matrices.peek().getModel();
         float float_2 = 32.0F;
         buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-        buffer.vertex(this.left, this.bottom, 0.0D).texture(this.left / 32.0F, ((this.bottom + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).next();
-        buffer.vertex(this.right, this.bottom, 0.0D).texture(this.right / 32.0F, ((this.bottom + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).next();
-        buffer.vertex(this.right, this.top, 0.0D).texture(this.right / 32.0F, ((this.top + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).next();
-        buffer.vertex(this.left, this.top, 0.0D).texture(this.left / 32.0F, ((this.top + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).next();
+        buffer.vertex(matrix, this.left, this.bottom, 0.0F).texture(this.left / 32.0F, ((this.bottom + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).next();
+        buffer.vertex(matrix, this.right, this.bottom, 0.0F).texture(this.right / 32.0F, ((this.bottom + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).next();
+        buffer.vertex(matrix, this.right, this.top, 0.0F).texture(this.right / 32.0F, ((this.top + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).next();
+        buffer.vertex(matrix, this.left, this.top, 0.0F).texture(this.left / 32.0F, ((this.top + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).next();
         tessellator.draw();
     }
     
     @SuppressWarnings("deprecation")
-    public void render(int mouseX, int mouseY, float delta) {
+    @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.drawBackground();
         int scrollbarPosition = this.getScrollbarPosition();
         int int_4 = scrollbarPosition + 6;
@@ -186,38 +190,39 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         RenderSystem.disableFog();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        renderBackBackground(buffer, tessellator);
+        renderBackBackground(matrices, buffer, tessellator);
         int rowLeft = this.getRowLeft();
         int startY = this.top + 4 - (int) this.getScroll();
         if (this.renderSelection)
-            this.renderHeader(rowLeft, startY, tessellator);
+            this.renderHeader(matrices, rowLeft, startY, tessellator);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(left, top, width, bottom - top));
-        this.renderList(rowLeft, startY, mouseX, mouseY, delta);
+        this.renderList(matrices, rowLeft, startY, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
         RenderSystem.disableDepthTest();
-        this.renderHoleBackground(0, this.top, 255, 255);
-        this.renderHoleBackground(this.bottom, this.height, 255, 255);
+        this.renderHoleBackground(matrices, 0, this.top, 255, 255);
+        this.renderHoleBackground(matrices, this.bottom, this.height, 255, 255);
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 0, 1);
         RenderSystem.disableAlphaTest();
         RenderSystem.shadeModel(7425);
         RenderSystem.disableTexture();
+        Matrix4f matrix = matrices.peek().getModel();
         buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-        buffer.vertex(this.left, this.top + 4, 0.0D).texture(0, 1).color(0, 0, 0, 0).next();
-        buffer.vertex(this.right, this.top + 4, 0.0D).texture(1, 1).color(0, 0, 0, 0).next();
-        buffer.vertex(this.right, this.top, 0.0D).texture(1, 0).color(0, 0, 0, 255).next();
-        buffer.vertex(this.left, this.top, 0.0D).texture(0, 0).color(0, 0, 0, 255).next();
+        buffer.vertex(matrix, this.left, this.top + 4, 0.0F).texture(0, 1).color(0, 0, 0, 0).next();
+        buffer.vertex(matrix, this.right, this.top + 4, 0.0F).texture(1, 1).color(0, 0, 0, 0).next();
+        buffer.vertex(matrix, this.right, this.top, 0.0F).texture(1, 0).color(0, 0, 0, 255).next();
+        buffer.vertex(matrix, this.left, this.top, 0.0F).texture(0, 0).color(0, 0, 0, 255).next();
         tessellator.draw();
         buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-        buffer.vertex(this.left, this.bottom, 0.0D).texture(0, 1).color(0, 0, 0, 255).next();
-        buffer.vertex(this.right, this.bottom, 0.0D).texture(1, 1).color(0, 0, 0, 255).next();
-        buffer.vertex(this.right, this.bottom - 4, 0.0D).texture(1, 0).color(0, 0, 0, 0).next();
-        buffer.vertex(this.left, this.bottom - 4, 0.0D).texture(0, 0).color(0, 0, 0, 0).next();
+        buffer.vertex(matrix, this.left, this.bottom, 0.0F).texture(0, 1).color(0, 0, 0, 255).next();
+        buffer.vertex(matrix, this.right, this.bottom, 0.0F).texture(1, 1).color(0, 0, 0, 255).next();
+        buffer.vertex(matrix, this.right, this.bottom - 4, 0.0F).texture(1, 0).color(0, 0, 0, 0).next();
+        buffer.vertex(matrix, this.left, this.bottom - 4, 0.0F).texture(0, 0).color(0, 0, 0, 0).next();
         tessellator.draw();
         int maxScroll = this.getMaxScroll();
-        renderScrollBar(tessellator, buffer, maxScroll, scrollbarPosition, int_4);
+        renderScrollBar(matrices, tessellator, buffer, maxScroll, scrollbarPosition, int_4);
         
-        this.renderDecorations(mouseX, mouseY);
+        this.renderDecorations(matrices, mouseX, mouseY);
         RenderSystem.enableTexture();
         RenderSystem.shadeModel(7424);
         RenderSystem.enableAlphaTest();
@@ -225,7 +230,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @SuppressWarnings("deprecation")
-    protected void renderScrollBar(Tessellator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
+    protected void renderScrollBar(MatrixStack matrices, Tessellator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
         if (maxScroll > 0) {
             int int_9 = ((this.bottom - this.top) * (this.bottom - this.top)) / this.getMaxScrollPosition();
             int_9 = MathHelper.clamp(int_9, 32, this.bottom - this.top - 8);
@@ -234,23 +239,24 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                 int_10 = this.top;
             }
             
+            Matrix4f matrix = matrices.peek().getModel();
             buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-            buffer.vertex(scrollbarPositionMinX, this.bottom, 0.0D).texture(0, 1).color(0, 0, 0, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, this.bottom, 0.0D).texture(1, 1).color(0, 0, 0, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, this.top, 0.0D).texture(1, 0).color(0, 0, 0, 255).next();
-            buffer.vertex(scrollbarPositionMinX, this.top, 0.0D).texture(0, 0).color(0, 0, 0, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMinX, this.bottom, 0.0F).texture(0, 1).color(0, 0, 0, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMaxX, this.bottom, 0.0F).texture(1, 1).color(0, 0, 0, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMaxX, this.top, 0.0F).texture(1, 0).color(0, 0, 0, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMinX, this.top, 0.0F).texture(0, 0).color(0, 0, 0, 255).next();
             tessellator.draw();
             buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-            buffer.vertex(scrollbarPositionMinX, int_10 + int_9, 0.0D).texture(0, 1).color(128, 128, 128, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, int_10 + int_9, 0.0D).texture(1, 1).color(128, 128, 128, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, int_10, 0.0D).texture(1, 0).color(128, 128, 128, 255).next();
-            buffer.vertex(scrollbarPositionMinX, int_10, 0.0D).texture(0, 0).color(128, 128, 128, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMinX, int_10 + int_9, 0.0F).texture(0, 1).color(128, 128, 128, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMaxX, int_10 + int_9, 0.0F).texture(1, 1).color(128, 128, 128, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMaxX, int_10, 0.0F).texture(1, 0).color(128, 128, 128, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMinX, int_10, 0.0F).texture(0, 0).color(128, 128, 128, 255).next();
             tessellator.draw();
             buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-            buffer.vertex(scrollbarPositionMinX, (int_10 + int_9 - 1), 0.0D).texture(0, 1).color(192, 192, 192, 255).next();
-            buffer.vertex((scrollbarPositionMaxX - 1), (int_10 + int_9 - 1), 0.0D).texture(1, 1).color(192, 192, 192, 255).next();
-            buffer.vertex((scrollbarPositionMaxX - 1), int_10, 0.0D).texture(1, 0).color(192, 192, 192, 255).next();
-            buffer.vertex(scrollbarPositionMinX, int_10, 0.0D).texture(0, 0).color(192, 192, 192, 255).next();
+            buffer.vertex(scrollbarPositionMinX, (int_10 + int_9 - 1), 0.0F).texture(0, 1).color(192, 192, 192, 255).next();
+            buffer.vertex((scrollbarPositionMaxX - 1), (int_10 + int_9 - 1), 0.0F).texture(1, 1).color(192, 192, 192, 255).next();
+            buffer.vertex((scrollbarPositionMaxX - 1), int_10, 0.0F).texture(1, 0).color(192, 192, 192, 255).next();
+            buffer.vertex(scrollbarPositionMinX, int_10, 0.0F).texture(0, 0).color(192, 192, 192, 255).next();
             tessellator.draw();
         }
     }
@@ -282,7 +288,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     public void capYPosition(double double_1) {
-        this.scroll = MathHelper.clamp(double_1, 0.0D, this.getMaxScroll());
+        this.scroll = MathHelper.clamp(double_1, 0.0F, this.getMaxScroll());
     }
     
     protected int getMaxScroll() {
@@ -335,7 +341,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             return true;
         } else if (int_1 == 0 && this.scrolling) {
             if (double_2 < (double) this.top) {
-                this.capYPosition(0.0D);
+                this.capYPosition(0.0F);
             } else if (double_2 > (double) this.bottom) {
                 this.capYPosition(this.getMaxScroll());
             } else {
@@ -391,7 +397,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return double_2 >= (double) this.top && double_2 <= (double) this.bottom && double_1 >= (double) this.left && double_1 <= (double) this.right;
     }
     
-    protected void renderList(int startX, int startY, int int_3, int int_4, float float_1) {
+    protected void renderList(MatrixStack matrices, int startX, int startY, int int_3, int int_4, float float_1) {
         int itemCount = this.getItemCount();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -409,19 +415,19 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                 itemMaxX = itemMinX + itemWidth;
                 RenderSystem.disableTexture();
                 float float_2 = this.isFocused() ? 1.0F : 0.5F;
-                RenderSystem.color4f(float_2, float_2, float_2, 1.0F);
-                buffer.begin(7, VertexFormats.POSITION);
-                buffer.vertex(itemMinX, itemY + itemHeight + 2, 0.0D).next();
-                buffer.vertex(itemMaxX, itemY + itemHeight + 2, 0.0D).next();
-                buffer.vertex(itemMaxX, itemY - 2, 0.0D).next();
-                buffer.vertex(itemMinX, itemY - 2, 0.0D).next();
+                Matrix4f matrix = matrices.peek().getModel();
+                RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+                buffer.begin(7, VertexFormats.POSITION_COLOR);
+                buffer.vertex(matrix, itemMinX, itemY + itemHeight + 2, 0.0F).color(float_2, float_2, float_2, 1.0F).next();
+                buffer.vertex(matrix, itemMaxX, itemY + itemHeight + 2, 0.0F).color(float_2, float_2, float_2, 1.0F).next();
+                buffer.vertex(matrix, itemMaxX, itemY - 2, 0.0F).color(float_2, float_2, float_2, 1.0F).next();
+                buffer.vertex(matrix, itemMinX, itemY - 2, 0.0F).color(float_2, float_2, float_2, 1.0F).next();
                 tessellator.draw();
-                RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
-                buffer.begin(7, VertexFormats.POSITION);
-                buffer.vertex(itemMinX + 1, itemY + itemHeight + 1, 0.0D).next();
-                buffer.vertex(itemMaxX - 1, itemY + itemHeight + 1, 0.0D).next();
-                buffer.vertex(itemMaxX - 1, itemY - 1, 0.0D).next();
-                buffer.vertex(itemMinX + 1, itemY - 1, 0.0D).next();
+                buffer.begin(7, VertexFormats.POSITION_COLOR);
+                buffer.vertex(matrix, itemMinX + 1, itemY + itemHeight + 1, 0.0F).color(0.0F, 0.0F, 0.0F, 1.0F).next();
+                buffer.vertex(matrix, itemMaxX - 1, itemY + itemHeight + 1, 0.0F).color(0.0F, 0.0F, 0.0F, 1.0F).next();
+                buffer.vertex(matrix, itemMaxX - 1, itemY - 1, 0.0F).color(0.0F, 0.0F, 0.0F, 1.0F).next();
+                buffer.vertex(matrix, itemMinX + 1, itemY - 1, 0.0F).color(0.0F, 0.0F, 0.0F, 1.0F).next();
                 tessellator.draw();
                 RenderSystem.enableTexture();
             }
@@ -429,13 +435,13 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             int y = this.getRowTop(renderIndex);
             int x = this.getRowLeft();
             DiffuseLighting.disable();
-            renderItem(item, renderIndex, y, x, itemWidth, itemHeight, int_3, int_4, this.isMouseOver(int_3, int_4) && Objects.equals(this.getItemAtPosition(int_3, int_4), item), float_1);
+            renderItem(matrices, item, renderIndex, y, x, itemWidth, itemHeight, int_3, int_4, this.isMouseOver(int_3, int_4) && Objects.equals(this.getItemAtPosition(int_3, int_4), item), float_1);
         }
         
     }
     
-    protected void renderItem(E item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-        item.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+    protected void renderItem(MatrixStack matrices, E item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        item.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
     }
     
     protected int getRowLeft() {
@@ -454,17 +460,18 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @SuppressWarnings("deprecation")
-    protected void renderHoleBackground(int int_1, int int_2, int int_3, int int_4) {
+    protected void renderHoleBackground(MatrixStack matrices, int int_1, int int_2, int int_3, int int_4) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         this.client.getTextureManager().bindTexture(backgroundLocation);
+        Matrix4f matrix = matrices.peek().getModel();
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         float float_1 = 32.0F;
         buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-        buffer.vertex(this.left, int_2, 0.0D).texture(0, ((float) int_2 / 32.0F)).color(64, 64, 64, int_4).next();
-        buffer.vertex(this.left + this.width, int_2, 0.0D).texture(((float) this.width / 32.0F), ((float) int_2 / 32.0F)).color(64, 64, 64, int_4).next();
-        buffer.vertex(this.left + this.width, int_1, 0.0D).texture(((float) this.width / 32.0F), ((float) int_1 / 32.0F)).color(64, 64, 64, int_3).next();
-        buffer.vertex(this.left, int_1, 0.0D).texture(0, ((float) int_1 / 32.0F)).color(64, 64, 64, int_3).next();
+        buffer.vertex(matrix, this.left, int_2, 0.0F).texture(0, ((float) int_2 / 32.0F)).color(64, 64, 64, int_4).next();
+        buffer.vertex(matrix, this.left + this.width, int_2, 0.0F).texture(((float) this.width / 32.0F), ((float) int_2 / 32.0F)).color(64, 64, 64, int_4).next();
+        buffer.vertex(matrix, this.left + this.width, int_1, 0.0F).texture(((float) this.width / 32.0F), ((float) int_1 / 32.0F)).color(64, 64, 64, int_3).next();
+        buffer.vertex(matrix, this.left, int_1, 0.0F).texture(0, ((float) int_1 / 32.0F)).color(64, 64, 64, int_3).next();
         tessellator.draw();
     }
     
@@ -495,7 +502,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         public Entry() {
         }
         
-        public abstract void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta);
+        public abstract void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta);
         
         public boolean isMouseOver(double double_1, double double_2) {
             return Objects.equals(this.parent.getItemAtPosition(double_1, double_2), this);

@@ -4,10 +4,9 @@ import me.shedaniel.clothconfig2.api.Modifier;
 import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
-
-import java.util.Objects;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
 @Environment(EnvType.CLIENT)
 public class ModifierKeyCodeImpl implements ModifierKeyCode {
@@ -43,27 +42,18 @@ public class ModifierKeyCodeImpl implements ModifierKeyCode {
     
     @Override
     public String toString() {
-        String string_1 = this.keyCode.getName();
-        int int_1 = this.keyCode.getKeyCode();
-        String string_2 = null;
-        switch (this.keyCode.getCategory()) {
-            case KEYSYM:
-                string_2 = InputUtil.getKeycodeName(int_1);
-                break;
-            case SCANCODE:
-                string_2 = InputUtil.getScancodeName(int_1);
-                break;
-            case MOUSE:
-                String string_3 = I18n.translate(string_1);
-                string_2 = Objects.equals(string_3, string_1) ? I18n.translate(InputUtil.Type.MOUSE.getName(), int_1 + 1) : string_3;
-        }
-        String base = string_2 == null ? I18n.translate(string_1) : string_2;
+        return getLocalizedName().getString();
+    }
+    
+    @Override
+    public Text getLocalizedName() {
+        Text base = this.keyCode.method_27445();
         if (modifier.hasShift())
-            base = I18n.translate("modifier.cloth-config.shift", base);
+            base = new TranslatableText("modifier.cloth-config.shift", base);
         if (modifier.hasControl())
-            base = I18n.translate("modifier.cloth-config.ctrl", base);
+            base = new TranslatableText("modifier.cloth-config.ctrl", base);
         if (modifier.hasAlt())
-            base = I18n.translate("modifier.cloth-config.alt", base);
+            base = new TranslatableText("modifier.cloth-config.alt", base);
         return base;
     }
     

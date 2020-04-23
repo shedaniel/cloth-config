@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.LongListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -14,16 +15,16 @@ import java.util.function.Supplier;
 public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
     
     private Consumer<Long> saveConsumer = null;
-    private Function<Long, Optional<String[]>> tooltipSupplier = l -> Optional.empty();
+    private Function<Long, Optional<Text[]>> tooltipSupplier = l -> Optional.empty();
     private final long value;
     private Long min = null, max = null;
     
-    public LongFieldBuilder(String resetButtonKey, String fieldNameKey, long value) {
+    public LongFieldBuilder(Text resetButtonKey, Text fieldNameKey, long value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
-    public LongFieldBuilder setErrorSupplier(Function<Long, Optional<String>> errorSupplier) {
+    public LongFieldBuilder setErrorSupplier(Function<Long, Optional<Text>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -48,22 +49,22 @@ public class LongFieldBuilder extends FieldBuilder<Long, LongListEntry> {
         return this;
     }
     
-    public LongFieldBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public LongFieldBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = l -> tooltipSupplier.get();
         return this;
     }
     
-    public LongFieldBuilder setTooltipSupplier(Function<Long, Optional<String[]>> tooltipSupplier) {
+    public LongFieldBuilder setTooltipSupplier(Function<Long, Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public LongFieldBuilder setTooltip(Optional<String[]> tooltip) {
+    public LongFieldBuilder setTooltip(Optional<Text[]> tooltip) {
         this.tooltipSupplier = l -> tooltip;
         return this;
     }
     
-    public LongFieldBuilder setTooltip(String... tooltip) {
+    public LongFieldBuilder setTooltip(Text... tooltip) {
         this.tooltipSupplier = l -> Optional.ofNullable(tooltip);
         return this;
     }

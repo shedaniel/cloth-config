@@ -6,6 +6,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 
 @Environment(EnvType.CLIENT)
 public interface ModifierKeyCode {
@@ -77,9 +78,7 @@ public interface ModifierKeyCode {
     
     String toString();
     
-    default String getLocalizedName() {
-        return toString();
-    }
+    Text getLocalizedName();
     
     default boolean isUnknown() {
         return getKeyCode().equals(InputUtil.UNKNOWN_KEYCODE);

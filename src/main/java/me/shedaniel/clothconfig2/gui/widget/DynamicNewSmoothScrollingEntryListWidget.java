@@ -9,8 +9,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 
 import static me.shedaniel.clothconfig2.ClothConfigInitializer.clamp;
 import static me.shedaniel.clothconfig2.ClothConfigInitializer.handleScrollingPosition;
@@ -103,18 +105,18 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     }
     
     @Override
-    public void render(int mouseX, int mouseY, float delta) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         double[] target = {this.target};
         scroll = handleScrollingPosition(target, scroll, getMaxScroll(), delta, start, duration);
         this.target = target[0];
-        super.render(mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
     
     @SuppressWarnings("deprecation")
     @Override
-    protected void renderScrollBar(Tessellator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
+    protected void renderScrollBar(MatrixStack matrices, Tessellator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
         if (!smoothScrolling)
-            super.renderScrollBar(tessellator, buffer, maxScroll, scrollbarPositionMinX, scrollbarPositionMaxX);
+            super.renderScrollBar(matrices, tessellator, buffer, maxScroll, scrollbarPositionMinX, scrollbarPositionMaxX);
         else if (maxScroll > 0) {
             int height = ((this.bottom - this.top) * (this.bottom - this.top)) / this.getMaxScrollPosition();
             height = MathHelper.clamp(height, 32, this.bottom - this.top - 8);
@@ -125,28 +127,29 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
             int bottomc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 168 : 128;
             int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 222 : 172;
             
+            Matrix4f matrix = matrices.peek().getModel();
             // Black Bar
             buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-            buffer.vertex(scrollbarPositionMinX, this.bottom, 0.0D).texture(0, 1).color(0, 0, 0, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, this.bottom, 0.0D).texture(1, 1).color(0, 0, 0, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, this.top, 0.0D).texture(1, 0).color(0, 0, 0, 255).next();
-            buffer.vertex(scrollbarPositionMinX, this.top, 0.0D).texture(0, 0).color(0, 0, 0, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMinX, this.bottom, 0.0F).texture(0, 1).color(0, 0, 0, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMaxX, this.bottom, 0.0F).texture(1, 1).color(0, 0, 0, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMaxX, this.top, 0.0F).texture(1, 0).color(0, 0, 0, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMinX, this.top, 0.0F).texture(0, 0).color(0, 0, 0, 255).next();
             tessellator.draw();
             
             // Bottom
             buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-            buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).texture(0, 1).color(bottomc, bottomc, bottomc, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).texture(1, 1).color(bottomc, bottomc, bottomc, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).texture(1, 0).color(bottomc, bottomc, bottomc, 255).next();
-            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).texture(0, 0).color(bottomc, bottomc, bottomc, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMinX, minY + height, 0.0F).texture(0, 1).color(bottomc, bottomc, bottomc, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMaxX, minY + height, 0.0F).texture(1, 1).color(bottomc, bottomc, bottomc, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMaxX, minY, 0.0F).texture(1, 0).color(bottomc, bottomc, bottomc, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMinX, minY, 0.0F).texture(0, 0).color(bottomc, bottomc, bottomc, 255).next();
             tessellator.draw();
             
             // Top
             buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-            buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).texture(0, 1).color(topc, topc, topc, 255).next();
-            buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).texture(1, 1).color(topc, topc, topc, 255).next();
-            buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).texture(1, 0).color(topc, topc, topc, 255).next();
-            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).texture(0, 0).color(topc, topc, topc, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMinX, (minY + height - 1), 0.0F).texture(0, 1).color(topc, topc, topc, 255).next();
+            buffer.vertex(matrix, (scrollbarPositionMaxX - 1), (minY + height - 1), 0.0F).texture(1, 1).color(topc, topc, topc, 255).next();
+            buffer.vertex(matrix, (scrollbarPositionMaxX - 1), minY, 0.0F).texture(1, 0).color(topc, topc, topc, 255).next();
+            buffer.vertex(matrix, scrollbarPositionMinX, minY, 0.0F).texture(0, 0).color(topc, topc, topc, 255).next();
             tessellator.draw();
         }
     }

@@ -4,6 +4,7 @@ import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 
@@ -15,12 +16,12 @@ import java.util.stream.Collectors;
 @Environment(EnvType.CLIENT)
 public class ConfigCategoryImpl implements ConfigCategory {
     
-    private final Supplier<List<Pair<String, Object>>> listSupplier;
+    private final Supplier<List<Pair<Text, Object>>> listSupplier;
     private final Consumer<Identifier> backgroundConsumer;
     private final Runnable destroyCategory;
-    private final String categoryKey;
+    private final Text categoryKey;
     
-    ConfigCategoryImpl(String categoryKey, Consumer<Identifier> backgroundConsumer, Supplier<List<Pair<String, Object>>> listSupplier, Runnable destroyCategory) {
+    ConfigCategoryImpl(Text categoryKey, Consumer<Identifier> backgroundConsumer, Supplier<List<Pair<Text, Object>>> listSupplier, Runnable destroyCategory) {
         this.listSupplier = listSupplier;
         this.backgroundConsumer = backgroundConsumer;
         this.categoryKey = categoryKey;
@@ -28,7 +29,7 @@ public class ConfigCategoryImpl implements ConfigCategory {
     }
     
     @Override
-    public String getCategoryKey() {
+    public Text getCategoryKey() {
         return categoryKey;
     }
     

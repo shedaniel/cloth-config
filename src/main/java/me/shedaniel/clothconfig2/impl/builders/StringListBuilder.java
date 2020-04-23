@@ -4,6 +4,8 @@ import me.shedaniel.clothconfig2.gui.entries.StringListListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,30 +18,30 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public class StringListBuilder extends FieldBuilder<List<String>, StringListListEntry> {
     
-    private Function<String, Optional<String>> cellErrorSupplier;
+    private Function<String, Optional<Text>> cellErrorSupplier;
     private Consumer<List<String>> saveConsumer = null;
-    private Function<List<String>, Optional<String[]>> tooltipSupplier = list -> Optional.empty();
+    private Function<List<String>, Optional<Text[]>> tooltipSupplier = list -> Optional.empty();
     private final List<String> value;
     private boolean expanded = false;
     private Function<StringListListEntry, StringListListEntry.StringListCell> createNewInstance;
-    private String addTooltip = I18n.translate("text.cloth-config.list.add"), removeTooltip = I18n.translate("text.cloth-config.list.remove");
+    private Text addTooltip = new TranslatableText("text.cloth-config.list.add"), removeTooltip = new TranslatableText("text.cloth-config.list.remove");
     private boolean deleteButtonEnabled = true, insertInFront = true;
     
-    public StringListBuilder(String resetButtonKey, String fieldNameKey, List<String> value) {
+    public StringListBuilder(Text resetButtonKey, Text fieldNameKey, List<String> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
-    public Function<String, Optional<String>> getCellErrorSupplier() {
+    public Function<String, Optional<Text>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
     
-    public StringListBuilder setCellErrorSupplier(Function<String, Optional<String>> cellErrorSupplier) {
+    public StringListBuilder setCellErrorSupplier(Function<String, Optional<Text>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
         return this;
     }
     
-    public StringListBuilder setErrorSupplier(Function<List<String>, Optional<String>> errorSupplier) {
+    public StringListBuilder setErrorSupplier(Function<List<String>, Optional<Text>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -54,12 +56,12 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
         return this;
     }
     
-    public StringListBuilder setAddButtonTooltip(String addTooltip) {
+    public StringListBuilder setAddButtonTooltip(Text addTooltip) {
         this.addTooltip = addTooltip;
         return this;
     }
     
-    public StringListBuilder setRemoveButtonTooltip(String removeTooltip) {
+    public StringListBuilder setRemoveButtonTooltip(Text removeTooltip) {
         this.removeTooltip = removeTooltip;
         return this;
     }
@@ -100,22 +102,22 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
         return this;
     }
     
-    public StringListBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public StringListBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = list -> tooltipSupplier.get();
         return this;
     }
     
-    public StringListBuilder setTooltipSupplier(Function<List<String>, Optional<String[]>> tooltipSupplier) {
+    public StringListBuilder setTooltipSupplier(Function<List<String>, Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public StringListBuilder setTooltip(Optional<String[]> tooltip) {
+    public StringListBuilder setTooltip(Optional<Text[]> tooltip) {
         this.tooltipSupplier = list -> tooltip;
         return this;
     }
     
-    public StringListBuilder setTooltip(String... tooltip) {
+    public StringListBuilder setTooltip(Text... tooltip) {
         this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }

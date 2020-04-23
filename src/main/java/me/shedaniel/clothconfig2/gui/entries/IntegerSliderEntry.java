@@ -7,8 +7,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -28,30 +31,24 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     private int minimum, maximum;
     private Consumer<Integer> saveConsumer;
     private Supplier<Integer> defaultValue;
-    private Function<Integer, String> textGetter = integer -> String.format("Value: %d", integer);
+    private Function<Integer, Text> textGetter = integer -> new LiteralText(String.format("Value: %d", integer));
     private List<Element> widgets;
     
     @ApiStatus.Internal
     @Deprecated
-    public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, Consumer<Integer> saveConsumer) {
-        this(fieldName, minimum, maximum, value, "text.cloth-config.reset_value", null, saveConsumer);
-    }
-    
-    @ApiStatus.Internal
-    @Deprecated
-    public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer) {
+    public IntegerSliderEntry(Text fieldName, int minimum, int maximum, int value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer) {
         this(fieldName, minimum, maximum, value, resetButtonKey, defaultValue, saveConsumer, null);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
+    public IntegerSliderEntry(Text fieldName, int minimum, int maximum, int value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier) {
         this(fieldName, minimum, maximum, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public IntegerSliderEntry(String fieldName, int minimum, int maximum, int value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    public IntegerSliderEntry(Text fieldName, int minimum, int maximum, int value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.value = new AtomicInteger(value);
@@ -59,7 +56,7 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
         this.maximum = maximum;
         this.minimum = minimum;
         this.sliderWidget = new Slider(0, 0, 152, 20, ((double) this.value.get() - minimum) / Math.abs(maximum - minimum));
-        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {
+        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.method_27525(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             sliderWidget.setProgress((MathHelper.clamp(this.defaultValue.get(), minimum, maximum) - minimum) / (double) Math.abs(maximum - minimum));
             this.value.set(MathHelper.clamp(this.defaultValue.get(), minimum, maximum));
             sliderWidget.updateMessage();
@@ -75,11 +72,11 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
             saveConsumer.accept(getValue());
     }
     
-    public Function<Integer, String> getTextGetter() {
+    public Function<Integer, Text> getTextGetter() {
         return textGetter;
     }
     
-    public IntegerSliderEntry setTextGetter(Function<Integer, String> textGetter) {
+    public IntegerSliderEntry setTextGetter(Function<Integer, Text> textGetter) {
         this.textGetter = textGetter;
         this.sliderWidget.setMessage(textGetter.apply(IntegerSliderEntry.this.value.get()));
         return this;
@@ -111,30 +108,30 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     }
     
     @Override
-    public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-        super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         Window window = MinecraftClient.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && defaultValue.get() != value.get();
         this.resetButton.y = y;
         this.sliderWidget.active = isEditable();
         this.sliderWidget.y = y;
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(getFieldName())), y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.method_27517(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.method_27525(getFieldName()), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.sliderWidget.x = x + resetButton.getWidth() + 1;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.method_27517(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.sliderWidget.x = x + entryWidth - 150;
         }
         this.sliderWidget.setWidth(150 - resetButton.getWidth() - 2);
-        resetButton.render(mouseX, mouseY, delta);
-        sliderWidget.render(mouseX, mouseY, delta);
+        resetButton.render(matrices, mouseX, mouseY, delta);
+        sliderWidget.render(matrices, mouseX, mouseY, delta);
     }
     
     private class Slider extends SliderWidget {
         protected Slider(int int_1, int int_2, int int_3, int int_4, double double_1) {
-            super(int_1, int_2, int_3, int_4, "", double_1);
+            super(int_1, int_2, int_3, int_4, NarratorManager.EMPTY, double_1);
         }
         
         @Override

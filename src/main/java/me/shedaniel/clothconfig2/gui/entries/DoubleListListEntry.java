@@ -2,7 +2,8 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,19 +20,19 @@ public class DoubleListListEntry extends AbstractTextFieldListListEntry<Double, 
     
     @ApiStatus.Internal
     @Deprecated
-    public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey) {
+    public DoubleListListEntry(Text fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, Text resetButtonKey) {
         this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey, boolean requiresRestart) {
+    public DoubleListListEntry(Text fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, Text resetButtonKey, boolean requiresRestart) {
         this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, true, true);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public DoubleListListEntry(String fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+    public DoubleListListEntry(Text fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, Text resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront, DoubleListCell::new);
         this.minimum = Double.NEGATIVE_INFINITY;
         this.maximum = Double.POSITIVE_INFINITY;
@@ -81,15 +82,15 @@ public class DoubleListListEntry extends AbstractTextFieldListListEntry<Double, 
         }
         
         @Override
-        public Optional<String> getError() {
+        public Optional<Text> getError() {
             try {
                 double i = Double.parseDouble(widget.getText());
                 if (i > listListEntry.maximum)
-                    return Optional.of(I18n.translate("text.cloth-config.error.too_large", listListEntry.maximum));
+                    return Optional.of(new TranslatableText("text.cloth-config.error.too_large", listListEntry.maximum));
                 else if (i < listListEntry.minimum)
-                    return Optional.of(I18n.translate("text.cloth-config.error.too_small", listListEntry.minimum));
+                    return Optional.of(new TranslatableText("text.cloth-config.error.too_small", listListEntry.minimum));
             } catch (NumberFormatException ex) {
-                return Optional.of(I18n.translate("text.cloth-config.error.not_valid_number_double"));
+                return Optional.of(new TranslatableText("text.cloth-config.error.not_valid_number_double"));
             }
             return Optional.empty();
         }

@@ -10,6 +10,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Window;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Collections;
@@ -73,6 +74,7 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
             for (int i = 1; i < scissorsAreas.size(); i++) {
                 r.setBounds(r.intersection(scissorsAreas.get(i)));
             }
+            r.setBounds(Math.min(r.x, r.x + r.width), Math.min(r.y, r.y + r.height), Math.abs(r.width), Math.abs(r.height));
             Window window = MinecraftClient.getInstance().getWindow();
             double scaleFactor = window.getScaleFactor();
             GL11.glEnable(GL11.GL_SCISSOR_TEST);

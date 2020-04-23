@@ -3,7 +3,8 @@ package me.shedaniel.clothconfig2.gui.entries;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
@@ -15,28 +16,22 @@ import java.util.function.Supplier;
 public class IntegerListEntry extends TextFieldListEntry<Integer> {
     
     private static Function<String, String> stripCharacters = s -> {
-        StringBuilder stringBuilder_1 = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         char[] var2 = s.toCharArray();
         int var3 = var2.length;
         
         for (char c : var2)
             if (Character.isDigit(c) || c == '-')
-                stringBuilder_1.append(c);
+                builder.append(c);
         
-        return stringBuilder_1.toString();
+        return builder.toString();
     };
     private int minimum, maximum;
     private Consumer<Integer> saveConsumer;
     
     @ApiStatus.Internal
     @Deprecated
-    public IntegerListEntry(String fieldName, Integer value, Consumer<Integer> saveConsumer) {
-        this(fieldName, value, "text.cloth-config.reset_value", null, saveConsumer);
-    }
-    
-    @ApiStatus.Internal
-    @Deprecated
-    public IntegerListEntry(String fieldName, Integer value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer) {
+    public IntegerListEntry(Text fieldName, Integer value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
         this.minimum = -Integer.MAX_VALUE;
         this.maximum = Integer.MAX_VALUE;
@@ -45,13 +40,13 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
     
     @ApiStatus.Internal
     @Deprecated
-    public IntegerListEntry(String fieldName, Integer value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
+    public IntegerListEntry(Text fieldName, Integer value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier) {
         this(fieldName, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public IntegerListEntry(String fieldName, Integer value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    public IntegerListEntry(Text fieldName, Integer value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
         this.minimum = -Integer.MAX_VALUE;
         this.maximum = Integer.MAX_VALUE;
@@ -107,15 +102,15 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
     }
     
     @Override
-    public Optional<String> getError() {
+    public Optional<Text> getError() {
         try {
             int i = Integer.parseInt(textFieldWidget.getText());
             if (i > maximum)
-                return Optional.of(I18n.translate("text.cloth-config.error.too_large", maximum));
+                return Optional.of(new TranslatableText("text.cloth-config.error.too_large", maximum));
             else if (i < minimum)
-                return Optional.of(I18n.translate("text.cloth-config.error.too_small", minimum));
+                return Optional.of(new TranslatableText("text.cloth-config.error.too_small", minimum));
         } catch (NumberFormatException ex) {
-            return Optional.of(I18n.translate("text.cloth-config.error.not_valid_number_int"));
+            return Optional.of(new TranslatableText("text.cloth-config.error.not_valid_number_int"));
         }
         return super.getError();
     }

@@ -42,12 +42,14 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 
     modApi "net.fabricmc:fabric-loader:${project.loader_version}"
-    modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modApi ("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}") {
+        exclude module: "fabric-biomes-v1"
+    }
 
-    modApi "me.shedaniel.cloth:basic-math:0.4.1"
-    include "me.shedaniel.cloth:basic-math:0.4.1"
+    modApi "me.shedaniel.cloth:basic-math:0.5.0"
+    include "me.shedaniel.cloth:basic-math:0.5.0"
 
-    modImplementation "io.github.prospector:modmenu:${modmenu_version}"
+    modCompileOnly "io.github.prospector:modmenu:${modmenu_version}"
 
 //    modRuntime "com.lettuce.fudge:notenoughcrashes:$nec_version"
 }
@@ -141,7 +143,7 @@ curseforge {
                 requiredDependency 'fabric-api'
             }
             mainArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
-                displayName = "[Fabric 20w14a] ClothConfig2-$project.version"
+                displayName = "[Fabric 20w17a] ClothConfig2-$project.version"
             }
             addArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar"))
             afterEvaluate {

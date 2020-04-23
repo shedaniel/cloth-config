@@ -3,7 +3,8 @@ package me.shedaniel.clothconfig2.gui.entries;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
@@ -18,7 +19,7 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
         StringBuilder stringBuilder_1 = new StringBuilder();
         char[] var2 = s.toCharArray();
         int var3 = var2.length;
-    
+        
         for (char c : var2)
             if (Character.isDigit(c) || c == '-' || c == '.')
                 stringBuilder_1.append(c);
@@ -30,13 +31,7 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
     
     @ApiStatus.Internal
     @Deprecated
-    public DoubleListEntry(String fieldName, Double value, Consumer<Double> saveConsumer) {
-        this(fieldName, value, "text.cloth-config.reset_value", null, saveConsumer);
-    }
-    
-    @ApiStatus.Internal
-    @Deprecated
-    public DoubleListEntry(String fieldName, Double value, String resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer) {
+    public DoubleListEntry(Text fieldName, Double value, Text resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
         this.minimum = -Double.MAX_VALUE;
         this.maximum = Double.MAX_VALUE;
@@ -45,13 +40,13 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
     
     @ApiStatus.Internal
     @Deprecated
-    public DoubleListEntry(String fieldName, Double value, String resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
+    public DoubleListEntry(Text fieldName, Double value, Text resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier) {
         this(fieldName, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public DoubleListEntry(String fieldName, Double value, String resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    public DoubleListEntry(Text fieldName, Double value, Text resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
         this.minimum = -Double.MAX_VALUE;
         this.maximum = Double.MAX_VALUE;
@@ -107,15 +102,15 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
     }
     
     @Override
-    public Optional<String> getError() {
+    public Optional<Text> getError() {
         try {
             double i = Double.parseDouble(textFieldWidget.getText());
             if (i > maximum)
-                return Optional.of(I18n.translate("text.cloth-config.error.too_large", maximum));
+                return Optional.of(new TranslatableText("text.cloth-config.error.too_large", maximum));
             else if (i < minimum)
-                return Optional.of(I18n.translate("text.cloth-config.error.too_small", minimum));
+                return Optional.of(new TranslatableText("text.cloth-config.error.too_small", minimum));
         } catch (NumberFormatException ex) {
-            return Optional.of(I18n.translate("text.cloth-config.error.not_valid_number_double"));
+            return Optional.of(new TranslatableText("text.cloth-config.error.not_valid_number_double"));
         }
         return super.getError();
     }

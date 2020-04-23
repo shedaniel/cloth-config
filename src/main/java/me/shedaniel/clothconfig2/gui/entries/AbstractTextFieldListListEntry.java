@@ -5,6 +5,9 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.util.NarratorManager;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +32,7 @@ import java.util.function.Supplier;
 public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFieldListListEntry.AbstractTextFieldListCell<T, C, SELF>, SELF extends AbstractTextFieldListListEntry<T, C, SELF>> extends AbstractListListEntry<T, C, SELF> {
     
     @ApiStatus.Internal
-    public AbstractTextFieldListListEntry(String fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<String[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, String resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, SELF, C> createNewCell) {
+    public AbstractTextFieldListListEntry(Text fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, Text resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, SELF, C> createNewCell) {
         super(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront, createNewCell);
     }
     
@@ -50,11 +53,11 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             
             final T finalValue = substituteDefault(value);
             
-            widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, "") {
+            widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 100, 18, NarratorManager.EMPTY) {
                 @Override
-                public void render(int mouseX, int mouseY, float delta) {
+                public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                     setFocused(isSelected);
-                    super.render(mouseX, mouseY, delta);
+                    super.render(matrices, mouseX, mouseY, delta);
                 }
             };
             widget.setTextPredicate(this::isValidText);
@@ -68,12 +71,12 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
                 }
             });
         }
-    
+        
         @Override
         public void updateSelected(boolean isSelected) {
             this.isSelected = isSelected;
         }
-    
+        
         /**
          * Allows subclasses to substitute default values.
          *
@@ -97,14 +100,14 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         }
         
         @Override
-        public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             widget.setWidth(entryWidth - 12);
             widget.x = x;
             widget.y = y + 1;
             widget.setEditable(listListEntry.isEditable());
-            widget.render(mouseX, mouseY, delta);
+            widget.render(matrices, mouseX, mouseY, delta);
             if (isSelected && listListEntry.isEditable())
-                fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
+                fill(matrices, x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
         
         @Override

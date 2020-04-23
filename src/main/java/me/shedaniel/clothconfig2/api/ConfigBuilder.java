@@ -5,6 +5,7 @@ import me.shedaniel.clothconfig2.impl.ConfigEntryBuilderImpl;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.function.Consumer;
@@ -17,35 +18,27 @@ public interface ConfigBuilder {
         return new ConfigBuilderImpl();
     }
     
-    /**
-     * @deprecated Use {@link ConfigBuilder#create()}
-     */
-    @Deprecated
-    static ConfigBuilder create(Screen parent, String title) {
-        return create().setParentScreen(parent).setTitle(title);
-    }
-    
     ConfigBuilder setFallbackCategory(ConfigCategory fallbackCategory);
     
     Screen getParentScreen();
     
     ConfigBuilder setParentScreen(Screen parent);
     
-    String getTitle();
+    Text getTitle();
     
-    ConfigBuilder setTitle(String title);
+    ConfigBuilder setTitle(Text title);
     
     boolean isEditable();
     
     ConfigBuilder setEditable(boolean editable);
     
-    ConfigCategory getOrCreateCategory(String categoryKey);
+    ConfigCategory getOrCreateCategory(Text categoryKey);
     
-    ConfigBuilder removeCategory(String categoryKey);
+    ConfigBuilder removeCategory(Text categoryKey);
     
-    ConfigBuilder removeCategoryIfExists(String categoryKey);
+    ConfigBuilder removeCategoryIfExists(Text categoryKey);
     
-    boolean hasCategory(String category);
+    boolean hasCategory(Text category);
     
     ConfigBuilder setShouldTabsSmoothScroll(boolean shouldTabsSmoothScroll);
     

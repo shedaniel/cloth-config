@@ -10,6 +10,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 
@@ -24,7 +26,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     
     private Runnable savingRunnable;
     private Screen parent;
-    private String title = "text.cloth-config.config";
+    private Text title = new TranslatableText("text.cloth-config.config");
     private boolean editable = true;
     private boolean tabsSmoothScroll = true;
     private boolean listSmoothScroll = true;
@@ -33,14 +35,14 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean transparentBackground = false;
     private Identifier defaultBackground = DrawableHelper.BACKGROUND_TEXTURE;
     private Consumer<Screen> afterInitConsumer = screen -> {};
-    private final Map<String, Identifier> categoryBackground = Maps.newHashMap();
-    private final Map<String, List<Pair<String, Object>>> dataMap = Maps.newLinkedHashMap();
-    private String fallbackCategory = null;
+    private final Map<Text, Identifier> categoryBackground = Maps.newHashMap();
+    private final Map<Text, List<Pair<Text, Object>>> dataMap = Maps.newLinkedHashMap();
+    private Text fallbackCategory = null;
     private boolean alwaysShowTabs = false;
     
     @Deprecated
     public ConfigBuilderImpl() {
-    
+        
     }
     
     @Override
@@ -84,12 +86,12 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public String getTitle() {
+    public Text getTitle() {
         return title;
     }
     
     @Override
-    public ConfigBuilder setTitle(String title) {
+    public ConfigBuilder setTitle(Text title) {
         this.title = title;
         return this;
     }
@@ -106,7 +108,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public ConfigCategory getOrCreateCategory(String categoryKey) {
+    public ConfigCategory getOrCreateCategory(Text categoryKey) {
         if (dataMap.containsKey(categoryKey))
             return new ConfigCategoryImpl(categoryKey, identifier -> {
                 if (transparentBackground)
@@ -124,7 +126,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public ConfigBuilder removeCategory(String category) {
+    public ConfigBuilder removeCategory(Text category) {
         if (dataMap.containsKey(category) && fallbackCategory.equals(category))
             fallbackCategory = null;
         if (!dataMap.containsKey(category))
@@ -134,7 +136,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public ConfigBuilder removeCategoryIfExists(String category) {
+    public ConfigBuilder removeCategoryIfExists(Text category) {
         if (dataMap.containsKey(category) && fallbackCategory.equals(category))
             fallbackCategory = null;
         dataMap.remove(category);
@@ -142,7 +144,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public boolean hasCategory(String category) {
+    public boolean hasCategory(Text category) {
         return dataMap.containsKey(category);
     }
     
@@ -216,7 +218,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     public Screen build() {
         if (dataMap.isEmpty() || fallbackCategory == null)
             throw new NullPointerException("There cannot be no categories or fallback category!");
-        ClothConfigScreen screen = new ClothConfigScreen(parent, I18n.translate(title), dataMap, doesConfirmSave, doesProcessErrors, listSmoothScroll, defaultBackground, categoryBackground) {
+        ClothConfigScreen screen = new ClothConfigScreen(parent, title, dataMap, doesConfirmSave, doesProcessErrors, listSmoothScroll, defaultBackground, categoryBackground) {
             @Override
             public void save() {
                 if (savingRunnable != null)

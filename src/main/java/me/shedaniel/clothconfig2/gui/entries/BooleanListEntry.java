@@ -6,8 +6,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -28,33 +31,27 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     
     @ApiStatus.Internal
     @Deprecated
-    public BooleanListEntry(String fieldName, boolean bool, Consumer<Boolean> saveConsumer) {
-        this(fieldName, bool, "text.cloth-config.reset_value", null, saveConsumer);
-    }
-    
-    @ApiStatus.Internal
-    @Deprecated
-    public BooleanListEntry(String fieldName, boolean bool, String resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer) {
+    public BooleanListEntry(Text fieldName, boolean bool, Text resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer) {
         this(fieldName, bool, resetButtonKey, defaultValue, saveConsumer, null);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public BooleanListEntry(String fieldName, boolean bool, String resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
+    public BooleanListEntry(Text fieldName, boolean bool, Text resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier) {
         this(fieldName, bool, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public BooleanListEntry(String fieldName, boolean bool, String resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    public BooleanListEntry(Text fieldName, boolean bool, Text resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.bool = new AtomicBoolean(bool);
-        this.buttonWidget = new ButtonWidget(0, 0, 150, 20, "", widget -> {
+        this.buttonWidget = new ButtonWidget(0, 0, 150, 20, NarratorManager.EMPTY, widget -> {
             BooleanListEntry.this.bool.set(!BooleanListEntry.this.bool.get());
             getScreen().setEdited(true, isRequiresRestart());
         });
-        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {
+        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.method_27525(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             BooleanListEntry.this.bool.set(defaultValue.get());
             getScreen().setEdited(true, isRequiresRestart());
         });
@@ -79,8 +76,8 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     }
     
     @Override
-    public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-        super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         Window window = MinecraftClient.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && defaultValue.get() != bool.get();
         this.resetButton.y = y;
@@ -88,21 +85,21 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(getYesNoText(bool.get()));
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(getFieldName())), y + 5, 16777215);
+            MinecraftClient.getInstance().textRenderer.method_27517(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.method_27525(getFieldName()), y + 5, 16777215);
             this.resetButton.x = x;
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.method_27517(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
         }
         this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
-        resetButton.render(mouseX, mouseY, delta);
-        buttonWidget.render(mouseX, mouseY, delta);
+        resetButton.render(matrices, mouseX, mouseY, delta);
+        buttonWidget.render(matrices, mouseX, mouseY, delta);
     }
     
-    public String getYesNoText(boolean bool) {
-        return I18n.translate("text.cloth-config.boolean.value." + bool);
+    public Text getYesNoText(boolean bool) {
+        return new TranslatableText("text.cloth-config.boolean.value." + bool);
     }
     
     @Override

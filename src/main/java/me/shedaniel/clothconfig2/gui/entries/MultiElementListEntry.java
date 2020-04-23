@@ -9,9 +9,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -26,7 +28,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     private final T object;
-    private String categoryName;
+    private Text categoryName;
     private List<AbstractConfigListEntry<?>> entries;
     private MultiElementListEntry<T>.CategoryLabelWidget widget;
     private List<Element> children;
@@ -34,7 +36,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     
     @ApiStatus.Internal
     @Deprecated
-    public MultiElementListEntry(String categoryName, T object, List<AbstractConfigListEntry<?>> entries, boolean defaultExpanded) {
+    public MultiElementListEntry(Text categoryName, T object, List<AbstractConfigListEntry<?>> entries, boolean defaultExpanded) {
         super(categoryName, null);
         this.categoryName = categoryName;
         this.object = object;
@@ -55,10 +57,10 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     
     @Override
     public void setRequiresRestart(boolean requiresRestart) {
-    
+        
     }
     
-    public String getCategoryName() {
+    public Text getCategoryName() {
         return categoryName;
     }
     
@@ -73,8 +75,8 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-        super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         widget.rectangle.x = x - 19;
         widget.rectangle.y = y;
         widget.rectangle.width = entryWidth + 19;
@@ -82,8 +84,8 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
         MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         DiffuseLighting.disable();
         RenderSystem.color4f(1, 1, 1, 1);
-        drawTexture(x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(categoryName), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        drawTexture(matrices, x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
+        MinecraftClient.getInstance().textRenderer.method_27517(matrices, categoryName, x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent(getParent());
             entry.setScreen(getScreen());
@@ -91,7 +93,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
         if (expanded) {
             int yy = y + 24;
             for (AbstractConfigListEntry<?> entry : entries) {
-                entry.render(-1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isSelected, delta);
+                entry.render(matrices, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isSelected, delta);
                 yy += entry.getItemHeight();
                 yy += Math.max(0, entry.getMorePossibleHeight());
             }
@@ -126,10 +128,10 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public void lateRender(int mouseX, int mouseY, float delta) {
+    public void lateRender(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (expanded) {
             for (AbstractConfigListEntry<?> entry : entries) {
-                entry.lateRender(mouseX, mouseY, delta);
+                entry.lateRender(matrices, mouseX, mouseY, delta);
             }
         }
     }
@@ -161,11 +163,11 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public Optional<String> getError() {
-        List<String> errors = entries.stream().map(AbstractConfigListEntry::getConfigError).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+    public Optional<Text> getError() {
+        List<Text> errors = entries.stream().map(AbstractConfigListEntry::getConfigError).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
         
         if (errors.size() > 1)
-            return Optional.of(I18n.translate("text.cloth-config.multi_error"));
+            return Optional.of(new TranslatableText("text.cloth-config.multi_error"));
         else
             return errors.stream().findFirst();
     }

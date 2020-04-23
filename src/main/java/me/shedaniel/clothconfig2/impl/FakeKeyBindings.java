@@ -6,6 +6,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -59,7 +60,7 @@ public class FakeKeyBindings extends KeyBinding {
     }
     
     @Override
-    public String getLocalizedName() {
+    public Text getLocalizedName() {
         return keyCode.getLocalizedName();
     }
     
@@ -70,7 +71,7 @@ public class FakeKeyBindings extends KeyBinding {
     
     @Override
     public String getName() {
-        return keyCode.getLocalizedName();
+        return keyCode.getLocalizedName().getString();
     }
     
     @Override

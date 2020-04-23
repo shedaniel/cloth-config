@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.IntegerListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -14,11 +15,11 @@ import java.util.function.Supplier;
 public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
     
     private Consumer<Integer> saveConsumer = null;
-    private Function<Integer, Optional<String[]>> tooltipSupplier = i -> Optional.empty();
+    private Function<Integer, Optional<Text[]>> tooltipSupplier = i -> Optional.empty();
     private final int value;
     private Integer min = null, max = null;
     
-    public IntFieldBuilder(String resetButtonKey, String fieldNameKey, int value) {
+    public IntFieldBuilder(Text resetButtonKey, Text fieldNameKey, int value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
@@ -28,7 +29,7 @@ public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
         return this;
     }
     
-    public IntFieldBuilder setErrorSupplier(Function<Integer, Optional<String>> errorSupplier) {
+    public IntFieldBuilder setErrorSupplier(Function<Integer, Optional<Text>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -48,22 +49,22 @@ public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
         return this;
     }
     
-    public IntFieldBuilder setTooltipSupplier(Function<Integer, Optional<String[]>> tooltipSupplier) {
+    public IntFieldBuilder setTooltipSupplier(Function<Integer, Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public IntFieldBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public IntFieldBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = i -> tooltipSupplier.get();
         return this;
     }
     
-    public IntFieldBuilder setTooltip(Optional<String[]> tooltip) {
+    public IntFieldBuilder setTooltip(Optional<Text[]> tooltip) {
         this.tooltipSupplier = i -> tooltip;
         return this;
     }
     
-    public IntFieldBuilder setTooltip(String... tooltip) {
+    public IntFieldBuilder setTooltip(Text... tooltip) {
         this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
         return this;
     }

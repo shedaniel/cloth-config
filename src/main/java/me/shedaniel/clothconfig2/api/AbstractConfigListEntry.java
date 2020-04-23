@@ -2,14 +2,15 @@ package me.shedaniel.clothconfig2.api;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 
 @Environment(EnvType.CLIENT)
 public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> {
-    private String fieldName;
+    private Text fieldName;
     private boolean editable = true;
     private boolean requiresRestart;
     
-    public AbstractConfigListEntry(String fieldName, boolean requiresRestart) {
+    public AbstractConfigListEntry(Text fieldName, boolean requiresRestart) {
         this.fieldName = fieldName;
         this.requiresRestart = requiresRestart;
     }
@@ -37,7 +38,7 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
     }
     
     @Override
-    public String getFieldName() {
+    public Text getFieldName() {
         return fieldName;
     }
 }

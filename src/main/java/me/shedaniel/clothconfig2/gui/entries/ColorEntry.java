@@ -4,7 +4,9 @@ import me.shedaniel.clothconfig2.gui.widget.ColorDisplayWidget;
 import me.shedaniel.clothconfig2.mixin.ButtonWidgetHooks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +24,7 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
     
     @ApiStatus.Internal
     @Deprecated
-    public ColorEntry(String fieldName, int value, String resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    public ColorEntry(Text fieldName, int value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, 0, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
         this.alpha = true;
         ColorValue colorValue = getColorValue(String.valueOf(value));
@@ -40,8 +42,8 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
     }
     
     @Override
-    public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-        super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         this.colorDisplayWidget.y = y;
         ColorValue value = getColorValue(textFieldWidget.getText());
         if (!value.hasError())
@@ -51,7 +53,7 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
         } else {
             this.colorDisplayWidget.x = textFieldWidget.x - 23;
         }
-        colorDisplayWidget.render(mouseX, mouseY, delta);
+        colorDisplayWidget.render(matrices, mouseX, mouseY, delta);
     }
     
     @Override
@@ -88,10 +90,10 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
     }
     
     @Override
-    public Optional<String> getError() {
+    public Optional<Text> getError() {
         ColorValue colorValue = getColorValue(this.textFieldWidget.getText());
         if (colorValue.hasError())
-            return Optional.of(I18n.translate("text.cloth-config.error.color." + colorValue.getError().name().toLowerCase(Locale.ROOT)));
+            return Optional.of(new TranslatableText("text.cloth-config.error.color." + colorValue.getError().name().toLowerCase(Locale.ROOT)));
         return super.getError();
     }
     

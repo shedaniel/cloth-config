@@ -3,7 +3,8 @@ package me.shedaniel.clothconfig2.gui.entries;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
@@ -30,13 +31,7 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     
     @ApiStatus.Internal
     @Deprecated
-    public LongListEntry(String fieldName, Long value, Consumer<Long> saveConsumer) {
-        this(fieldName, value, "text.cloth-config.reset_value", null, saveConsumer);
-    }
-    
-    @ApiStatus.Internal
-    @Deprecated
-    public LongListEntry(String fieldName, Long value, String resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer) {
+    public LongListEntry(Text fieldName, Long value, Text resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
         this.minimum = -Long.MAX_VALUE;
         this.maximum = Long.MAX_VALUE;
@@ -45,13 +40,13 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     
     @ApiStatus.Internal
     @Deprecated
-    public LongListEntry(String fieldName, Long value, String resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
+    public LongListEntry(Text fieldName, Long value, Text resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier) {
         this(fieldName, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public LongListEntry(String fieldName, Long value, String resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    public LongListEntry(Text fieldName, Long value, Text resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
         this.minimum = -Long.MAX_VALUE;
         this.maximum = Long.MAX_VALUE;
@@ -107,15 +102,15 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     }
     
     @Override
-    public Optional<String> getError() {
+    public Optional<Text> getError() {
         try {
             long i = Long.parseLong(textFieldWidget.getText());
             if (i > maximum)
-                return Optional.of(I18n.translate("text.cloth-config.error.too_large", maximum));
+                return Optional.of(new TranslatableText("text.cloth-config.error.too_large", maximum));
             else if (i < minimum)
-                return Optional.of(I18n.translate("text.cloth-config.error.too_small", minimum));
+                return Optional.of(new TranslatableText("text.cloth-config.error.too_small", minimum));
         } catch (NumberFormatException ex) {
-            return Optional.of(I18n.translate("text.cloth-config.error.not_valid_number_long"));
+            return Optional.of(new TranslatableText("text.cloth-config.error.not_valid_number_long"));
         }
         return super.getError();
     }

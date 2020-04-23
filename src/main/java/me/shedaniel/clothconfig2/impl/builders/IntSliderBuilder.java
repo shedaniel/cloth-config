@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.IntegerSliderEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -14,20 +15,20 @@ import java.util.function.Supplier;
 public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> {
     
     private Consumer<Integer> saveConsumer = null;
-    private Function<Integer, Optional<String[]>> tooltipSupplier = i -> Optional.empty();
+    private Function<Integer, Optional<Text[]>> tooltipSupplier = i -> Optional.empty();
     private final int value;
     private int max;
     private int min;
-    private Function<Integer, String> textGetter = null;
+    private Function<Integer, Text> textGetter = null;
     
-    public IntSliderBuilder(String resetButtonKey, String fieldNameKey, int value, int min, int max) {
+    public IntSliderBuilder(Text resetButtonKey, Text fieldNameKey, int value, int min, int max) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
         this.max = max;
         this.min = min;
     }
     
-    public IntSliderBuilder setErrorSupplier(Function<Integer, Optional<String>> errorSupplier) {
+    public IntSliderBuilder setErrorSupplier(Function<Integer, Optional<Text>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -37,7 +38,7 @@ public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> 
         return this;
     }
     
-    public IntSliderBuilder setTextGetter(Function<Integer, String> textGetter) {
+    public IntSliderBuilder setTextGetter(Function<Integer, Text> textGetter) {
         this.textGetter = textGetter;
         return this;
     }
@@ -57,22 +58,22 @@ public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> 
         return this;
     }
     
-    public IntSliderBuilder setTooltipSupplier(Function<Integer, Optional<String[]>> tooltipSupplier) {
+    public IntSliderBuilder setTooltipSupplier(Function<Integer, Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public IntSliderBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public IntSliderBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = i -> tooltipSupplier.get();
         return this;
     }
     
-    public IntSliderBuilder setTooltip(Optional<String[]> tooltip) {
+    public IntSliderBuilder setTooltip(Optional<Text[]> tooltip) {
         this.tooltipSupplier = i -> tooltip;
         return this;
     }
     
-    public IntSliderBuilder setTooltip(String... tooltip) {
+    public IntSliderBuilder setTooltip(Text... tooltip) {
         this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
         return this;
     }

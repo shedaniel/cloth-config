@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,13 +14,13 @@ import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public abstract class FieldBuilder<T, A extends AbstractConfigListEntry> {
-    @NotNull private final String fieldNameKey;
-    @NotNull private final String resetButtonKey;
+    @NotNull private final Text fieldNameKey;
+    @NotNull private final Text resetButtonKey;
     protected boolean requireRestart = false;
     @Nullable protected Supplier<T> defaultValue = null;
-    @Nullable protected Function<T, Optional<String>> errorSupplier;
+    @Nullable protected Function<T, Optional<Text>> errorSupplier;
     
-    protected FieldBuilder(String resetButtonKey, String fieldNameKey) {
+    protected FieldBuilder(Text resetButtonKey, Text fieldNameKey) {
         this.resetButtonKey = Objects.requireNonNull(resetButtonKey);
         this.fieldNameKey = Objects.requireNonNull(fieldNameKey);
     }
@@ -39,12 +40,12 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry> {
     public abstract A build();
     
     @NotNull
-    public final String getFieldNameKey() {
+    public final Text getFieldNameKey() {
         return fieldNameKey;
     }
     
     @NotNull
-    public final String getResetButtonKey() {
+    public final Text getResetButtonKey() {
         return resetButtonKey;
     }
     

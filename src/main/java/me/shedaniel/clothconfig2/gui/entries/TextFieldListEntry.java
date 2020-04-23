@@ -7,8 +7,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -27,29 +29,29 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     
     @ApiStatus.Internal
     @Deprecated
-    protected TextFieldListEntry(String fieldName, T original, String resetButtonKey, Supplier<T> defaultValue) {
+    protected TextFieldListEntry(Text fieldName, T original, Text resetButtonKey, Supplier<T> defaultValue) {
         this(fieldName, original, resetButtonKey, defaultValue, null);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    protected TextFieldListEntry(String fieldName, T original, String resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<String[]>> tooltipSupplier) {
+    protected TextFieldListEntry(Text fieldName, T original, Text resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<Text[]>> tooltipSupplier) {
         this(fieldName, original, resetButtonKey, defaultValue, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    protected TextFieldListEntry(String fieldName, T original, String resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
+    protected TextFieldListEntry(Text fieldName, T original, Text resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier);
         this.defaultValue = defaultValue;
         this.original = original;
-        this.textFieldWidget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 148, 18, "") {
+        this.textFieldWidget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 148, 18, NarratorManager.EMPTY) {
             @Override
-            public void render(int int_1, int int_2, float float_1) {
+            public void render(MatrixStack matrices, int int_1, int int_2, float float_1) {
 //                boolean f = isFocused();
                 setFocused(isSelected);
                 textFieldPreRender(this);
-                super.render(int_1, int_2, float_1);
+                super.render(matrices, int_1, int_2, float_1);
 //                setFocused(f);
             }
             
@@ -64,7 +66,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
             if (getScreen() != null && !original.equals(s))
                 getScreen().setEdited(true, isRequiresRestart());
         });
-        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {
+        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.method_27525(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             TextFieldListEntry.this.textFieldWidget.setText(String.valueOf(defaultValue.get()));
             getScreen().setEdited(true, isRequiresRestart());
         });
@@ -85,7 +87,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     }
     
     protected void textFieldPreRender(TextFieldWidget widget) {
-    
+        
     }
     
     @Override
@@ -94,25 +96,25 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-        super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         Window window = MinecraftClient.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault(textFieldWidget.getText());
         this.resetButton.y = y;
         this.textFieldWidget.setEditable(isEditable());
         this.textFieldWidget.y = y + 1;
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(getFieldName())), y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.method_27517(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.method_27525(getFieldName()), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.textFieldWidget.x = x + resetButton.getWidth();
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.method_27517(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.textFieldWidget.x = x + entryWidth - 148;
         }
         setTextFieldWidth(textFieldWidget, 148 - resetButton.getWidth() - 4);
-        resetButton.render(mouseX, mouseY, delta);
-        textFieldWidget.render(mouseX, mouseY, delta);
+        resetButton.render(matrices, mouseX, mouseY, delta);
+        textFieldWidget.render(matrices, mouseX, mouseY, delta);
     }
     
     protected abstract boolean isMatchDefault(String text);

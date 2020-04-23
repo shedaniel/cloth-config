@@ -6,6 +6,7 @@ import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,11 +19,11 @@ import java.util.function.Supplier;
 public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> {
     
     @Nullable private Consumer<ModifierKeyCode> saveConsumer = null;
-    @NotNull private Function<ModifierKeyCode, Optional<String[]>> tooltipSupplier = bool -> Optional.empty();
+    @NotNull private Function<ModifierKeyCode, Optional<Text[]>> tooltipSupplier = bool -> Optional.empty();
     private final ModifierKeyCode value;
     private boolean allowKey = true, allowMouse = true, allowModifiers = true;
     
-    public KeyCodeBuilder(String resetButtonKey, String fieldNameKey, ModifierKeyCode value) {
+    public KeyCodeBuilder(Text resetButtonKey, Text fieldNameKey, ModifierKeyCode value) {
         super(resetButtonKey, fieldNameKey);
         this.value = ModifierKeyCode.copyOf(value);
     }
@@ -48,11 +49,11 @@ public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> 
         return this;
     }
     
-    public KeyCodeBuilder setErrorSupplier(@Nullable Function<InputUtil.KeyCode, Optional<String>> errorSupplier) {
+    public KeyCodeBuilder setErrorSupplier(@Nullable Function<InputUtil.KeyCode, Optional<Text>> errorSupplier) {
         return setModifierErrorSupplier(keyCode -> errorSupplier.apply(keyCode.getKeyCode()));
     }
     
-    public KeyCodeBuilder setModifierErrorSupplier(@Nullable Function<ModifierKeyCode, Optional<String>> errorSupplier) {
+    public KeyCodeBuilder setModifierErrorSupplier(@Nullable Function<ModifierKeyCode, Optional<Text>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -89,26 +90,26 @@ public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> 
         return this;
     }
     
-    public KeyCodeBuilder setTooltipSupplier(@NotNull Function<InputUtil.KeyCode, Optional<String[]>> tooltipSupplier) {
+    public KeyCodeBuilder setTooltipSupplier(@NotNull Function<InputUtil.KeyCode, Optional<Text[]>> tooltipSupplier) {
         return setModifierTooltipSupplier(keyCode -> tooltipSupplier.apply(keyCode.getKeyCode()));
     }
     
-    public KeyCodeBuilder setModifierTooltipSupplier(@NotNull Function<ModifierKeyCode, Optional<String[]>> tooltipSupplier) {
+    public KeyCodeBuilder setModifierTooltipSupplier(@NotNull Function<ModifierKeyCode, Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public KeyCodeBuilder setTooltipSupplier(@NotNull Supplier<Optional<String[]>> tooltipSupplier) {
+    public KeyCodeBuilder setTooltipSupplier(@NotNull Supplier<Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = bool -> tooltipSupplier.get();
         return this;
     }
     
-    public KeyCodeBuilder setTooltip(Optional<String[]> tooltip) {
+    public KeyCodeBuilder setTooltip(Optional<Text[]> tooltip) {
         this.tooltipSupplier = bool -> tooltip;
         return this;
     }
     
-    public KeyCodeBuilder setTooltip(@Nullable String... tooltip) {
+    public KeyCodeBuilder setTooltip(@Nullable Text... tooltip) {
         this.tooltipSupplier = bool -> Optional.ofNullable(tooltip);
         return this;
     }

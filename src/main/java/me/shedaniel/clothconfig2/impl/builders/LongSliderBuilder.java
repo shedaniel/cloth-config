@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.LongSliderEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -14,20 +15,20 @@ import java.util.function.Supplier;
 public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
     
     private Consumer<Long> saveConsumer = null;
-    private Function<Long, Optional<String[]>> tooltipSupplier = l -> Optional.empty();
+    private Function<Long, Optional<Text[]>> tooltipSupplier = l -> Optional.empty();
     private final long value;
     private final long max;
     private final long min;
-    private Function<Long, String> textGetter = null;
+    private Function<Long, Text> textGetter = null;
     
-    public LongSliderBuilder(String resetButtonKey, String fieldNameKey, long value, long min, long max) {
+    public LongSliderBuilder(Text resetButtonKey, Text fieldNameKey, long value, long min, long max) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
         this.max = max;
         this.min = min;
     }
     
-    public LongSliderBuilder setErrorSupplier(Function<Long, Optional<String>> errorSupplier) {
+    public LongSliderBuilder setErrorSupplier(Function<Long, Optional<Text>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -37,7 +38,7 @@ public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
         return this;
     }
     
-    public LongSliderBuilder setTextGetter(Function<Long, String> textGetter) {
+    public LongSliderBuilder setTextGetter(Function<Long, Text> textGetter) {
         this.textGetter = textGetter;
         return this;
     }
@@ -57,22 +58,22 @@ public class LongSliderBuilder extends FieldBuilder<Long, LongSliderEntry> {
         return this;
     }
     
-    public LongSliderBuilder setTooltipSupplier(Function<Long, Optional<String[]>> tooltipSupplier) {
+    public LongSliderBuilder setTooltipSupplier(Function<Long, Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public LongSliderBuilder setTooltipSupplier(Supplier<Optional<String[]>> tooltipSupplier) {
+    public LongSliderBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
         this.tooltipSupplier = i -> tooltipSupplier.get();
         return this;
     }
     
-    public LongSliderBuilder setTooltip(Optional<String[]> tooltip) {
+    public LongSliderBuilder setTooltip(Optional<Text[]> tooltip) {
         this.tooltipSupplier = i -> tooltip;
         return this;
     }
     
-    public LongSliderBuilder setTooltip(String... tooltip) {
+    public LongSliderBuilder setTooltip(Text... tooltip) {
         this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
         return this;
     }
