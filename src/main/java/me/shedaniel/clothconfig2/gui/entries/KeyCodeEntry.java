@@ -108,7 +108,7 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(getLocalizedName());
         if (getScreen().getFocusedBinding() == this)
-            this.buttonWidget.setMessage(new LiteralText(Formatting.WHITE + "> " + Formatting.YELLOW + this.buttonWidget.getMessage() + Formatting.WHITE + " <"));
+            this.buttonWidget.setMessage(new LiteralText(  "> ").method_27692(Formatting.WHITE).append(this.buttonWidget.getMessage().method_27662().method_27692(Formatting.YELLOW)).append(new LiteralText(  " <").method_27692(Formatting.WHITE)));
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
             MinecraftClient.getInstance().textRenderer.method_27517(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.method_27525(getFieldName()), y + 5, 16777215);
             this.resetButton.x = x;
