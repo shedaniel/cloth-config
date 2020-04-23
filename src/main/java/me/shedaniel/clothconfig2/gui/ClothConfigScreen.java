@@ -559,46 +559,51 @@ public abstract class ClothConfigScreen extends Screen {
     
     @Override
     public boolean keyPressed(int int_1, int int_2, int int_3) {
-        if (this.focusedBinding != null && focusedBinding.isAllowKey()) {
-            if (startedKeyCode.isUnknown())
-                startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
-            else if (focusedBinding.isAllowModifiers()) {
-                if (startedKeyCode.getType() == InputUtil.Type.KEYSYM) {
-                    int code = startedKeyCode.getKeyCode().getKeyCode();
-                    if (MinecraftClient.IS_SYSTEM_MAC ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
+        if (this.focusedBinding != null && (focusedBinding.isAllowKey() || int_1 == 256)) {
+            if (int_1 != 256) {
+                if (startedKeyCode.isUnknown())
+                    startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                else if (focusedBinding.isAllowModifiers()) {
+                    if (startedKeyCode.getType() == InputUtil.Type.KEYSYM) {
+                        int code = startedKeyCode.getKeyCode().getKeyCode();
+                        if (MinecraftClient.IS_SYSTEM_MAC ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
+                            Modifier modifier = startedKeyCode.getModifier();
+                            startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
+                            startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                            return true;
+                        } else if (code == 344 || code == 340) {
+                            Modifier modifier = startedKeyCode.getModifier();
+                            startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
+                            startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                            return true;
+                        } else if (code == 342 || code == 346) {
+                            Modifier modifier = startedKeyCode.getModifier();
+                            startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
+                            startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                            return true;
+                        }
+                    }
+                    if (MinecraftClient.IS_SYSTEM_MAC ? (int_1 == 343 || int_1 == 347) : (int_1 == 341 || int_1 == 345)) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
-                        startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
                         return true;
-                    } else if (code == 344 || code == 340) {
+                    } else if (int_1 == 344 || int_1 == 340) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
-                        startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
                         return true;
-                    } else if (code == 342 || code == 346) {
+                    } else if (int_1 == 342 || int_1 == 346) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
-                        startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
                         return true;
                     }
                 }
-                if (MinecraftClient.IS_SYSTEM_MAC ? (int_1 == 343 || int_1 == 347) : (int_1 == 341 || int_1 == 345)) {
-                    Modifier modifier = startedKeyCode.getModifier();
-                    startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
-                    return true;
-                } else if (int_1 == 344 || int_1 == 340) {
-                    Modifier modifier = startedKeyCode.getModifier();
-                    startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
-                    return true;
-                } else if (int_1 == 342 || int_1 == 346) {
-                    Modifier modifier = startedKeyCode.getModifier();
-                    startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
-                    return true;
-                }
+            } else {
+                focusedBinding.setValue(ModifierKeyCode.unknown());
+                setFocusedBinding(null);
             }
             return true;
         }
-        if (this.focusedBinding != null)
+        if (this.focusedBinding != null && int_1 != 256)
             return true;
         if (int_1 == 256 && this.shouldCloseOnEsc()) {
             if (confirmSave && edited)
