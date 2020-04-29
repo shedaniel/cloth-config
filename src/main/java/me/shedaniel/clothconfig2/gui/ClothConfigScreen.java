@@ -144,6 +144,14 @@ public abstract class ClothConfigScreen extends Screen {
     @Deprecated
     public void setFallbackCategory(@Nullable String defaultFallbackCategory) {
         this.defaultFallbackCategory = defaultFallbackCategory;
+        for (int i = 0; i < tabs.size(); i++) {
+            Pair<String, Integer> pair = tabs.get(i);
+            if (pair.getLeft().equals(getFallbackCategory())) {
+                this.nextTabIndex = i;
+                this.selectedTabIndex = i;
+                break;
+            }
+        }
     }
     
     @Override
