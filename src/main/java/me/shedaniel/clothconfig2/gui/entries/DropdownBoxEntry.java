@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
+import me.shedaniel.clothconfig2.api.ScrollingContainer;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
 import net.fabricmc.api.EnvType;
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static me.shedaniel.clothconfig2.ClothConfigInitializer.handleScrollingPosition;
+import static me.shedaniel.clothconfig2.api.ScrollingContainer.handleScrollingPosition;
 
 @SuppressWarnings("deprecation")
 @Environment(EnvType.CLIENT)
@@ -482,7 +483,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         public void scrollTo(double value, boolean animated, long duration) {
-            target = ClothConfigInitializer.clamp(value, getMaxScrollPosition());
+            target = ScrollingContainer.clampExtension(value, getMaxScrollPosition());
             
             if (animated) {
                 start = System.currentTimeMillis();

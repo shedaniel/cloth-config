@@ -6,7 +6,6 @@ import me.shedaniel.clothconfig2.gui.entries.DoubleListEntry;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry;
 import me.shedaniel.clothconfig2.gui.entries.LongSliderEntry;
 import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
-import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.clothconfig2.impl.EasingMethod.EasingMethodImpl;
 import me.shedaniel.clothconfig2.impl.EasingMethods;
@@ -29,10 +28,10 @@ import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,32 +50,28 @@ public class ClothConfigInitializer implements ClientModInitializer {
     private static double scrollStep = 19;
     private static double bounceBackMultiplier = .24;
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public static double handleScrollingPosition(double[] target, double scroll, double maxScroll, float delta, double start, double duration) {
-        if (getBounceBackMultiplier() >= 0) {
-            target[0] = clamp(target[0], maxScroll);
-            if (target[0] < 0) {
-                target[0] -= target[0] * (1 - getBounceBackMultiplier()) * delta / 3;
-            } else if (target[0] > maxScroll) {
-                target[0] = (target[0] - maxScroll) * (1 - (1 - getBounceBackMultiplier()) * delta / 3) + maxScroll;
-            }
-        } else
-            target[0] = clamp(target[0], maxScroll, 0);
-        if (!Precision.almostEquals(scroll, target[0], Precision.FLOAT_EPSILON))
-            return expoEase(scroll, target[0], Math.min((System.currentTimeMillis() - start) / duration * delta * 3, 1));
-        else
-            return target[0];
+        return ScrollingContainer.handleScrollingPosition(target, scroll, maxScroll, delta, start, duration);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public static double expoEase(double start, double end, double amount) {
-        return start + (end - start) * getEasingMethod().apply(amount);
+        return ScrollingContainer.ease(start, end, amount, getEasingMethod());
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public static double clamp(double v, double maxScroll) {
-        return clamp(v, maxScroll, DynamicEntryListWidget.SmoothScrollingSettings.CLAMP_EXTENSION);
+        return ScrollingContainer.clampExtension(v, maxScroll);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public static double clamp(double v, double maxScroll, double clampExtension) {
-        return MathHelper.clamp(v, -clampExtension, maxScroll + clampExtension);
+        return ScrollingContainer.clampExtension(v, -clampExtension, maxScroll + clampExtension);
     }
     
     public static EasingMethod getEasingMethod() {
