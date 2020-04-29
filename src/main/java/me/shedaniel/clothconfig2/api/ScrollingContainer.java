@@ -36,7 +36,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.ApiStatus;
 
-@ApiStatus.Internal
 public abstract class ScrollingContainer {
     public double scrollAmount;
     public double scrollTarget;

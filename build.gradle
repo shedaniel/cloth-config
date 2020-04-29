@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-
 plugins {
     id 'fabric-loom' version '0.2.7-SNAPSHOT'
     id 'maven-publish'
@@ -36,29 +34,28 @@ processResources {
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:18.0.0'
+    compileOnly("org.jetbrains:annotations:18.0.0")
 
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    minecraft("com.mojang:minecraft:${project.minecraft_version}")
+    mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
 
-    modApi "net.fabricmc:fabric-loader:${project.loader_version}"
-    modApi ("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}") {
-        exclude module: "fabric-biomes-v1"
-    }
+    modApi("net.fabricmc:fabric-loader:${project.loader_version}")
+    modApi("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
-    modApi "me.shedaniel.cloth:basic-math:0.5.0"
-    include "me.shedaniel.cloth:basic-math:0.5.0"
+    modApi("me.shedaniel.cloth:basic-math:0.5.0")
+    include("me.shedaniel.cloth:basic-math:0.5.0")
 
-    modCompileOnly "io.github.prospector:modmenu:${modmenu_version}"
+    modCompileOnly("io.github.prospector:modmenu:${modmenu_version}")
+    modRuntime("io.github.prospector:modmenu:${modmenu_version}")
 
-//    modRuntime "com.lettuce.fudge:notenoughcrashes:$nec_version"
+//    modRuntime("com.lettuce.fudge:notenoughcrashes:$nec_version")
 }
 
 bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
     publications = ["MyPublication"]
-    override = true
+    publish = true
     pkg {
         repo = "cloth-config-2"
         name = "config-2"
@@ -76,15 +73,6 @@ bintray {
             gpg {
                 sign = true
             }
-//            mavenCentralSync {
-//                sync = true //[Default: true] Determines whether to sync the version to Maven Central.
-//                user = project.hasProperty('ossToken') ? project.property('ossToken') : System.getenv('OSS_TOKEN')
-//                OSS user token: mandatory
-//                password = project.hasProperty('ossPass') ? project.property('ossPass') : System.getenv('OSS_PASS')
-            //OSS user password: mandatory
-//                close = '1'
-            //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
-//            }
         }
     }
 }
@@ -143,7 +131,7 @@ curseforge {
                 requiredDependency 'fabric-api'
             }
             mainArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
-                displayName = "[Fabric 20w17a] ClothConfig2-$project.version"
+                displayName = "[Fabric ${project.supported_version}] ClothConfig2-$project.version"
             }
             addArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar"))
             afterEvaluate {
