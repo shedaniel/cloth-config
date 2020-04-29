@@ -45,9 +45,9 @@ public class TextListEntry extends TooltipListEntry<Object> {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         this.savedWidth = entryWidth;
         int yy = y + 4;
-        List<Text> strings = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(text, savedWidth);
+        List<Text> strings = MinecraftClient.getInstance().textRenderer.wrapLines(text, savedWidth);
         for (Text string : strings) {
-            MinecraftClient.getInstance().textRenderer.method_27517(matrices, string, x, yy, color);
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, string, x, yy, color);
             yy += MinecraftClient.getInstance().textRenderer.fontHeight + 3;
         }
     }
@@ -56,7 +56,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
     public int getItemHeight() {
         if (savedWidth == -1)
             return 12;
-        List<Text> strings = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(text, savedWidth);
+        List<Text> strings = MinecraftClient.getInstance().textRenderer.wrapLines(text, savedWidth);
         if (strings.isEmpty())
             return 0;
         return 15 + strings.size() * 12;

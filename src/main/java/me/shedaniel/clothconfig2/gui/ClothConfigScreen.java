@@ -94,7 +94,7 @@ public abstract class ClothConfigScreen extends Screen {
             tabbedEntries.put(tab, list);
         });
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        this.tabs = tabbedEntries.keySet().stream().map(s -> new Pair<>(s, textRenderer.method_27525(s) + 8)).collect(Collectors.toList());
+        this.tabs = tabbedEntries.keySet().stream().map(s -> new Pair<>(s, textRenderer.getWidth(s) + 8)).collect(Collectors.toList());
         this.nextTabIndex = 0;
         this.selectedTabIndex = 0;
         for (int i = 0; i < tabs.size(); i++) {
@@ -145,6 +145,14 @@ public abstract class ClothConfigScreen extends Screen {
     @Deprecated
     public void setFallbackCategory(@Nullable Text defaultFallbackCategory) {
         this.defaultFallbackCategory = defaultFallbackCategory;
+        for (int i = 0; i < tabs.size(); i++) {
+            Pair<Text, Integer> pair = tabs.get(i);
+            if (pair.getLeft().equals(getFallbackCategory())) {
+                this.nextTabIndex = i;
+                this.selectedTabIndex = i;
+                break;
+            }
+        }
     }
     
     @Override
@@ -422,7 +430,7 @@ public abstract class ClothConfigScreen extends Screen {
                 RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
                 String text = "§c" + (errors.size() == 1 ? errors.get(0) : I18n.translate("text.cloth-config.multi_error"));
                 if (isTransparentBackground()) {
-                    int stringWidth = client.textRenderer.getStringWidth(text);
+                    int stringWidth = client.textRenderer.getWidth(text);
                     fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + client.textRenderer.fontHeight, 0x68000000, 0x68000000);
                 }
                 drawTexture(matrices, 10, 10, 0, 54, 3, 11);
@@ -433,7 +441,7 @@ public abstract class ClothConfigScreen extends Screen {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             String text = "§c" + I18n.translate("text.cloth-config.not_editable");
             if (isTransparentBackground()) {
-                int stringWidth = client.textRenderer.getStringWidth(text);
+                int stringWidth = client.textRenderer.getWidth(text);
                 fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + client.textRenderer.fontHeight, 0x68000000, 0x68000000);
             }
             drawTexture(matrices, 10, 10, 0, 54, 3, 11);

@@ -41,7 +41,7 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
             getScreen().setFocusedBinding(this);
             getScreen().setEdited(true, isRequiresRestart());
         });
-        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.method_27525(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
+        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             KeyCodeEntry.this.value = getDefaultValue().orElse(null);
             getScreen().setFocusedBinding(null);
             getScreen().setEdited(true, isRequiresRestart());
@@ -108,13 +108,13 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(getLocalizedName());
         if (getScreen().getFocusedBinding() == this)
-            this.buttonWidget.setMessage(new LiteralText(  "> ").method_27692(Formatting.WHITE).append(this.buttonWidget.getMessage().method_27662().method_27692(Formatting.YELLOW)).append(new LiteralText(  " <").method_27692(Formatting.WHITE)));
+            this.buttonWidget.setMessage(new LiteralText(  "> ").formatted(Formatting.WHITE).append(this.buttonWidget.getMessage().copy().formatted(Formatting.YELLOW)).append(new LiteralText(  " <").formatted(Formatting.WHITE)));
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.method_27517(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.method_27525(getFieldName()), y + 5, 16777215);
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(getFieldName()), y + 5, 16777215);
             this.resetButton.x = x;
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
         } else {
-            MinecraftClient.getInstance().textRenderer.method_27517(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
         }

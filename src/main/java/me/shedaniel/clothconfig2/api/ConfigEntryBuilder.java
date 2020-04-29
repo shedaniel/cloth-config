@@ -10,13 +10,12 @@ import me.shedaniel.math.Color;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.mixin.client.keybinding.KeyCodeAccessor;
-import net.minecraft.class_5251;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-
+import net.minecraft.text.TextColor;
 import java.util.List;
 import java.util.function.Function;
 
@@ -51,8 +50,8 @@ public interface ConfigEntryBuilder {
     
     ColorFieldBuilder startColorField(Text fieldNameKey, int value);
     
-    default ColorFieldBuilder startColorField(Text fieldNameKey, class_5251 color) {
-        return startColorField(fieldNameKey, color.method_27716());
+    default ColorFieldBuilder startColorField(Text fieldNameKey, TextColor color) {
+        return startColorField(fieldNameKey, color.getRgb());
     }
     
     default ColorFieldBuilder startColorField(Text fieldNameKey, Color color) {

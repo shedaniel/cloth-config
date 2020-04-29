@@ -4,8 +4,8 @@ import me.shedaniel.clothconfig2.gui.entries.ColorEntry;
 import me.shedaniel.math.Color;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5251;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -49,8 +49,8 @@ public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
         return this;
     }
     
-    public ColorFieldBuilder setSaveConsumer3(Consumer<class_5251> saveConsumer) {
-        this.saveConsumer = integer -> saveConsumer.accept(class_5251.method_27717(integer));
+    public ColorFieldBuilder setSaveConsumer3(Consumer<TextColor> saveConsumer) {
+        this.saveConsumer = integer -> saveConsumer.accept(TextColor.fromRgb(integer));
         return this;
     }
     
@@ -64,8 +64,8 @@ public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
         return this;
     }
     
-    public ColorFieldBuilder setDefaultValue3(Supplier<class_5251> defaultValue) {
-        this.defaultValue = () -> defaultValue.get().method_27716();
+    public ColorFieldBuilder setDefaultValue3(Supplier<TextColor> defaultValue) {
+        this.defaultValue = () -> defaultValue.get().getRgb();
         return this;
     }
     
@@ -79,8 +79,8 @@ public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
         return this;
     }
     
-    public ColorFieldBuilder setDefaultValue(class_5251 defaultValue) {
-        this.defaultValue = () -> Objects.requireNonNull(defaultValue).method_27716();
+    public ColorFieldBuilder setDefaultValue(TextColor defaultValue) {
+        this.defaultValue = () -> Objects.requireNonNull(defaultValue).getRgb();
         return this;
     }
     
