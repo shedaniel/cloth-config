@@ -420,15 +420,15 @@ public abstract class ClothConfigScreen extends Screen {
             method_27534(matrices, client.textRenderer, title, width / 2, 12, -1);
         
         if (displayErrors && isEditable()) {
-            List<String> errors = Lists.newArrayList();
+            List<Text> errors = Lists.newArrayList();
             for (List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values()))
                 for (AbstractConfigEntry entry : entries)
                     if (entry.getConfigError().isPresent())
-                        errors.add(((Optional<String>) entry.getConfigError()).get());
+                        errors.add(((Optional<Text>) entry.getConfigError()).get());
             if (errors.size() > 0) {
                 client.getTextureManager().bindTexture(CONFIG_TEX);
                 RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-                String text = "§c" + (errors.size() == 1 ? errors.get(0) : I18n.translate("text.cloth-config.multi_error"));
+                String text = "§c" + (errors.size() == 1 ? errors.get(0).copy().getString() : I18n.translate("text.cloth-config.multi_error"));
                 if (isTransparentBackground()) {
                     int stringWidth = client.textRenderer.getWidth(text);
                     fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + client.textRenderer.fontHeight, 0x68000000, 0x68000000);
