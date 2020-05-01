@@ -1,11 +1,12 @@
 plugins {
-    id 'fabric-loom' version '0.2.7-SNAPSHOT'
+    id 'fabric-loom' version "0.4.3"
     id 'maven-publish'
     id 'maven'
     id 'signing'
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
     id 'java-library'
+    id 'net.corda.plugins.jar-filter' version "5.0.8" apply false
 }
 
 repositories {
@@ -34,7 +35,7 @@ processResources {
 }
 
 dependencies {
-    compileOnly("org.jetbrains:annotations:18.0.0")
+    compile("org.jetbrains:annotations:18.0.0")
 
     minecraft("com.mojang:minecraft:${project.minecraft_version}")
     mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
@@ -47,8 +48,28 @@ dependencies {
 
     modCompileOnly("io.github.prospector:modmenu:${modmenu_version}")
     modRuntime("io.github.prospector:modmenu:${modmenu_version}")
+}
 
-//    modRuntime("com.lettuce.fudge:notenoughcrashes:$nec_version")
+task jarFilter(type: net.corda.gradle.jarfilter.JarFilterTask) {
+    jars remapJar
+    annotations {
+        forRemove = [
+                "org.jetbrains.annotations.NotNull",
+                "org.jetbrains.annotations.Nullable",
+                "org.jetbrains.annotations.ApiStatus\$Experimental",
+                "org.jetbrains.annotations.ApiStatus\$Internal",
+                "org.jetbrains.annotations.ApiStatus\$ScheduledForRemoval",
+                "org.jetbrains.annotations.ApiStatus\$AvailableSince",
+                "org.jetbrains.annotations.ApiStatus\$NonExtendable",
+                "org.jetbrains.annotations.ApiStatus\$OverrideOnly"
+        ]
+    }
+}
+
+task copyJarFilter(type: Copy) {
+    from jarFilter
+    into "${project.buildDir}/filtered-libs/"
+    rename { "${project.archivesBaseName}-${project.version}.jar" }
 }
 
 bintray {
@@ -130,12 +151,12 @@ curseforge {
             relations {
                 requiredDependency 'fabric-api'
             }
-            mainArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
+            mainArtifact(file("${project.buildDir}/filtered-libs/${project.archivesBaseName}-${project.version}.jar")) {
                 displayName = "[Fabric ${project.supported_version}] ClothConfig2-$project.version"
             }
             addArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar"))
             afterEvaluate {
-                uploadTask.dependsOn("remapJar")
+                uploadTask.dependsOn("copyJarFilter")
                 uploadTask.dependsOn("remapSourcesJar")
             }
         }
