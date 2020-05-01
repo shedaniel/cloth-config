@@ -1,13 +1,12 @@
-import java.text.SimpleDateFormat
-
 plugins {
-    id 'fabric-loom' version '0.2.7-SNAPSHOT'
+    id 'fabric-loom' version "0.4.3"
     id 'maven-publish'
     id 'maven'
     id 'signing'
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
     id 'java-library'
+    id 'net.corda.plugins.jar-filter' version "5.0.8" apply false
 }
 
 repositories {
@@ -36,7 +35,7 @@ processResources {
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:18.0.0'
+    compile("org.jetbrains:annotations:18.0.0")
 
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -48,15 +47,35 @@ dependencies {
     include "me.shedaniel.cloth:basic-math:0.5.0"
 
     modImplementation "io.github.prospector:modmenu:${modmenu_version}"
+}
 
-//    modRuntime "com.lettuce.fudge:notenoughcrashes:$nec_version"
+task jarFilter(type: net.corda.gradle.jarfilter.JarFilterTask) {
+    jars remapJar
+    annotations {
+        forRemove = [
+                "org.jetbrains.annotations.NotNull",
+                "org.jetbrains.annotations.Nullable",
+                "org.jetbrains.annotations.ApiStatus\$Experimental",
+                "org.jetbrains.annotations.ApiStatus\$Internal",
+                "org.jetbrains.annotations.ApiStatus\$ScheduledForRemoval",
+                "org.jetbrains.annotations.ApiStatus\$AvailableSince",
+                "org.jetbrains.annotations.ApiStatus\$NonExtendable",
+                "org.jetbrains.annotations.ApiStatus\$OverrideOnly"
+        ]
+    }
+}
+
+task copyJarFilter(type: Copy) {
+    from jarFilter
+    into "${project.buildDir}/filtered-libs/"
+    rename { "${project.archivesBaseName}-${project.version}.jar" }
 }
 
 bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
     publications = ["MyPublication"]
-    override = true
+    publish = true
     pkg {
         repo = "cloth-config-2"
         name = "config-2"
@@ -74,24 +93,12 @@ bintray {
             gpg {
                 sign = true
             }
-//            mavenCentralSync {
-//                sync = true //[Default: true] Determines whether to sync the version to Maven Central.
-//                user = project.hasProperty('ossToken') ? project.property('ossToken') : System.getenv('OSS_TOKEN')
-//                OSS user token: mandatory
-//                password = project.hasProperty('ossPass') ? project.property('ossPass') : System.getenv('OSS_PASS')
-            //OSS user password: mandatory
-//                close = '1'
-            //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
-//            }
         }
     }
 }
 
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    classifier("sources")
     from sourceSets.main.allSource
 }
 
@@ -100,7 +107,7 @@ task javadocs(type: Javadoc) {
 }
 
 task javadocsJar(type: Jar, dependsOn: javadocs) {
-    classifier = "javadocs"
+    classifier("javadocs")
     javadocs.failOnError false
     from javadocs.destinationDir
 }
@@ -143,12 +150,12 @@ curseforge {
             relations {
                 requiredDependency 'fabric-api'
             }
-            mainArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
+            mainArtifact(file("${project.buildDir}/filtered-libs/${project.archivesBaseName}-${project.version}.jar")) {
                 displayName = "[Fabric 1.15.x] ClothConfig2-$project.version"
             }
             addArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar"))
             afterEvaluate {
-                uploadTask.dependsOn("remapJar")
+                uploadTask.dependsOn("copyJarFilter")
                 uploadTask.dependsOn("remapSourcesJar")
             }
         }
