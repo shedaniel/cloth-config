@@ -160,7 +160,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         @Override
         public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-            fill(matrices, bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height, -6250336);
+            fill(matrices, bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height, topRenderer.isSelected ? -1 : -6250336);
             fill(matrices, bounds.x + 1, bounds.y + 1, bounds.x + bounds.width - 1, bounds.y + bounds.height - 1, -16777216);
             topRenderer.render(matrices, mouseX, mouseY, bounds.x, bounds.y, bounds.width, bounds.height, delta);
             if (menu.isExpanded())
@@ -362,7 +362,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public void lateRender(MatrixStack matrices, int mouseX, int mouseY, float delta) {
             int last10Height = getHeight();
             int cWidth = getCellCreator().getCellWidth();
-            fill(matrices, lastRectangle.x, lastRectangle.y + lastRectangle.height, lastRectangle.x + cWidth, lastRectangle.y + lastRectangle.height + last10Height + 1, -6250336);
+            fill(matrices, lastRectangle.x, lastRectangle.y + lastRectangle.height, lastRectangle.x + cWidth, lastRectangle.y + lastRectangle.height + last10Height + 1, isExpanded() ? -1 : -6250336);
             fill(matrices, lastRectangle.x + 1, lastRectangle.y + lastRectangle.height + 1, lastRectangle.x + cWidth - 1, lastRectangle.y + lastRectangle.height + last10Height, -16777216);
             RenderSystem.pushMatrix();
             RenderSystem.translatef(0, 0, 300f);

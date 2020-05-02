@@ -33,7 +33,7 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
         this.alpha = false;
         this.saveConsumer = saveConsumer;
         this.textFieldWidget.setText(getHexColorString(value));
-        this.colorDisplayWidget = new ColorDisplayWidget(0, 0, 20, getColorValueColor(textFieldWidget.getText()));
+        this.colorDisplayWidget = new ColorDisplayWidget(textFieldWidget, 0, 0, 20, getColorValueColor(textFieldWidget.getText()));
         this.original = value;
         ((ButtonWidgetHooks) this.resetButton).setOnPress(button -> {
             this.textFieldWidget.setText(getHexColorString(original));
