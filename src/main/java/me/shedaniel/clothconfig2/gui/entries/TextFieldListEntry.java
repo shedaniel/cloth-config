@@ -40,7 +40,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     @ApiStatus.Internal
     @Deprecated
     protected TextFieldListEntry(String fieldName, T original, String resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
-        super(fieldName, tooltipSupplier);
+        super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.original = original;
         this.textFieldWidget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 148, 18, "") {

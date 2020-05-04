@@ -209,13 +209,13 @@ public abstract class ClothConfigScreen extends Screen {
                 entry.save();
         save();
         setEdited(false);
-        requiresRestart = false;
         if (openOtherScreens) {
             if (requiresRestart)
                 ClothConfigScreen.this.minecraft.openScreen(new ClothRequiresRestartScreen(parent));
             else
                 ClothConfigScreen.this.minecraft.openScreen(parent);
         }
+        requiresRestart = false;
     }
     
     @Override
@@ -264,6 +264,8 @@ public abstract class ClothConfigScreen extends Screen {
         addButton(applyButton = new AbstractPressableButtonWidget(25 + (6 + buttonWidths) * 2, height - 26, buttonWidths, 20, I18n.translate("text.cloth-config.apply")) {
             @Override
             public void onPress() {
+                if (requiresRestart)
+                    ClothConfigScreen.this.minecraft.openScreen(new ClothRequiresRestartScreen(ClothConfigScreen.this));
                 saveAll(false);
             }
             
