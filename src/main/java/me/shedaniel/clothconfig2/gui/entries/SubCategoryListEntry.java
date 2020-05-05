@@ -157,12 +157,14 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public Optional<String> getError() {
         String error = null;
-        for (AbstractConfigListEntry<?> entry : entries)
-            if (entry.getError().isPresent()) {
+        for (AbstractConfigListEntry<?> entry : entries) {
+            Optional<String> configError = entry.getConfigError();
+            if (configError.isPresent()) {
                 if (error != null)
                     return Optional.ofNullable(I18n.translate("text.cloth-config.multi_error"));
-                return entry.getError();
+                return configError;
             }
+        }
         return Optional.ofNullable(error);
     }
     
