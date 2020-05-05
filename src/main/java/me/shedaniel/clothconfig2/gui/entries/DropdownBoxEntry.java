@@ -46,6 +46,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     protected SelectionElement<T> selectionElement;
     @NotNull private Supplier<T> defaultValue;
     @Nullable private Consumer<T> saveConsumer;
+    private boolean suggestionMode = true;
     
     @ApiStatus.Internal
     @Deprecated
@@ -80,6 +81,14 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         this.selectionElement.bounds.width = 150 - resetButton.getWidth() - 4;
         resetButton.render(matrices, mouseX, mouseY, delta);
         selectionElement.render(matrices, mouseX, mouseY, delta);
+    }
+    
+    public boolean isSuggestionMode() {
+        return suggestionMode;
+    }
+    
+    public void setSuggestionMode(boolean suggestionMode) {
+        this.suggestionMode = suggestionMode;
     }
     
     @Override
@@ -241,6 +250,10 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             return isSelected && this.getEntry().getFocused() == this.getEntry().selectionElement;
         }
         
+        public final boolean isSuggestionMode() {
+            return entry.isSuggestionMode();
+        }
+        
         @Override
         public abstract List<SelectionCellElement<R>> children();
     }
@@ -288,18 +301,23 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         public void search() {
-            currentElements.clear();
-            String keyword = this.lastSearchKeyword.getString().toLowerCase();
-            for (SelectionCellElement<R> cell : cells) {
-                Text key = cell.getSearchKey();
-                if (key == null || key.getString().toLowerCase().contains(keyword))
-                    currentElements.add(cell);
+            if (isSuggestionMode()) {
+                currentElements.clear();
+                String keyword = this.lastSearchKeyword.getString().toLowerCase();
+                for (SelectionCellElement<R> cell : cells) {
+                    Text key = cell.getSearchKey();
+                    if (key == null || key.getString().toLowerCase().contains(keyword))
+                        currentElements.add(cell);
+                }
+                if (!keyword.isEmpty()) {
+                    Comparator<SelectionCellElement<?>> c = Comparator.comparingDouble(i -> i.getSearchKey() == null ? Double.MAX_VALUE : similarity(i.getSearchKey().getString(), keyword));
+                    currentElements.sort(c.reversed());
+                }
+                scrollTo(0, false);
+            } else {
+                currentElements.clear();
+                currentElements.addAll(cells);
             }
-            if (!keyword.isEmpty()) {
-                Comparator<SelectionCellElement<?>> c = Comparator.comparingDouble(i -> i.getSearchKey() == null ? Double.MAX_VALUE : similarity(i.getSearchKey().getString(), keyword));
-                currentElements.sort(c.reversed());
-            }
-            scrollTo(0, false);
         }
         
         protected int editDistance(String s1, String s2) {
@@ -538,7 +556,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     public static abstract class SelectionCellElement<R> extends AbstractParentElement {
-        @Deprecated @NotNull private DropdownBoxEntry<R> entry;
+        @SuppressWarnings("NotNullFieldNotInitialized") @Deprecated @NotNull private DropdownBoxEntry<R> entry;
         
         @NotNull
         public final DropdownBoxEntry<R> getEntry() {
@@ -641,9 +659,17 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public final boolean hasConfigError() {
             return getConfigError().isPresent();
         }
+    
+        public final boolean hasError() {
+            return getError().isPresent();
+        }
         
         public final int getPreferredTextColor() {
             return getConfigError().isPresent() ? 16733525 : 16777215;
+        }
+        
+        public final boolean isSuggestionMode() {
+            return getParent().isSuggestionMode();
         }
         
         public void selectFirstRecommendation() {
@@ -673,7 +699,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             textFieldWidget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 148, 18, NarratorManager.EMPTY) {
                 @Override
                 public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-                    setFocused(isSelected && DefaultSelectionTopCellElement.this.getParent().getFocused() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.getFocused() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.getFocused() == this);
+                    setFocused(isSuggestionMode() && isSelected && DefaultSelectionTopCellElement.this.getParent().getFocused() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.getFocused() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.getFocused() == this);
                     super.render(matrices, mouseX, mouseY, delta);
                 }
                 
@@ -683,7 +709,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                         DefaultSelectionTopCellElement.this.selectFirstRecommendation();
                         return true;
                     }
-                    return super.keyPressed(int_1, int_2, int_3);
+                    return isSuggestionMode() && super.keyPressed(int_1, int_2, int_3);
+                }
+                
+                @Override
+                public boolean charTyped(char chr, int keyCode) {
+                    return isSuggestionMode() && super.charTyped(chr, keyCode);
                 }
             };
             textFieldWidget.setHasBorder(false);
@@ -707,7 +738,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         @Override
         public R getValue() {
-            if (hasConfigError())
+            if (hasError())
                 return value;
             return toObjectFunction.apply(textFieldWidget.getText());
         }

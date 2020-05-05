@@ -34,6 +34,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
     protected Function<T, Optional<Text[]>> tooltipSupplier = str -> Optional.empty();
     protected Consumer<T> saveConsumer = null;
     protected Iterable<T> selections = Collections.emptyList();
+    protected boolean suggestionMode = true;
     
     public DropdownMenuBuilder(Text resetButtonKey, Text fieldNameKey, SelectionTopCellElement<T> topCellElement, SelectionCellCreator<T> cellCreator) {
         super(resetButtonKey, fieldNameKey);
@@ -91,6 +92,15 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         return this;
     }
     
+    public DropdownMenuBuilder<T> setSuggestionMode(boolean suggestionMode) {
+        this.suggestionMode = suggestionMode;
+        return this;
+    }
+    
+    public boolean isSuggestionMode() {
+        return suggestionMode;
+    }
+    
     @NotNull
     @Override
     public DropdownBoxEntry<T> build() {
@@ -98,6 +108,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
+        entry.setSuggestionMode(suggestionMode);
         return entry;
     }
     

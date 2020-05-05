@@ -58,7 +58,7 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
     
     @Override
     protected void textFieldPreRender(TextFieldWidget widget) {
-        if (!getError().isPresent()) {
+        if (!getConfigError().isPresent()) {
             widget.setEditableColor(14737632);
         } else {
             widget.setEditableColor(16733525);
