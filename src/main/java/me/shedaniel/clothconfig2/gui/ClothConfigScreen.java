@@ -231,14 +231,14 @@ public abstract class ClothConfigScreen extends Screen {
         listWidget.setSmoothScrolling(this.smoothScrollingList);
         if (tabbedEntries.size() > selectedTabIndex)
             Lists.newArrayList(tabbedEntries.values()).get(selectedTabIndex).forEach(entry -> listWidget.children().add(entry));
-        int buttonWidths = (width - 50 - 12) / 3;
-        addButton(quitButton = new ButtonWidget(25, height - 26, buttonWidths, 20, edited ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"), widget -> {
+        int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
+        addButton(quitButton = new ButtonWidget(width / 2 - buttonWidths / 2 - buttonWidths - 6, height - 26, buttonWidths, 20, edited ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"), widget -> {
             if (confirmSave && edited)
                 client.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), new TranslatableText("text.cloth-config.quit_discard"), new TranslatableText("gui.cancel")));
             else
                 client.openScreen(parent);
         }));
-        addButton(saveButton = new AbstractPressableButtonWidget(25 + 6 + buttonWidths, height - 26, buttonWidths, 20, NarratorManager.EMPTY) {
+        addButton(saveButton = new AbstractPressableButtonWidget(width / 2 + buttonWidths / 2 + 6, height - 26, buttonWidths, 20, NarratorManager.EMPTY) {
             @Override
             public void onPress() {
                 saveAll(true);
@@ -262,7 +262,7 @@ public abstract class ClothConfigScreen extends Screen {
                 super.render(matrices, mouseX, mouseY, delta);
             }
         });
-        addButton(applyButton = new AbstractPressableButtonWidget(25 + (6 + buttonWidths) * 2, height - 26, buttonWidths, 20, new TranslatableText("text.cloth-config.apply")) {
+        addButton(applyButton = new AbstractPressableButtonWidget(width / 2 - buttonWidths / 2, height - 26, buttonWidths, 20, new TranslatableText("text.cloth-config.apply")) {
             @Override
             public void onPress() {
                 if (requiresRestart)
