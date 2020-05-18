@@ -230,14 +230,14 @@ public abstract class ClothConfigScreen extends Screen {
         listWidget.setSmoothScrolling(this.smoothScrollingList);
         if (tabbedEntries.size() > selectedTabIndex)
             Lists.newArrayList(tabbedEntries.values()).get(selectedTabIndex).forEach(entry -> listWidget.children().add(entry));
-        int buttonWidths = (width - 50 - 12) / 3;
-        addButton(quitButton = new ButtonWidget(25, height - 26, buttonWidths, 20, edited ? I18n.translate("text.cloth-config.cancel_discard") : I18n.translate("gui.cancel"), widget -> {
+        int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
+        addButton(quitButton = new ButtonWidget(width / 2 - buttonWidths / 2 - buttonWidths - 6, height - 26, buttonWidths, 20, edited ? I18n.translate("text.cloth-config.cancel_discard") : I18n.translate("gui.cancel"), widget -> {
             if (confirmSave && edited)
                 minecraft.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), I18n.translate("text.cloth-config.quit_discard"), I18n.translate("gui.cancel")));
             else
                 minecraft.openScreen(parent);
         }));
-        addButton(saveButton = new AbstractPressableButtonWidget(25 + 6 + buttonWidths, height - 26, buttonWidths, 20, "") {
+        addButton(saveButton = new AbstractPressableButtonWidget(width / 2 + buttonWidths / 2 + 6, height - 26, buttonWidths, 20, "") {
             @Override
             public void onPress() {
                 saveAll(true);
@@ -261,7 +261,7 @@ public abstract class ClothConfigScreen extends Screen {
                 super.render(int_1, int_2, float_1);
             }
         });
-        addButton(applyButton = new AbstractPressableButtonWidget(25 + (6 + buttonWidths) * 2, height - 26, buttonWidths, 20, I18n.translate("text.cloth-config.apply")) {
+        addButton(applyButton = new AbstractPressableButtonWidget(width / 2 - buttonWidths / 2, height - 26, buttonWidths, 20, I18n.translate("text.cloth-config.apply")) {
             @Override
             public void onPress() {
                 if (requiresRestart)
