@@ -289,31 +289,31 @@ public class ClothConfigInitializer implements ClientModInitializer {
         class Pair<T, R> {
             T t;
             R r;
-        
+            
             public Pair(T t, R r) {
                 this.t = t;
                 this.r = r;
             }
-        
+            
             public T getLeft() {
                 return t;
             }
-        
+            
             public R getRight() {
                 return r;
             }
-        
+            
             @Override
             public boolean equals(Object o) {
                 if (this == o) return true;
                 if (o == null || getClass() != o.getClass()) return false;
-            
+                
                 Pair<?, ?> pair = (Pair<?, ?>) o;
-            
+                
                 if (!Objects.equals(t, pair.t)) return false;
                 return Objects.equals(r, pair.r);
             }
-        
+            
             @Override
             public int hashCode() {
                 int result = t != null ? t.hashCode() : 0;
@@ -340,6 +340,24 @@ public class ClothConfigInitializer implements ClientModInitializer {
         colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
         colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
         testing.addEntry(colors.build());
+        testing.addEntry(entryBuilder.startDropdownMenu(new LiteralText("Suggestion Random Int"), DropdownMenuBuilder.TopCellElementBuilder.of(10,
+                s -> {
+                    try {
+                        return Integer.parseInt(s);
+                    } catch (NumberFormatException ignored) {
+                        
+                    }
+                    return null;
+                })).setDefaultValue(10).setSelections(Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).build());
+        testing.addEntry(entryBuilder.startDropdownMenu(new LiteralText("Selection Random Int"), DropdownMenuBuilder.TopCellElementBuilder.of(10,
+                s -> {
+                    try {
+                        return Integer.parseInt(s);
+                    } catch (NumberFormatException ignored) {
+                        
+                    }
+                    return null;
+                })).setDefaultValue(5).setSuggestionMode(false).setSelections(Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).build());
         testing.addEntry(new NestedListListEntry<Pair<Integer, Integer>, MultiElementListEntry<Pair<Integer, Integer>>>(
                 new LiteralText("Nice"),
                 Lists.newArrayList(new Pair<>(10, 10), new Pair<>(20, 40)),

@@ -29,7 +29,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         if (legacyRequiresRestart) return true;
         for (List<AbstractConfigEntry<?>> entries : getCategorizedEntries().values()) {
             for (AbstractConfigEntry<?> entry : entries) {
-                if (entry.isRequiresRestart()) {
+                if (!entry.getConfigError().isPresent() && entry.isEdited() && entry.isRequiresRestart()) {
                     return true;
                 }
             }

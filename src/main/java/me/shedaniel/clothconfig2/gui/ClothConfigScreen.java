@@ -198,9 +198,6 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
         this.children.clear();
         this.tabButtons.clear();
         
-        // Put already created list back to entries
-        if (listWidget != null)
-            categorizedEntries.put(tabs.get(selectedTabIndex).getLeft(), (List) listWidget.children());
         selectedTabIndex = nextTabIndex;
         children.add(listWidget = new ListWidget(client, width, height, isShowingTabs() ? 70 : 30, height - 32, getBackgroundLocation()));
         if (categorizedEntries.size() > selectedTabIndex) {

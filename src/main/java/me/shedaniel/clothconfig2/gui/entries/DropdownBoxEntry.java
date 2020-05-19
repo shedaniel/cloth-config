@@ -377,7 +377,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         private void updatePosition(float delta) {
             double[] target = {this.target};
-            scroll = handleScrollingPosition(target, scroll, getMaxScroll(), delta, start, duration);
+            scroll = handleScrollingPosition(target, scroll, getMaxScrollPosition(), delta, start, duration);
             this.target = target[0];
         }
         
