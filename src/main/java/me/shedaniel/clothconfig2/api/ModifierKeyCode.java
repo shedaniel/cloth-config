@@ -1,12 +1,12 @@
 package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.clothconfig2.impl.ModifierKeyCodeImpl;
-import me.shedaniel.clothconfig2.mixin.MouseHooks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public interface ModifierKeyCode {
@@ -34,6 +34,10 @@ public interface ModifierKeyCode {
     
     ModifierKeyCode setModifier(Modifier modifier);
     
+    default ModifierKeyCode copy() {
+        return copyOf(this);
+    }
+    
     default boolean matchesMouse(int button) {
         return !isUnknown() && getType() == InputUtil.Type.MOUSE && getKeyCode().getKeyCode() == button && getModifier().matchesCurrent();
     }
@@ -50,14 +54,7 @@ public interface ModifierKeyCode {
     
     default boolean matchesCurrentMouse() {
         if (!isUnknown() && getType() == InputUtil.Type.MOUSE && getModifier().matchesCurrent()) {
-            switch (getKeyCode().getKeyCode()) {
-                case 0:
-                    return MinecraftClient.getInstance().mouse.wasLeftButtonClicked();
-                case 1:
-                    return MinecraftClient.getInstance().mouse.wasRightButtonClicked();
-                case 2:
-                    return ((MouseHooks) MinecraftClient.getInstance().mouse).middleButtonClicked();
-            }
+            return GLFW.glfwGetMouseButton(MinecraftClient.getInstance().getWindow().getHandle(), getKeyCode().getKeyCode()) == GLFW.GLFW_PRESS;
         }
         return false;
     }

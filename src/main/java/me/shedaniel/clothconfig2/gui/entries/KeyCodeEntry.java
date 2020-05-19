@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     
     private ModifierKeyCode value;
+    private ModifierKeyCode original;
     private ButtonWidget buttonWidget, resetButton;
     private Consumer<ModifierKeyCode> saveConsumer;
     private Supplier<ModifierKeyCode> defaultValue;
@@ -36,18 +37,22 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     public KeyCodeEntry(Text fieldName, ModifierKeyCode value, Text resetButtonKey, Supplier<ModifierKeyCode> defaultValue, Consumer<ModifierKeyCode> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
-        this.value = value;
+        this.value = value.copy();
+        this.original = value.copy();
         this.buttonWidget = new ButtonWidget(0, 0, 150, 20, NarratorManager.EMPTY, widget -> {
             getScreen().setFocusedBinding(this);
-            getScreen().setEdited(true, isRequiresRestart());
         });
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
-            KeyCodeEntry.this.value = getDefaultValue().orElse(null);
+            KeyCodeEntry.this.value = getDefaultValue().orElse(null).copy();
             getScreen().setFocusedBinding(null);
-            getScreen().setEdited(true, isRequiresRestart());
         });
         this.saveConsumer = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
+    }
+    
+    @Override
+    public boolean isEdited() {
+        return super.isEdited() || !this.original.equals(getValue());
     }
     
     public boolean isAllowModifiers() {
@@ -91,7 +96,7 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     
     @Override
     public Optional<ModifierKeyCode> getDefaultValue() {
-        return Optional.ofNullable(defaultValue).map(Supplier::get);
+        return Optional.ofNullable(defaultValue).map(Supplier::get).map(ModifierKeyCode::copy);
     }
     
     private Text getLocalizedName() {
@@ -102,13 +107,13 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         Window window = MinecraftClient.getInstance().getWindow();
-        this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !getDefaultValue().get().equals(value);
+        this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !getDefaultValue().get().equals(getValue());
         this.resetButton.y = y;
         this.buttonWidget.active = isEditable();
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(getLocalizedName());
         if (getScreen().getFocusedBinding() == this)
-            this.buttonWidget.setMessage(new LiteralText(  "> ").formatted(Formatting.WHITE).append(this.buttonWidget.getMessage().copy().formatted(Formatting.YELLOW)).append(new LiteralText(  " <").formatted(Formatting.WHITE)));
+            this.buttonWidget.setMessage(new LiteralText("> ").formatted(Formatting.WHITE).append(this.buttonWidget.getMessage().copy().formatted(Formatting.YELLOW)).append(new LiteralText(" <").formatted(Formatting.WHITE)));
         Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 5, 16777215);

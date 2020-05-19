@@ -140,5 +140,4 @@ public class Modifier {
     public int hashCode() {
         return Objects.hash(value);
     }
-    
 }

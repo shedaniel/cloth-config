@@ -55,7 +55,7 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
     private final LinkedHashMap<Text, List<AbstractConfigEntry<?>>> categorizedEntries = Maps.newLinkedHashMap();
     private final List<Pair<Text, Integer>> tabs;
     private final boolean confirmSave;
-    private AbstractButtonWidget quitButton, saveButton, applyButton, buttonLeftTab, buttonRightTab;
+    private AbstractButtonWidget quitButton, saveButton, buttonLeftTab, buttonRightTab;
     private Rectangle tabsBounds, tabsLeftBounds, tabsRightBounds;
     private double tabsMaximumScrolled = -1d;
     private final List<ClothConfigTabButton> tabButtons = Lists.newArrayList();
@@ -207,13 +207,13 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
             listWidget.children().addAll((List) Lists.newArrayList(categorizedEntries.values()).get(selectedTabIndex));
         }
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addButton(quitButton = new ButtonWidget(width / 2 - buttonWidths / 2 - buttonWidths - 6, height - 26, buttonWidths, 20, isEdited() ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"), widget -> {
+        addButton(quitButton = new ButtonWidget(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"), widget -> {
             if (confirmSave && isEdited())
                 client.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), new TranslatableText("text.cloth-config.quit_discard"), new TranslatableText("gui.cancel")));
             else
                 client.openScreen(parent);
         }));
-        addButton(saveButton = new AbstractPressableButtonWidget(width / 2 + buttonWidths / 2 + 6, height - 26, buttonWidths, 20, NarratorManager.EMPTY) {
+        addButton(saveButton = new AbstractPressableButtonWidget(width / 2 + 3, height - 26, buttonWidths, 20, NarratorManager.EMPTY) {
             @Override
             public void onPress() {
                 saveAll(true);
@@ -233,20 +233,6 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 }
                 active = isEdited() && !hasErrors;
                 setMessage(hasErrors ? new TranslatableText("text.cloth-config.error_cannot_save") : new TranslatableText("text.cloth-config.save_and_done"));
-                super.render(matrices, mouseX, mouseY, delta);
-            }
-        });
-        addButton(applyButton = new AbstractPressableButtonWidget(width / 2 - buttonWidths / 2, height - 26, buttonWidths, 20, new TranslatableText("text.cloth-config.apply")) {
-            @Override
-            public void onPress() {
-                if (isRequiresRestart())
-                    ClothConfigScreen.this.client.openScreen(new ClothRequiresRestartScreen(ClothConfigScreen.this));
-                saveAll(false);
-            }
-            
-            @Override
-            public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-                active = saveButton.active;
                 super.render(matrices, mouseX, mouseY, delta);
             }
         });
