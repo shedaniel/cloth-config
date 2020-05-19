@@ -56,7 +56,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         this.saveConsumer = saveConsumer;
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             selectionElement.topRenderer.setValue(defaultValue.get());
-            getScreen().setEdited(true, isRequiresRestart());
         });
         this.selectionElement = new SelectionElement<>(this, new Rectangle(0, 0, 150, 20), new DefaultDropdownMenuElement<>(selections == null ? ImmutableList.of() : ImmutableList.copyOf(selections)), topRenderer, cellCreator);
     }
@@ -69,18 +68,24 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         this.resetButton.y = y;
         this.selectionElement.active = isEditable();
         this.selectionElement.bounds.y = y;
+        Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(getFieldName()), y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.selectionElement.bounds.x = x + resetButton.getWidth() + 1;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.selectionElement.bounds.x = x + entryWidth - 150 + 1;
         }
         this.selectionElement.bounds.width = 150 - resetButton.getWidth() - 4;
         resetButton.render(matrices, mouseX, mouseY, delta);
         selectionElement.render(matrices, mouseX, mouseY, delta);
+    }
+    
+    @Override
+    public boolean isEdited() {
+        return this.selectionElement.topRenderer.isEdited();
     }
     
     public boolean isSuggestionMode() {
@@ -646,6 +651,10 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         public abstract Text getSearchTerm();
         
+        public boolean isEdited() {
+            return getConfigError().isPresent();
+        }
+        
         public abstract Optional<Text> getError();
         
         public final Optional<Text> getConfigError() {
@@ -659,7 +668,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public final boolean hasConfigError() {
             return getConfigError().isPresent();
         }
-    
+        
         public final boolean hasError() {
             return getError().isPresent();
         }
@@ -690,9 +699,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         protected TextFieldWidget textFieldWidget;
         protected Function<String, R> toObjectFunction;
         protected Function<R, Text> toTextFunction;
+        protected final R original;
         protected R value;
         
         public DefaultSelectionTopCellElement(R value, Function<String, R> toObjectFunction, Function<R, Text> toTextFunction) {
+            this.original = Objects.requireNonNull(value);
             this.value = Objects.requireNonNull(value);
             this.toObjectFunction = Objects.requireNonNull(toObjectFunction);
             this.toTextFunction = Objects.requireNonNull(toTextFunction);
@@ -720,10 +731,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             textFieldWidget.setHasBorder(false);
             textFieldWidget.setMaxLength(999999);
             textFieldWidget.setText(toTextFunction.apply(value).getString());
-            textFieldWidget.setChangedListener(s -> {
-                if (getParent() != null && getParent().getScreen() != null && !toTextFunction.apply(value).getString().equals(s))
-                    getParent().getScreen().setEdited(true, getParent().isRequiresRestart());
-            });
+        }
+        
+        @Override
+        public boolean isEdited() {
+            return super.isEdited() || !getValue().equals(original);
         }
         
         @Override

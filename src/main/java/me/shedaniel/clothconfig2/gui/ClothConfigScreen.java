@@ -38,36 +38,27 @@ import org.jetbrains.annotations.Nullable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"deprecation", "rawtypes", "unchecked", "DuplicatedCode"})
+@SuppressWarnings({"deprecation", "rawtypes", "DuplicatedCode"})
 @Environment(EnvType.CLIENT)
-public abstract class ClothConfigScreen extends Screen {
-    
+public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     private final List<QueuedTooltip> queuedTooltips = Lists.newArrayList();
-    public int nextTabIndex;
-    public int selectedTabIndex;
+    public int nextTabIndex = 0;
+    public int selectedTabIndex = 0;
     public double tabsScrollVelocity = 0d;
-    public double tabsScrollProgress;
+    public double tabsScrollProgress = 0d;
     public ListWidget<AbstractConfigEntry<AbstractConfigEntry>> listWidget;
     private KeyCodeEntry focusedBinding;
     private final Screen parent;
-    private final LinkedHashMap<Text, List<AbstractConfigEntry>> tabbedEntries;
+    private final LinkedHashMap<Text, List<AbstractConfigEntry<?>>> categorizedEntries = Maps.newLinkedHashMap();
     private final List<Pair<Text, Integer>> tabs;
-    private boolean edited;
-    private boolean requiresRestart;
     private final boolean confirmSave;
     private AbstractButtonWidget quitButton, saveButton, applyButton, buttonLeftTab, buttonRightTab;
     private Rectangle tabsBounds, tabsLeftBounds, tabsRightBounds;
     private double tabsMaximumScrolled = -1d;
-    private final boolean displayErrors;
-    private final List<ClothConfigTabButton> tabButtons;
-    private boolean smoothScrollingTabs = true;
-    private boolean smoothScrollingList;
-    private final Identifier defaultBackgroundLocation;
-    private final Map<Text, Identifier> categoryBackgroundLocation;
+    private final List<ClothConfigTabButton> tabButtons = Lists.newArrayList();
     private boolean transparentBackground = false;
     private boolean editable = true;
     @Nullable private Text defaultFallbackCategory = null;
@@ -75,28 +66,20 @@ public abstract class ClothConfigScreen extends Screen {
     private ModifierKeyCode startedKeyCode = null;
     
     @Deprecated
-    public ClothConfigScreen(Screen parent, Text title, Map<Text, List<Pair<Text, Object>>> o, boolean confirmSave, boolean displayErrors, boolean smoothScrollingList, Identifier defaultBackgroundLocation, Map<Text, Identifier> categoryBackgroundLocation) {
-        super(title);
+    public ClothConfigScreen(Screen parent, Text title, Map<Text, List<Pair<Text, Object>>> entriesMap, boolean confirmSave, Identifier backgroundLocation) {
+        super(title, backgroundLocation);
         this.parent = parent;
-        this.tabbedEntries = Maps.newLinkedHashMap();
-        this.smoothScrollingList = smoothScrollingList;
-        this.defaultBackgroundLocation = defaultBackgroundLocation;
-        o.forEach((tab, pairs) -> {
-            List<AbstractConfigEntry> list = Lists.newArrayList();
+        entriesMap.forEach((categoryName, pairs) -> {
+            List<AbstractConfigEntry<?>> list = Lists.newArrayList();
             for (Pair<Text, Object> pair : pairs) {
-                if (pair.getRight() instanceof AbstractConfigListEntry) {
-                    list.add((AbstractConfigListEntry) pair.getRight());
-                } else {
-                    throw new IllegalArgumentException("Unsupported Type (" + pair.getLeft() + "): " + pair.getRight().getClass().getSimpleName());
-                }
+                AbstractConfigListEntry<?> entry = (AbstractConfigListEntry<?>) pair.getRight();
+                entry.setScreen(this);
+                list.add(entry);
             }
-            list.forEach(entry -> entry.setScreen(this));
-            tabbedEntries.put(tab, list);
+            categorizedEntries.put(categoryName, list);
         });
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        this.tabs = tabbedEntries.keySet().stream().map(s -> new Pair<>(s, textRenderer.getWidth(s) + 8)).collect(Collectors.toList());
-        this.nextTabIndex = 0;
-        this.selectedTabIndex = 0;
+        this.tabs = categorizedEntries.keySet().stream().map(s -> new Pair<>(s, textRenderer.getWidth(s) + 8)).collect(Collectors.toList());
         for (int i = 0; i < tabs.size(); i++) {
             Pair<Text, Integer> pair = tabs.get(i);
             if (pair.getLeft().equals(getFallbackCategory())) {
@@ -106,12 +89,16 @@ public abstract class ClothConfigScreen extends Screen {
             }
         }
         this.confirmSave = confirmSave;
-        this.edited = false;
-        this.requiresRestart = false;
-        this.tabsScrollProgress = 0d;
-        this.tabButtons = Lists.newArrayList();
-        this.displayErrors = displayErrors;
-        this.categoryBackgroundLocation = categoryBackgroundLocation;
+    }
+    
+    @Override
+    public Text getSelectedCategory() {
+        return tabs.get(selectedTabIndex).getLeft();
+    }
+    
+    @Override
+    public Map<Text, List<AbstractConfigEntry<?>>> getCategorizedEntries() {
+        return categorizedEntries;
     }
     
     public boolean isShowingTabs() {
@@ -161,79 +148,67 @@ public abstract class ClothConfigScreen extends Screen {
         for (Element child : children())
             if (child instanceof Tickable)
                 ((Tickable) child).tick();
-    }
-    
-    public Identifier getBackgroundLocation() {
-        if (categoryBackgroundLocation.containsKey(Lists.newArrayList(tabbedEntries.keySet()).get(selectedTabIndex)))
-            return categoryBackgroundLocation.get(Lists.newArrayList(tabbedEntries.keySet()).get(selectedTabIndex));
-        return defaultBackgroundLocation;
-    }
-    
-    public boolean isSmoothScrollingList() {
-        return smoothScrollingList;
-    }
-    
-    @Deprecated
-    public void setSmoothScrollingList(boolean smoothScrollingList) {
-        this.smoothScrollingList = smoothScrollingList;
-    }
-    
-    public boolean isSmoothScrollingTabs() {
-        return smoothScrollingTabs;
-    }
-    
-    @Deprecated
-    public void setSmoothScrollingTabs(boolean smoothScrolling) {
-        this.smoothScrollingTabs = smoothScrolling;
-    }
-    
-    public boolean isEdited() {
-        return edited;
-    }
-    
-    @Deprecated
-    public void setEdited(boolean edited) {
-        this.edited = edited;
+        boolean edited = isEdited();
         quitButton.setMessage(edited ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"));
         saveButton.active = edited;
     }
     
-    public void setEdited(boolean edited, boolean requiresRestart) {
-        setEdited(edited);
-        if (!this.requiresRestart && requiresRestart)
-            this.requiresRestart = requiresRestart;
+    @Override
+    public boolean isEdited() {
+        return super.isEdited();
     }
     
+    /**
+     * Override #isEdited please
+     */
+    @Deprecated
+    public void setEdited(boolean edited) {
+        super.setEdited(edited);
+    }
+    
+    /**
+     * Override #isEdited please
+     */
+    @Override
+    @Deprecated
+    public void setEdited(boolean edited, boolean requiresRestart) {
+        super.setEdited(edited, requiresRestart);
+    }
+    
+    @Override
     public void saveAll(boolean openOtherScreens) {
-        for (List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values()))
-            for (AbstractConfigEntry entry : entries)
+        for (List<AbstractConfigEntry<?>> entries : Lists.newArrayList(categorizedEntries.values()))
+            for (AbstractConfigEntry<?> entry : entries)
                 entry.save();
         save();
         setEdited(false);
         if (openOtherScreens) {
-            if (requiresRestart)
+            if (isRequiresRestart())
                 ClothConfigScreen.this.client.openScreen(new ClothRequiresRestartScreen(parent));
             else
                 ClothConfigScreen.this.client.openScreen(parent);
         }
-        requiresRestart = false;
+        this.legacyRequiresRestart = false;
     }
     
     @Override
     protected void init() {
         super.init();
+        // Clear children
         this.children.clear();
         this.tabButtons.clear();
+        
+        // Put already created list back to entries
         if (listWidget != null)
-            tabbedEntries.put(tabs.get(selectedTabIndex).getLeft(), (List) listWidget.children());
+            categorizedEntries.put(tabs.get(selectedTabIndex).getLeft(), (List) listWidget.children());
         selectedTabIndex = nextTabIndex;
         children.add(listWidget = new ListWidget(client, width, height, isShowingTabs() ? 70 : 30, height - 32, getBackgroundLocation()));
-        listWidget.setSmoothScrolling(this.smoothScrollingList);
-        if (tabbedEntries.size() > selectedTabIndex)
-            Lists.newArrayList(tabbedEntries.values()).get(selectedTabIndex).forEach(entry -> listWidget.children().add(entry));
+        if (categorizedEntries.size() > selectedTabIndex) {
+            listWidget.children().addAll((List) Lists.newArrayList(categorizedEntries.values()).get(selectedTabIndex));
+        }
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addButton(quitButton = new ButtonWidget(width / 2 - buttonWidths / 2 - buttonWidths - 6, height - 26, buttonWidths, 20, edited ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"), widget -> {
-            if (confirmSave && edited)
+        addButton(quitButton = new ButtonWidget(width / 2 - buttonWidths / 2 - buttonWidths - 6, height - 26, buttonWidths, 20, isEdited() ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"), widget -> {
+            if (confirmSave && isEdited())
                 client.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), new TranslatableText("text.cloth-config.quit_discard"), new TranslatableText("gui.cancel")));
             else
                 client.openScreen(parent);
@@ -247,25 +222,24 @@ public abstract class ClothConfigScreen extends Screen {
             @Override
             public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
-                if (displayErrors)
-                    for (List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values())) {
-                        for (AbstractConfigEntry entry : entries)
-                            if (entry.getConfigError().isPresent()) {
-                                hasErrors = true;
-                                break;
-                            }
-                        if (hasErrors)
+                for (List<AbstractConfigEntry<?>> entries : Lists.newArrayList(categorizedEntries.values())) {
+                    for (AbstractConfigEntry<?> entry : entries)
+                        if (entry.getConfigError().isPresent()) {
+                            hasErrors = true;
                             break;
-                    }
-                active = edited && !hasErrors;
-                setMessage(displayErrors && hasErrors ? new TranslatableText("text.cloth-config.error_cannot_save") : new TranslatableText("text.cloth-config.save_and_done"));
+                        }
+                    if (hasErrors)
+                        break;
+                }
+                active = isEdited() && !hasErrors;
+                setMessage(hasErrors ? new TranslatableText("text.cloth-config.error_cannot_save") : new TranslatableText("text.cloth-config.save_and_done"));
                 super.render(matrices, mouseX, mouseY, delta);
             }
         });
         addButton(applyButton = new AbstractPressableButtonWidget(width / 2 - buttonWidths / 2, height - 26, buttonWidths, 20, new TranslatableText("text.cloth-config.apply")) {
             @Override
             public void onPress() {
-                if (requiresRestart)
+                if (isRequiresRestart())
                     ClothConfigScreen.this.client.openScreen(new ClothRequiresRestartScreen(ClothConfigScreen.this));
                 saveAll(false);
             }
@@ -276,7 +250,7 @@ public abstract class ClothConfigScreen extends Screen {
                 super.render(matrices, mouseX, mouseY, delta);
             }
         });
-        saveButton.active = edited;
+        saveButton.active = isEdited();
         if (isShowingTabs()) {
             tabsBounds = new Rectangle(0, 41, width, 24);
             tabsLeftBounds = new Rectangle(0, 41, 18, 24);
@@ -369,7 +343,8 @@ public abstract class ClothConfigScreen extends Screen {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (isShowingTabs()) {
-            if (smoothScrollingTabs) {
+            // TODO Rewrite code for smooth tabs
+            if (true) {
                 double change = tabsScrollVelocity * 0.2f;
                 if (change != 0) {
                     if (change > 0 && change < .2)
@@ -421,12 +396,12 @@ public abstract class ClothConfigScreen extends Screen {
         } else
             method_27534(matrices, client.textRenderer, title, width / 2, 12, -1);
         
-        if (displayErrors && isEditable()) {
+        if (isEditable()) {
             List<Text> errors = Lists.newArrayList();
-            for (List<AbstractConfigEntry> entries : Lists.newArrayList(tabbedEntries.values()))
-                for (AbstractConfigEntry entry : entries)
+            for (List<AbstractConfigEntry<?>> entries : Lists.newArrayList(categorizedEntries.values()))
+                for (AbstractConfigEntry<?> entry : entries)
                     if (entry.getConfigError().isPresent())
-                        errors.add(((Optional<Text>) entry.getConfigError()).get());
+                        errors.add(entry.getConfigError().get());
             if (errors.size() > 0) {
                 client.getTextureManager().bindTexture(CONFIG_TEX);
                 RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -624,7 +599,7 @@ public abstract class ClothConfigScreen extends Screen {
         if (this.focusedBinding != null && int_1 != 256)
             return true;
         if (int_1 == 256 && this.shouldCloseOnEsc()) {
-            if (confirmSave && edited)
+            if (confirmSave && isEdited())
                 client.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), new TranslatableText("text.cloth-config.quit_discard"), new TranslatableText("gui.cancel")));
             else
                 client.openScreen(parent);

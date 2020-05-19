@@ -52,9 +52,21 @@ public interface ConfigBuilder {
     
     boolean doesConfirmSave();
     
-    ConfigBuilder setDoesProcessErrors(boolean processErrors);
+    /**
+     * This feature has been removed.
+     */
+    @Deprecated
+    default ConfigBuilder setDoesProcessErrors(boolean processErrors) {
+        return this;
+    }
     
-    boolean doesProcessErrors();
+    /**
+     * This feature has been removed.
+     */
+    @Deprecated
+    default boolean doesProcessErrors() {
+        return false;
+    }
     
     Identifier getDefaultBackgroundTexture();
     

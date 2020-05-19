@@ -1,11 +1,9 @@
 package me.shedaniel.clothconfig2;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import me.shedaniel.clothconfig2.api.*;
-import me.shedaniel.clothconfig2.gui.entries.DoubleListEntry;
-import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry;
-import me.shedaniel.clothconfig2.gui.entries.LongSliderEntry;
-import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
+import me.shedaniel.clothconfig2.gui.entries.*;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.clothconfig2.impl.EasingMethod.EasingMethodImpl;
 import me.shedaniel.clothconfig2.impl.EasingMethods;
@@ -191,7 +189,6 @@ public class ClothConfigInitializer implements ClientModInitializer {
         LongSliderEntry scrollDurationEntry = entryBuilder.startLongSlider(new TranslatableText("option.cloth-config.scrollDuration"), scrollDuration, 0, 5000).setTextGetter(integer -> new LiteralText(integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms"))).setDefaultValue(600).setSaveConsumer(i -> scrollDuration = i).build();
         DoubleListEntry scrollStepEntry = entryBuilder.startDoubleField(new TranslatableText("option.cloth-config.scrollStep"), scrollStep).setDefaultValue(19).setSaveConsumer(i -> scrollStep = i).build();
         LongSliderEntry bounceMultiplierEntry = entryBuilder.startLongSlider(new TranslatableText("option.cloth-config.bounceBackMultiplier"), (long) (bounceBackMultiplier * 1000), -10, 750).setTextGetter(integer -> new LiteralText(integer < 0 ? "Value: Disabled" : String.format("Value: %s", integer / 1000d))).setDefaultValue(240).setSaveConsumer(i -> bounceBackMultiplier = i / 1000d).build();
-        
         scrolling.addEntry(new TooltipListEntry<Object>(new TranslatableText("option.cloth-config.setDefaultSmoothScroll"), null) {
             final int width = 220;
             private final AbstractButtonWidget buttonWidget = new AbstractPressableButtonWidget(0, 0, 0, 20, getFieldName()) {
@@ -201,7 +198,6 @@ public class ClothConfigInitializer implements ClientModInitializer {
                     scrollDurationEntry.setValue(600);
                     scrollStepEntry.setValue("19.0");
                     bounceMultiplierEntry.setValue(240);
-                    getScreen().setEdited(true, isRequiresRestart());
                 }
             };
             private final List<AbstractButtonWidget> children = ImmutableList.of(buttonWidget);
@@ -246,7 +242,6 @@ public class ClothConfigInitializer implements ClientModInitializer {
                     scrollDurationEntry.setValue(0);
                     scrollStepEntry.setValue("16.0");
                     bounceMultiplierEntry.setValue(-10);
-                    getScreen().setEdited(true, isRequiresRestart());
                 }
             };
             private final List<AbstractButtonWidget> children = ImmutableList.of(buttonWidget);
@@ -291,6 +286,42 @@ public class ClothConfigInitializer implements ClientModInitializer {
     }
     
     public static ConfigBuilder getConfigBuilderWithDemo() {
+        class Pair<T, R> {
+            T t;
+            R r;
+        
+            public Pair(T t, R r) {
+                this.t = t;
+                this.r = r;
+            }
+        
+            public T getLeft() {
+                return t;
+            }
+        
+            public R getRight() {
+                return r;
+            }
+        
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+            
+                Pair<?, ?> pair = (Pair<?, ?>) o;
+            
+                if (!Objects.equals(t, pair.t)) return false;
+                return Objects.equals(r, pair.r);
+            }
+        
+            @Override
+            public int hashCode() {
+                int result = t != null ? t.hashCode() : 0;
+                result = 31 * result + (r != null ? r.hashCode() : 0);
+                return result;
+            }
+        }
+        
         ConfigBuilder builder = getConfigBuilder();
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory testing = builder.getOrCreateCategory(new TranslatableText("category.cloth-config.testing"));
@@ -302,12 +333,38 @@ public class ClothConfigInitializer implements ClientModInitializer {
         SubCategoryBuilder colors = entryBuilder.startSubCategory(new LiteralText("Colors")).setExpanded(true);
         colors.add(entryBuilder.startColorField(new LiteralText("A color field"), 0x00ffff).setDefaultValue(0x00ffff).build());
         colors.add(entryBuilder.startColorField(new LiteralText("An alpha color field"), 0xff00ffff).setDefaultValue(0xff00ffff).setAlphaMode(true).build());
+        colors.add(entryBuilder.startColorField(new LiteralText("An alpha color field"), 0xffffffff).setDefaultValue(0xffff0000).setAlphaMode(true).build());
         colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
         colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
         colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
         colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
         colors.add(entryBuilder.startDropdownMenu(new LiteralText("lol apple"), DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(Items.APPLE), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject()).setDefaultValue(Items.APPLE).setSelections(Registry.ITEM.stream().sorted(Comparator.comparing(Item::toString)).collect(Collectors.toCollection(LinkedHashSet::new))).setSaveConsumer(item -> System.out.println("save this " + item)).build());
         testing.addEntry(colors.build());
+        testing.addEntry(new NestedListListEntry<Pair<Integer, Integer>, MultiElementListEntry<Pair<Integer, Integer>>>(
+                new LiteralText("Nice"),
+                Lists.newArrayList(new Pair<>(10, 10), new Pair<>(20, 40)),
+                false,
+                Optional::empty,
+                list -> {},
+                () -> Lists.newArrayList(new Pair<>(10, 10), new Pair<>(20, 40)),
+                entryBuilder.getResetButtonKey(),
+                true,
+                true,
+                (elem, nestedListListEntry) -> {
+                    if (elem == null) {
+                        Pair<Integer, Integer> newDefaultElemValue = new Pair<>(10, 10);
+                        return new MultiElementListEntry<>(new LiteralText("Pair"), newDefaultElemValue,
+                                Lists.newArrayList(entryBuilder.startIntField(new LiteralText("Left"), newDefaultElemValue.getLeft()).setDefaultValue(10).build(),
+                                        entryBuilder.startIntField(new LiteralText("Right"), newDefaultElemValue.getRight()).setDefaultValue(10).build()),
+                                true);
+                    } else {
+                        return new MultiElementListEntry<>(new LiteralText("Pair"), elem,
+                                Lists.newArrayList(entryBuilder.startIntField(new LiteralText("Left"), elem.getLeft()).setDefaultValue(10).build(),
+                                        entryBuilder.startIntField(new LiteralText("Right"), elem.getRight()).setDefaultValue(10).build()),
+                                true);
+                    }
+                }
+        ));
         return builder;
     }
     

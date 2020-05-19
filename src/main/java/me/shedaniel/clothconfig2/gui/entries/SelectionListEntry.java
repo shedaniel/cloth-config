@@ -16,6 +16,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -27,6 +28,7 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     
     private ImmutableList<T> values;
     private AtomicInteger index;
+    private final int original;
     private ButtonWidget buttonWidget, resetButton;
     private Consumer<T> saveConsumer;
     private Supplier<T> defaultValue;
@@ -62,14 +64,13 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
         this.defaultValue = defaultValue;
         this.index = new AtomicInteger(this.values.indexOf(value));
         this.index.compareAndSet(-1, 0);
+        this.original = this.values.indexOf(value);
         this.buttonWidget = new ButtonWidget(0, 0, 150, 20, NarratorManager.EMPTY, widget -> {
             SelectionListEntry.this.index.incrementAndGet();
             SelectionListEntry.this.index.compareAndSet(SelectionListEntry.this.values.size(), 0);
-            getScreen().setEdited(true, isRequiresRestart());
         });
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             SelectionListEntry.this.index.set(getDefaultIndex());
-            getScreen().setEdited(true, isRequiresRestart());
         });
         this.saveConsumer = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
@@ -80,6 +81,11 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     public void save() {
         if (saveConsumer != null)
             saveConsumer.accept(getValue());
+    }
+    
+    @Override
+    public boolean isEdited() {
+        return super.isEdited() || !Objects.equals(this.index.get(), this.original);
     }
     
     @Override
@@ -101,12 +107,13 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
         this.buttonWidget.active = isEditable();
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(nameProvider.apply(getValue()));
+        Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(getFieldName()), y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
         }

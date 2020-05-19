@@ -5,7 +5,9 @@ import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -20,6 +22,19 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     public abstract void setRequiresRestart(boolean requiresRestart);
     
     public abstract Text getFieldName();
+    
+    public Text getDisplayedFieldName() {
+        MutableText text = getFieldName().shallowCopy();
+        boolean hasError = getConfigError().isPresent();
+        boolean isEdited = isEdited();
+        if (hasError)
+            text = text.formatted(Formatting.RED);
+        if (isEdited)
+            text = text.formatted(Formatting.ITALIC);
+        if (!hasError && !isEdited)
+            text = text.formatted(Formatting.GRAY);
+        return text;
+    }
     
     public abstract T getValue();
     
@@ -57,6 +72,10 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     }
     
     public abstract void save();
+    
+    public boolean isEdited() {
+        return getConfigError().isPresent();
+    }
     
     @Override
     public int getItemHeight() {

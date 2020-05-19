@@ -11,7 +11,6 @@ import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public abstract class BaseListCell extends AbstractParentElement {
-    
     private Supplier<Optional<Text>> errorSupplier;
     
     public final int getPreferredTextColor() {
@@ -36,4 +35,11 @@ public abstract class BaseListCell extends AbstractParentElement {
     
     public void updateSelected(boolean isSelected) {}
     
+    public boolean isRequiresRestart() {
+        return false;
+    }
+    
+    public boolean isEdited() {
+        return getConfigError().isPresent();
+    }
 }

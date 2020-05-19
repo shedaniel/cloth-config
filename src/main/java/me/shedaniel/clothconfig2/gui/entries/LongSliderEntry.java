@@ -28,6 +28,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     protected Slider sliderWidget;
     protected ButtonWidget resetButton;
     protected AtomicLong value;
+    protected final long orginial;
     private long minimum, maximum;
     private Consumer<Long> saveConsumer;
     private Supplier<Long> defaultValue;
@@ -50,6 +51,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     @Deprecated
     public LongSliderEntry(Text fieldName, long minimum, long maximum, long value, Consumer<Long> saveConsumer, Text resetButtonKey, Supplier<Long> defaultValue, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
+        this.orginial = value;
         this.defaultValue = defaultValue;
         this.value = new AtomicLong(value);
         this.saveConsumer = saveConsumer;
@@ -58,7 +60,6 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         this.sliderWidget = new Slider(0, 0, 152, 20, ((double) LongSliderEntry.this.value.get() - minimum) / Math.abs(maximum - minimum));
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             setValue(defaultValue.get());
-            getScreen().setEdited(true, isRequiresRestart());
         });
         this.sliderWidget.setMessage(textGetter.apply(LongSliderEntry.this.value.get()));
         this.widgets = Lists.newArrayList(sliderWidget, resetButton);
@@ -102,6 +103,11 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         return widgets;
     }
     
+    @Override
+    public boolean isEdited() {
+        return super.isEdited() || getValue() != orginial;
+    }
+    
     public LongSliderEntry setMaximum(long maximum) {
         this.maximum = maximum;
         return this;
@@ -120,12 +126,13 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         this.resetButton.y = y;
         this.sliderWidget.active = isEditable();
         this.sliderWidget.y = y;
+        Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(getFieldName()), y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.sliderWidget.x = x + resetButton.getWidth() + 1;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.sliderWidget.x = x + entryWidth - 150;
         }
@@ -147,7 +154,6 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         @Override
         protected void applyValue() {
             LongSliderEntry.this.value.set((long) (minimum + Math.abs(maximum - minimum) * value));
-            getScreen().setEdited(true, isRequiresRestart());
         }
         
         @Override

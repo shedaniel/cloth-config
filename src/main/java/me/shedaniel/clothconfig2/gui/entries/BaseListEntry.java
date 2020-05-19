@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -79,12 +80,34 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
             cells.clear();
             defaultValue.get().stream().map(this::getFromValue).forEach(cells::add);
             widgets.addAll(cells);
-            getScreen().setEdited(true, isRequiresRestart());
         });
         this.widgets.add(resetWidget);
         this.saveConsumer = saveConsumer;
         this.createNewInstance = createNewInstance;
         this.defaultValue = defaultValue;
+    }
+    
+    @Override
+    public boolean isEdited() {
+        if (super.isEdited()) return true;
+        if (cells.stream().anyMatch(BaseListCell::isEdited)) return true;
+        List<T> value = getValue();
+        List<T> defaultValue = this.defaultValue.get();
+        if (value.size() != defaultValue.size()) return true;
+        for (int i = 0; i < value.size(); i++) {
+            if (!Objects.equals(value.get(i), defaultValue.get(i)))
+                return true;
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean isRequiresRestart() {
+        return cells.stream().anyMatch(BaseListCell::isRequiresRestart);
+    }
+    
+    @Override
+    public void setRequiresRestart(boolean requiresRestart) {
     }
     
     public abstract SELF self();
@@ -214,9 +237,9 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
             drawTexture(matrices, x - 15 + 26, y + 4, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
         resetWidget.x = x + entryWidth - resetWidget.getWidth();
         resetWidget.y = y;
-        resetWidget.active = isEditable() && getDefaultValue().isPresent();
+        resetWidget.active = isEdited();
         resetWidget.render(matrices, mouseX, mouseY, delta);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
+        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
         if (expanded) {
             int yy = y + 24;
             for (BaseListCell cell : cells) {
@@ -254,7 +277,6 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                     cells.add(cell = createNewInstance.apply(BaseListEntry.this.self()));
                     widgets.add(cell);
                 }
-                getScreen().setEdited(true, isRequiresRestart());
                 MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             } else if (isDeleteButtonEnabled() && isInsideDelete(double_1, double_2)) {
@@ -263,7 +285,6 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                     //noinspection SuspiciousMethodCalls
                     cells.remove(focused);
                     widgets.remove(focused);
-                    getScreen().setEdited(true, isRequiresRestart());
                     MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 }
                 return true;

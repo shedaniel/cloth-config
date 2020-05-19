@@ -28,7 +28,6 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     private final T object;
-    private Text categoryName;
     private List<AbstractConfigListEntry<?>> entries;
     private MultiElementListEntry<T>.CategoryLabelWidget widget;
     private List<Element> children;
@@ -38,7 +37,6 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     @Deprecated
     public MultiElementListEntry(Text categoryName, T object, List<AbstractConfigListEntry<?>> entries, boolean defaultExpanded) {
         super(categoryName, null);
-        this.categoryName = categoryName;
         this.object = object;
         this.entries = entries;
         this.expanded = defaultExpanded;
@@ -56,12 +54,27 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
+    public boolean isEdited() {
+        for (AbstractConfigListEntry<?> entry : entries) {
+            if (entry.isEdited()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    @Override
     public void setRequiresRestart(boolean requiresRestart) {
         
     }
     
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+    
     public Text getCategoryName() {
-        return categoryName;
+        return getFieldName();
     }
     
     @Override
@@ -85,7 +98,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
         DiffuseLighting.disable();
         RenderSystem.color4f(1, 1, 1, 1);
         drawTexture(matrices, x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, categoryName, x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName(), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent(getParent());
             entry.setScreen(getScreen());

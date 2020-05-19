@@ -31,15 +31,6 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
     }
     
     @Override
-    public boolean isRequiresRestart() {
-        return cells.stream().anyMatch(NestedListCell::isRequiresRestart);
-    }
-    
-    @Override
-    public void setRequiresRestart(boolean requiresRestart) {
-    }
-    
-    @Override
     public NestedListListEntry<T, INNER> self() {
         return this;
     }
@@ -49,7 +40,6 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
      * @see NestedListListEntry
      */
     public static class NestedListCell<T, INNER extends AbstractConfigListEntry<T>> extends AbstractListListEntry.AbstractListCell<T, NestedListCell<T, INNER>, NestedListListEntry<T, INNER>> {
-        
         private final INNER nestedEntry;
         
         @ApiStatus.Internal
@@ -84,8 +74,19 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
             return Collections.singletonList(nestedEntry);
         }
         
-        private boolean isRequiresRestart() {
+        @Override
+        public boolean isRequiresRestart() {
             return nestedEntry.isRequiresRestart();
+        }
+        
+        @Override
+        public void updateSelected(boolean isSelected) {
+            this.nestedEntry.updateSelected(isSelected);
+        }
+        
+        @Override
+        public boolean isEdited() {
+            return super.isEdited() || nestedEntry.isEdited();
         }
     }
     

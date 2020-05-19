@@ -60,15 +60,19 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         };
         textFieldWidget.setMaxLength(999999);
         textFieldWidget.setText(String.valueOf(original));
-        textFieldWidget.setChangedListener(s -> {
-            if (getScreen() != null && !original.equals(s))
-                getScreen().setEdited(true, isRequiresRestart());
-        });
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             TextFieldListEntry.this.textFieldWidget.setText(String.valueOf(defaultValue.get()));
-            getScreen().setEdited(true, isRequiresRestart());
         });
         this.widgets = Lists.newArrayList(textFieldWidget, resetButton);
+    }
+    
+    @Override
+    public boolean isEdited() {
+        return isChanged(original, textFieldWidget.getText());
+    }
+    
+    protected boolean isChanged(T original, String s) {
+        return !String.valueOf(original).equals(s);
     }
     
     protected static void setTextFieldWidth(TextFieldWidget widget, int width) {
@@ -101,12 +105,13 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         this.resetButton.y = y;
         this.textFieldWidget.setEditable(isEditable());
         this.textFieldWidget.y = y + 1;
+        Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(getFieldName()), y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.textFieldWidget.x = x + resetButton.getWidth();
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.textFieldWidget.x = x + entryWidth - 148;
         }

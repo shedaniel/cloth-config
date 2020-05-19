@@ -25,7 +25,6 @@ import java.util.Optional;
 public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigListEntry>> {
     
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
-    private Text categoryName;
     private List<AbstractConfigListEntry> entries;
     private CategoryLabelWidget widget;
     private List<Element> children;
@@ -34,7 +33,6 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Deprecated
     public SubCategoryListEntry(Text categoryName, List<AbstractConfigListEntry> entries, boolean defaultExpanded) {
         super(categoryName, null);
-        this.categoryName = categoryName;
         this.entries = entries;
         this.expanded = defaultExpanded;
         this.widget = new CategoryLabelWidget();
@@ -56,7 +54,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     }
     
     public Text getCategoryName() {
-        return categoryName;
+        return getFieldName();
     }
     
     @Override
@@ -80,7 +78,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         DiffuseLighting.disable();
         RenderSystem.color4f(1, 1, 1, 1);
         drawTexture(matrices, x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, categoryName, x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName(), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent(getParent());
             entry.setScreen(getScreen());
@@ -99,6 +97,16 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.updateSelected(expanded && isSelected && getFocused() == entry);
         }
+    }
+    
+    @Override
+    public boolean isEdited() {
+        for (AbstractConfigListEntry<?> entry : entries) {
+            if (entry.isEdited()) {
+                return true;
+            }
+        }
+        return false;
     }
     
     @Override

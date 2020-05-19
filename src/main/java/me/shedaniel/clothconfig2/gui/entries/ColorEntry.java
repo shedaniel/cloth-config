@@ -32,13 +32,18 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
             throw new IllegalArgumentException("Invalid Color: " + colorValue.getError().name());
         this.alpha = false;
         this.saveConsumer = saveConsumer;
+        this.original = value;
         this.textFieldWidget.setText(getHexColorString(value));
         this.colorDisplayWidget = new ColorDisplayWidget(textFieldWidget, 0, 0, 20, getColorValueColor(textFieldWidget.getText()));
-        this.original = value;
         ((ButtonWidgetHooks) this.resetButton).setOnPress(button -> {
-            this.textFieldWidget.setText(getHexColorString(original));
-            getScreen().setEdited(true, isRequiresRestart());
+            this.textFieldWidget.setText(getHexColorString(defaultValue.get()));
         });
+    }
+    
+    @Override
+    protected boolean isChanged(Integer original, String s) {
+        ColorValue colorValue = getColorValue(s);
+        return colorValue.hasError() || this.original != colorValue.color;
     }
     
     @Override
@@ -76,7 +81,13 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
         if (!getDefaultValue().isPresent())
             return false;
         ColorValue colorValue = getColorValue(text);
-        return colorValue.hasError() && colorValue.color == getDefaultValue().get();
+        return !colorValue.hasError() && colorValue.color == getDefaultValue().get();
+    }
+    
+    @Override
+    public boolean isEdited() {
+        ColorValue colorValue = getColorValue(textFieldWidget.getText());
+        return colorValue.hasError() || colorValue.color != original;
     }
     
     @Override

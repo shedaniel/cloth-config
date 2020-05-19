@@ -28,6 +28,7 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     protected Slider sliderWidget;
     protected ButtonWidget resetButton;
     protected AtomicInteger value;
+    protected final long orginial;
     private int minimum, maximum;
     private Consumer<Integer> saveConsumer;
     private Supplier<Integer> defaultValue;
@@ -50,6 +51,7 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     @Deprecated
     public IntegerSliderEntry(Text fieldName, int minimum, int maximum, int value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
+        this.orginial = value;
         this.defaultValue = defaultValue;
         this.value = new AtomicInteger(value);
         this.saveConsumer = saveConsumer;
@@ -57,10 +59,7 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
         this.minimum = minimum;
         this.sliderWidget = new Slider(0, 0, 152, 20, ((double) this.value.get() - minimum) / Math.abs(maximum - minimum));
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
-            sliderWidget.setProgress((MathHelper.clamp(this.defaultValue.get(), minimum, maximum) - minimum) / (double) Math.abs(maximum - minimum));
-            this.value.set(MathHelper.clamp(this.defaultValue.get(), minimum, maximum));
-            sliderWidget.updateMessage();
-            getScreen().setEdited(true, isRequiresRestart());
+            setValue(defaultValue.get());
         });
         this.sliderWidget.setMessage(textGetter.apply(IntegerSliderEntry.this.value.get()));
         this.widgets = Lists.newArrayList(sliderWidget, resetButton);
@@ -85,6 +84,18 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     @Override
     public Integer getValue() {
         return value.get();
+    }
+    
+    @Deprecated
+    public void setValue(int value) {
+        sliderWidget.setValue((MathHelper.clamp(value, minimum, maximum) - minimum) / (double) Math.abs(maximum - minimum));
+        this.value.set(Math.min(Math.max(value, minimum), maximum));
+        sliderWidget.updateMessage();
+    }
+    
+    @Override
+    public boolean isEdited() {
+        return super.isEdited() || getValue() != orginial;
     }
     
     @Override
@@ -115,12 +126,13 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
         this.resetButton.y = y;
         this.sliderWidget.active = isEditable();
         this.sliderWidget.y = y;
+        Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(getFieldName()), y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.sliderWidget.x = x + resetButton.getWidth() + 1;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.sliderWidget.x = x + entryWidth - 150;
         }
@@ -142,7 +154,6 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
         @Override
         protected void applyValue() {
             IntegerSliderEntry.this.value.set((int) (minimum + Math.abs(maximum - minimum) * value));
-            getScreen().setEdited(true, isRequiresRestart());
         }
         
         @Override
@@ -164,6 +175,10 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
         }
         
         public void setProgress(double integer) {
+            this.value = integer;
+        }
+        
+        public void setValue(double integer) {
             this.value = integer;
         }
     }

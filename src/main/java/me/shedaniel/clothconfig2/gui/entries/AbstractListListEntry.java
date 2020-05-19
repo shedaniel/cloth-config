@@ -70,7 +70,6 @@ public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.A
         }
         
         public abstract T getValue();
-        
     }
     
 }

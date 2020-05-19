@@ -40,7 +40,7 @@ public class ConfigCategoryImpl implements ConfigCategory {
     
     @Override
     public ConfigCategory addEntry(AbstractConfigListEntry entry) {
-        listSupplier.get().add(new Pair<>(entry.getFieldName(), entry));
+        listSupplier.get().add(new Pair<>(null, entry));
         return this;
     }
     

@@ -23,6 +23,7 @@ import java.util.function.Supplier;
 public class BooleanListEntry extends TooltipListEntry<Boolean> {
     
     private final AtomicBoolean bool;
+    private final boolean original;
     private final ButtonWidget buttonWidget;
     private final ButtonWidget resetButton;
     private final Consumer<Boolean> saveConsumer;
@@ -46,17 +47,21 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     public BooleanListEntry(Text fieldName, boolean bool, Text resetButtonKey, Supplier<Boolean> defaultValue, Consumer<Boolean> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
+        this.original = bool;
         this.bool = new AtomicBoolean(bool);
         this.buttonWidget = new ButtonWidget(0, 0, 150, 20, NarratorManager.EMPTY, widget -> {
             BooleanListEntry.this.bool.set(!BooleanListEntry.this.bool.get());
-            getScreen().setEdited(true, isRequiresRestart());
         });
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             BooleanListEntry.this.bool.set(defaultValue.get());
-            getScreen().setEdited(true, isRequiresRestart());
         });
         this.saveConsumer = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
+    }
+    
+    @Override
+    public boolean isEdited() {
+        return super.isEdited() || original != bool.get();
     }
     
     @Override
@@ -84,12 +89,13 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
         this.buttonWidget.active = isEditable();
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(getYesNoText(bool.get()));
+        Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(getFieldName()), y + 5, 16777215);
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 5, 16777215);
             this.resetButton.x = x;
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getFieldName(), x, y + 5, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
         }

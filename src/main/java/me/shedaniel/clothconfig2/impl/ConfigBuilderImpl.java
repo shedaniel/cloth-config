@@ -9,7 +9,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -30,7 +29,6 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean editable = true;
     private boolean tabsSmoothScroll = true;
     private boolean listSmoothScroll = true;
-    private boolean doesProcessErrors = true;
     private boolean doesConfirmSave = true;
     private boolean transparentBackground = false;
     private Identifier defaultBackground = DrawableHelper.BACKGROUND_TEXTURE;
@@ -182,17 +180,6 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public ConfigBuilder setDoesProcessErrors(boolean processErrors) {
-        this.doesProcessErrors = processErrors;
-        return this;
-    }
-    
-    @Override
-    public boolean doesProcessErrors() {
-        return doesProcessErrors;
-    }
-    
-    @Override
     public Identifier getDefaultBackgroundTexture() {
         return defaultBackground;
     }
@@ -218,7 +205,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     public Screen build() {
         if (dataMap.isEmpty() || fallbackCategory == null)
             throw new NullPointerException("There cannot be no categories or fallback category!");
-        ClothConfigScreen screen = new ClothConfigScreen(parent, title, dataMap, doesConfirmSave, doesProcessErrors, listSmoothScroll, defaultBackground, categoryBackground) {
+        ClothConfigScreen screen = new ClothConfigScreen(parent, title, dataMap, doesConfirmSave, defaultBackground) {
             @Override
             public void save() {
                 if (savingRunnable != null)
@@ -233,9 +220,9 @@ public class ConfigBuilderImpl implements ConfigBuilder {
         };
         screen.setEditable(editable);
         screen.setFallbackCategory(fallbackCategory);
-        screen.setSmoothScrollingTabs(tabsSmoothScroll);
         screen.setTransparentBackground(transparentBackground);
         screen.setAlwaysShowTabs(alwaysShowTabs);
+        categoryBackground.forEach(screen::registerCategoryBackground);
         return screen;
     }
     
