@@ -1,7 +1,7 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
-import me.shedaniel.clothconfig2.api.QueuedTooltip;
+import me.shedaniel.clothconfig2.api.Tooltip;
 import me.shedaniel.math.Point;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -36,7 +36,7 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
         if (isMouseInside(mouseX, mouseY, x, y, entryWidth, entryHeight)) {
             Optional<Text[]> tooltip = getTooltip();
             if (tooltip.isPresent() && tooltip.get().length > 0)
-                getScreen().queueTooltip(QueuedTooltip.create(new Point(mouseX, mouseY), tooltip.get()));
+                addTooltip(Tooltip.of(new Point(mouseX, mouseY), tooltip.get()));
         }
     }
     

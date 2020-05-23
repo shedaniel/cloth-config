@@ -1,7 +1,10 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
+import com.google.common.collect.Lists;
+import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry.NestedListCell;
+import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Element;
@@ -23,11 +26,13 @@ import java.util.function.Supplier;
  */
 @Environment(EnvType.CLIENT)
 public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<T>> extends AbstractListListEntry<T, NestedListCell<T, INNER>, NestedListListEntry<T, INNER>> {
+    private final List<AbstractConfigEntry<?>> referencableEntries = Lists.newArrayList();
     
     @ApiStatus.Internal
     @Deprecated
     public NestedListListEntry(Text fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, Text resetButtonKey, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, NestedListListEntry<T, INNER>, INNER> createNewCell) {
         super(fieldName, value, defaultExpanded, null, null, defaultValue, resetButtonKey, false, deleteButtonEnabled, insertInFront, (t, nestedListListEntry) -> new NestedListCell<>(t, nestedListListEntry, createNewCell.apply(t, nestedListListEntry)));
+        setReferencableEntries(referencableEntries);
     }
     
     @Override
@@ -65,7 +70,8 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
         
         @Override
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-            nestedEntry.setScreen(listListEntry.getScreen());
+            nestedEntry.setParent((DynamicEntryListWidget) listListEntry.getParent());
+            nestedEntry.setScreen(listListEntry.getConfigScreen());
             nestedEntry.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         }
         
@@ -88,6 +94,19 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
         public boolean isEdited() {
             return super.isEdited() || nestedEntry.isEdited();
         }
+        
+        @Override
+        public void onAdd() {
+            super.onAdd();
+            listListEntry.referencableEntries.add(nestedEntry);
+            listListEntry.requestReferenceRebuilding();
+        }
+        
+        @Override
+        public void onDelete() {
+            super.onDelete();
+            listListEntry.referencableEntries.remove(nestedEntry);
+            listListEntry.requestReferenceRebuilding();
+        }
     }
-    
 }

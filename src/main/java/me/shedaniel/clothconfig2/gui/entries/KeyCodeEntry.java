@@ -40,11 +40,11 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
         this.value = value.copy();
         this.original = value.copy();
         this.buttonWidget = new ButtonWidget(0, 0, 150, 20, NarratorManager.EMPTY, widget -> {
-            getScreen().setFocusedBinding(this);
+            getConfigScreen().setFocusedBinding(this);
         });
         this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             KeyCodeEntry.this.value = getDefaultValue().orElse(null).copy();
-            getScreen().setFocusedBinding(null);
+            getConfigScreen().setFocusedBinding(null);
         });
         this.saveConsumer = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
@@ -112,7 +112,7 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
         this.buttonWidget.active = isEditable();
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(getLocalizedName());
-        if (getScreen().getFocusedBinding() == this)
+        if (getConfigScreen().getFocusedBinding() == this)
             this.buttonWidget.setMessage(new LiteralText("> ").formatted(Formatting.WHITE).append(this.buttonWidget.getMessage().copy().formatted(Formatting.YELLOW)).append(new LiteralText(" <").formatted(Formatting.WHITE)));
         Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {

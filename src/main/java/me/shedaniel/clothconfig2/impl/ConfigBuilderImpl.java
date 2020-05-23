@@ -4,7 +4,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
+import me.shedaniel.clothconfig2.api.TabbedConfigScreen;
+import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
+import me.shedaniel.clothconfig2.gui.GlobalizedClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawableHelper;
@@ -12,20 +15,20 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-@Deprecated
 @Environment(EnvType.CLIENT)
+@ApiStatus.Internal
 public class ConfigBuilderImpl implements ConfigBuilder {
-    
     private Runnable savingRunnable;
     private Screen parent;
     private Text title = new TranslatableText("text.cloth-config.config");
+    private boolean globalized = false;
     private boolean editable = true;
     private boolean tabsSmoothScroll = true;
     private boolean listSmoothScroll = true;
@@ -34,13 +37,18 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private Identifier defaultBackground = DrawableHelper.BACKGROUND_TEXTURE;
     private Consumer<Screen> afterInitConsumer = screen -> {};
     private final Map<Text, Identifier> categoryBackground = Maps.newHashMap();
-    private final Map<Text, List<Pair<Text, Object>>> dataMap = Maps.newLinkedHashMap();
+    private final Map<Text, List<Object>> dataMap = Maps.newLinkedHashMap();
     private Text fallbackCategory = null;
     private boolean alwaysShowTabs = false;
     
-    @Deprecated
+    @ApiStatus.Internal
     public ConfigBuilderImpl() {
         
+    }
+    
+    @Override
+    public void setGlobalized(boolean globalized) {
+        this.globalized = globalized;
     }
     
     @Override
@@ -205,24 +213,43 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     public Screen build() {
         if (dataMap.isEmpty() || fallbackCategory == null)
             throw new NullPointerException("There cannot be no categories or fallback category!");
-        ClothConfigScreen screen = new ClothConfigScreen(parent, title, dataMap, doesConfirmSave, defaultBackground) {
-            @Override
-            public void save() {
-                if (savingRunnable != null)
-                    savingRunnable.run();
-            }
-            
-            @Override
-            protected void init() {
-                super.init();
-                afterInitConsumer.accept(this);
-            }
+        AbstractConfigScreen screen;
+        if (globalized) {
+            screen = new GlobalizedClothConfigScreen(parent, title, dataMap, defaultBackground) {
+                @Override
+                public void save() {
+                    if (savingRunnable != null)
+                        savingRunnable.run();
+                }
+        
+                @Override
+                protected void init() {
+                    super.init();
+                    afterInitConsumer.accept(this);
+                }
+            };
+        } else {
+            screen = new ClothConfigScreen(parent, title, dataMap, defaultBackground) {
+                @Override
+                public void save() {
+                    if (savingRunnable != null)
+                        savingRunnable.run();
+                }
+        
+                @Override
+                protected void init() {
+                    super.init();
+                    afterInitConsumer.accept(this);
+                }
+            };
         };
         screen.setEditable(editable);
         screen.setFallbackCategory(fallbackCategory);
         screen.setTransparentBackground(transparentBackground);
         screen.setAlwaysShowTabs(alwaysShowTabs);
-        categoryBackground.forEach(screen::registerCategoryBackground);
+        screen.setConfirmSave(doesConfirmSave);
+        if (screen instanceof TabbedConfigScreen)
+            categoryBackground.forEach(((TabbedConfigScreen) screen)::registerCategoryBackground);
         return screen;
     }
     

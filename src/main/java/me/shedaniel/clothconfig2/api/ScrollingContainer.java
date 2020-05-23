@@ -34,7 +34,6 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.MathHelper;
-import org.jetbrains.annotations.ApiStatus;
 
 public abstract class ScrollingContainer {
     public double scrollAmount;
@@ -113,10 +112,7 @@ public abstract class ScrollingContainer {
             }
         } else
             target[0] = clampExtension(target[0], maxScroll, 0);
-        if (!ClothConfigInitializer.Precision.almostEquals(scroll, target[0], ClothConfigInitializer.Precision.FLOAT_EPSILON))
-            return ease(scroll, target[0], Math.min((System.currentTimeMillis() - start) / duration * delta * 3, 1), easingMethod);
-        else
-            return target[0];
+        return ease(scroll, target[0], Math.min((System.currentTimeMillis() - start) / duration * delta * 3, 1), easingMethod);
     }
     
     public static double ease(double start, double end, double amount, EasingMethod easingMethod) {
@@ -135,6 +131,7 @@ public abstract class ScrollingContainer {
         renderScrollBar(0, 1, 1);
     }
     
+    @SuppressWarnings("deprecation")
     public void renderScrollBar(int background, float alpha, float scrollBarAlphaOffset) {
         if (hasScrollBar()) {
             Rectangle bounds = getBounds();

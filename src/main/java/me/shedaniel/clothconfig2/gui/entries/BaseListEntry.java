@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
-import me.shedaniel.clothconfig2.api.QueuedTooltip;
+import me.shedaniel.clothconfig2.api.Tooltip;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
@@ -77,8 +77,14 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         this.widgets = Lists.newArrayList(labelWidget);
         this.resetWidget = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             widgets.removeAll(cells);
+            for (C cell : cells) {
+                cell.onDelete();
+            }
             cells.clear();
             defaultValue.get().stream().map(this::getFromValue).forEach(cells::add);
+            for (C cell : cells) {
+                cell.onAdd();
+            }
             widgets.addAll(cells);
         });
         this.widgets.add(resetWidget);
@@ -223,7 +229,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         if (isMouseInside(mouseX, mouseY, x, y, entryWidth, entryHeight)) {
             Optional<Text[]> tooltip = getTooltip(mouseX, mouseY);
             if (tooltip.isPresent() && tooltip.get().length > 0)
-                getScreen().queueTooltip(QueuedTooltip.create(new Point(mouseX, mouseY), tooltip.get()));
+                addTooltip(Tooltip.of(new Point(mouseX, mouseY), tooltip.get()));
         }
         MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         DiffuseLighting.disable();
@@ -277,11 +283,13 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                     cells.add(cell = createNewInstance.apply(BaseListEntry.this.self()));
                     widgets.add(cell);
                 }
+                cell.onAdd();
                 MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             } else if (isDeleteButtonEnabled() && isInsideDelete(double_1, double_2)) {
                 Element focused = getFocused();
                 if (expanded && focused instanceof BaseListCell) {
+                    ((BaseListCell) focused).onDelete();
                     //noinspection SuspiciousMethodCalls
                     cells.remove(focused);
                     widgets.remove(focused);

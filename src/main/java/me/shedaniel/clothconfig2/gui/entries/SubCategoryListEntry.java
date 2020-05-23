@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -38,6 +39,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         this.widget = new CategoryLabelWidget();
         this.children = Lists.newArrayList(widget);
         this.children.addAll(entries);
+        this.setReferencableEntries((List) entries);
     }
     
     @Override
@@ -80,8 +82,8 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         drawTexture(matrices, x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
         MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName(), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry<?> entry : entries) {
-            entry.setParent(getParent());
-            entry.setScreen(getScreen());
+            entry.setParent((DynamicEntryListWidget) getParent());
+            entry.setScreen(getConfigScreen());
         }
         if (expanded) {
             int yy = y + 24;

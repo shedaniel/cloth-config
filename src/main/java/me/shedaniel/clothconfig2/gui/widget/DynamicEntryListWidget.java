@@ -3,7 +3,6 @@ package me.shedaniel.clothconfig2.gui.widget;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
-import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget.Entries;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -39,7 +38,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     public int left;
     protected boolean verticallyCenter = true;
     protected int yDrag = -2;
-    protected boolean visible = true;
+    protected boolean selectionVisible = true;
     protected boolean renderSelection;
     protected int headerHeight;
     protected double scroll;
@@ -59,7 +58,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     public void setRenderSelection(boolean boolean_1) {
-        this.visible = boolean_1;
+        this.selectionVisible = boolean_1;
     }
     
     protected void setRenderHeader(boolean boolean_1, int headerHeight) {
@@ -411,7 +410,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             int itemHeight = item.getItemHeight() - 4;
             int itemWidth = this.getItemWidth();
             int itemMinX, itemMaxX;
-            if (this.visible && this.isSelected(renderIndex)) {
+            if (this.selectionVisible && this.isSelected(renderIndex)) {
                 itemMinX = this.left + this.width / 2 - itemWidth / 2;
                 itemMaxX = itemMinX + itemWidth;
                 RenderSystem.disableTexture();

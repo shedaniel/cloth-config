@@ -22,4 +22,6 @@ public interface ConfigScreen {
     void setEdited(boolean edited, boolean legacyRequiresRestart);
     
     void saveAll(boolean openOtherScreens);
+    
+    void addTooltip(Tooltip tooltip);
 }

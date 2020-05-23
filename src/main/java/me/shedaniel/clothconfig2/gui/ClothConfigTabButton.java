@@ -2,6 +2,7 @@ package me.shedaniel.clothconfig2.gui;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -21,14 +22,13 @@ public class ClothConfigTabButton extends AbstractPressableButtonWidget {
     @Override
     public void onPress() {
         if (index != -1)
-            screen.nextTabIndex = index;
-        screen.tabsScrollVelocity = 0d;
-        screen.init();
+            screen.selectedCategoryIndex = index;
+        screen.init(MinecraftClient.getInstance(), screen.width, screen.height);
     }
     
     @Override
     public void render(MatrixStack matrices, int int_1, int int_2, float float_1) {
-        active = index != screen.selectedTabIndex;
+        active = index != screen.selectedCategoryIndex;
         super.render(matrices, int_1, int_2, float_1);
     }
     

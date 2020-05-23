@@ -1,14 +1,13 @@
 package me.shedaniel.clothconfig2.api;
 
-import com.google.common.collect.Lists;
 import me.shedaniel.math.Point;
 import net.minecraft.text.Text;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class QueuedTooltip {
-    
+public class QueuedTooltip implements Tooltip {
     private Point location;
     private List<Text> text;
     
@@ -22,23 +21,16 @@ public class QueuedTooltip {
     }
     
     public static QueuedTooltip create(Point location, Text... text) {
-        return QueuedTooltip.create(location, Lists.newArrayList(text));
+        return QueuedTooltip.create(location, Arrays.asList(text));
     }
     
+    @Override
     public Point getPoint() {
         return location;
     }
     
-    public int getX() {
-        return location.x;
-    }
-    
-    public int getY() {
-        return location.y;
-    }
-    
+    @Override
     public List<Text> getText() {
         return text;
     }
-    
 }

@@ -42,4 +42,8 @@ public abstract class BaseListCell extends AbstractParentElement {
     public boolean isEdited() {
         return getConfigError().isPresent();
     }
+    
+    public void onAdd() {}
+    
+    public void onDelete() {}
 }

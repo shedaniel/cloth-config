@@ -9,7 +9,6 @@ import net.minecraft.text.TranslatableText;
 
 @Environment(EnvType.CLIENT)
 public class ClothRequiresRestartScreen extends ConfirmScreen {
-    
     public ClothRequiresRestartScreen(Screen parent) {
         super(t -> {
             if (t)
@@ -18,5 +17,4 @@ public class ClothRequiresRestartScreen extends ConfirmScreen {
                 MinecraftClient.getInstance().openScreen(parent);
         }, new TranslatableText("text.cloth-config.restart_required"), new TranslatableText("text.cloth-config.restart_required_sub"), new TranslatableText("text.cloth-config.exit_minecraft"), new TranslatableText("text.cloth-config.ignore_restart"));
     }
-    
 }

@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 @Environment(EnvType.CLIENT)
 public interface ConfigBuilder {
     
-    @SuppressWarnings("deprecation")
     static ConfigBuilder create() {
         return new ConfigBuilderImpl();
     }
@@ -83,6 +82,12 @@ public interface ConfigBuilder {
     default ConfigBuilder alwaysShowTabs() {
         return setAlwaysShowTabs(true);
     }
+    
+    /**
+     * @deprecated does not work
+     */
+    @Deprecated
+    void setGlobalized(boolean globalized);
     
     boolean isAlwaysShowTabs();
     

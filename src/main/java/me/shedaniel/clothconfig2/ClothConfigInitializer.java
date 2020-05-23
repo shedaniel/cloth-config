@@ -1,26 +1,19 @@
 package me.shedaniel.clothconfig2;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import me.shedaniel.clothconfig2.api.*;
-import me.shedaniel.clothconfig2.gui.entries.*;
+import me.shedaniel.clothconfig2.gui.entries.MultiElementListEntry;
+import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.clothconfig2.impl.EasingMethod.EasingMethodImpl;
-import me.shedaniel.clothconfig2.impl.EasingMethods;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.impl.client.keybinding.KeyBindingRegistryImpl;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
-import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.Window;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
@@ -31,11 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,10 +32,6 @@ import java.util.stream.Collectors;
 public class ClothConfigInitializer implements ClientModInitializer {
     
     public static final Logger LOGGER = LogManager.getFormatterLogger("ClothConfig");
-    private static EasingMethod easingMethod = EasingMethodImpl.LINEAR;
-    private static long scrollDuration = 600;
-    private static double scrollStep = 19;
-    private static double bounceBackMultiplier = .24;
     
     @Deprecated
     @ApiStatus.ScheduledForRemoval
@@ -73,81 +58,23 @@ public class ClothConfigInitializer implements ClientModInitializer {
     }
     
     public static EasingMethod getEasingMethod() {
-        return easingMethod;
+        return EasingMethodImpl.NONE;
     }
     
     public static long getScrollDuration() {
-        return scrollDuration;
+        return 0;
     }
     
     public static double getScrollStep() {
-        return scrollStep;
+        return 16.0;
     }
     
     public static double getBounceBackMultiplier() {
-        return bounceBackMultiplier;
-    }
-    
-    private static void loadConfig() {
-        File file = new File(FabricLoader.getInstance().getConfigDirectory(), "cloth-config2/config.properties");
-        try {
-            file.getParentFile().mkdirs();
-            easingMethod = EasingMethodImpl.LINEAR;
-            scrollDuration = 600;
-            scrollStep = 19;
-            bounceBackMultiplier = .24;
-            if (!file.exists()) {
-                saveConfig();
-            }
-            Properties properties = new Properties();
-            properties.load(new FileInputStream(file));
-            String easing = properties.getProperty("easingMethod1", "LINEAR");
-            for (EasingMethod value : EasingMethods.getMethods()) {
-                if (value.toString().equalsIgnoreCase(easing)) {
-                    easingMethod = value;
-                    break;
-                }
-            }
-            scrollDuration = Long.parseLong(properties.getProperty("scrollDuration1", "600"));
-            scrollStep = Double.parseDouble(properties.getProperty("scrollStep1", "19"));
-            bounceBackMultiplier = Double.parseDouble(properties.getProperty("bounceBackMultiplier2", "0.24"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            easingMethod = EasingMethodImpl.LINEAR;
-            scrollDuration = 600;
-            scrollStep = 19;
-            bounceBackMultiplier = .24;
-            try {
-                Files.deleteIfExists(file.toPath());
-            } catch (Exception ignored) {
-            }
-        }
-        saveConfig();
-    }
-    
-    private static void saveConfig() {
-        File file = new File(FabricLoader.getInstance().getConfigDirectory(), "cloth-config2/config.properties");
-        try {
-            FileWriter writer = new FileWriter(file, false);
-            Properties properties = new Properties();
-            properties.setProperty("easingMethod1", easingMethod.toString());
-            properties.setProperty("scrollDuration1", scrollDuration + "");
-            properties.setProperty("scrollStep1", scrollStep + "");
-            properties.setProperty("bounceBackMultiplier2", bounceBackMultiplier + "");
-            properties.store(writer, null);
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            easingMethod = EasingMethodImpl.LINEAR;
-            scrollDuration = 600;
-            scrollStep = 19;
-            bounceBackMultiplier = .24;
-        }
+        return -10;
     }
     
     @Override
     public void onInitializeClient() {
-        loadConfig();
         if (FabricLoader.getInstance().isModLoaded("modmenu")) {
             try {
                 Class<?> clazz = Class.forName("io.github.prospector.modmenu.api.ModMenuApi");
@@ -163,126 +90,6 @@ public class ClothConfigInitializer implements ClientModInitializer {
                 ClothConfigInitializer.LOGGER.error("[ClothConfig] Failed to add test config override for ModMenu!", e);
             }
         }
-        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
-            try {
-                KeyBindingRegistryImpl.INSTANCE.addCategory("Cloth Test Keybinds");
-                FakeModifierKeyCodeAdder.INSTANCE.registerModifierKeyCode("Cloth Test Keybinds", "Keybind 1",
-                        ModifierKeyCode::unknown, ModifierKeyCode::unknown, System.out::println);
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        }
-    }
-    
-    @SuppressWarnings("deprecation")
-    public static ConfigBuilder getConfigBuilder() {
-        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(MinecraftClient.getInstance().currentScreen).setTitle(new TranslatableText("title.cloth-config.config"));
-        builder.setDefaultBackgroundTexture(new Identifier("minecraft:textures/block/oak_planks.png"));
-        ConfigCategory scrolling = builder.getOrCreateCategory(new TranslatableText("category.cloth-config.scrolling"));
-        ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
-        DropdownBoxEntry<EasingMethod> easingMethodEntry = entryBuilder.startDropdownMenu(new LiteralText("Easing Method"), DropdownMenuBuilder.TopCellElementBuilder.of(easingMethod, str -> {
-            for (EasingMethod m : EasingMethods.getMethods())
-                if (m.toString().equals(str))
-                    return m;
-            return null;
-        })).setDefaultValue(EasingMethodImpl.LINEAR).setSaveConsumer(o -> easingMethod = o).setSelections(EasingMethods.getMethods()).build();
-        LongSliderEntry scrollDurationEntry = entryBuilder.startLongSlider(new TranslatableText("option.cloth-config.scrollDuration"), scrollDuration, 0, 5000).setTextGetter(integer -> new LiteralText(integer <= 0 ? "Value: Disabled" : (integer > 1500 ? String.format("Value: %.1fs", integer / 1000f) : "Value: " + integer + "ms"))).setDefaultValue(600).setSaveConsumer(i -> scrollDuration = i).build();
-        DoubleListEntry scrollStepEntry = entryBuilder.startDoubleField(new TranslatableText("option.cloth-config.scrollStep"), scrollStep).setDefaultValue(19).setSaveConsumer(i -> scrollStep = i).build();
-        LongSliderEntry bounceMultiplierEntry = entryBuilder.startLongSlider(new TranslatableText("option.cloth-config.bounceBackMultiplier"), (long) (bounceBackMultiplier * 1000), -10, 750).setTextGetter(integer -> new LiteralText(integer < 0 ? "Value: Disabled" : String.format("Value: %s", integer / 1000d))).setDefaultValue(240).setSaveConsumer(i -> bounceBackMultiplier = i / 1000d).build();
-        scrolling.addEntry(new TooltipListEntry<Object>(new TranslatableText("option.cloth-config.setDefaultSmoothScroll"), null) {
-            final int width = 220;
-            private final AbstractButtonWidget buttonWidget = new AbstractPressableButtonWidget(0, 0, 0, 20, getFieldName()) {
-                @Override
-                public void onPress() {
-                    easingMethodEntry.getSelectionElement().getTopRenderer().setValue(EasingMethodImpl.LINEAR);
-                    scrollDurationEntry.setValue(600);
-                    scrollStepEntry.setValue("19.0");
-                    bounceMultiplierEntry.setValue(240);
-                }
-            };
-            private final List<AbstractButtonWidget> children = ImmutableList.of(buttonWidget);
-            
-            @Override
-            public Object getValue() {
-                return null;
-            }
-            
-            @Override
-            public Optional<Object> getDefaultValue() {
-                return Optional.empty();
-            }
-            
-            @Override
-            public void save() {
-            }
-            
-            @Override
-            public List<? extends Element> children() {
-                return children;
-            }
-            
-            @Override
-            public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-                super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
-                Window window = MinecraftClient.getInstance().getWindow();
-                this.buttonWidget.active = this.isEditable();
-                this.buttonWidget.y = y;
-                this.buttonWidget.x = x + entryWidth / 2 - width / 2;
-                this.buttonWidget.setWidth(width);
-                this.buttonWidget.render(matrices, mouseX, mouseY, delta);
-            }
-        });
-        
-        scrolling.addEntry(new TooltipListEntry<Object>(new TranslatableText("option.cloth-config.disableSmoothScroll"), null) {
-            final int width = 220;
-            private final AbstractButtonWidget buttonWidget = new AbstractPressableButtonWidget(0, 0, 0, 20, getFieldName()) {
-                @Override
-                public void onPress() {
-                    easingMethodEntry.getSelectionElement().getTopRenderer().setValue(EasingMethodImpl.NONE);
-                    scrollDurationEntry.setValue(0);
-                    scrollStepEntry.setValue("16.0");
-                    bounceMultiplierEntry.setValue(-10);
-                }
-            };
-            private final List<AbstractButtonWidget> children = ImmutableList.of(buttonWidget);
-            
-            @Override
-            public Object getValue() {
-                return null;
-            }
-            
-            @Override
-            public Optional<Object> getDefaultValue() {
-                return Optional.empty();
-            }
-            
-            @Override
-            public void save() {
-            }
-            
-            @Override
-            public List<? extends Element> children() {
-                return children;
-            }
-            
-            @Override
-            public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-                super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
-                Window window = MinecraftClient.getInstance().getWindow();
-                this.buttonWidget.active = this.isEditable();
-                this.buttonWidget.y = y;
-                this.buttonWidget.x = x + entryWidth / 2 - width / 2;
-                this.buttonWidget.setWidth(width);
-                this.buttonWidget.render(matrices, mouseX, mouseY, delta);
-            }
-        });
-        scrolling.addEntry(easingMethodEntry);
-        scrolling.addEntry(scrollDurationEntry);
-        scrolling.addEntry(scrollStepEntry);
-        scrolling.addEntry(bounceMultiplierEntry);
-        builder.setSavingRunnable(ClothConfigInitializer::saveConfig);
-        builder.transparentBackground();
-        return builder;
     }
     
     public static ConfigBuilder getConfigBuilderWithDemo() {
@@ -322,7 +129,8 @@ public class ClothConfigInitializer implements ClientModInitializer {
             }
         }
         
-        ConfigBuilder builder = getConfigBuilder();
+        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(MinecraftClient.getInstance().currentScreen).setTitle(new TranslatableText("title.cloth-config.config"));
+        builder.setDefaultBackgroundTexture(new Identifier("minecraft:textures/block/oak_planks.png"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory testing = builder.getOrCreateCategory(new TranslatableText("category.cloth-config.testing"));
         testing.addEntry(entryBuilder.startKeyCodeField(new LiteralText("Cool Key"), InputUtil.UNKNOWN_KEYCODE).setDefaultValue(InputUtil.UNKNOWN_KEYCODE).build());
@@ -383,20 +191,7 @@ public class ClothConfigInitializer implements ClientModInitializer {
                     }
                 }
         ));
+        builder.transparentBackground();
         return builder;
     }
-    
-    public static class Precision {
-        public static final float FLOAT_EPSILON = 1e-3f;
-        public static final double DOUBLE_EPSILON = 1e-7;
-        
-        public static boolean almostEquals(float value1, float value2, float acceptableDifference) {
-            return Math.abs(value1 - value2) <= acceptableDifference;
-        }
-        
-        public static boolean almostEquals(double value1, double value2, double acceptableDifference) {
-            return Math.abs(value1 - value2) <= acceptableDifference;
-        }
-    }
-    
 }
