@@ -157,14 +157,14 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         if (isTransparentBackground()) {
             fillGradient(matrices, 0, 0, this.width, this.height, -1072689136, -804253680);
         } else {
-            renderDirtBackground(0);
+            renderBackgroundTexture(0);
         }
         listWidget.render(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
         for (AbstractConfigEntry<?> child : listWidget.children())
             child.lateRender(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
-        method_27534(matrices, client.textRenderer, title, width / 2, 12, -1);
+        drawCenteredText(matrices, client.textRenderer, title, width / 2, 12, -1);
         super.render(matrices, mouseX, mouseY, delta);
         if (isTransparentBackground()) {
 //            fillGradient(matrices, 0, 0, (int) sideSlider.scrollAmount, height, -1072689136, -804253680);
@@ -240,7 +240,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         
         @Override
         public int getItemHeight() {
-            List<Text> strings = MinecraftClient.getInstance().textRenderer.wrapLines(text, getParent().getItemWidth());
+            List<Text> strings = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(text, getParent().getItemWidth());
             if (strings.isEmpty())
                 return 0;
             return 4 + strings.size() * 10;
@@ -262,7 +262,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         @Override
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
             int yy = y + 2;
-            List<Text> texts = MinecraftClient.getInstance().textRenderer.wrapLines(this.text, getParent().getItemWidth());
+            List<Text> texts = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(this.text, getParent().getItemWidth());
             for (Text text : texts) {
                 MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, text, x - 4 + entryWidth / 2 - MinecraftClient.getInstance().textRenderer.getWidth(text) / 2, yy, -1);
                 yy += 10;

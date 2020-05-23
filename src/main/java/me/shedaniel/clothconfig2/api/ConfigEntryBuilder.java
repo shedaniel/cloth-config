@@ -93,7 +93,7 @@ public interface ConfigEntryBuilder {
     }
     
     default KeyCodeBuilder fillKeybindingField(Text fieldNameKey, KeyBinding value) {
-        return startKeyCodeField(fieldNameKey, ((KeyCodeAccessor) value).getKeyCode()).setDefaultValue(value.getDefaultKeyCode()).setSaveConsumer(code -> {
+        return startKeyCodeField(fieldNameKey, ((KeyCodeAccessor) value).getBoundKey()).setDefaultValue(value.getDefaultKeyCode()).setSaveConsumer(code -> {
             value.setKeyCode(code);
             KeyBinding.updateKeysByCode();
             MinecraftClient.getInstance().options.write();

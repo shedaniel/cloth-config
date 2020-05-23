@@ -247,7 +247,7 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
         if (isTransparentBackground()) {
             fillGradient(matrices, 0, 0, this.width, this.height, -1072689136, -804253680);
         } else {
-            renderDirtBackground(0);
+            renderBackgroundTexture(0);
         }
         listWidget.render(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
@@ -255,7 +255,7 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
             child.lateRender(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
         if (isShowingTabs()) {
-            method_27534(matrices, client.textRenderer, title, width / 2, 18, -1);
+            drawCenteredText(matrices, client.textRenderer, title, width / 2, 18, -1);
             Rectangle onlyInnerTabBounds = new Rectangle(tabsBounds.x + 20, tabsBounds.y, tabsBounds.width - 40, tabsBounds.height);
             ScissorsHandler.INSTANCE.scissor(onlyInnerTabBounds);
             if (isTransparentBackground())
@@ -268,7 +268,7 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
             buttonLeftTab.render(matrices, mouseX, mouseY, delta);
             buttonRightTab.render(matrices, mouseX, mouseY, delta);
         } else
-            method_27534(matrices, client.textRenderer, title, width / 2, 12, -1);
+            drawCenteredText(matrices, client.textRenderer, title, width / 2, 12, -1);
         
         if (isEditable()) {
             List<Text> errors = Lists.newArrayList();
@@ -281,22 +281,22 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
                 String text = "§c" + (errors.size() == 1 ? errors.get(0).copy().getString() : I18n.translate("text.cloth-config.multi_error"));
                 if (isTransparentBackground()) {
-                    int stringWidth = client.textRenderer.getWidth(text);
+                    int stringWidth = client.textRenderer.getStringWidth(text);
                     fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + client.textRenderer.fontHeight, 0x68000000, 0x68000000);
                 }
                 drawTexture(matrices, 10, 10, 0, 54, 3, 11);
-                drawString(matrices, client.textRenderer, text, 18, 12, -1);
+                drawStringWithShadow(matrices, client.textRenderer, text, 18, 12, -1);
             }
         } else if (!isEditable()) {
             client.getTextureManager().bindTexture(CONFIG_TEX);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             String text = "§c" + I18n.translate("text.cloth-config.not_editable");
             if (isTransparentBackground()) {
-                int stringWidth = client.textRenderer.getWidth(text);
+                int stringWidth = client.textRenderer.getStringWidth(text);
                 fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + client.textRenderer.fontHeight, 0x68000000, 0x68000000);
             }
             drawTexture(matrices, 10, 10, 0, 54, 3, 11);
-            drawString(matrices, client.textRenderer, text, 18, 12, -1);
+            drawStringWithShadow(matrices, client.textRenderer, text, 18, 12, -1);
         }
         super.render(matrices, mouseX, mouseY, delta);
     }

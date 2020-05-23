@@ -47,7 +47,7 @@ public class ModifierKeyCodeImpl implements ModifierKeyCode {
     
     @Override
     public Text getLocalizedName() {
-        Text base = this.keyCode.method_27445();
+        Text base = this.keyCode.getLocalizedText();
         if (modifier.hasShift())
             base = new TranslatableText("modifier.cloth-config.shift", base);
         if (modifier.hasControl())
