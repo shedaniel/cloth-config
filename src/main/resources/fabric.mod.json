@@ -3,7 +3,7 @@
   "id": "cloth-config2",
   "name": "Cloth Config v2",
   "description": "An API for config screens.",
-  "version": "${version}",
+  "version": "4.4.0",
   "authors": [
     "shedaniel"
   ],
@@ -19,12 +19,10 @@
       "me.shedaniel.clothconfig2.ClothConfigInitializer"
     ]
   },
-  "mixins": [
-    "mixin.cloth-config2.json"
-  ],
   "depends": {
     "fabricloader": ">=0.4.0"
   },
+  "accessWidener": "cloth-config2.accessWidener",
   "custom": {
     "modmenu:clientsideOnly": true
   }

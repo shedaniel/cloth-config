@@ -19,6 +19,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -336,20 +337,20 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return false;
     }
     
-    public boolean mouseDragged(double double_1, double double_2, int int_1, double double_3, double double_4) {
-        if (super.mouseDragged(double_1, double_2, int_1, double_3, double_4)) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
             return true;
-        } else if (int_1 == 0 && this.scrolling) {
-            if (double_2 < (double) this.top) {
+        } else if (button == 0 && this.scrolling) {
+            if (mouseY < (double) this.top) {
                 this.capYPosition(0.0F);
-            } else if (double_2 > (double) this.bottom) {
+            } else if (mouseY > (double) this.bottom) {
                 this.capYPosition(this.getMaxScroll());
             } else {
                 double double_5 = Math.max(1, this.getMaxScroll());
                 int int_2 = this.bottom - this.top;
                 int int_3 = MathHelper.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
                 double double_6 = Math.max(1.0D, double_5 / (double) (int_2 - int_3));
-                this.capYPosition(this.getScroll() + double_4 * double_6);
+                this.capYPosition(this.getScroll() + deltaY * double_6);
             }
             
             return true;
@@ -460,7 +461,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @SuppressWarnings("deprecation")
-    protected void renderHoleBackground(MatrixStack matrices, int int_1, int int_2, int int_3, int int_4) {
+    protected void renderHoleBackground(MatrixStack matrices, int y1, int y2, int alpha1, int alpha2) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         this.client.getTextureManager().bindTexture(backgroundLocation);
@@ -468,10 +469,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         float float_1 = 32.0F;
         buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-        buffer.vertex(matrix, this.left, int_2, 0.0F).texture(0, ((float) int_2 / 32.0F)).color(64, 64, 64, int_4).next();
-        buffer.vertex(matrix, this.left + this.width, int_2, 0.0F).texture(((float) this.width / 32.0F), ((float) int_2 / 32.0F)).color(64, 64, 64, int_4).next();
-        buffer.vertex(matrix, this.left + this.width, int_1, 0.0F).texture(((float) this.width / 32.0F), ((float) int_1 / 32.0F)).color(64, 64, 64, int_3).next();
-        buffer.vertex(matrix, this.left, int_1, 0.0F).texture(0, ((float) int_1 / 32.0F)).color(64, 64, 64, int_3).next();
+        buffer.vertex(matrix, this.left, y2, 0.0F).texture(0, ((float) y2 / 32.0F)).color(64, 64, 64, alpha2).next();
+        buffer.vertex(matrix, this.left + this.width, y2, 0.0F).texture(((float) this.width / 32.0F), ((float) y2 / 32.0F)).color(64, 64, 64, alpha2).next();
+        buffer.vertex(matrix, this.left + this.width, y1, 0.0F).texture(((float) this.width / 32.0F), ((float) y1 / 32.0F)).color(64, 64, 64, alpha1).next();
+        buffer.vertex(matrix, this.left, y1, 0.0F).texture(0, ((float) y1 / 32.0F)).color(64, 64, 64, alpha1).next();
         tessellator.draw();
     }
     

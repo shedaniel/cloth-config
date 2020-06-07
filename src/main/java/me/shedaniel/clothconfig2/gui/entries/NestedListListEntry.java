@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.Lists;
 import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import me.shedaniel.clothconfig2.api.ReferenceProvider;
 import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry.NestedListCell;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import net.fabricmc.api.EnvType;
@@ -32,6 +33,9 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
     @Deprecated
     public NestedListListEntry(Text fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, Text resetButtonKey, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, NestedListListEntry<T, INNER>, INNER> createNewCell) {
         super(fieldName, value, defaultExpanded, null, null, defaultValue, resetButtonKey, false, deleteButtonEnabled, insertInFront, (t, nestedListListEntry) -> new NestedListCell<>(t, nestedListListEntry, createNewCell.apply(t, nestedListListEntry)));
+        for (NestedListCell<T, INNER> cell : cells) {
+            referencableEntries.add(cell.nestedEntry);
+        }
         setReferencableEntries(referencableEntries);
     }
     
@@ -44,13 +48,18 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
      * @param <T> the configuration object type
      * @see NestedListListEntry
      */
-    public static class NestedListCell<T, INNER extends AbstractConfigListEntry<T>> extends AbstractListListEntry.AbstractListCell<T, NestedListCell<T, INNER>, NestedListListEntry<T, INNER>> {
+    public static class NestedListCell<T, INNER extends AbstractConfigListEntry<T>> extends AbstractListListEntry.AbstractListCell<T, NestedListCell<T, INNER>, NestedListListEntry<T, INNER>> implements ReferenceProvider<T> {
         private final INNER nestedEntry;
         
         @ApiStatus.Internal
         public NestedListCell(@Nullable T value, NestedListListEntry<T, INNER> listListEntry, INNER nestedEntry) {
             super(value, listListEntry);
             this.nestedEntry = nestedEntry;
+        }
+        
+        @Override
+        public AbstractConfigEntry<T> provideReferenceEntry() {
+            return nestedEntry;
         }
         
         @Override

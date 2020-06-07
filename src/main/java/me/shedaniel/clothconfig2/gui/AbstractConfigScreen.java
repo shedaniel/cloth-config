@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public abstract class AbstractConfigScreen extends Screen implements ConfigScreen {
     protected static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
@@ -42,11 +44,25 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     private KeyCodeEntry focusedBinding;
     private ModifierKeyCode startedKeyCode = null;
     private final List<Tooltip> tooltips = Lists.newArrayList();
+    @Nullable
+    private Runnable savingRunnable = null;
+    @Nullable
+    protected Consumer<Screen> afterInitConsumer = null;
     
     protected AbstractConfigScreen(Screen parent, Text title, Identifier backgroundLocation) {
         super(title);
         this.parent = parent;
         this.backgroundLocation = backgroundLocation;
+    }
+    
+    @Override
+    public void setSavingRunnable(@Nullable Runnable savingRunnable) {
+        this.savingRunnable = savingRunnable;
+    }
+    
+    @Override
+    public void setAfterInitConsumer(@Nullable Consumer<Screen> afterInitConsumer) {
+        this.afterInitConsumer = afterInitConsumer;
     }
     
     @Override
@@ -162,6 +178,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     }
     
     public void save() {
+        Optional.ofNullable(this.savingRunnable).ifPresent(Runnable::run);
     }
     
     public boolean isEditable() {
@@ -351,7 +368,6 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         BufferBuilder buffer = tessellator.getBuffer();
         client.getTextureManager().bindTexture(getBackgroundLocation());
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        float f = 32.0F;
         buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
         buffer.vertex(matrix, rect.getMinX(), rect.getMaxY(), 0.0F).texture(rect.getMinX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();
         buffer.vertex(matrix, rect.getMaxX(), rect.getMaxY(), 0.0F).texture(rect.getMaxX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();

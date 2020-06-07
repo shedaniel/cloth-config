@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> {
+public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> implements ReferenceProvider<T> {
     private AbstractConfigScreen screen;
     private Supplier<Optional<Text>> errorSupplier;
     @Nullable
@@ -33,6 +33,11 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
         if (configScreen instanceof ReferenceBuildingConfigScreen) {
             ((ReferenceBuildingConfigScreen) configScreen).requestReferenceRebuilding();
         }
+    }
+    
+    @Override
+    public AbstractConfigEntry<T> provideReferenceEntry() {
+        return this;
     }
     
     @Nullable
@@ -100,7 +105,6 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     
     public void updateSelected(boolean isSelected) {}
     
-    @Deprecated
     @ApiStatus.Internal
     public final void setScreen(AbstractConfigScreen screen) {
         this.screen = screen;
@@ -115,5 +119,9 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     @Override
     public int getItemHeight() {
         return 24;
+    }
+    
+    public int getInitialReferenceOffset() {
+        return 0;
     }
 }

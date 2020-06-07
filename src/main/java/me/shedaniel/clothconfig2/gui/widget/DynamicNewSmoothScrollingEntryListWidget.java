@@ -72,22 +72,22 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     }
     
     @Override
-    public boolean mouseDragged(double double_1, double double_2, int int_1, double double_3, double double_4) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (!smoothScrolling)
-            return super.mouseDragged(double_1, double_2, int_1, double_3, double_4);
-        if ((this.getFocused() != null && this.isDragging() && int_1 == 0) && this.getFocused().mouseDragged(double_1, double_2, int_1, double_3, double_4)) {
+            return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        if ((this.getFocused() != null && this.isDragging() && button == 0) && this.getFocused().mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
             return true;
-        } else if (int_1 == 0 && this.scrolling) {
-            if (double_2 < (double) this.top) {
+        } else if (button == 0 && this.scrolling) {
+            if (mouseY < (double) this.top) {
                 this.capYPosition(0.0D);
-            } else if (double_2 > (double) this.bottom) {
+            } else if (mouseY > (double) this.bottom) {
                 this.capYPosition(this.getMaxScroll());
             } else {
                 double double_5 = Math.max(1, this.getMaxScroll());
                 int int_2 = this.bottom - this.top;
                 int int_3 = MathHelper.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
                 double double_6 = Math.max(1.0D, double_5 / (double) (int_2 - int_3));
-                this.capYPosition(MathHelper.clamp(this.getScroll() + double_4 * double_6, 0, getMaxScroll()));
+                this.capYPosition(MathHelper.clamp(this.getScroll() + deltaY * double_6, 0, getMaxScroll()));
             }
             return true;
         }
@@ -95,18 +95,18 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     }
     
     @Override
-    public boolean mouseScrolled(double double_1, double double_2, double double_3) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         for (E entry : children()) {
-            if (entry.mouseScrolled(double_1, double_2, double_3)) {
+            if (entry.mouseScrolled(mouseX, mouseY, amount)) {
                 return true;
             }
         }
         if (!smoothScrolling) {
-            scroll += 16 * -double_3;
-            this.scroll = MathHelper.clamp(double_3, 0.0D, this.getMaxScroll());
+            scroll += 16 * -amount;
+            this.scroll = MathHelper.clamp(amount, 0.0D, this.getMaxScroll());
             return true;
         }
-        offset(ClothConfigInitializer.getScrollStep() * -double_3, true);
+        offset(ClothConfigInitializer.getScrollStep() * -amount, true);
         return true;
     }
     

@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import me.shedaniel.clothconfig2.api.Expandable;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
@@ -25,7 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
-public class MultiElementListEntry<T> extends TooltipListEntry<T> {
+public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Expandable {
     
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     private final T object;
@@ -143,6 +144,11 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
+    public int getInitialReferenceOffset() {
+        return 24;
+    }
+    
+    @Override
     public void lateRender(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (expanded) {
             for (AbstractConfigListEntry<?> entry : entries) {
@@ -185,6 +191,16 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> {
             return Optional.of(new TranslatableText("text.cloth-config.multi_error"));
         else
             return errors.stream().findFirst();
+    }
+    
+    @Override
+    public boolean isExpanded() {
+        return this.expanded;
+    }
+    
+    @Override
+    public void setExpanded(boolean expanded) {
+        this.expanded = expanded;
     }
     
     public class CategoryLabelWidget implements Element {

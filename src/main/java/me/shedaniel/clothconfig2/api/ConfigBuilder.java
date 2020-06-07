@@ -83,11 +83,9 @@ public interface ConfigBuilder {
         return setAlwaysShowTabs(true);
     }
     
-    /**
-     * @deprecated does not work
-     */
-    @Deprecated
     void setGlobalized(boolean globalized);
+    
+    void setGlobalizedExpanded(boolean globalizedExpanded);
     
     boolean isAlwaysShowTabs();
     

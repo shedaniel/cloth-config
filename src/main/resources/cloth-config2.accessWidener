@@ -1,0 +1,4 @@
+accessWidener   v1  named
+accessible method net/minecraft/client/font/TextRenderer drawLayer (Ljava/lang/String;FFIZLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)F
+accessible field net/minecraft/client/gui/widget/ButtonWidget onPress Lnet/minecraft/client/gui/widget/ButtonWidget$PressAction;
+mutable field net/minecraft/client/gui/widget/ButtonWidget onPress Lnet/minecraft/client/gui/widget/ButtonWidget$PressAction;

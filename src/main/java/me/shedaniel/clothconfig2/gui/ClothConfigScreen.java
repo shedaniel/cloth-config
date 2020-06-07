@@ -11,7 +11,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
-import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
@@ -29,11 +28,12 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"deprecation", "rawtypes", "DuplicatedCode"})
 @Environment(EnvType.CLIENT)
-public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
+public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     private ScrollingContainer tabsScroller = new ScrollingContainer() {
         @Override
         public Rectangle getBounds() {
@@ -59,7 +59,7 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
     private double tabsMaximumScrolled = -1d;
     private final List<ClothConfigTabButton> tabButtons = Lists.newArrayList();
     
-    @Deprecated
+    @ApiStatus.Internal
     public ClothConfigScreen(Screen parent, Text title, Map<Text, List<Object>> entriesMap, Identifier backgroundLocation) {
         super(parent, title, backgroundLocation);
         entriesMap.forEach((categoryName, list) -> {
@@ -134,15 +134,8 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
             listWidget.children().addAll((List) Lists.newArrayList(categorizedEntries.values()).get(selectedCategoryIndex));
         }
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addButton(quitButton = new ButtonWidget(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"), widget -> {
-            quit();
-        }));
-        addButton(saveButton = new AbstractPressableButtonWidget(width / 2 + 3, height - 26, buttonWidths, 20, NarratorManager.EMPTY) {
-            @Override
-            public void onPress() {
-                saveAll(true);
-            }
-            
+        addButton(quitButton = new ButtonWidget(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"), widget -> quit()));
+        addButton(saveButton = new ButtonWidget(width / 2 + 3, height - 26, buttonWidths, 20, NarratorManager.EMPTY, button -> saveAll(true)) {
             @Override
             public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
@@ -165,12 +158,7 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
             tabsBounds = new Rectangle(0, 41, width, 24);
             tabsLeftBounds = new Rectangle(0, 41, 18, 24);
             tabsRightBounds = new Rectangle(width - 18, 41, 18, 24);
-            children.add(buttonLeftTab = new AbstractPressableButtonWidget(4, 44, 12, 18, NarratorManager.EMPTY) {
-                @Override
-                public void onPress() {
-                    tabsScroller.scrollTo(0, false);
-                }
-                
+            children.add(buttonLeftTab = new ButtonWidget(4, 44, 12, 18, NarratorManager.EMPTY, button -> tabsScroller.scrollTo(0, true)) {
                 @Override
                 public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                     client.getTextureManager().bindTexture(CONFIG_TEX);
@@ -188,12 +176,7 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 j++;
             }
             children.addAll(tabButtons);
-            children.add(buttonRightTab = new AbstractPressableButtonWidget(width - 16, 44, 12, 18, NarratorManager.EMPTY) {
-                @Override
-                public void onPress() {
-                    tabsScroller.scrollTo(tabsScroller.getMaxScroll(), false);
-                }
-                
+            children.add(buttonRightTab = new ButtonWidget(width - 16, 44, 12, 18, NarratorManager.EMPTY, button -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true)) {
                 @Override
                 public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                     client.getTextureManager().bindTexture(CONFIG_TEX);
@@ -208,15 +191,16 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
         } else {
             tabsBounds = tabsLeftBounds = tabsRightBounds = new Rectangle();
         }
+        Optional.ofNullable(this.afterInitConsumer).ifPresent(consumer -> consumer.accept(this));
     }
     
     @Override
-    public boolean mouseScrolled(double double_1, double double_2, double double_3) {
-        if (tabsBounds.contains(double_1, double_2) && !tabsLeftBounds.contains(double_1, double_2) && !tabsRightBounds.contains(double_1, double_2) && double_3 != 0d) {
-            tabsScroller.offset(-double_3 * 16, true);
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        if (tabsBounds.contains(mouseX, mouseY) && !tabsLeftBounds.contains(mouseX, mouseY) && !tabsRightBounds.contains(mouseX, mouseY) && amount != 0d) {
+            tabsScroller.offset(-amount * 16, true);
             return true;
         }
-        return super.mouseScrolled(double_1, double_2, double_3);
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
     
     public double getTabsMaximumScrolled() {
@@ -374,20 +358,20 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
         
         @Override
-        public boolean mouseClicked(double double_1, double double_2, int int_1) {
-            this.updateScrollingState(double_1, double_2, int_1);
-            if (!this.isMouseOver(double_1, double_2)) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            this.updateScrollingState(mouseX, mouseY, button);
+            if (!this.isMouseOver(mouseX, mouseY)) {
                 return false;
             } else {
                 for (R entry : children()) {
-                    if (entry.mouseClicked(double_1, double_2, int_1)) {
+                    if (entry.mouseClicked(mouseX, mouseY, button)) {
                         this.setFocused(entry);
                         this.setDragging(true);
                         return true;
                     }
                 }
-                if (int_1 == 0) {
-                    this.clickedHeader((int) (double_1 - (double) (this.left + this.width / 2 - this.getItemWidth() / 2)), (int) (double_2 - (double) this.top) + (int) this.getScroll() - 4);
+                if (button == 0) {
+                    this.clickedHeader((int) (mouseX - (double) (this.left + this.width / 2 - this.getItemWidth() / 2)), (int) (mouseY - (double) this.top) + (int) this.getScroll() - 4);
                     return true;
                 }
                 
@@ -405,9 +389,9 @@ public abstract class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
         
         @Override
-        protected void renderHoleBackground(MatrixStack matrices, int int_1, int int_2, int int_3, int int_4) {
+        protected void renderHoleBackground(MatrixStack matrices, int y1, int y2, int alpha1, int alpha2) {
             if (!screen.isTransparentBackground())
-                super.renderHoleBackground(matrices, int_1, int_2, int_3, int_4);
+                super.renderHoleBackground(matrices, y1, y2, alpha1, alpha2);
         }
     }
 }

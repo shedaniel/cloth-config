@@ -2,6 +2,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
+import me.shedaniel.clothconfig2.api.Expandable;
 import me.shedaniel.clothconfig2.api.Tooltip;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
  * @implNote See <a href="https://stackoverflow.com/questions/7354740/is-there-a-way-to-refer-to-the-current-type-with-a-type-variable">Is there a way to refer to the current type with a type variable?</href> on Stack Overflow.
  */
 @Environment(EnvType.CLIENT)
-public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends BaseListEntry<T, C, SELF>> extends TooltipListEntry<List<T>> {
+public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends BaseListEntry<T, C, SELF>> extends TooltipListEntry<List<T>> implements Expandable {
     
     protected static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     @NotNull protected final List<C> cells;
@@ -55,19 +56,16 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     protected Text addTooltip = new TranslatableText("text.cloth-config.list.add"), removeTooltip = new TranslatableText("text.cloth-config.list.remove");
     
     @ApiStatus.Internal
-    @Deprecated
     public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, false);
     }
     
     @ApiStatus.Internal
-    @Deprecated
     public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey, boolean requiresRestart) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, requiresRestart, true, true);
     }
     
     @ApiStatus.Internal
-    @Deprecated
     public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.deleteButtonEnabled = deleteButtonEnabled;
@@ -91,6 +89,16 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         this.saveConsumer = saveConsumer;
         this.createNewInstance = createNewInstance;
         this.defaultValue = defaultValue;
+    }
+    
+    @Override
+    public boolean isExpanded() {
+        return expanded;
+    }
+    
+    @Override
+    public void setExpanded(boolean expanded) {
+        this.expanded = expanded;
     }
     
     @Override
@@ -260,6 +268,11 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         for (C cell : cells) {
             cell.updateSelected(isSelected && getFocused() == cell && expanded);
         }
+    }
+    
+    @Override
+    public int getInitialReferenceOffset() {
+        return 24;
     }
     
     public boolean insertInFront() {

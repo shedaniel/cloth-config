@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
+import me.shedaniel.clothconfig2.api.Expandable;
 import me.shedaniel.clothconfig2.api.TabbedConfigScreen;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
@@ -29,6 +30,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private Screen parent;
     private Text title = new TranslatableText("text.cloth-config.config");
     private boolean globalized = false;
+    private boolean globalizedExpanded = true;
     private boolean editable = true;
     private boolean tabsSmoothScroll = true;
     private boolean listSmoothScroll = true;
@@ -49,6 +51,11 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     @Override
     public void setGlobalized(boolean globalized) {
         this.globalized = globalized;
+    }
+    
+    @Override
+    public void setGlobalizedExpanded(boolean globalizedExpanded) {
+        this.globalizedExpanded = globalizedExpanded;
     }
     
     @Override
@@ -215,39 +222,19 @@ public class ConfigBuilderImpl implements ConfigBuilder {
             throw new NullPointerException("There cannot be no categories or fallback category!");
         AbstractConfigScreen screen;
         if (globalized) {
-            screen = new GlobalizedClothConfigScreen(parent, title, dataMap, defaultBackground) {
-                @Override
-                public void save() {
-                    if (savingRunnable != null)
-                        savingRunnable.run();
-                }
-        
-                @Override
-                protected void init() {
-                    super.init();
-                    afterInitConsumer.accept(this);
-                }
-            };
+            screen = new GlobalizedClothConfigScreen(parent, title, dataMap, defaultBackground);
         } else {
-            screen = new ClothConfigScreen(parent, title, dataMap, defaultBackground) {
-                @Override
-                public void save() {
-                    if (savingRunnable != null)
-                        savingRunnable.run();
-                }
-        
-                @Override
-                protected void init() {
-                    super.init();
-                    afterInitConsumer.accept(this);
-                }
-            };
-        };
+            screen = new ClothConfigScreen(parent, title, dataMap, defaultBackground);
+        }
+        screen.setSavingRunnable(savingRunnable);
         screen.setEditable(editable);
         screen.setFallbackCategory(fallbackCategory);
         screen.setTransparentBackground(transparentBackground);
         screen.setAlwaysShowTabs(alwaysShowTabs);
         screen.setConfirmSave(doesConfirmSave);
+        screen.setAfterInitConsumer(afterInitConsumer);
+        if (screen instanceof Expandable)
+            ((Expandable) screen).setExpanded(globalizedExpanded);
         if (screen instanceof TabbedConfigScreen)
             categoryBackground.forEach(((TabbedConfigScreen) screen)::registerCategoryBackground);
         return screen;

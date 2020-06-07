@@ -1,7 +1,6 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import me.shedaniel.clothconfig2.gui.widget.ColorDisplayWidget;
-import me.shedaniel.clothconfig2.mixin.ButtonWidgetHooks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -35,9 +34,9 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
         this.original = value;
         this.textFieldWidget.setText(getHexColorString(value));
         this.colorDisplayWidget = new ColorDisplayWidget(textFieldWidget, 0, 0, 20, getColorValueColor(textFieldWidget.getText()));
-        ((ButtonWidgetHooks) this.resetButton).setOnPress(button -> {
+        this.resetButton.onPress = button -> {
             this.textFieldWidget.setText(getHexColorString(defaultValue.get()));
-        });
+        };
     }
     
     @Override

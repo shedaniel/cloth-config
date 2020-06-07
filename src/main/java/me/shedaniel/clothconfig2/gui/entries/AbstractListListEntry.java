@@ -33,7 +33,7 @@ public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.A
         for (T f : value)
             cells.add(createNewCell.apply(f, this.self()));
         this.widgets.addAll(cells);
-        expanded = defaultExpanded;
+        setExpanded(defaultExpanded);
     }
     
     public Function<T, Optional<Text>> getCellErrorSupplier() {

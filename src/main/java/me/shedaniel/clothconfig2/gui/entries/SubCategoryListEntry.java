@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import me.shedaniel.clothconfig2.api.Expandable;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
-public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigListEntry>> {
+public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigListEntry>> implements Expandable {
     
     private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
     private List<AbstractConfigListEntry> entries;
@@ -40,6 +41,16 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         this.children = Lists.newArrayList(widget);
         this.children.addAll(entries);
         this.setReferencableEntries((List) entries);
+    }
+    
+    @Override
+    public boolean isExpanded() {
+        return expanded;
+    }
+    
+    @Override
+    public void setExpanded(boolean expanded) {
+        this.expanded = expanded;
     }
     
     @Override
@@ -153,6 +164,11 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
                 i += entry.getItemHeight();
             return i;
         }
+        return 24;
+    }
+    
+    @Override
+    public int getInitialReferenceOffset() {
         return 24;
     }
     
