@@ -30,7 +30,6 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
     private final List<AbstractConfigEntry<?>> referencableEntries = Lists.newArrayList();
     
     @ApiStatus.Internal
-    @Deprecated
     public NestedListListEntry(Text fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, Text resetButtonKey, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, NestedListListEntry<T, INNER>, INNER> createNewCell) {
         super(fieldName, value, defaultExpanded, null, null, defaultValue, resetButtonKey, false, deleteButtonEnabled, insertInFront, (t, nestedListListEntry) -> new NestedListCell<>(t, nestedListListEntry, createNewCell.apply(t, nestedListListEntry)));
         for (NestedListCell<T, INNER> cell : cells) {

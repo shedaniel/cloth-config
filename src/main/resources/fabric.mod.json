@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "cloth-config2",
-  "name": "Cloth Config v2",
+  "name": "Cloth Config v4",
   "description": "An API for config screens.",
   "version": "4.4.0",
   "authors": [
@@ -15,8 +15,8 @@
   "license": "Unlicense",
   "icon": "icon.png",
   "entrypoints": {
-    "client": [
-      "me.shedaniel.clothconfig2.ClothConfigInitializer"
+    "modmenu": [
+      "me.shedaniel.clothconfig2.ClothConfigModMenuDemo"
     ]
   },
   "depends": {
@@ -24,6 +24,7 @@
   },
   "accessWidener": "cloth-config2.accessWidener",
   "custom": {
-    "modmenu:clientsideOnly": true
+    "modmenu:clientsideOnly": true,
+    "modmenu:api": true
   }
 }
