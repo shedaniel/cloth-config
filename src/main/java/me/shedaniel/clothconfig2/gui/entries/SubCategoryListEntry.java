@@ -40,7 +40,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         this.widget = new CategoryLabelWidget();
         this.children = Lists.newArrayList(widget);
         this.children.addAll(entries);
-        this.setReferencableEntries((List) entries);
+        this.setReferenceProviderEntries((List) entries);
     }
     
     @Override

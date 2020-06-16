@@ -12,6 +12,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -27,7 +28,7 @@ import java.util.function.Supplier;
  */
 @Environment(EnvType.CLIENT)
 public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<T>> extends AbstractListListEntry<T, NestedListCell<T, INNER>, NestedListListEntry<T, INNER>> {
-    private final List<AbstractConfigEntry<?>> referencableEntries = Lists.newArrayList();
+    private final List<ReferenceProvider<?>> referencableEntries = Lists.newArrayList();
     
     @ApiStatus.Internal
     public NestedListListEntry(Text fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, Text resetButtonKey, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, NestedListListEntry<T, INNER>, INNER> createNewCell) {
@@ -35,7 +36,7 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
         for (NestedListCell<T, INNER> cell : cells) {
             referencableEntries.add(cell.nestedEntry);
         }
-        setReferencableEntries(referencableEntries);
+        setReferenceProviderEntries(referencableEntries);
     }
     
     @Override
@@ -57,6 +58,7 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
         }
         
         @Override
+        @NotNull
         public AbstractConfigEntry<T> provideReferenceEntry() {
             return nestedEntry;
         }

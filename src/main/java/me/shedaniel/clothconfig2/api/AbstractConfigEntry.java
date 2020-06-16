@@ -16,15 +16,22 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
 public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> implements ReferenceProvider<T> {
     private AbstractConfigScreen screen;
     private Supplier<Optional<Text>> errorSupplier;
     @Nullable
-    private List<AbstractConfigEntry<?>> referencableEntries = null;
+    private List<ReferenceProvider<?>> referencableEntries = null;
     
-    public final void setReferencableEntries(List<AbstractConfigEntry<?>> referencableEntries) {
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
+    public final void setReferencableEntries(@Nullable List<AbstractConfigEntry<?>> referencableEntries) {
+        setReferenceProviderEntries(referencableEntries.stream().map(AbstractConfigEntry::provideReferenceEntry).collect(Collectors.toList()));
+    }
+    
+    public final void setReferenceProviderEntries(@Nullable List<ReferenceProvider<?>> referencableEntries) {
         this.referencableEntries = referencableEntries;
     }
     
@@ -36,13 +43,21 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     }
     
     @Override
-    public AbstractConfigEntry<T> provideReferenceEntry() {
+    public @NotNull AbstractConfigEntry<T> provideReferenceEntry() {
         return this;
     }
     
     @Nullable
     @ApiStatus.Internal
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public final List<AbstractConfigEntry<?>> getReferencableEntries() {
+        return referencableEntries.stream().map(ReferenceProvider::provideReferenceEntry).collect(Collectors.toList());
+    }
+    
+    @Nullable
+    @ApiStatus.Internal
+    public final List<ReferenceProvider<?>> getReferenceProviderEntries() {
         return referencableEntries;
     }
     

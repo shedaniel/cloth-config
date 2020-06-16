@@ -154,11 +154,11 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     }
     
     private void buildReferenceFor(AbstractConfigEntry<?> entry, int layer) {
-        List<AbstractConfigEntry<?>> referencableEntries = entry.getReferencableEntries();
+        List<ReferenceProvider<?>> referencableEntries = entry.getReferenceProviderEntries();
         if (referencableEntries != null) {
             this.references.add(new ConfigEntryReference(entry, layer));
-            for (AbstractConfigEntry<?> referencableEntry : referencableEntries) {
-                buildReferenceFor(referencableEntry, layer + 1);
+            for (ReferenceProvider<?> referencableEntry : referencableEntries) {
+                buildReferenceFor(referencableEntry.provideReferenceEntry(), layer + 1);
             }
         }
     }
