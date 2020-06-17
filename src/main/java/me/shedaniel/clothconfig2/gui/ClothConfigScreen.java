@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
+import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -25,10 +26,7 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.Matrix4f;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"deprecation", "rawtypes", "DuplicatedCode"})
@@ -270,6 +268,11 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 }
                 drawTexture(matrices, 10, 10, 0, 54, 3, 11);
                 drawStringWithShadow(matrices, client.textRenderer, text, 18, 12, -1);
+                if (errors.size() > 1) {
+                    int stringWidth = client.textRenderer.getStringWidth(text);
+                    if (mouseX >= 10 && mouseY >= 10 && mouseX <= 18 + stringWidth && mouseY <= 14 + client.textRenderer.fontHeight)
+                        addTooltip(Tooltip.of(new Point(mouseX, mouseY), errors.toArray(new Text[0])));
+                }
             }
         } else if (!isEditable()) {
             client.getTextureManager().bindTexture(CONFIG_TEX);
