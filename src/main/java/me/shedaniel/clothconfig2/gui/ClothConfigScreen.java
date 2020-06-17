@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
+import me.shedaniel.math.api.Point;
 import me.shedaniel.math.api.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -32,10 +33,7 @@ import net.minecraft.util.Tickable;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"deprecation", "rawtypes", "unchecked", "DuplicatedCode"})
@@ -436,6 +434,11 @@ public abstract class ClothConfigScreen extends Screen {
                 }
                 blit(10, 10, 0, 54, 3, 11);
                 drawString(minecraft.textRenderer, text, 18, 12, -1);
+                if (errors.size() > 1) {
+                    int stringWidth = minecraft.textRenderer.getStringWidth(text);
+                    if (int_1 >= 10 && int_2 >= 10 && int_1 <= 18 + stringWidth && int_2 <= 14 + minecraft.textRenderer.fontHeight)
+                        queuedTooltips.add(QueuedTooltip.create(new Point(int_1, int_2), new ArrayList<>(errors)));
+                }
             }
         } else if (!isEditable()) {
             minecraft.getTextureManager().bindTexture(CONFIG_TEX);
