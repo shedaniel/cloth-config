@@ -3,7 +3,7 @@
   "id": "cloth-config2",
   "name": "Cloth Config v4",
   "description": "An API for config screens.",
-  "version": "4.4.0",
+  "version": "${version}",
   "authors": [
     "shedaniel"
   ],
