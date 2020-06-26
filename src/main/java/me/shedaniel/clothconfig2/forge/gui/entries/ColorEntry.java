@@ -1,15 +1,14 @@
-package me.shedaniel.clothconfig2.gui.entries;
+package me.shedaniel.clothconfig2.forge.gui.entries;
 
-import me.shedaniel.clothconfig2.gui.widget.ColorDisplayWidget;
-import net.minecraft.client.MinecraftClient;
+import me.shedaniel.clothconfig2.forge.gui.widget.ColorDisplayWidget;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-
+import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -23,7 +22,7 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
     
     @ApiStatus.Internal
     @Deprecated
-    public ColorEntry(Text fieldName, int value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
+    public ColorEntry(ITextComponent fieldName, int value, ITextComponent resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<ITextComponent[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, 0, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
         this.alpha = true;
         ColorValue colorValue = getColorValue(String.valueOf(value));
@@ -34,7 +33,7 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
         this.original = value;
         this.textFieldWidget.setText(getHexColorString(value));
         this.colorDisplayWidget = new ColorDisplayWidget(textFieldWidget, 0, 0, 20, getColorValueColor(textFieldWidget.getText()));
-        this.resetButton.onPress = button -> {
+        this.resetButton.field_230697_t_ = button -> {
             this.textFieldWidget.setText(getHexColorString(defaultValue.get()));
         };
     }
@@ -48,24 +47,24 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
     @Override
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
-        this.colorDisplayWidget.y = y;
+        this.colorDisplayWidget.field_230691_m_ = y;
         ColorValue value = getColorValue(textFieldWidget.getText());
         if (!value.hasError())
             colorDisplayWidget.setColor(alpha ? value.getColor() : 0xff000000 | value.getColor());
-        if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            this.colorDisplayWidget.x = x + resetButton.getWidth() + textFieldWidget.getWidth();
+        if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
+            this.colorDisplayWidget.field_230690_l_ = x + resetButton.func_230998_h_() + textFieldWidget.func_230998_h_();
         } else {
-            this.colorDisplayWidget.x = textFieldWidget.x - 23;
+            this.colorDisplayWidget.field_230690_l_ = textFieldWidget.field_230690_l_ - 23;
         }
-        colorDisplayWidget.render(matrices, mouseX, mouseY, delta);
+        colorDisplayWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
     }
     
     @Override
     protected void textFieldPreRender(TextFieldWidget widget) {
         if (!getConfigError().isPresent()) {
-            widget.setEditableColor(14737632);
+            widget.setTextColor(14737632);
         } else {
-            widget.setEditableColor(16733525);
+            widget.setTextColor(16733525);
         }
     }
     
@@ -100,10 +99,10 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
     }
     
     @Override
-    public Optional<Text> getError() {
+    public Optional<ITextComponent> getError() {
         ColorValue colorValue = getColorValue(this.textFieldWidget.getText());
         if (colorValue.hasError())
-            return Optional.of(new TranslatableText("text.cloth-config.error.color." + colorValue.getError().name().toLowerCase(Locale.ROOT)));
+            return Optional.of(new TranslationTextComponent("text.cloth-config.error.color." + colorValue.getError().name().toLowerCase(Locale.ROOT)));
         return super.getError();
     }
     

@@ -113,9 +113,8 @@ artifacts {
     archives deobfJar
 }
 
-task sourceJar(type: Jar, dependsOn: 'classes') {
-    from "build/sources/java"
-    from "build/resources/main/java"
+task sourceJar(type: Jar, dependsOn: classes) {
+    from sourceSets.main.allJava
     classifier "sources"
 }
 
@@ -125,6 +124,7 @@ artifacts {
 
 task javadocJar(type: Jar, dependsOn: 'javadoc') {
     from "build/docs/javadoc"
+    javadoc.failOnError false
     classifier "javadoc"
 }
 
@@ -160,7 +160,7 @@ publishing {
     publications {
         MyPublication(MavenPublication) {
             artifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
-                builtBy jar
+                builtBy build
             }
             artifact sourceJar
             artifact javadocJar
