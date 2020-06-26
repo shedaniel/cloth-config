@@ -3,10 +3,7 @@ name: Java CI
 on:
   push:
     branches:    
-      - v2
-      - v2-unstable
-      - v4
-      - v4-unstable
+      - v4-forge
 
 jobs:
   build:

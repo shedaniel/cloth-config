@@ -1,66 +1,74 @@
+buildscript {
+    repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+    }
+}
+
 plugins {
-    id 'fabric-loom' version "0.4-SNAPSHOT"
     id 'maven-publish'
     id 'maven'
-    id 'signing'
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
     id 'java-library'
-    id 'net.corda.plugins.jar-filter' version "5.0.8" apply false
+    id 'net.corda.plugins.jar-filter' version "4.0.48" apply false
+    id "com.github.johnrengelman.shadow" version "4.0.4"
 }
 
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+
 repositories {
-    maven {
-        name = 'Fabric'
-        url = 'https://maven.fabricmc.net/'
-    }
     jcenter()
     maven { url "https://jitpack.io" }
-    maven { url "https://dl.bintray.com/shedaniel/legacy-yarn-updated" }
 }
 
 sourceCompatibility = targetCompatibility = 1.8
 
 group = "me.shedaniel.cloth"
-archivesBaseName = "config-2"
+archivesBaseName = "cloth-config-forge"
 version = project.mod_version
 
-repositories {
-    maven { url "https://dl.bintray.com/shedaniel/shedaniel-mods" }
-}
-
 minecraft {
-    accessWidener = file("src/main/resources/cloth-config2.accessWidener")
-}
+    mappings channel: 'snapshot', version: project.mcp_version
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-processResources {
-    filesMatching('fabric.mod.json') {
-        expand 'version': project.version
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
     }
-    inputs.property "version", project.version
 }
 
 dependencies {
+    minecraft("net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}")
+
     compile("org.jetbrains:annotations:18.0.0")
-
-    minecraft("com.mojang:minecraft:${project.minecraft_version}")
-    mappings("me.shedaniel:legacy-yarn:${project.yarn_mappings}:v2")
-
-    modApi("net.fabricmc:fabric-loader:${project.loader_version}")
-    modApi("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
-
-    modApi("me.shedaniel.cloth:basic-math:0.5.1")
-    include("me.shedaniel.cloth:basic-math:0.5.1")
-
-    modCompileOnly("io.github.prospector:modmenu:${modmenu_version}")
-    modRuntime("io.github.prospector:modmenu:${modmenu_version}")
-    modRuntime("me.shedaniel:SmoothScrollingEverywhere:3.0.3-unstable") {
-        transitive(false)
-    }
+    compile("me.shedaniel.cloth:basic-math:0.5.1")
 }
 
 task jarFilter(type: net.corda.gradle.jarfilter.JarFilterTask) {
-    jars remapJar
+    jars jar
     annotations {
         forRemove = [
                 "org.jetbrains.annotations.NotNull",
@@ -75,6 +83,57 @@ task jarFilter(type: net.corda.gradle.jarfilter.JarFilterTask) {
     }
 }
 
+shadowJar {
+    manifest {
+        inheritFrom project.jar.manifest
+    }
+
+    dependencies {
+        include(dependency("me.shedaniel.cloth:basic-math:0.5.1"))
+    }
+
+    appendix = ''
+    classifier = ''
+}
+
+reobf {
+    shadowJar {}
+}
+
+shadowJar.finalizedBy('reobfJar')
+tasks.reobfShadowJar.mustRunAfter shadowJar
+tasks.build.dependsOn reobfShadowJar
+
+task deobfJar(type: Jar, dependsOn: 'jar') {
+    from "build/source/main"
+    classifier "dev"
+}
+
+artifacts {
+    archives deobfJar
+}
+
+task sourceJar(type: Jar, dependsOn: 'classes') {
+    from "build/sources/java"
+    from "build/resources/main/java"
+    classifier "sources"
+}
+
+artifacts {
+    archives sourceJar
+}
+
+task javadocJar(type: Jar, dependsOn: 'javadoc') {
+    from "build/docs/javadoc"
+    classifier "javadoc"
+}
+
+artifacts {
+    archives javadocJar
+}
+
+jar.finalizedBy('reobfJar')
+
 task copyJarFilter(type: Copy) {
     from jarFilter
     into "${project.buildDir}/filtered-libs/"
@@ -88,55 +147,25 @@ bintray {
     publish = true
     pkg {
         repo = "cloth-config-2"
-        name = "config-2"
+        name = "cloth-config-forge"
         userOrg = "shedaniel"
         licenses = ["Unlicense"]
         version {
-            name = project.version
-            vcsTag = project.version
-            released = new Date()
-            desc = "Cloth Config API for Minecraft"
-            githubRepo = 'shedaniel/ClothConfig'
-            websiteUrl = 'https://github.com/shedaniel/ClothConfig'
-            issueTrackerUrl = 'https://github.com/shedaniel/ClothConfig/issues'
             vcsUrl = 'https://github.com/shedaniel/ClothConfig.git'
-            gpg {
-                sign = true
-            }
         }
     }
-}
-
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocs(type: Javadoc) {
-    source = sourceSets.main.allJava
-}
-
-task javadocsJar(type: Jar, dependsOn: javadocs) {
-    classifier = "javadocs"
-    javadocs.failOnError false
-    from javadocs.destinationDir
 }
 
 publishing {
     publications {
         MyPublication(MavenPublication) {
             artifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
-                builtBy remapJar
+                builtBy jar
             }
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
-            artifact javadocsJar
+            artifact sourceJar
+            artifact javadocJar
             groupId 'me.shedaniel.cloth'
-            artifactId 'config-2'
+            artifactId 'cloth-config-forge'
             version = project.version
         }
     }
@@ -152,21 +181,18 @@ curseforge {
     apiKey = project.hasProperty('apiKey') ? project.property('apiKey') : System.getenv('CF_API_KEY')
     if (apiKey != null)
         project {
-            id = '319057'
+            id = '348521'
             releaseType = 'beta'
-            addGameVersion '1.16-Snapshot'
-            addGameVersion 'Fabric'
+            addGameVersion '1.16.1'
+            addGameVersion 'Forge'
             addGameVersion 'Java 8'
-            relations {
-                requiredDependency 'fabric-api'
-            }
             mainArtifact(file("${project.buildDir}/filtered-libs/${project.archivesBaseName}-${project.version}.jar")) {
-                displayName = "[Fabric ${project.supported_version}] ClothConfig2-$project.version"
+                displayName = "[Forge ${project.supported_version}] v$project.version"
             }
             addArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar"))
             afterEvaluate {
                 uploadTask.dependsOn("copyJarFilter")
-                uploadTask.dependsOn("remapSourcesJar")
+                uploadTask.dependsOn("sourceJar")
             }
         }
     options {
