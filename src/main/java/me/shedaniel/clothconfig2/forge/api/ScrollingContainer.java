@@ -185,11 +185,11 @@ public abstract class ScrollingContainer {
         }
     }
     
-    public boolean func_231045_a_(double mouseX, double mouseY, int button, double dx, double dy) {
-        return func_231045_a_(mouseX, mouseY, button, dx, dy, false, 0);
+    public boolean handleMouseDrag(double mouseX, double mouseY, int button, double dx, double dy) {
+        return handleMouseDrag(mouseX, mouseY, button, dx, dy, false, 0);
     }
     
-    public boolean func_231045_a_(double mouseX, double mouseY, int button, double dx, double dy, boolean snapToRows, double rowSize) {
+    public boolean handleMouseDrag(double mouseX, double mouseY, int button, double dx, double dy, boolean snapToRows, double rowSize) {
         if (button == 0 && draggingScrollBar) {
             float height = getMaxScrollHeight();
             Rectangle bounds = getBounds();
