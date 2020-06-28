@@ -17,7 +17,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Upload to Bintray & CurseForge
-      run: ./gradlew clean bintrayUpload curseforge
+      run: ./gradlew bintrayUpload curseforge
       env:
         BINTRAY_USER: shedaniel
         OSS_TOKEN: shedaniel
