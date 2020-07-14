@@ -336,6 +336,11 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public Optional<Object> getDefaultValue() {
             return Optional.empty();
         }
+    
+        @Override
+        public boolean isMouseInside(int mouseX, int mouseY, int x, int y, int entryWidth, int entryHeight) {
+            return false;
+        }
         
         @Override
         public void save() {}
@@ -381,7 +386,13 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public void save() {}
         
         @Override
+        public boolean isMouseInside(int mouseX, int mouseY, int x, int y, int entryWidth, int entryHeight) {
+            return false;
+        }
+        
+        @Override
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+            super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
             int yy = y + 2;
             List<StringRenderable> texts = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(this.text, getParent().getItemWidth());
             for (StringRenderable text : texts) {

@@ -83,15 +83,11 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
-        widget.rectangle.x = x - 19;
-        widget.rectangle.y = y;
-        widget.rectangle.width = entryWidth + 19;
-        widget.rectangle.height = 24;
         MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         DiffuseLighting.disable();
         RenderSystem.color4f(1, 1, 1, 1);
-        drawTexture(matrices, x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName(), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        drawTexture(matrices, x - 15, y + 5, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
+        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName(), x, y + 6, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent((DynamicEntryListWidget) getParent());
             entry.setScreen(getConfigScreen());
@@ -148,12 +144,12 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     }
     
     @Override
-    public boolean isMouseInside(int mouseX, int mouseY, int x, int y, int entryWidth, int entryHeight) {
+    public Rectangle getEntryArea(int x, int y, int entryWidth, int entryHeight) {
         widget.rectangle.x = x - 15;
         widget.rectangle.y = y;
         widget.rectangle.width = entryWidth + 15;
         widget.rectangle.height = 24;
-        return widget.rectangle.contains(mouseX, mouseY) && getParent().isMouseOver(mouseX, mouseY);
+        return new Rectangle(getParent().left, y, getParent().right - getParent().left, 20);
     }
     
     @Override

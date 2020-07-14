@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
+import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
@@ -331,6 +332,15 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     
     public static class ListWidget<R extends DynamicElementListWidget.ElementEntry<R>> extends DynamicElementListWidget<R> {
         private AbstractConfigScreen screen;
+        private boolean hasCurrent;
+        private double currentX;
+        private double currentY;
+        private double currentWidth;
+        private double currentHeight;
+        public Rectangle target;
+        public Rectangle thisTimeTarget;
+        public long start;
+        public long duration;
         
         public ListWidget(AbstractConfigScreen screen, MinecraftClient client, int width, int height, int top, int bottom, Identifier backgroundLocation) {
             super(client, width, height, top, bottom, backgroundLocation);
@@ -353,6 +363,64 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             if (item instanceof AbstractConfigEntry)
                 ((AbstractConfigEntry) item).updateSelected(getFocused() == item);
             super.renderItem(matrices, item, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+        }
+        
+        @Override
+        protected void renderList(MatrixStack matrices, int startX, int startY, int int_3, int int_4, float delta) {
+            thisTimeTarget = null;
+            if (hasCurrent) {
+                fillGradient(matrices, currentX, currentY, currentX + currentWidth, currentY + currentHeight, 0x24FFFFFF, 0x24FFFFFF);
+            }
+            super.renderList(matrices, startX, startY, int_3, int_4, delta);
+            if (thisTimeTarget != null && !thisTimeTarget.equals(target)) {
+                if (!hasCurrent) {
+                    currentX = thisTimeTarget.x;
+                    currentY = thisTimeTarget.y;
+                    currentWidth = thisTimeTarget.width;
+                    currentHeight = thisTimeTarget.height;
+                    hasCurrent = true;
+                }
+                target = thisTimeTarget.clone();
+                start = System.currentTimeMillis();
+                this.duration = 40;
+            } else if (hasCurrent && target != null) {
+                currentX = (int) ScrollingContainer.ease(currentX, target.x, Math.min((System.currentTimeMillis() - start) / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
+                currentY = (int) ScrollingContainer.ease(currentY, target.y, Math.min((System.currentTimeMillis() - start) / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
+                currentWidth = (int) ScrollingContainer.ease(currentWidth, target.width, Math.min((System.currentTimeMillis() - start) / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
+                currentHeight = (int) ScrollingContainer.ease(currentHeight, target.height, Math.min((System.currentTimeMillis() - start) / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
+            }
+        }
+        
+        protected void fillGradient(MatrixStack matrices, double xStart, double yStart, double xEnd, double yEnd, int colorStart, int colorEnd) {
+            RenderSystem.disableTexture();
+            RenderSystem.enableBlend();
+            RenderSystem.disableAlphaTest();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.shadeModel(7425);
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder bufferBuilder = tessellator.getBuffer();
+            bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
+            fillGradient(matrices.peek().getModel(), bufferBuilder, xStart, yStart, xEnd, yEnd, this.getZOffset(), colorStart, colorEnd);
+            tessellator.draw();
+            RenderSystem.shadeModel(7424);
+            RenderSystem.disableBlend();
+            RenderSystem.enableAlphaTest();
+            RenderSystem.enableTexture();
+        }
+        
+        protected static void fillGradient(Matrix4f matrix4f, BufferBuilder bufferBuilder, double xStart, double yStart, double xEnd, double yEnd, int i, int j, int k) {
+            float f = (float) (j >> 24 & 255) / 255.0F;
+            float g = (float) (j >> 16 & 255) / 255.0F;
+            float h = (float) (j >> 8 & 255) / 255.0F;
+            float l = (float) (j & 255) / 255.0F;
+            float m = (float) (k >> 24 & 255) / 255.0F;
+            float n = (float) (k >> 16 & 255) / 255.0F;
+            float o = (float) (k >> 8 & 255) / 255.0F;
+            float p = (float) (k & 255) / 255.0F;
+            bufferBuilder.vertex(matrix4f, (float) xEnd, (float) yStart, (float) i).color(g, h, l, f).next();
+            bufferBuilder.vertex(matrix4f, (float) xStart, (float) yStart, (float) i).color(g, h, l, f).next();
+            bufferBuilder.vertex(matrix4f, (float) xStart, (float) yEnd, (float) i).color(n, o, p, m).next();
+            bufferBuilder.vertex(matrix4f, (float) xEnd, (float) yEnd, (float) i).color(n, o, p, m).next();
         }
         
         @Override

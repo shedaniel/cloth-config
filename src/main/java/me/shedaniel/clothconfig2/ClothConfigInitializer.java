@@ -9,10 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 @Environment(EnvType.CLIENT)
 public class ClothConfigInitializer {
     public static final Logger LOGGER = LogManager.getFormatterLogger("ClothConfig");
@@ -55,19 +51,5 @@ public class ClothConfigInitializer {
     
     public static double getBounceBackMultiplier() {
         return -10;
-    }
-    
-    static {
-        printClassPath();
-    }
-    
-    public static void printClassPath() {
-        System.out.println(
-                Arrays.stream(
-                        ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs()
-                ).map(
-                        url ->  url.getFile().replace("%20", " ") 
-                ).collect(Collectors.joining("\n"))
-        );
     }
 }

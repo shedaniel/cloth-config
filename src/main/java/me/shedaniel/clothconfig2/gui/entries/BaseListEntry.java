@@ -202,12 +202,12 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
     
     @Override
-    public boolean isMouseInside(int mouseX, int mouseY, int x, int y, int entryWidth, int entryHeight) {
+    public Rectangle getEntryArea(int x, int y, int entryWidth, int entryHeight) {
         labelWidget.rectangle.x = x - 15;
         labelWidget.rectangle.y = y;
         labelWidget.rectangle.width = entryWidth + 15;
         labelWidget.rectangle.height = 24;
-        return labelWidget.rectangle.contains(mouseX, mouseY) && getParent().isMouseOver(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY);
+        return new Rectangle(getParent().left, y, getParent().right - getParent().left, 20);
     }
     
     protected boolean isInsideCreateNew(double mouseX, double mouseY) {
@@ -229,31 +229,23 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
     
     @Override
-    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-        labelWidget.rectangle.x = x - 19;
-        labelWidget.rectangle.y = y;
-        labelWidget.rectangle.width = entryWidth + 19;
-        labelWidget.rectangle.height = 24;
-        if (isMouseInside(mouseX, mouseY, x, y, entryWidth, entryHeight)) {
-            Optional<Text[]> tooltip = getTooltip(mouseX, mouseY);
-            if (tooltip.isPresent() && tooltip.get().length > 0)
-                addTooltip(Tooltip.of(new Point(mouseX, mouseY), tooltip.get()));
-        }
+    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         DiffuseLighting.disable();
         RenderSystem.color4f(1, 1, 1, 1);
         BaseListCell focused = !expanded || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);
-        drawTexture(matrices, x - 15, y + 4, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        drawTexture(matrices, x - 15 + 13, y + 4, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
+        drawTexture(matrices, x - 15, y + 5, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
+        drawTexture(matrices, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
         if (isDeleteButtonEnabled())
-            drawTexture(matrices, x - 15 + 26, y + 4, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
+            drawTexture(matrices, x - 15 + 26, y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
         resetWidget.x = x + entryWidth - resetWidget.getWidth();
         resetWidget.y = y;
         resetWidget.active = isEdited();
         resetWidget.render(matrices, mouseX, mouseY, delta);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
+        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 6, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
         if (expanded) {
             int yy = y + 24;
             for (BaseListCell cell : cells) {

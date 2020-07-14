@@ -33,15 +33,12 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     
     @Override
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         if (isMouseInside(mouseX, mouseY, x, y, entryWidth, entryHeight)) {
             Optional<Text[]> tooltip = getTooltip();
             if (tooltip.isPresent() && tooltip.get().length > 0)
                 addTooltip(Tooltip.of(new Point(mouseX, mouseY), tooltip.get()));
         }
-    }
-    
-    public boolean isMouseInside(int mouseX, int mouseY, int x, int y, int entryWidth, int entryHeight) {
-        return mouseX >= x && mouseY >= y && mouseX <= x + entryWidth && mouseY <= y + entryHeight && getParent().isMouseOver(mouseX, mouseY);
     }
     
     public Optional<Text[]> getTooltip() {
