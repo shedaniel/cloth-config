@@ -10,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
@@ -338,9 +339,16 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     @Override
     public void tick() {
         super.tick();
+        boolean edited = isEdited();
+        Optional.ofNullable(getQuitButton()).ifPresent(button -> button.setMessage(edited ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel")));
         for (Element child : children())
             if (child instanceof Tickable)
                 ((Tickable) child).tick();
+    }
+    
+    @Nullable
+    protected AbstractButtonWidget getQuitButton() {
+        return null;
     }
     
     @Override

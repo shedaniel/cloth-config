@@ -26,7 +26,10 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.Matrix4f;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"deprecation", "rawtypes", "DuplicatedCode"})
@@ -85,14 +88,6 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     @Override
     public Map<Text, List<AbstractConfigEntry<?>>> getCategorizedEntries() {
         return categorizedEntries;
-    }
-    
-    @Override
-    public void tick() {
-        super.tick();
-        boolean edited = isEdited();
-        quitButton.setMessage(edited ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"));
-        saveButton.active = edited;
     }
     
     @Override

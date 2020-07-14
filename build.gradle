@@ -54,9 +54,9 @@ dependencies {
 
     modCompileOnly("io.github.prospector:modmenu:${modmenu_version}")
     modRuntime("io.github.prospector:modmenu:${modmenu_version}")
-    modRuntime("me.shedaniel:SmoothScrollingEverywhere:3.0.3-unstable") {
-        transitive(false)
-    }
+//    modRuntime("me.shedaniel:SmoothScrollingEverywhere:3.0.3-unstable") {
+//        transitive(false)
+//    }
 }
 
 task jarFilter(type: net.corda.gradle.jarfilter.JarFilterTask) {
