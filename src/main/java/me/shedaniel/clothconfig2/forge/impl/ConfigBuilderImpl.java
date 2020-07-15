@@ -36,7 +36,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean listSmoothScroll = true;
     private boolean doesConfirmSave = true;
     private boolean transparentBackground = false;
-    private ResourceLocation defaultBackground = AbstractGui.field_230663_f_;
+    private ResourceLocation defaultBackground = AbstractGui.BACKGROUND_LOCATION;
     private Consumer<Screen> afterInitConsumer = screen -> {};
     private final Map<ITextComponent, ResourceLocation> categoryBackground = Maps.newHashMap();
     private final Map<ITextComponent, List<Object>> dataMap = Maps.newLinkedHashMap();

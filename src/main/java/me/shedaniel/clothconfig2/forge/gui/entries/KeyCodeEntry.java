@@ -107,30 +107,30 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         MainWindow window = Minecraft.getInstance().getMainWindow();
-        this.resetButton.field_230693_o_ = isEditable() && getDefaultValue().isPresent() && !getDefaultValue().get().equals(getValue());
-        this.resetButton.field_230691_m_ = y;
-        this.buttonWidget.field_230693_o_ = isEditable();
-        this.buttonWidget.field_230691_m_ = y;
-        this.buttonWidget.func_238482_a_(getLocalizedName());
+        this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !getDefaultValue().get().equals(getValue());
+        this.resetButton.y = y;
+        this.buttonWidget.active = isEditable();
+        this.buttonWidget.y = y;
+        this.buttonWidget.setMessage(getLocalizedName());
         if (getConfigScreen().getFocusedBinding() == this)
-            this.buttonWidget.func_238482_a_(new StringTextComponent("> ").func_240699_a_(TextFormatting.WHITE).func_230529_a_(this.buttonWidget.func_230458_i_().func_230532_e_().func_240699_a_(TextFormatting.YELLOW)).func_230529_a_(new StringTextComponent(" <").func_240699_a_(TextFormatting.WHITE)));
+            this.buttonWidget.setMessage(new StringTextComponent("> ").func_240699_a_(TextFormatting.WHITE).func_230529_a_(this.buttonWidget.getMessage().deepCopy().func_240699_a_(TextFormatting.YELLOW)).func_230529_a_(new StringTextComponent(" <").func_240699_a_(TextFormatting.WHITE)));
         ITextComponent displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, 16777215);
-            this.resetButton.field_230690_l_ = x;
-            this.buttonWidget.field_230690_l_ = x + resetButton.func_230998_h_() + 2;
+            this.resetButton.x = x;
+            this.buttonWidget.x = x + resetButton.getWidth() + 2;
         } else {
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
-            this.resetButton.field_230690_l_ = x + entryWidth - resetButton.func_230998_h_();
-            this.buttonWidget.field_230690_l_ = x + entryWidth - 150;
+            this.resetButton.x = x + entryWidth - resetButton.getWidth();
+            this.buttonWidget.x = x + entryWidth - 150;
         }
-        this.buttonWidget.func_230991_b_(150 - resetButton.func_230998_h_() - 2);
-        resetButton.func_230430_a_(matrices, mouseX, mouseY, delta);
-        buttonWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
+        this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
+        resetButton.render(matrices, mouseX, mouseY, delta);
+        buttonWidget.render(matrices, mouseX, mouseY, delta);
     }
     
     @Override
-    public List<? extends IGuiEventListener> func_231039_at__() {
+    public List<? extends IGuiEventListener> children() {
         return widgets;
     }
     

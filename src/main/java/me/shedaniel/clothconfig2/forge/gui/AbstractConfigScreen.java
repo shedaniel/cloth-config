@@ -170,9 +170,9 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         setEdited(false);
         if (openOtherScreens) {
             if (isRequiresRestart())
-                AbstractConfigScreen.this.field_230706_i_.displayGuiScreen(new ClothRequiresRestartScreen(parent));
+                AbstractConfigScreen.this.minecraft.displayGuiScreen(new ClothRequiresRestartScreen(parent));
             else
-                AbstractConfigScreen.this.field_230706_i_.displayGuiScreen(parent);
+                AbstractConfigScreen.this.minecraft.displayGuiScreen(parent);
         }
         this.legacyRequiresRestart = false;
     }
@@ -210,13 +210,13 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     }
     
     @Override
-    public boolean func_231048_c_(double double_1, double double_2, int int_1) {
+    public boolean mouseReleased(double double_1, double double_2, int int_1) {
         if (this.focusedBinding != null && this.startedKeyCode != null && !this.startedKeyCode.isUnknown() && focusedBinding.isAllowMouse()) {
             focusedBinding.setValue(startedKeyCode);
             setFocusedBinding(null);
             return true;
         }
-        return super.func_231048_c_(double_1, double_2, int_1);
+        return super.mouseReleased(double_1, double_2, int_1);
     }
     
     @Override
@@ -230,7 +230,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     }
     
     @Override
-    public boolean func_231044_a_(double double_1, double double_2, int int_1) {
+    public boolean mouseClicked(double double_1, double double_2, int int_1) {
         if (this.focusedBinding != null && this.startedKeyCode != null && focusedBinding.isAllowMouse()) {
             if (startedKeyCode.isUnknown())
                 startedKeyCode.setKeyCode(InputMappings.Type.MOUSE.getOrMakeInput(int_1));
@@ -259,12 +259,12 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         } else {
             if (this.focusedBinding != null)
                 return true;
-            return super.func_231044_a_(double_1, double_2, int_1);
+            return super.mouseClicked(double_1, double_2, int_1);
         }
     }
     
     @Override
-    public boolean func_231046_a_(int int_1, int int_2, int int_3) {
+    public boolean keyPressed(int int_1, int int_2, int int_3) {
         if (this.focusedBinding != null && (focusedBinding.isAllowKey() || int_1 == 256)) {
             if (int_1 != 256) {
                 if (startedKeyCode.isUnknown())
@@ -311,17 +311,17 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         }
         if (this.focusedBinding != null && int_1 != 256)
             return true;
-        if (int_1 == 256 && this.func_231178_ax__()) {
+        if (int_1 == 256 && this.shouldCloseOnEsc()) {
             return quit();
         }
-        return super.func_231046_a_(int_1, int_2, int_3);
+        return super.keyPressed(int_1, int_2, int_3);
     }
     
     protected final boolean quit() {
         if (confirmSave && isEdited())
-            field_230706_i_.displayGuiScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslationTextComponent("text.cloth-config.quit_config"), new TranslationTextComponent("text.cloth-config.quit_config_sure"), new TranslationTextComponent("text.cloth-config.quit_discard"), new TranslationTextComponent("gui.cancel")));
+            minecraft.displayGuiScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslationTextComponent("text.cloth-config.quit_config"), new TranslationTextComponent("text.cloth-config.quit_config_sure"), new TranslationTextComponent("text.cloth-config.quit_discard"), new TranslationTextComponent("gui.cancel")));
         else
-            field_230706_i_.displayGuiScreen(parent);
+            minecraft.displayGuiScreen(parent);
         return true;
     }
     
@@ -329,25 +329,25 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         @Override
         public void accept(boolean t) {
             if (!t)
-                field_230706_i_.displayGuiScreen(AbstractConfigScreen.this);
+                minecraft.displayGuiScreen(AbstractConfigScreen.this);
             else
-                field_230706_i_.displayGuiScreen(parent);
+                minecraft.displayGuiScreen(parent);
         }
     }
     
     @Override
-    public void func_231023_e_() {
-        super.func_231023_e_();
-        for (IGuiEventListener child : func_231039_at__())
+    public void tick() {
+        super.tick();
+        for (IGuiEventListener child : children())
             if (child instanceof IScreen)
-                ((IScreen) child).func_231023_e_();
+                ((IScreen) child).tick();
     }
     
     @Override
-    public void func_230430_a_(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        super.func_230430_a_(matrices, mouseX, mouseY, delta);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
         for (Tooltip tooltip : tooltips) {
-            func_238654_b_(matrices, tooltip.getText(), tooltip.getX(), tooltip.getY(), field_230712_o_);
+            renderTooltip(matrices, tooltip.getText(), tooltip.getX(), tooltip.getY());
         }
         this.tooltips.clear();
     }
@@ -366,7 +366,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
             return;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        field_230706_i_.getTextureManager().bindTexture(getBackgroundLocation());
+        minecraft.getTextureManager().bindTexture(getBackgroundLocation());
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
         buffer.pos(matrix, rect.getMinX(), rect.getMaxY(), 0.0F).tex(rect.getMinX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).endVertex();

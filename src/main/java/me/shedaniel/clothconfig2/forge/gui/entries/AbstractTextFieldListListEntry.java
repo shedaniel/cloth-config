@@ -54,9 +54,9 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             
             widget = new TextFieldWidget(Minecraft.getInstance().fontRenderer, 0, 0, 100, 18, NarratorChatListener.EMPTY) {
                 @Override
-                public void func_230430_a_(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+                public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                     setFocused2(isSelected);
-                    super.func_230430_a_(matrices, mouseX, mouseY, delta);
+                    super.render(matrices, mouseX, mouseY, delta);
                 }
             };
             widget.setValidator(this::isValidText);
@@ -97,17 +97,17 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         
         @Override
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-            widget.func_230991_b_(entryWidth - 12);
-            widget.field_230690_l_ = x;
-            widget.field_230691_m_ = y + 1;
+            widget.setWidth(entryWidth - 12);
+            widget.x = x;
+            widget.y = y + 1;
             widget.setEnabled(listListEntry.isEditable());
-            widget.func_230430_a_(matrices, mouseX, mouseY, delta);
+            widget.render(matrices, mouseX, mouseY, delta);
             if (isSelected && listListEntry.isEditable())
-                func_238467_a_(matrices, x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
+                fill(matrices, x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
         
         @Override
-        public List<? extends IGuiEventListener> func_231039_at__() {
+        public List<? extends IGuiEventListener> children() {
             return Collections.singletonList(widget);
         }
     }

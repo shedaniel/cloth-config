@@ -68,7 +68,7 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     public abstract ITextComponent getFieldName();
     
     public ITextComponent getDisplayedFieldName() {
-        IFormattableTextComponent text = getFieldName().func_230532_e_();
+        IFormattableTextComponent text = getFieldName().deepCopy();
         boolean hasError = getConfigError().isPresent();
         boolean isEdited = isEdited();
         if (hasError)

@@ -47,10 +47,10 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         this.original = original;
         this.textFieldWidget = new TextFieldWidget(Minecraft.getInstance().fontRenderer, 0, 0, 148, 18, NarratorChatListener.EMPTY) {
             @Override
-            public void func_230430_a_(MatrixStack matrices, int int_1, int int_2, float float_1) {
-                setFocused2(isSelected && TextFieldListEntry.this.func_241217_q_() == this);
+            public void render(MatrixStack matrices, int int_1, int int_2, float float_1) {
+                setFocused2(isSelected && TextFieldListEntry.this.getFocused() == this);
                 textFieldPreRender(this);
-                super.func_230430_a_(matrices, int_1, int_2, float_1);
+                super.render(matrices, int_1, int_2, float_1);
             }
             
             @Override
@@ -76,7 +76,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     }
     
     protected static void setTextFieldWidth(TextFieldWidget widget, int width) {
-        widget.func_230991_b_(width);
+        widget.setWidth(width);
     }
     
     @Deprecated
@@ -101,23 +101,23 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         MainWindow window = Minecraft.getInstance().getMainWindow();
-        this.resetButton.field_230693_o_ = isEditable() && getDefaultValue().isPresent() && !isMatchDefault(textFieldWidget.getText());
-        this.resetButton.field_230691_m_ = y;
+        this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault(textFieldWidget.getText());
+        this.resetButton.y = y;
         this.textFieldWidget.setEnabled(isEditable());
-        this.textFieldWidget.field_230691_m_ = y + 1;
+        this.textFieldWidget.y = y + 1;
         ITextComponent displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, getPreferredTextColor());
-            this.resetButton.field_230690_l_ = x;
-            this.textFieldWidget.field_230690_l_ = x + resetButton.func_230998_h_();
+            this.resetButton.x = x;
+            this.textFieldWidget.x = x + resetButton.getWidth();
         } else {
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
-            this.resetButton.field_230690_l_ = x + entryWidth - resetButton.func_230998_h_();
-            this.textFieldWidget.field_230690_l_ = x + entryWidth - 148;
+            this.resetButton.x = x + entryWidth - resetButton.getWidth();
+            this.textFieldWidget.x = x + entryWidth - 148;
         }
-        setTextFieldWidth(textFieldWidget, 148 - resetButton.func_230998_h_() - 4);
-        resetButton.func_230430_a_(matrices, mouseX, mouseY, delta);
-        textFieldWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
+        setTextFieldWidth(textFieldWidget, 148 - resetButton.getWidth() - 4);
+        resetButton.render(matrices, mouseX, mouseY, delta);
+        textFieldWidget.render(matrices, mouseX, mouseY, delta);
     }
     
     protected abstract boolean isMatchDefault(String text);
@@ -128,7 +128,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public List<? extends IGuiEventListener> func_231039_at__() {
+    public List<? extends IGuiEventListener> children() {
         return widgets;
     }
     

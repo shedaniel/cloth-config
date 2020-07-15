@@ -89,7 +89,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         Minecraft.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         RenderHelper.disableStandardItemLighting();
         RenderSystem.color4f(1, 1, 1, 1);
-        func_238474_b_(matrices, x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
+        blit(matrices, x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
         Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, getDisplayedFieldName(), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent((DynamicEntryListWidget) getParent());
@@ -98,7 +98,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         if (expanded) {
             int yy = y + 24;
             for (AbstractConfigListEntry<?> entry : entries) {
-                entry.render(matrices, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered && func_241217_q_() == entry, delta);
+                entry.render(matrices, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered && getFocused() == entry, delta);
                 yy += entry.getItemHeight();
             }
         }
@@ -107,7 +107,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public void updateSelected(boolean isSelected) {
         for (AbstractConfigListEntry<?> entry : entries) {
-            entry.updateSelected(expanded && isSelected && func_241217_q_() == entry);
+            entry.updateSelected(expanded && isSelected && getFocused() == entry);
         }
     }
     
@@ -152,7 +152,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         widget.rectangle.y = y;
         widget.rectangle.width = entryWidth + 15;
         widget.rectangle.height = 24;
-        return widget.rectangle.contains(mouseX, mouseY) && getParent().func_231047_b_(mouseX, mouseY);
+        return widget.rectangle.contains(mouseX, mouseY) && getParent().isMouseOver(mouseX, mouseY);
     }
     
     @Override
@@ -172,7 +172,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     }
     
     @Override
-    public List<? extends IGuiEventListener> func_231039_at__() {
+    public List<? extends IGuiEventListener> children() {
         return expanded ? children : Collections.singletonList(widget);
     }
     
@@ -199,7 +199,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         private Rectangle rectangle = new Rectangle();
         
         @Override
-        public boolean func_231044_a_(double double_1, double double_2, int int_1) {
+        public boolean mouseClicked(double double_1, double double_2, int int_1) {
             if (rectangle.contains(double_1, double_2)) {
                 expanded = !expanded;
                 Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));

@@ -102,24 +102,24 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         MainWindow window = Minecraft.getInstance().getMainWindow();
-        this.resetButton.field_230693_o_ = isEditable() && getDefaultValue().isPresent() && getDefaultIndex() != this.index.get();
-        this.resetButton.field_230691_m_ = y;
-        this.buttonWidget.field_230693_o_ = isEditable();
-        this.buttonWidget.field_230691_m_ = y;
-        this.buttonWidget.func_238482_a_(nameProvider.apply(getValue()));
+        this.resetButton.active = isEditable() && getDefaultValue().isPresent() && getDefaultIndex() != this.index.get();
+        this.resetButton.y = y;
+        this.buttonWidget.active = isEditable();
+        this.buttonWidget.y = y;
+        this.buttonWidget.setMessage(nameProvider.apply(getValue()));
         ITextComponent displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, getPreferredTextColor());
-            this.resetButton.field_230690_l_ = x;
-            this.buttonWidget.field_230690_l_ = x + resetButton.func_230998_h_() + 2;
+            this.resetButton.x = x;
+            this.buttonWidget.x = x + resetButton.getWidth() + 2;
         } else {
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
-            this.resetButton.field_230690_l_ = x + entryWidth - resetButton.func_230998_h_();
-            this.buttonWidget.field_230690_l_ = x + entryWidth - 150;
+            this.resetButton.x = x + entryWidth - resetButton.getWidth();
+            this.buttonWidget.x = x + entryWidth - 150;
         }
-        this.buttonWidget.func_230991_b_(150 - resetButton.func_230998_h_() - 2);
-        resetButton.func_230430_a_(matrices, mouseX, mouseY, delta);
-        buttonWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
+        this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
+        resetButton.render(matrices, mouseX, mouseY, delta);
+        buttonWidget.render(matrices, mouseX, mouseY, delta);
     }
     
     private int getDefaultIndex() {
@@ -127,7 +127,7 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public List<? extends IGuiEventListener> func_231039_at__() {
+    public List<? extends IGuiEventListener> children() {
         return widgets;
     }
     

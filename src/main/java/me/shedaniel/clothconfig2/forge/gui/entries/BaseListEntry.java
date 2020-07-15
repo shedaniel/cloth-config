@@ -176,7 +176,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
     
     @Override
-    public List<? extends IGuiEventListener> func_231039_at__() {
+    public List<? extends IGuiEventListener> children() {
         if (!expanded) {
             List<IGuiEventListener> elements = new ArrayList<>(widgets);
             elements.removeAll(cells);
@@ -207,7 +207,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         labelWidget.rectangle.y = y;
         labelWidget.rectangle.width = entryWidth + 15;
         labelWidget.rectangle.height = 24;
-        return labelWidget.rectangle.contains(mouseX, mouseY) && getParent().func_231047_b_(mouseX, mouseY) && !resetWidget.func_231047_b_(mouseX, mouseY);
+        return labelWidget.rectangle.contains(mouseX, mouseY) && getParent().isMouseOver(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY);
     }
     
     protected boolean isInsideCreateNew(double mouseX, double mouseY) {
@@ -242,22 +242,22 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         Minecraft.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         RenderHelper.disableStandardItemLighting();
         RenderSystem.color4f(1, 1, 1, 1);
-        BaseListCell focused = !expanded || func_241217_q_() == null || !(func_241217_q_() instanceof BaseListCell) ? null : (BaseListCell) func_241217_q_();
+        BaseListCell focused = !expanded || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);
-        func_238474_b_(matrices, x - 15, y + 4, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        func_238474_b_(matrices, x - 15 + 13, y + 4, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
+        blit(matrices, x - 15, y + 4, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
+        blit(matrices, x - 15 + 13, y + 4, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
         if (isDeleteButtonEnabled())
-            func_238474_b_(matrices, x - 15 + 26, y + 4, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
-        resetWidget.field_230690_l_ = x + entryWidth - resetWidget.func_230998_h_();
-        resetWidget.field_230691_m_ = y;
-        resetWidget.field_230693_o_ = isEdited();
-        resetWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
-        Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, getDisplayedFieldName(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.func_231047_b_(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
+            blit(matrices, x - 15 + 26, y + 4, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
+        resetWidget.x = x + entryWidth - resetWidget.getWidth();
+        resetWidget.y = y;
+        resetWidget.active = isEdited();
+        resetWidget.render(matrices, mouseX, mouseY, delta);
+        Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, getDisplayedFieldName(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
         if (expanded) {
             int yy = y + 24;
             for (BaseListCell cell : cells) {
-                cell.render(matrices, -1, yy, x + 14, entryWidth - 14, cell.getCellHeight(), mouseX, mouseY, getParent().func_241217_q_() != null && getParent().func_241217_q_().equals(this) && func_241217_q_() != null && func_241217_q_().equals(cell), delta);
+                cell.render(matrices, -1, yy, x + 14, entryWidth - 14, cell.getCellHeight(), mouseX, mouseY, getParent().getFocused() != null && getParent().getFocused().equals(this) && getFocused() != null && getFocused().equals(cell), delta);
                 yy += cell.getCellHeight();
             }
         }
@@ -266,7 +266,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     @Override
     public void updateSelected(boolean isSelected) {
         for (C cell : cells) {
-            cell.updateSelected(isSelected && func_241217_q_() == cell && expanded);
+            cell.updateSelected(isSelected && getFocused() == cell && expanded);
         }
     }
     
@@ -283,8 +283,8 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         protected Rectangle rectangle = new Rectangle();
         
         @Override
-        public boolean func_231044_a_(double double_1, double double_2, int int_1) {
-            if (resetWidget.func_231047_b_(double_1, double_2)) {
+        public boolean mouseClicked(double double_1, double double_2, int int_1) {
+            if (resetWidget.isMouseOver(double_1, double_2)) {
                 return false;
             } else if (isInsideCreateNew(double_1, double_2)) {
                 expanded = true;
@@ -300,7 +300,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                 Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             } else if (isDeleteButtonEnabled() && isInsideDelete(double_1, double_2)) {
-                IGuiEventListener focused = func_241217_q_();
+                IGuiEventListener focused = getFocused();
                 if (expanded && focused instanceof BaseListCell) {
                     ((BaseListCell) focused).onDelete();
                     //noinspection SuspiciousMethodCalls

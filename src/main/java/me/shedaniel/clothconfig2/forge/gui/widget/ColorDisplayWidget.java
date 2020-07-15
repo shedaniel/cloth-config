@@ -19,18 +19,18 @@ public class ColorDisplayWidget extends Widget {
     }
     
     @Override
-    public void func_230431_b_(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        func_238468_a_(matrices, this.field_230690_l_, this.field_230691_m_, this.field_230690_l_ + size, this.field_230691_m_ + size, textFieldWidget.func_230999_j_() ? -1 : -6250336, textFieldWidget.func_230999_j_() ? -1 : -6250336);
-        func_238468_a_(matrices, this.field_230690_l_ + 1, this.field_230691_m_ + 1, this.field_230690_l_ + size - 1, this.field_230691_m_ + size - 1, 0xffffffff, 0xffffffff);
-        func_238468_a_(matrices, this.field_230690_l_ + 1, this.field_230691_m_ + 1, this.field_230690_l_ + size - 1, this.field_230691_m_ + size - 1, color, color);
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        fillGradient(matrices, this.x, this.y, this.x + size, this.y + size, textFieldWidget.isFocused() ? -1 : -6250336, textFieldWidget.isFocused() ? -1 : -6250336);
+        fillGradient(matrices, this.x + 1, this.y + 1, this.x + size - 1, this.y + size - 1, 0xffffffff, 0xffffffff);
+        fillGradient(matrices, this.x + 1, this.y + 1, this.x + size - 1, this.y + size - 1, color, color);
     }
     
     @Override
-    public void func_230982_a_(double mouseX, double mouseY) {
+    public void onClick(double mouseX, double mouseY) {
     }
     
     @Override
-    public void func_231000_a__(double mouseX, double mouseY) {
+    public void onRelease(double mouseX, double mouseY) {
     }
     
     public void setColor(int color) {

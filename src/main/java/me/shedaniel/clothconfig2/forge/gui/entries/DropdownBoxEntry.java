@@ -64,23 +64,23 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         MainWindow window = Minecraft.getInstance().getMainWindow();
-        this.resetButton.field_230693_o_ = isEditable() && getDefaultValue().isPresent() && (!defaultValue.get().equals(getValue()) || getConfigError().isPresent());
-        this.resetButton.field_230691_m_ = y;
+        this.resetButton.active = isEditable() && getDefaultValue().isPresent() && (!defaultValue.get().equals(getValue()) || getConfigError().isPresent());
+        this.resetButton.y = y;
         this.selectionElement.active = isEditable();
         this.selectionElement.bounds.y = y;
         ITextComponent displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, getPreferredTextColor());
-            this.resetButton.field_230690_l_ = x;
-            this.selectionElement.bounds.x = x + resetButton.func_230998_h_() + 1;
+            this.resetButton.x = x;
+            this.selectionElement.bounds.x = x + resetButton.getWidth() + 1;
         } else {
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
-            this.resetButton.field_230690_l_ = x + entryWidth - resetButton.func_230998_h_();
+            this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.selectionElement.bounds.x = x + entryWidth - 150 + 1;
         }
-        this.selectionElement.bounds.width = 150 - resetButton.func_230998_h_() - 4;
-        resetButton.func_230430_a_(matrices, mouseX, mouseY, delta);
-        selectionElement.func_230430_a_(matrices, mouseX, mouseY, delta);
+        this.selectionElement.bounds.width = 150 - resetButton.getWidth() - 4;
+        resetButton.render(matrices, mouseX, mouseY, delta);
+        selectionElement.render(matrices, mouseX, mouseY, delta);
     }
     
     @Override
@@ -129,7 +129,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public List<? extends IGuiEventListener> func_231039_at__() {
+    public List<? extends IGuiEventListener> children() {
         return Lists.newArrayList(selectionElement, resetButton);
     }
     
@@ -149,8 +149,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public boolean func_231043_a_(double double_1, double double_2, double double_3) {
-        return selectionElement.func_231043_a_(double_1, double_2, double_3);
+    public boolean mouseScrolled(double double_1, double double_2, double double_3) {
+        return selectionElement.mouseScrolled(double_1, double_2, double_3);
     }
     
     public static class SelectionElement<R> extends FocusableGui implements IRenderable {
@@ -173,9 +173,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public void func_230430_a_(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-            func_238467_a_(matrices, bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height, topRenderer.isSelected ? -1 : -6250336);
-            func_238467_a_(matrices, bounds.x + 1, bounds.y + 1, bounds.x + bounds.width - 1, bounds.y + bounds.height - 1, -16777216);
+        public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+            fill(matrices, bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height, topRenderer.isSelected ? -1 : -6250336);
+            fill(matrices, bounds.x + 1, bounds.y + 1, bounds.x + bounds.width - 1, bounds.y + bounds.height - 1, -16777216);
             topRenderer.render(matrices, mouseX, mouseY, bounds.x, bounds.y, bounds.width, bounds.height, delta);
             if (menu.isExpanded())
                 menu.render(matrices, mouseX, mouseY, bounds, delta);
@@ -187,9 +187,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean func_231043_a_(double double_1, double double_2, double double_3) {
+        public boolean mouseScrolled(double double_1, double double_2, double double_3) {
             if (menu.isExpanded())
-                return menu.func_231043_a_(double_1, double_2, double_3);
+                return menu.mouseScrolled(double_1, double_2, double_3);
             return false;
         }
         
@@ -209,16 +209,16 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public List<? extends IGuiEventListener> func_231039_at__() {
+        public List<? extends IGuiEventListener> children() {
             return Lists.newArrayList(topRenderer, menu);
         }
         
         @Override
-        public boolean func_231044_a_(double double_1, double double_2, int int_1) {
+        public boolean mouseClicked(double double_1, double double_2, int int_1) {
             dontReFocus = false;
-            boolean b = super.func_231044_a_(double_1, double_2, int_1);
+            boolean b = super.mouseClicked(double_1, double_2, int_1);
             if (dontReFocus) {
-                func_231035_a_(null);
+                setFocused(null);
                 dontReFocus = false;
             }
             return b;
@@ -252,7 +252,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public abstract int getHeight();
         
         public final boolean isExpanded() {
-            return isSelected && this.getEntry().func_241217_q_() == this.getEntry().selectionElement;
+            return isSelected && this.getEntry().getFocused() == this.getEntry().selectionElement;
         }
         
         public final boolean isSuggestionMode() {
@@ -260,7 +260,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public abstract List<SelectionCellElement<R>> func_231039_at__();
+        public abstract List<SelectionCellElement<R>> children();
     }
     
     public static class DefaultDropdownMenuElement<R> extends DropdownMenuElement<R> {
@@ -385,8 +385,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public void lateRender(MatrixStack matrices, int mouseX, int mouseY, float delta) {
             int last10Height = getHeight();
             int cWidth = getCellCreator().getCellWidth();
-            func_238467_a_(matrices, lastRectangle.x, lastRectangle.y + lastRectangle.height, lastRectangle.x + cWidth, lastRectangle.y + lastRectangle.height + last10Height + 1, isExpanded() ? -1 : -6250336);
-            func_238467_a_(matrices, lastRectangle.x + 1, lastRectangle.y + lastRectangle.height + 1, lastRectangle.x + cWidth - 1, lastRectangle.y + lastRectangle.height + last10Height, -16777216);
+            fill(matrices, lastRectangle.x, lastRectangle.y + lastRectangle.height, lastRectangle.x + cWidth, lastRectangle.y + lastRectangle.height + last10Height + 1, isExpanded() ? -1 : -6250336);
+            fill(matrices, lastRectangle.x + 1, lastRectangle.y + lastRectangle.height + 1, lastRectangle.x + cWidth - 1, lastRectangle.y + lastRectangle.height + last10Height, -16777216);
             RenderSystem.pushMatrix();
             RenderSystem.translatef(0, 0, 300f);
             
@@ -450,12 +450,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean func_231047_b_(double mouseX, double mouseY) {
+        public boolean isMouseOver(double mouseX, double mouseY) {
             return isExpanded() && mouseX >= lastRectangle.x && mouseX <= lastRectangle.x + getCellCreator().getCellWidth() && mouseY >= lastRectangle.y + lastRectangle.height && mouseY <= lastRectangle.y + lastRectangle.height + getHeight() + 1;
         }
         
         @Override
-        public boolean func_231045_a_(double double_1, double double_2, int int_1, double double_3, double double_4) {
+        public boolean mouseDragged(double double_1, double double_2, int int_1, double double_3, double double_4) {
             if (!isExpanded())
                 return false;
             if (int_1 == 0 && this.scrolling) {
@@ -477,8 +477,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean func_231043_a_(double mouseX, double mouseY, double double_3) {
-            if (func_231047_b_(mouseX, mouseY)) {
+        public boolean mouseScrolled(double mouseX, double mouseY, double double_3) {
+            if (isMouseOver(mouseX, mouseY)) {
                 offset(ClothConfigInitializer.getScrollStep() * -double_3, true);
                 return true;
             }
@@ -490,11 +490,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean func_231044_a_(double double_1, double double_2, int int_1) {
+        public boolean mouseClicked(double double_1, double double_2, int int_1) {
             if (!isExpanded())
                 return false;
             updateScrollingState(double_1, double_2, int_1);
-            return super.func_231044_a_(double_1, double_2, int_1) || scrolling;
+            return super.mouseClicked(double_1, double_2, int_1) || scrolling;
         }
         
         public void offset(double value, boolean animated) {
@@ -516,7 +516,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public List<SelectionCellElement<R>> func_231039_at__() {
+        public List<SelectionCellElement<R>> children() {
             return currentElements;
         }
     }
@@ -602,7 +602,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             this.height = height;
             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
             if (b)
-                func_238467_a_(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
+                fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r), x + 6, y + 3, b ? 16777215 : 8947848);
         }
         
@@ -624,16 +624,16 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public List<? extends IGuiEventListener> func_231039_at__() {
+        public List<? extends IGuiEventListener> children() {
             return Collections.emptyList();
         }
         
         @Override
-        public boolean func_231044_a_(double mouseX, double mouseY, int int_1) {
+        public boolean mouseClicked(double mouseX, double mouseY, int int_1) {
             boolean b = rendering && mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
             if (b) {
                 getEntry().selectionElement.topRenderer.setValue(r);
-                getEntry().selectionElement.func_231035_a_(null);
+                getEntry().selectionElement.setFocused(null);
                 getEntry().selectionElement.dontReFocus = true;
                 return true;
             }
@@ -682,11 +682,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         public void selectFirstRecommendation() {
-            List<SelectionCellElement<R>> children = getParent().selectionElement.menu.func_231039_at__();
+            List<SelectionCellElement<R>> children = getParent().selectionElement.menu.children();
             for (SelectionCellElement<R> child : children) {
                 if (child.getSelection() != null) {
                     setValue(child.getSelection());
-                    getParent().selectionElement.func_231035_a_(null);
+                    getParent().selectionElement.setFocused(null);
                     break;
                 }
             }
@@ -709,23 +709,23 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             this.toTextFunction = Objects.requireNonNull(toTextFunction);
             textFieldWidget = new TextFieldWidget(Minecraft.getInstance().fontRenderer, 0, 0, 148, 18, NarratorChatListener.EMPTY) {
                 @Override
-                public void func_230430_a_(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-                    setFocused2(isSuggestionMode() && isSelected && DefaultSelectionTopCellElement.this.getParent().func_241217_q_() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.func_241217_q_() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.func_241217_q_() == this);
-                    super.func_230430_a_(matrices, mouseX, mouseY, delta);
+                public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+                    setFocused2(isSuggestionMode() && isSelected && DefaultSelectionTopCellElement.this.getParent().getFocused() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.getFocused() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.getFocused() == this);
+                    super.render(matrices, mouseX, mouseY, delta);
                 }
                 
                 @Override
-                public boolean func_231046_a_(int int_1, int int_2, int int_3) {
+                public boolean keyPressed(int int_1, int int_2, int int_3) {
                     if (int_1 == 257 || int_1 == 335) {
                         DefaultSelectionTopCellElement.this.selectFirstRecommendation();
                         return true;
                     }
-                    return isSuggestionMode() && super.func_231046_a_(int_1, int_2, int_3);
+                    return isSuggestionMode() && super.keyPressed(int_1, int_2, int_3);
                 }
                 
                 @Override
-                public boolean func_231042_a_(char chr, int keyCode) {
-                    return isSuggestionMode() && super.func_231042_a_(chr, keyCode);
+                public boolean charTyped(char chr, int keyCode) {
+                    return isSuggestionMode() && super.charTyped(chr, keyCode);
                 }
             };
             textFieldWidget.setEnableBackgroundDrawing(false);
@@ -740,12 +740,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         @Override
         public void render(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
-            textFieldWidget.field_230690_l_ = x + 4;
-            textFieldWidget.field_230691_m_ = y + 6;
-            textFieldWidget.func_230991_b_(width - 8);
+            textFieldWidget.x = x + 4;
+            textFieldWidget.y = y + 6;
+            textFieldWidget.setWidth(width - 8);
             textFieldWidget.setEnabled(getParent().isEditable());
             textFieldWidget.setTextColor(getPreferredTextColor());
-            textFieldWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
+            textFieldWidget.render(matrices, mouseX, mouseY, delta);
         }
         
         @Override
@@ -774,7 +774,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public List<? extends IGuiEventListener> func_231039_at__() {
+        public List<? extends IGuiEventListener> children() {
             return Collections.singletonList(textFieldWidget);
         }
     }

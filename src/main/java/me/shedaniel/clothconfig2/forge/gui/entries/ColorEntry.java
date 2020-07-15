@@ -33,7 +33,7 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
         this.original = value;
         this.textFieldWidget.setText(getHexColorString(value));
         this.colorDisplayWidget = new ColorDisplayWidget(textFieldWidget, 0, 0, 20, getColorValueColor(textFieldWidget.getText()));
-        this.resetButton.field_230697_t_ = button -> {
+        this.resetButton.onPress = button -> {
             this.textFieldWidget.setText(getHexColorString(defaultValue.get()));
         };
     }
@@ -47,16 +47,16 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
     @Override
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
-        this.colorDisplayWidget.field_230691_m_ = y;
+        this.colorDisplayWidget.y = y;
         ColorValue value = getColorValue(textFieldWidget.getText());
         if (!value.hasError())
             colorDisplayWidget.setColor(alpha ? value.getColor() : 0xff000000 | value.getColor());
         if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
-            this.colorDisplayWidget.field_230690_l_ = x + resetButton.func_230998_h_() + textFieldWidget.func_230998_h_();
+            this.colorDisplayWidget.x = x + resetButton.getWidth() + textFieldWidget.getWidth();
         } else {
-            this.colorDisplayWidget.field_230690_l_ = textFieldWidget.field_230690_l_ - 23;
+            this.colorDisplayWidget.x = textFieldWidget.x - 23;
         }
-        colorDisplayWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
+        colorDisplayWidget.render(matrices, mouseX, mouseY, delta);
     }
     
     @Override

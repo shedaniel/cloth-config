@@ -78,7 +78,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
     }
     
     @Override
-    public List<? extends IGuiEventListener> func_231039_at__() {
+    public List<? extends IGuiEventListener> children() {
         return Collections.emptyList();
     }
     

@@ -14,10 +14,11 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         super(client, width, height, top, bottom, backgroundLocation);
     }
     
-    public boolean func_231049_c__(boolean boolean_1) {
-        boolean boolean_2 = super.func_231049_c__(boolean_1);
+    @Override
+    public boolean changeFocus(boolean boolean_1) {
+        boolean boolean_2 = super.changeFocus(boolean_1);
         if (boolean_2)
-            this.ensureVisible(this.func_241217_q_());
+            this.ensureVisible(this.getFocused());
         return boolean_2;
     }
     
@@ -33,19 +34,19 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         public ElementEntry() {
         }
         
-        public boolean func_231041_ay__() {
+        public boolean isDragging() {
             return this.dragging;
         }
         
-        public void func_231037_b__(boolean boolean_1) {
+        public void setDragging(boolean boolean_1) {
             this.dragging = boolean_1;
         }
         
-        public IGuiEventListener func_241217_q_() {
+        public IGuiEventListener getFocused() {
             return this.focused;
         }
         
-        public void func_231035_a_(IGuiEventListener element_1) {
+        public void setFocused(IGuiEventListener element_1) {
             this.focused = element_1;
         }
     }

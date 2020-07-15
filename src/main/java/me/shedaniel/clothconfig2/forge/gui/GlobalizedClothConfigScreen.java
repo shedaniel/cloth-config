@@ -36,7 +36,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     private final ScrollingContainer sideScroller = new ScrollingContainer() {
         @Override
         public Rectangle getBounds() {
-            return new Rectangle(4, 4, getSideSliderPosition() - 14 - 4, field_230709_l_ - 8);
+            return new Rectangle(4, 4, getSideSliderPosition() - 14 - 4, height - 8);
         }
         
         @Override
@@ -44,7 +44,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             int i = 0;
             for (Reference reference : references) {
                 if (i != 0) i += 3 * reference.getScale();
-                i += field_230712_o_.FONT_HEIGHT * reference.getScale();
+                i += font.FONT_HEIGHT * reference.getScale();
             }
             return i;
         }
@@ -68,10 +68,10 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         int max = 0;
         for (Reference reference : references) {
             ITextComponent referenceText = reference.getText();
-            int width = field_230712_o_.func_238414_a_(new StringTextComponent(StringUtils.repeat("  ", reference.getIndent()) + "- ").func_230529_a_(referenceText));
+            int width = font.func_238414_a_(new StringTextComponent(StringUtils.repeat("  ", reference.getIndent()) + "- ").func_230529_a_(referenceText));
             if (width > max) max = width;
         }
-        return Math.min(max + 8, field_230708_k_ / 4);
+        return Math.min(max + 8, width / 4);
     });
     private boolean requestingReferenceRebuilding = false;
     
@@ -107,26 +107,26 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     
     @SuppressWarnings("rawtypes")
     @Override
-    protected void func_231160_c_() {
-        super.func_231160_c_();
+    protected void init() {
+        super.init();
         this.sideExpandLimit.reset();
         this.references.clear();
         buildReferences();
-        this.field_230705_e_.add(listWidget = new ClothConfigScreen.ListWidget<>(this, field_230706_i_, field_230708_k_ - 14, field_230709_l_, 30, field_230709_l_ - 32, getBackgroundLocation()));
+        this.children.add(listWidget = new ClothConfigScreen.ListWidget<>(this, minecraft, width - 14, height, 30, height - 32, getBackgroundLocation()));
         this.listWidget.setLeftPos(14);
         this.categorizedEntries.forEach((category, entries) -> {
-            if (!listWidget.func_231039_at__().isEmpty())
-                this.listWidget.func_231039_at__().add((AbstractConfigEntry) new EmptyEntry(5));
-            this.listWidget.func_231039_at__().add((AbstractConfigEntry) new EmptyEntry(4));
-            this.listWidget.func_231039_at__().add((AbstractConfigEntry) new CategoryTextEntry(category, category.func_230532_e_().func_240699_a_(TextFormatting.BOLD)));
-            this.listWidget.func_231039_at__().add((AbstractConfigEntry) new EmptyEntry(4));
-            this.listWidget.func_231039_at__().addAll((List) entries);
+            if (!listWidget.children().isEmpty())
+                this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(5));
+            this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(4));
+            this.listWidget.children().add((AbstractConfigEntry) new CategoryTextEntry(category, category.deepCopy().func_240699_a_(TextFormatting.BOLD)));
+            this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(4));
+            this.listWidget.children().addAll((List) entries);
         });
-        int buttonWidths = Math.min(200, (field_230708_k_ - 50 - 12) / 3);
-        func_230480_a_(cancelButton = new Button(0, field_230709_l_ - 26, buttonWidths, 20, isEdited() ? new TranslationTextComponent("text.cloth-config.cancel_discard") : new TranslationTextComponent("gui.cancel"), widget -> quit()));
-        func_230480_a_(exitButton = new Button(0, field_230709_l_ - 26, buttonWidths, 20, NarratorChatListener.EMPTY, button -> saveAll(true)) {
+        int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
+        addButton(cancelButton = new Button(0, height - 26, buttonWidths, 20, isEdited() ? new TranslationTextComponent("text.cloth-config.cancel_discard") : new TranslationTextComponent("gui.cancel"), widget -> quit()));
+        addButton(exitButton = new Button(0, height - 26, buttonWidths, 20, NarratorChatListener.EMPTY, button -> saveAll(true)) {
             @Override
-            public void func_230430_a_(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+            public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
                 label:
                 for (List<AbstractConfigEntry<?>> entries : categorizedEntries.values()) {
@@ -137,9 +137,9 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
                         }
                     }
                 }
-                field_230693_o_ = isEdited() && !hasErrors;
-                func_238482_a_(hasErrors ? new TranslationTextComponent("text.cloth-config.error_cannot_save") : new TranslationTextComponent("text.cloth-config.save_and_done"));
-                super.func_230430_a_(matrices, mouseX, mouseY, delta);
+                active = isEdited() && !hasErrors;
+                setMessage(hasErrors ? new TranslationTextComponent("text.cloth-config.error_cannot_save") : new TranslationTextComponent("text.cloth-config.save_and_done"));
+                super.render(matrices, mouseX, mouseY, delta);
             }
         });
         Optional.ofNullable(this.afterInitConsumer).ifPresent(consumer -> consumer.accept(this));
@@ -164,7 +164,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     
     @SuppressWarnings("deprecation")
     @Override
-    public void func_230430_a_(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.lastHoveredReference = null;
         if (requestingReferenceRebuilding) {
             this.references.clear();
@@ -172,46 +172,46 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             requestingReferenceRebuilding = false;
         }
         int sliderPosition = getSideSliderPosition();
-        ScissorsHandler.INSTANCE.scissor(new Rectangle(sliderPosition, 0, field_230708_k_ - sliderPosition, field_230709_l_));
+        ScissorsHandler.INSTANCE.scissor(new Rectangle(sliderPosition, 0, width - sliderPosition, height));
         if (isTransparentBackground()) {
-            func_238468_a_(matrices, 14, 0, field_230708_k_, field_230709_l_, -1072689136, -804253680);
+            fillGradient(matrices, 14, 0, width, height, -1072689136, -804253680);
         } else {
-            func_231165_f_(0);
-            overlayBackground(matrices, new Rectangle(14, 0, field_230708_k_, field_230709_l_), 64, 64, 64, 255, 255);
+            renderDirtBackground(0);
+            overlayBackground(matrices, new Rectangle(14, 0, width, height), 64, 64, 64, 255, 255);
         }
-        listWidget.width = field_230708_k_ - sliderPosition;
+        listWidget.width = width - sliderPosition;
         listWidget.setLeftPos(sliderPosition);
-        listWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
+        listWidget.render(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
-        for (AbstractConfigEntry<?> child : listWidget.func_231039_at__())
+        for (AbstractConfigEntry<?> child : listWidget.children())
             child.lateRender(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
-        field_230712_o_.func_238407_a_(matrices, field_230704_d_, sliderPosition + (field_230708_k_ - sliderPosition) / 2f - field_230712_o_.func_238414_a_(field_230704_d_) / 2f, 12, -1);
+        font.func_238407_a_(matrices, title, sliderPosition + (width - sliderPosition) / 2f - font.func_238414_a_(title) / 2f, 12, -1);
         ScissorsHandler.INSTANCE.removeLastScissor();
-        cancelButton.field_230690_l_ = sliderPosition + (field_230708_k_ - sliderPosition) / 2 - cancelButton.func_230998_h_() - 3;
-        exitButton.field_230690_l_ = sliderPosition + (field_230708_k_ - sliderPosition) / 2 + 3;
-        super.func_230430_a_(matrices, mouseX, mouseY, delta);
+        cancelButton.x = sliderPosition + (width - sliderPosition) / 2 - cancelButton.getWidth() - 3;
+        exitButton.x = sliderPosition + (width - sliderPosition) / 2 + 3;
+        super.render(matrices, mouseX, mouseY, delta);
         sideSlider.updatePosition(delta);
         sideScroller.updatePosition(delta);
         if (isTransparentBackground()) {
-            func_238468_a_(matrices, 0, 0, sliderPosition, field_230709_l_, -1240461296, -972025840);
-            func_238468_a_(matrices, 0, 0, sliderPosition - 14, field_230709_l_, 1744830464, 1744830464);
+            fillGradient(matrices, 0, 0, sliderPosition, height, -1240461296, -972025840);
+            fillGradient(matrices, 0, 0, sliderPosition - 14, height, 1744830464, 1744830464);
         } else {
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
-            field_230706_i_.getTextureManager().bindTexture(getBackgroundLocation());
+            minecraft.getTextureManager().bindTexture(getBackgroundLocation());
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             float f = 32.0F;
             buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-            buffer.pos(sliderPosition - 14, field_230709_l_, 0.0D).tex(0, field_230709_l_ / 32.0F).color(68, 68, 68, 255).endVertex();
-            buffer.pos(sliderPosition, field_230709_l_, 0.0D).tex(14 / 32.0F, field_230709_l_ / 32.0F).color(68, 68, 68, 255).endVertex();
+            buffer.pos(sliderPosition - 14, height, 0.0D).tex(0, height / 32.0F).color(68, 68, 68, 255).endVertex();
+            buffer.pos(sliderPosition, height, 0.0D).tex(14 / 32.0F, height / 32.0F).color(68, 68, 68, 255).endVertex();
             buffer.pos(sliderPosition, 0, 0.0D).tex(14 / 32.0F, 0).color(68, 68, 68, 255).endVertex();
             buffer.pos(sliderPosition - 14, 0, 0.0D).tex(0, 0).color(68, 68, 68, 255).endVertex();
             tessellator.draw();
             
             buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-            buffer.pos(0, field_230709_l_, 0.0D).tex(0, (field_230709_l_ + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
-            buffer.pos(sliderPosition - 14, field_230709_l_, 0.0D).tex((sliderPosition - 14) / 32.0F, (field_230709_l_ + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
+            buffer.pos(0, height, 0.0D).tex(0, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
+            buffer.pos(sliderPosition - 14, height, 0.0D).tex((sliderPosition - 14) / 32.0F, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
             buffer.pos(sliderPosition - 14, 0, 0.0D).tex((sliderPosition - 14) / 32.0F, ((int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
             buffer.pos(0, 0, 0.0D).tex(0, ((int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
             tessellator.draw();
@@ -229,42 +229,42 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
             buffer.pos(matrix, sliderPosition + 4, 0, 100.0F).color(0, 0, 0, 0).endVertex();
             buffer.pos(matrix, sliderPosition, 0, 100.0F).color(0, 0, 0, shadeColor).endVertex();
-            buffer.pos(matrix, sliderPosition, field_230709_l_, 100.0F).color(0, 0, 0, shadeColor).endVertex();
-            buffer.pos(matrix, sliderPosition + 4, field_230709_l_, 100.0F).color(0, 0, 0, 0).endVertex();
+            buffer.pos(matrix, sliderPosition, height, 100.0F).color(0, 0, 0, shadeColor).endVertex();
+            buffer.pos(matrix, sliderPosition + 4, height, 100.0F).color(0, 0, 0, 0).endVertex();
             tessellator.draw();
             shadeColor /= 2;
             buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
             buffer.pos(matrix, sliderPosition - 14, 0, 100.0F).color(0, 0, 0, shadeColor).endVertex();
             buffer.pos(matrix, sliderPosition - 14 - 4, 0, 100.0F).color(0, 0, 0, 0).endVertex();
-            buffer.pos(matrix, sliderPosition - 14 - 4, field_230709_l_, 100.0F).color(0, 0, 0, 0).endVertex();
-            buffer.pos(matrix, sliderPosition - 14, field_230709_l_, 100.0F).color(0, 0, 0, shadeColor).endVertex();
+            buffer.pos(matrix, sliderPosition - 14 - 4, height, 100.0F).color(0, 0, 0, 0).endVertex();
+            buffer.pos(matrix, sliderPosition - 14, height, 100.0F).color(0, 0, 0, shadeColor).endVertex();
             tessellator.draw();
             RenderSystem.shadeModel(7424);
             RenderSystem.disableBlend();
             RenderSystem.enableAlphaTest();
             RenderSystem.enableTexture();
         }
-        Rectangle slideArrowBounds = new Rectangle(sliderPosition - 14, 0, 14, field_230709_l_);
+        Rectangle slideArrowBounds = new Rectangle(sliderPosition - 14, 0, 14, height);
         {
             RenderSystem.enableAlphaTest();
             IRenderTypeBuffer.Impl immediate = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
-            field_230712_o_.func_238426_c_(ITextProperties.func_240652_a_(">"), sliderPosition - 7 - field_230712_o_.getStringWidth(">") / 2f, field_230709_l_ / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil((1 - sideSlider.scrollAmount) * 255.0F), 0, 255) << 24, false, matrices.getLast().getMatrix(), immediate, false, 0, 15728880);
-            field_230712_o_.func_238426_c_(ITextProperties.func_240652_a_("<"), sliderPosition - 7 - field_230712_o_.getStringWidth("<") / 2f, field_230709_l_ / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil(sideSlider.scrollAmount * 255.0F), 0, 255) << 24, false, matrices.getLast().getMatrix(), immediate, false, 0, 15728880);
+            font.func_238426_c_(ITextProperties.func_240652_a_(">"), sliderPosition - 7 - font.getStringWidth(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil((1 - sideSlider.scrollAmount) * 255.0F), 0, 255) << 24, false, matrices.getLast().getMatrix(), immediate, false, 0, 15728880);
+            font.func_238426_c_(ITextProperties.func_240652_a_("<"), sliderPosition - 7 - font.getStringWidth("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil(sideSlider.scrollAmount * 255.0F), 0, 255) << 24, false, matrices.getLast().getMatrix(), immediate, false, 0, 15728880);
             immediate.finish();
             
             Rectangle scrollerBounds = sideScroller.getBounds();
             if (!scrollerBounds.isEmpty()) {
-                ScissorsHandler.INSTANCE.scissor(new Rectangle(0, 0, sliderPosition - 14, field_230709_l_));
+                ScissorsHandler.INSTANCE.scissor(new Rectangle(0, 0, sliderPosition - 14, height));
                 int scrollOffset = (int) (scrollerBounds.y - sideScroller.scrollAmount);
                 for (Reference reference : references) {
                     matrices.push();
                     matrices.scale(reference.getScale(), reference.getScale(), reference.getScale());
                     IFormattableTextComponent text = new StringTextComponent(StringUtils.repeat("  ", reference.getIndent()) + "- ").func_230529_a_(reference.getText());
-                    if (lastHoveredReference == null && new Rectangle(scrollerBounds.x, (int) (scrollOffset - 4 * reference.getScale()), (int) (field_230712_o_.func_238414_a_(text) * reference.getScale()), (int) ((field_230712_o_.FONT_HEIGHT + 4) * reference.getScale())).contains(mouseX, mouseY))
+                    if (lastHoveredReference == null && new Rectangle(scrollerBounds.x, (int) (scrollOffset - 4 * reference.getScale()), (int) (font.func_238414_a_(text) * reference.getScale()), (int) ((font.FONT_HEIGHT + 4) * reference.getScale())).contains(mouseX, mouseY))
                         lastHoveredReference = reference;
-                    field_230712_o_.func_238422_b_(matrices, text, scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
+                    font.func_238422_b_(matrices, text, scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
                     matrices.pop();
-                    scrollOffset += (field_230712_o_.FONT_HEIGHT + 3) * reference.getScale();
+                    scrollOffset += (font.FONT_HEIGHT + 3) * reference.getScale();
                 }
                 ScissorsHandler.INSTANCE.removeLastScissor();
                 sideScroller.renderScrollBar();
@@ -273,20 +273,20 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     }
     
     @Override
-    public boolean func_231044_a_(double mouseX, double mouseY, int button) {
-        Rectangle slideBounds = new Rectangle(0, 0, getSideSliderPosition() - 14, field_230709_l_);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        Rectangle slideBounds = new Rectangle(0, 0, getSideSliderPosition() - 14, height);
         if (button == 0 && slideBounds.contains(mouseX, mouseY) && lastHoveredReference != null) {
-            field_230706_i_.getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            minecraft.getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             lastHoveredReference.go();
             return true;
         }
-        Rectangle slideArrowBounds = new Rectangle(getSideSliderPosition() - 14, 0, 14, field_230709_l_);
+        Rectangle slideArrowBounds = new Rectangle(getSideSliderPosition() - 14, 0, 14, height);
         if (button == 0 && slideArrowBounds.contains(mouseX, mouseY)) {
             setExpanded(!isExpanded());
-            field_230706_i_.getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            minecraft.getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             return true;
         }
-        return super.func_231044_a_(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
     
     @Override
@@ -300,13 +300,13 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     }
     
     @Override
-    public boolean func_231043_a_(double mouseX, double mouseY, double amount) {
-        Rectangle slideBounds = new Rectangle(0, 0, getSideSliderPosition() - 14, field_230709_l_);
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        Rectangle slideBounds = new Rectangle(0, 0, getSideSliderPosition() - 14, height);
         if (slideBounds.contains(mouseX, mouseY)) {
             sideScroller.offset(ClothConfigInitializer.getScrollStep() * -amount, true);
             return true;
         }
-        return super.func_231043_a_(mouseX, mouseY, amount);
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
     
     private int getSideSliderPosition() {
@@ -343,7 +343,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {}
         
         @Override
-        public List<? extends IGuiEventListener> func_231039_at__() {
+        public List<? extends IGuiEventListener> children() {
             return Collections.emptyList();
         }
     }
@@ -390,7 +390,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         }
         
         @Override
-        public List<? extends IGuiEventListener> func_231039_at__() {
+        public List<? extends IGuiEventListener> children() {
             return Collections.emptyList();
         }
     }
@@ -427,7 +427,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         @Override
         public void go() {
             int i = 0;
-            for (AbstractConfigEntry<?> child : listWidget.func_231039_at__()) {
+            for (AbstractConfigEntry<?> child : listWidget.children()) {
                 if (child instanceof CategoryTextEntry && ((CategoryTextEntry) child).category == category) {
                     listWidget.scrollTo(i, true);
                     return;
@@ -464,7 +464,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         @Override
         public void go() {
             int[] i = {0};
-            for (AbstractConfigEntry<?> child : listWidget.func_231039_at__()) {
+            for (AbstractConfigEntry<?> child : listWidget.children()) {
                 int i1 = i[0];
                 if (goChild(i, null, child)) return;
                 i[0] = i1 + child.getItemHeight();
@@ -480,7 +480,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             i[0] += root.getInitialReferenceOffset();
             boolean expanded = root instanceof Expandable && ((Expandable) root).isExpanded();
             if (root instanceof Expandable) ((Expandable) root).setExpanded(true);
-            List<? extends IGuiEventListener> children = root.func_231039_at__();
+            List<? extends IGuiEventListener> children = root.children();
             if (root instanceof Expandable) ((Expandable) root).setExpanded(expanded);
             for (IGuiEventListener child : children) {
                 if (child instanceof ReferenceProvider<?>) {

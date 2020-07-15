@@ -81,11 +81,11 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @Override
-    public E func_241217_q_() {
-        return (E) super.func_241217_q_();
+    public E getFocused() {
+        return (E) super.getFocused();
     }
     
-    public final List<E> func_231039_at__() {
+    public final List<E> children() {
         return this.entries;
     }
     
@@ -94,7 +94,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected E getItem(int index) {
-        return this.func_231039_at__().get(index);
+        return this.children().get(index);
     }
     
     protected int addItem(E item) {
@@ -103,11 +103,11 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected int getItemCount() {
-        return this.func_231039_at__().size();
+        return this.children().size();
     }
     
     protected boolean isSelected(int index) {
-        return Objects.equals(this.getSelectedItem(), this.func_231039_at__().get(index));
+        return Objects.equals(this.getSelectedItem(), this.children().get(index));
     }
     
     protected final E getItemAtPosition(double mouseX, double mouseY) {
@@ -125,7 +125,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                 break;
             }
         }
-        return mouseX < (double) this.getScrollbarPosition() && mouseX >= minX && mouseX <= maxX && itemIndex >= 0 && currentY >= 0 && itemIndex < this.getItemCount() ? this.func_231039_at__().get(itemIndex) : null;
+        return mouseX < (double) this.getScrollbarPosition() && mouseX >= minX && mouseX <= maxX && itemIndex >= 0 && currentY >= 0 && itemIndex < this.getItemCount() ? this.children().get(itemIndex) : null;
     }
     
     public void updateSize(int width, int height, int top, int bottom) {
@@ -183,7 +183,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     @SuppressWarnings("deprecation")
     @Override
-    public void func_230430_a_(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.drawBackground();
         int scrollbarPosition = this.getScrollbarPosition();
         int int_4 = scrollbarPosition + 6;
@@ -264,13 +264,13 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     protected void centerScrollOn(E item) {
         double d = (this.bottom - this.top) / -2d;
-        for (int i = 0; i < this.func_231039_at__().indexOf(item) && i < this.getItemCount(); i++)
+        for (int i = 0; i < this.children().indexOf(item) && i < this.getItemCount(); i++)
             d += getItem(i).getItemHeight();
         this.capYPosition(d);
     }
     
     protected void ensureVisible(E item) {
-        int rowTop = this.getRowTop(this.func_231039_at__().indexOf(item));
+        int rowTop = this.getRowTop(this.children().indexOf(item));
         int int_2 = rowTop - this.top - 4 - item.getItemHeight();
         if (int_2 < 0)
             this.scroll(int_2);
@@ -309,16 +309,16 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @Override
-    public boolean func_231044_a_(double double_1, double double_2, int int_1) {
+    public boolean mouseClicked(double double_1, double double_2, int int_1) {
         this.updateScrollingState(double_1, double_2, int_1);
-        if (!this.func_231047_b_(double_1, double_2)) {
+        if (!this.isMouseOver(double_1, double_2)) {
             return false;
         } else {
             E item = this.getItemAtPosition(double_1, double_2);
             if (item != null) {
-                if (item.func_231044_a_(double_1, double_2, int_1)) {
-                    this.func_231035_a_(item);
-                    this.func_231037_b__(true);
+                if (item.mouseClicked(double_1, double_2, int_1)) {
+                    this.setFocused(item);
+                    this.setDragging(true);
                     return true;
                 }
             } else if (int_1 == 0) {
@@ -331,17 +331,17 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @Override
-    public boolean func_231048_c_(double double_1, double double_2, int int_1) {
-        if (this.func_241217_q_() != null) {
-            this.func_241217_q_().func_231048_c_(double_1, double_2, int_1);
+    public boolean mouseReleased(double double_1, double double_2, int int_1) {
+        if (this.getFocused() != null) {
+            this.getFocused().mouseReleased(double_1, double_2, int_1);
         }
         
         return false;
     }
     
     @Override
-    public boolean func_231045_a_(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (super.func_231045_a_(mouseX, mouseY, button, deltaX, deltaY)) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
             return true;
         } else if (button == 0 && this.scrolling) {
             if (mouseY < (double) this.top) {
@@ -363,9 +363,9 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @Override
-    public boolean func_231043_a_(double double_1, double double_2, double double_3) {
+    public boolean mouseScrolled(double double_1, double double_2, double double_3) {
         for (E entry : entries) {
-            if (entry.func_231043_a_(double_1, double_2, double_3)) {
+            if (entry.mouseScrolled(double_1, double_2, double_3)) {
                 return true;
             }
         }
@@ -374,8 +374,8 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @Override
-    public boolean func_231046_a_(int int_1, int int_2, int int_3) {
-        if (super.func_231046_a_(int_1, int_2, int_3)) {
+    public boolean keyPressed(int int_1, int int_2, int int_3) {
+        if (super.keyPressed(int_1, int_2, int_3)) {
             return true;
         } else if (int_1 == 264) {
             this.moveSelection(1);
@@ -389,10 +389,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected void moveSelection(int int_1) {
-        if (!this.func_231039_at__().isEmpty()) {
-            int int_2 = this.func_231039_at__().indexOf(this.getSelectedItem());
+        if (!this.children().isEmpty()) {
+            int int_2 = this.children().indexOf(this.getSelectedItem());
             int int_3 = MathHelper.clamp(int_2 + int_1, 0, this.getItemCount() - 1);
-            E itemListWidget$Item_1 = this.func_231039_at__().get(int_3);
+            E itemListWidget$Item_1 = this.children().get(int_3);
             this.selectItem(itemListWidget$Item_1);
             this.ensureVisible(itemListWidget$Item_1);
         }
@@ -400,7 +400,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @Override
-    public boolean func_231047_b_(double double_1, double double_2) {
+    public boolean isMouseOver(double double_1, double double_2) {
         return double_2 >= (double) this.top && double_2 <= (double) this.bottom && double_1 >= (double) this.left && double_1 <= (double) this.right;
     }
     
@@ -442,7 +442,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             int y = this.getRowTop(renderIndex);
             int x = this.getRowLeft();
             RenderHelper.disableStandardItemLighting();
-            renderItem(matrices, item, renderIndex, y, x, itemWidth, itemHeight, int_3, int_4, this.func_231047_b_(int_3, int_4) && Objects.equals(this.getItemAtPosition(int_3, int_4), item), float_1);
+            renderItem(matrices, item, renderIndex, y, x, itemWidth, itemHeight, int_3, int_4, this.isMouseOver(int_3, int_4) && Objects.equals(this.getItemAtPosition(int_3, int_4), item), float_1);
         }
         
     }
@@ -511,7 +511,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         
         public abstract void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta);
         
-        public boolean func_231047_b_(double double_1, double double_2) {
+        public boolean isMouseOver(double double_1, double double_2) {
             return Objects.equals(this.parent.getItemAtPosition(double_1, double_2), this);
         }
         

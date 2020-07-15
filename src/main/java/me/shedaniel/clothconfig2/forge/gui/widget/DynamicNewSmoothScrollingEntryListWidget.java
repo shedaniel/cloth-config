@@ -73,10 +73,10 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     }
     
     @Override
-    public boolean func_231045_a_(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (!smoothScrolling)
-            return super.func_231045_a_(mouseX, mouseY, button, deltaX, deltaY);
-        if ((this.func_241217_q_() != null && this.func_231041_ay__() && button == 0) && this.func_241217_q_().func_231045_a_(mouseX, mouseY, button, deltaX, deltaY)) {
+            return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        if ((this.getFocused() != null && this.isDragging() && button == 0) && this.getFocused().mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
             return true;
         } else if (button == 0 && this.scrolling) {
             if (mouseY < (double) this.top) {
@@ -96,9 +96,9 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     }
     
     @Override
-    public boolean func_231043_a_(double mouseX, double mouseY, double amount) {
-        for (E entry : func_231039_at__()) {
-            if (entry.func_231043_a_(mouseX, mouseY, amount)) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        for (E entry : children()) {
+            if (entry.mouseScrolled(mouseX, mouseY, amount)) {
                 return true;
             }
         }
@@ -130,11 +130,11 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     }
     
     @Override
-    public void func_230430_a_(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         double[] target = {this.target};
         scroll = handleScrollingPosition(target, scroll, getMaxScroll(), delta, start, duration);
         this.target = target[0];
-        super.func_230430_a_(matrices, mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
     
     @SuppressWarnings("deprecation")

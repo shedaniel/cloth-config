@@ -40,7 +40,7 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     }
     
     public boolean isMouseInside(int mouseX, int mouseY, int x, int y, int entryWidth, int entryHeight) {
-        return mouseX >= x && mouseY >= y && mouseX <= x + entryWidth && mouseY <= y + entryHeight && getParent().func_231047_b_(mouseX, mouseY);
+        return mouseX >= x && mouseY >= y && mouseX <= x + entryWidth && mouseY <= y + entryHeight && getParent().isMouseOver(mouseX, mouseY);
     }
     
     public Optional<ITextComponent[]> getTooltip() {

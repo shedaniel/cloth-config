@@ -165,12 +165,12 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
             return new DefaultSelectionTopCellElement<ResourceLocation>(Registry.ITEM.getKey(item), ITEM_IDENTIFIER_FUNCTION, identifier -> new StringTextComponent(identifier.toString())) {
                 @Override
                 public void render(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
-                    textFieldWidget.field_230690_l_ = x + 4;
-                    textFieldWidget.field_230691_m_ = y + 6;
-                    textFieldWidget.func_230991_b_(width - 4 - 20);
+                    textFieldWidget.x = x + 4;
+                    textFieldWidget.y = y + 6;
+                    textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEnabled(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());
-                    textFieldWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
+                    textFieldWidget.render(matrices, mouseX, mouseY, delta);
                     ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                     ItemStack stack = hasConfigError() ? BARRIER : new ItemStack(Registry.ITEM.getOrDefault(getValue()));
                     itemRenderer.renderItemIntoGUI(stack, x + width - 18, y + 2);
@@ -182,12 +182,12 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
             return new DefaultSelectionTopCellElement<ResourceLocation>(Registry.BLOCK.getKey(block), BLOCK_IDENTIFIER_FUNCTION, identifier -> new StringTextComponent(identifier.toString())) {
                 @Override
                 public void render(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
-                    textFieldWidget.field_230690_l_ = x + 4;
-                    textFieldWidget.field_230691_m_ = y + 6;
-                    textFieldWidget.func_230991_b_(width - 4 - 20);
+                    textFieldWidget.x = x + 4;
+                    textFieldWidget.y = y + 6;
+                    textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEnabled(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());
-                    textFieldWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
+                    textFieldWidget.render(matrices, mouseX, mouseY, delta);
                     ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                     ItemStack stack = hasConfigError() ? BARRIER : new ItemStack(Registry.BLOCK.getOrDefault(getValue()));
                     itemRenderer.renderItemIntoGUI(stack, x + width - 18, y + 2);
@@ -199,12 +199,12 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
             return new DefaultSelectionTopCellElement<Item>(item, ITEM_FUNCTION, i -> new StringTextComponent(Registry.ITEM.getKey(i).toString())) {
                 @Override
                 public void render(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
-                    textFieldWidget.field_230690_l_ = x + 4;
-                    textFieldWidget.field_230691_m_ = y + 6;
-                    textFieldWidget.func_230991_b_(width - 4 - 20);
+                    textFieldWidget.x = x + 4;
+                    textFieldWidget.y = y + 6;
+                    textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEnabled(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());
-                    textFieldWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
+                    textFieldWidget.render(matrices, mouseX, mouseY, delta);
                     ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                     ItemStack stack = hasConfigError() ? BARRIER : new ItemStack(getValue());
                     itemRenderer.renderItemIntoGUI(stack, x + width - 18, y + 2);
@@ -216,12 +216,12 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
             return new DefaultSelectionTopCellElement<Block>(block, BLOCK_FUNCTION, i -> new StringTextComponent(Registry.BLOCK.getKey(i).toString())) {
                 @Override
                 public void render(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
-                    textFieldWidget.field_230690_l_ = x + 4;
-                    textFieldWidget.field_230691_m_ = y + 6;
-                    textFieldWidget.func_230991_b_(width - 4 - 20);
+                    textFieldWidget.x = x + 4;
+                    textFieldWidget.y = y + 6;
+                    textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEnabled(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());
-                    textFieldWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
+                    textFieldWidget.render(matrices, mouseX, mouseY, delta);
                     ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                     ItemStack stack = hasConfigError() ? BARRIER : new ItemStack(getValue());
                     itemRenderer.renderItemIntoGUI(stack, x + width - 18, y + 2);
@@ -364,7 +364,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             this.height = height;
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
-                                func_238467_a_(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
+                                fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
                             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                             itemRenderer.renderItemIntoGUI(s, x + 4, y + 2);
@@ -413,7 +413,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             this.height = height;
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
-                                func_238467_a_(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
+                                fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
                             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                             itemRenderer.renderItemIntoGUI(s, x + 4, y + 2);
@@ -461,7 +461,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             this.height = height;
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
-                                func_238467_a_(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
+                                fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
                             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                             itemRenderer.renderItemIntoGUI(s, x + 4, y + 2);
@@ -509,7 +509,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             this.height = height;
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
-                                func_238467_a_(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
+                                fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
                             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                             itemRenderer.renderItemIntoGUI(s, x + 4, y + 2);

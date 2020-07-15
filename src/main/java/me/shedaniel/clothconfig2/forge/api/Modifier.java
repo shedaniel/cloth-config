@@ -47,7 +47,7 @@ public class Modifier {
     }
     
     public static Modifier current() {
-        return Modifier.of(Screen.func_231174_t_(), Screen.func_231172_r_(), Screen.func_231173_s_());
+        return Modifier.of(Screen.hasAltDown(), Screen.hasControlDown(), Screen.hasShiftDown());
     }
     
     private static short setFlag(short base, short flag, boolean val) {

@@ -61,7 +61,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         this.resetButton = new Button(0, 0, Minecraft.getInstance().fontRenderer.func_238414_a_(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             setValue(defaultValue.get());
         });
-        this.sliderWidget.func_238482_a_(textGetter.apply(LongSliderEntry.this.value.get()));
+        this.sliderWidget.setMessage(textGetter.apply(LongSliderEntry.this.value.get()));
         this.widgets = Lists.newArrayList(sliderWidget, resetButton);
     }
     
@@ -77,7 +77,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     
     public LongSliderEntry setTextGetter(Function<Long, ITextComponent> textGetter) {
         this.textGetter = textGetter;
-        this.sliderWidget.func_238482_a_(textGetter.apply(LongSliderEntry.this.value.get()));
+        this.sliderWidget.setMessage(textGetter.apply(LongSliderEntry.this.value.get()));
         return this;
     }
     
@@ -99,7 +99,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     }
     
     @Override
-    public List<? extends IGuiEventListener> func_231039_at__() {
+    public List<? extends IGuiEventListener> children() {
         return widgets;
     }
     
@@ -122,23 +122,23 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         MainWindow window = Minecraft.getInstance().getMainWindow();
-        this.resetButton.field_230693_o_ = isEditable() && getDefaultValue().isPresent() && defaultValue.get() != value.get();
-        this.resetButton.field_230691_m_ = y;
-        this.sliderWidget.field_230693_o_ = isEditable();
-        this.sliderWidget.field_230691_m_ = y;
+        this.resetButton.active = isEditable() && getDefaultValue().isPresent() && defaultValue.get() != value.get();
+        this.resetButton.y = y;
+        this.sliderWidget.active = isEditable();
+        this.sliderWidget.y = y;
         ITextComponent displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, getPreferredTextColor());
-            this.resetButton.field_230690_l_ = x;
-            this.sliderWidget.field_230690_l_ = x + resetButton.func_230998_h_() + 1;
+            this.resetButton.x = x;
+            this.sliderWidget.x = x + resetButton.getWidth() + 1;
         } else {
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
-            this.resetButton.field_230690_l_ = x + entryWidth - resetButton.func_230998_h_();
-            this.sliderWidget.field_230690_l_ = x + entryWidth - 150;
+            this.resetButton.x = x + entryWidth - resetButton.getWidth();
+            this.sliderWidget.x = x + entryWidth - 150;
         }
-        this.sliderWidget.func_230991_b_(150 - resetButton.func_230998_h_() - 2);
-        resetButton.func_230430_a_(matrices, mouseX, mouseY, delta);
-        sliderWidget.func_230430_a_(matrices, mouseX, mouseY, delta);
+        this.sliderWidget.setWidth(150 - resetButton.getWidth() - 2);
+        resetButton.render(matrices, mouseX, mouseY, delta);
+        sliderWidget.render(matrices, mouseX, mouseY, delta);
     }
     
     private class Slider extends AbstractSlider {
@@ -148,7 +148,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         
         @Override
         public void func_230979_b_() {
-            func_238482_a_(textGetter.apply(LongSliderEntry.this.value.get()));
+            setMessage(textGetter.apply(LongSliderEntry.this.value.get()));
         }
         
         @Override
@@ -157,17 +157,17 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         }
         
         @Override
-        public boolean func_231046_a_(int int_1, int int_2, int int_3) {
+        public boolean keyPressed(int int_1, int int_2, int int_3) {
             if (!isEditable())
                 return false;
-            return super.func_231046_a_(int_1, int_2, int_3);
+            return super.keyPressed(int_1, int_2, int_3);
         }
         
         @Override
-        public boolean func_231045_a_(double double_1, double double_2, int int_1, double double_3, double double_4) {
+        public boolean mouseDragged(double double_1, double double_2, int int_1, double double_3, double double_4) {
             if (!isEditable())
                 return false;
-            return super.func_231045_a_(double_1, double_2, int_1, double_3, double_4);
+            return super.mouseDragged(double_1, double_2, int_1, double_3, double_4);
         }
         
         public double getValue() {
