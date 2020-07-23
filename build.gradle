@@ -30,7 +30,7 @@ repositories {
 }
 
 minecraft {
-    accessWidener = file("src/main/resources/cloth-config2.accessWidener")
+    accessWidener = file("src/main/resources/cloth-config.accessWidener")
 }
 
 processResources {
@@ -52,8 +52,12 @@ dependencies {
     modApi("me.shedaniel.cloth:basic-math:0.5.1")
     include("me.shedaniel.cloth:basic-math:0.5.1")
 
-    modCompileOnly("io.github.prospector:modmenu:${modmenu_version}")
-    modRuntime("io.github.prospector:modmenu:${modmenu_version}")
+    modCompileOnly("io.github.prospector:modmenu:${modmenu_version}") {
+        transitive(false)
+    }
+    modRuntime("io.github.prospector:modmenu:${modmenu_version}") {
+        transitive(false)
+    }
 //    modRuntime("me.shedaniel:SmoothScrollingEverywhere:3.0.3-unstable") {
 //        transitive(false)
 //    }

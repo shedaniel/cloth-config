@@ -9,13 +9,14 @@ import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder.TopCellElemen
 import me.shedaniel.math.Color;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.mixin.client.keybinding.KeyCodeAccessor;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
+
 import java.util.List;
 import java.util.function.Function;
 
@@ -93,7 +94,7 @@ public interface ConfigEntryBuilder {
     }
     
     default KeyCodeBuilder fillKeybindingField(Text fieldNameKey, KeyBinding value) {
-        return startKeyCodeField(fieldNameKey, ((KeyCodeAccessor) value).getBoundKey()).setDefaultValue(value.getDefaultKeyCode()).setSaveConsumer(code -> {
+        return startKeyCodeField(fieldNameKey, KeyBindingHelper.getBoundKeyOf(value)).setDefaultValue(value.getDefaultKeyCode()).setSaveConsumer(code -> {
             value.setKeyCode(code);
             KeyBinding.updateKeysByCode();
             MinecraftClient.getInstance().options.write();
