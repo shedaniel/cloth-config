@@ -6,8 +6,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -18,7 +20,8 @@ public class ConfigCategoryImpl implements ConfigCategory {
     private final Consumer<Identifier> backgroundConsumer;
     private final Runnable destroyCategory;
     private final Text categoryKey;
-    
+    @Nullable private Supplier<Optional<Text[]>> tooltipSupplier;
+
     ConfigCategoryImpl(Text categoryKey, Consumer<Identifier> backgroundConsumer, Supplier<List<Object>> listSupplier, Runnable destroyCategory) {
         this.listSupplier = listSupplier;
         this.backgroundConsumer = backgroundConsumer;
@@ -52,5 +55,15 @@ public class ConfigCategoryImpl implements ConfigCategory {
     public void removeCategory() {
         destroyCategory.run();
     }
-    
+
+    @Nullable
+    public Supplier<Optional<Text[]>> getTooltipSupplier() {
+        return tooltipSupplier;
+    }
+
+    public ConfigCategory setTooltipSupplier(@Nullable Supplier<Optional<Text[]>> tooltipSupplier) {
+        this.tooltipSupplier = tooltipSupplier;
+        return this;
+    }
+
 }

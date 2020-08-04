@@ -60,9 +60,10 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     private Rectangle tabsBounds, tabsLeftBounds, tabsRightBounds;
     private double tabsMaximumScrolled = -1d;
     private final List<ClothConfigTabButton> tabButtons = Lists.newArrayList();
+    private final Map<Text, ConfigCategory> categoryMap;
     
     @ApiStatus.Internal
-    public ClothConfigScreen(Screen parent, Text title, Map<Text, List<Object>> entriesMap, Identifier backgroundLocation) {
+    public ClothConfigScreen(Screen parent, Text title, Map<Text, List<Object>> entriesMap, Map<Text, ConfigCategory> categoryMap, Identifier backgroundLocation) {
         super(parent, title, backgroundLocation);
         entriesMap.forEach((categoryName, list) -> {
             List<AbstractConfigEntry<?>> entries = Lists.newArrayList();
@@ -78,7 +79,9 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             }
             categorizedEntries.put(categoryName, entries);
         });
+
         this.tabs = categorizedEntries.keySet().stream().map(s -> new Pair<>(s, MinecraftClient.getInstance().textRenderer.getWidth(s) + 8)).collect(Collectors.toList());
+        this.categoryMap = categoryMap;
     }
     
     @Override
@@ -166,7 +169,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             });
             int j = 0;
             for (Pair<Text, Integer> tab : tabs) {
-                tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getRight(), 20, tab.getLeft()));
+                tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getRight(), 20, tab.getLeft(), this.categoryMap.get(tab.getLeft()).getTooltipSupplier()));
                 j++;
             }
             children.addAll(tabButtons);

@@ -40,6 +40,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private Consumer<Screen> afterInitConsumer = screen -> {};
     private final Map<Text, Identifier> categoryBackground = Maps.newHashMap();
     private final Map<Text, List<Object>> dataMap = Maps.newLinkedHashMap();
+    private final Map<Text, ConfigCategory> categoryMap = Maps.newHashMap();
     private Text fallbackCategory = null;
     private boolean alwaysShowTabs = false;
     
@@ -122,20 +123,16 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     
     @Override
     public ConfigCategory getOrCreateCategory(Text categoryKey) {
-        if (dataMap.containsKey(categoryKey))
-            return new ConfigCategoryImpl(categoryKey, identifier -> {
-                if (transparentBackground)
-                    throw new IllegalStateException("Cannot set category background if screen is using transparent background.");
-                categoryBackground.put(categoryKey, identifier);
-            }, () -> dataMap.get(categoryKey), () -> removeCategory(categoryKey));
+        if (categoryMap.containsKey(categoryKey))
+            return categoryMap.get(categoryKey);
         dataMap.put(categoryKey, Lists.newArrayList());
         if (fallbackCategory == null)
             fallbackCategory = categoryKey;
-        return new ConfigCategoryImpl(categoryKey, identifier -> {
+        return categoryMap.computeIfAbsent(categoryKey, key -> new ConfigCategoryImpl(categoryKey, identifier -> {
             if (transparentBackground)
                 throw new IllegalStateException("Cannot set category background if screen is using transparent background.");
             categoryBackground.put(categoryKey, identifier);
-        }, () -> dataMap.get(categoryKey), () -> removeCategory(categoryKey));
+        }, () -> dataMap.get(categoryKey), () -> removeCategory(categoryKey)));
     }
     
     @Override
@@ -224,7 +221,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
         if (globalized) {
             screen = new GlobalizedClothConfigScreen(parent, title, dataMap, defaultBackground);
         } else {
-            screen = new ClothConfigScreen(parent, title, dataMap, defaultBackground);
+            screen = new ClothConfigScreen(parent, title, dataMap, categoryMap, defaultBackground);
         }
         screen.setSavingRunnable(savingRunnable);
         screen.setEditable(editable);
