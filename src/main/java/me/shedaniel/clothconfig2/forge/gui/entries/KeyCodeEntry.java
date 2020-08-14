@@ -113,14 +113,14 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(getLocalizedName());
         if (getConfigScreen().getFocusedBinding() == this)
-            this.buttonWidget.setMessage(new StringTextComponent("> ").func_240699_a_(TextFormatting.WHITE).func_230529_a_(this.buttonWidget.getMessage().deepCopy().func_240699_a_(TextFormatting.YELLOW)).func_230529_a_(new StringTextComponent(" <").func_240699_a_(TextFormatting.WHITE)));
+            this.buttonWidget.setMessage(new StringTextComponent("> ").mergeStyle(TextFormatting.WHITE).append(this.buttonWidget.getMessage().deepCopy().mergeStyle(TextFormatting.YELLOW)).append(new StringTextComponent(" <").mergeStyle(TextFormatting.WHITE)));
         ITextComponent displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
-            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, 16777215);
+            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName.func_241878_f(), window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, 16777215);
             this.resetButton.x = x;
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
         } else {
-            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
+            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName.func_241878_f(), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
         }
@@ -130,8 +130,7 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     }
     
     @Override
-    public List<? extends IGuiEventListener> children() {
+    public List<? extends IGuiEventListener> getEventListeners() {
         return widgets;
     }
-    
 }

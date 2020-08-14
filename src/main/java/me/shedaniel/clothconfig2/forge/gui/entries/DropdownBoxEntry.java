@@ -70,11 +70,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         this.selectionElement.bounds.y = y;
         ITextComponent displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
-            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, getPreferredTextColor());
+            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName.func_241878_f(), window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.selectionElement.bounds.x = x + resetButton.getWidth() + 1;
         } else {
-            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
+            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName.func_241878_f(), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.selectionElement.bounds.x = x + entryWidth - 150 + 1;
         }
@@ -129,7 +129,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public List<? extends IGuiEventListener> children() {
+    public List<? extends IGuiEventListener> getEventListeners() {
         return Lists.newArrayList(selectionElement, resetButton);
     }
     
@@ -209,7 +209,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public List<? extends IGuiEventListener> children() {
+        public List<? extends IGuiEventListener> getEventListeners() {
             return Lists.newArrayList(topRenderer, menu);
         }
         
@@ -218,7 +218,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             dontReFocus = false;
             boolean b = super.mouseClicked(double_1, double_2, int_1);
             if (dontReFocus) {
-                setFocused(null);
+                setListener(null);
                 dontReFocus = false;
             }
             return b;
@@ -252,7 +252,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public abstract int getHeight();
         
         public final boolean isExpanded() {
-            return isSelected && this.getEntry().getFocused() == this.getEntry().selectionElement;
+            return isSelected && this.getEntry().getListener() == this.getEntry().selectionElement;
         }
         
         public final boolean isSuggestionMode() {
@@ -260,7 +260,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public abstract List<SelectionCellElement<R>> children();
+        public abstract List<SelectionCellElement<R>> getEventListeners();
     }
     
     public static class DefaultDropdownMenuElement<R> extends DropdownMenuElement<R> {
@@ -404,7 +404,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             if (currentElements.isEmpty()) {
                 FontRenderer textRenderer = Minecraft.getInstance().fontRenderer;
                 ITextComponent text = new TranslationTextComponent("text.cloth-config.dropdown.value.unknown");
-                textRenderer.func_238407_a_(matrices, text, lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.func_238414_a_(text) / 2f, lastRectangle.y + lastRectangle.height + 3, -1);
+                textRenderer.func_238407_a_(matrices, text.func_241878_f(), lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.func_238414_a_(text) / 2f, lastRectangle.y + lastRectangle.height + 3, -1);
             }
             
             if (getMaxScrollPosition() > 6) {
@@ -516,7 +516,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public List<SelectionCellElement<R>> children() {
+        public List<SelectionCellElement<R>> getEventListeners() {
             return currentElements;
         }
     }
@@ -603,7 +603,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
             if (b)
                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r), x + 6, y + 3, b ? 16777215 : 8947848);
+            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r).func_241878_f(), x + 6, y + 3, b ? 16777215 : 8947848);
         }
         
         @Override
@@ -624,7 +624,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public List<? extends IGuiEventListener> children() {
+        public List<? extends IGuiEventListener> getEventListeners() {
             return Collections.emptyList();
         }
         
@@ -633,7 +633,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             boolean b = rendering && mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
             if (b) {
                 getEntry().selectionElement.topRenderer.setValue(r);
-                getEntry().selectionElement.setFocused(null);
+                getEntry().selectionElement.setListener(null);
                 getEntry().selectionElement.dontReFocus = true;
                 return true;
             }
@@ -682,11 +682,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         public void selectFirstRecommendation() {
-            List<SelectionCellElement<R>> children = getParent().selectionElement.menu.children();
+            List<SelectionCellElement<R>> children = getParent().selectionElement.menu.getEventListeners();
             for (SelectionCellElement<R> child : children) {
                 if (child.getSelection() != null) {
                     setValue(child.getSelection());
-                    getParent().selectionElement.setFocused(null);
+                    getParent().selectionElement.setListener(null);
                     break;
                 }
             }
@@ -710,7 +710,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             textFieldWidget = new TextFieldWidget(Minecraft.getInstance().fontRenderer, 0, 0, 148, 18, NarratorChatListener.EMPTY) {
                 @Override
                 public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-                    setFocused2(isSuggestionMode() && isSelected && DefaultSelectionTopCellElement.this.getParent().getFocused() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.getFocused() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.getFocused() == this);
+                    setFocused2(isSuggestionMode() && isSelected && DefaultSelectionTopCellElement.this.getParent().getListener() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.getListener() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.getListener() == this);
                     super.render(matrices, mouseX, mouseY, delta);
                 }
                 
@@ -774,7 +774,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public List<? extends IGuiEventListener> children() {
+        public List<? extends IGuiEventListener> getEventListeners() {
             return Collections.singletonList(textFieldWidget);
         }
     }

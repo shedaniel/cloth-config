@@ -19,6 +19,7 @@ import net.minecraft.client.util.InputMappings;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.LanguageMap;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -338,7 +339,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     @Override
     public void tick() {
         super.tick();
-        for (IGuiEventListener child : children())
+        for (IGuiEventListener child : getEventListeners())
             if (child instanceof IScreen)
                 ((IScreen) child).tick();
     }
@@ -347,7 +348,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
         for (Tooltip tooltip : tooltips) {
-            renderTooltip(matrices, tooltip.getText(), tooltip.getX(), tooltip.getY());
+            renderTooltip(matrices, LanguageMap.getInstance().func_244260_a((List) tooltip.getText()), tooltip.getX(), tooltip.getY());
         }
         this.tooltips.clear();
     }

@@ -90,7 +90,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         RenderHelper.disableStandardItemLighting();
         RenderSystem.color4f(1, 1, 1, 1);
         blit(matrices, x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, getDisplayedFieldName(), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, getDisplayedFieldName().func_241878_f(), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent((DynamicEntryListWidget) getParent());
             entry.setScreen(getConfigScreen());
@@ -98,7 +98,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         if (expanded) {
             int yy = y + 24;
             for (AbstractConfigListEntry<?> entry : entries) {
-                entry.render(matrices, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered && getFocused() == entry, delta);
+                entry.render(matrices, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered && getListener() == entry, delta);
                 yy += entry.getItemHeight();
             }
         }
@@ -107,7 +107,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public void updateSelected(boolean isSelected) {
         for (AbstractConfigListEntry<?> entry : entries) {
-            entry.updateSelected(expanded && isSelected && getFocused() == entry);
+            entry.updateSelected(expanded && isSelected && getListener() == entry);
         }
     }
     
@@ -172,7 +172,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     }
     
     @Override
-    public List<? extends IGuiEventListener> children() {
+    public List<? extends IGuiEventListener> getEventListeners() {
         return expanded ? children : Collections.singletonList(widget);
     }
     

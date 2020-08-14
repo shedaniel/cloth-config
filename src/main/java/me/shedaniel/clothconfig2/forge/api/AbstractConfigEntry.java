@@ -72,11 +72,11 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
         boolean hasError = getConfigError().isPresent();
         boolean isEdited = isEdited();
         if (hasError)
-            text = text.func_240699_a_(TextFormatting.RED);
+            text = text.mergeStyle(TextFormatting.RED);
         if (isEdited)
-            text = text.func_240699_a_(TextFormatting.ITALIC);
+            text = text.mergeStyle(TextFormatting.ITALIC);
         if (!hasError && !isEdited)
-            text = text.func_240699_a_(TextFormatting.GRAY);
+            text = text.mergeStyle(TextFormatting.GRAY);
         return text;
     }
     

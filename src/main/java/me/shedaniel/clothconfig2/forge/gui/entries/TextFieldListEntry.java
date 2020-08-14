@@ -48,7 +48,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         this.textFieldWidget = new TextFieldWidget(Minecraft.getInstance().fontRenderer, 0, 0, 148, 18, NarratorChatListener.EMPTY) {
             @Override
             public void render(MatrixStack matrices, int int_1, int int_2, float float_1) {
-                setFocused2(isSelected && TextFieldListEntry.this.getFocused() == this);
+                setFocused2(isSelected && TextFieldListEntry.this.getListener() == this);
                 textFieldPreRender(this);
                 super.render(matrices, int_1, int_2, float_1);
             }
@@ -107,11 +107,11 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         this.textFieldWidget.y = y + 1;
         ITextComponent displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
-            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, getPreferredTextColor());
+            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName.func_241878_f(), window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.textFieldWidget.x = x + resetButton.getWidth();
         } else {
-            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
+            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName.func_241878_f(), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.textFieldWidget.x = x + entryWidth - 148;
         }
@@ -128,7 +128,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public List<? extends IGuiEventListener> children() {
+    public List<? extends IGuiEventListener> getEventListeners() {
         return widgets;
     }
     

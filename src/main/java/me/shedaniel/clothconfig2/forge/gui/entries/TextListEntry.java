@@ -1,5 +1,6 @@
 package me.shedaniel.clothconfig2.forge.gui.entries;
 
+import net.minecraft.util.IReorderingProcessor;
 import org.jetbrains.annotations.ApiStatus;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.Collections;
@@ -45,8 +46,8 @@ public class TextListEntry extends TooltipListEntry<Object> {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         this.savedWidth = entryWidth;
         int yy = y + 4;
-        List<ITextProperties> strings = Minecraft.getInstance().fontRenderer.func_238425_b_(text, savedWidth);
-        for (ITextProperties string : strings) {
+        List<IReorderingProcessor> strings = Minecraft.getInstance().fontRenderer.func_238425_b_(text, savedWidth);
+        for (IReorderingProcessor string : strings) {
             Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, string, x, yy, color);
             yy += Minecraft.getInstance().fontRenderer.FONT_HEIGHT + 3;
         }
@@ -56,7 +57,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
     public int getItemHeight() {
         if (savedWidth == -1)
             return 12;
-        List<ITextProperties> strings = Minecraft.getInstance().fontRenderer.func_238425_b_(text, savedWidth);
+        List<IReorderingProcessor> strings = Minecraft.getInstance().fontRenderer.func_238425_b_(text, savedWidth);
         if (strings.isEmpty())
             return 0;
         return 15 + strings.size() * 12;
@@ -78,7 +79,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
     }
     
     @Override
-    public List<? extends IGuiEventListener> children() {
+    public List<? extends IGuiEventListener> getEventListeners() {
         return Collections.emptyList();
     }
     

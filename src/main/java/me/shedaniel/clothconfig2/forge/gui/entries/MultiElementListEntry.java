@@ -100,7 +100,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         RenderHelper.disableStandardItemLighting();
         RenderSystem.color4f(1, 1, 1, 1);
         blit(matrices, x - 15, y + 4, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, getDisplayedFieldName(), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, getDisplayedFieldName().func_241878_f(), x, y + 5, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent((DynamicEntryListWidget) getParent());
             entry.setScreen(getConfigScreen());
@@ -138,7 +138,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     @Override
     public void updateSelected(boolean isSelected) {
         for (AbstractConfigListEntry<?> entry : entries) {
-            entry.updateSelected(expanded && isSelected && getFocused() == entry);
+            entry.updateSelected(expanded && isSelected && getListener() == entry);
         }
     }
     
@@ -173,7 +173,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     }
     
     @Override
-    public List<? extends IGuiEventListener> children() {
+    public List<? extends IGuiEventListener> getEventListeners() {
         return expanded ? children : Collections.singletonList(widget);
     }
     

@@ -99,7 +99,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     }
     
     @Override
-    public List<? extends IGuiEventListener> children() {
+    public List<? extends IGuiEventListener> getEventListeners() {
         return widgets;
     }
     
@@ -128,11 +128,11 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         this.sliderWidget.y = y;
         ITextComponent displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
-            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, getPreferredTextColor());
+            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName.func_241878_f(), window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.func_238414_a_(displayedFieldName), y + 5, getPreferredTextColor());
             this.resetButton.x = x;
             this.sliderWidget.x = x + resetButton.getWidth() + 1;
         } else {
-            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
+            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, displayedFieldName.func_241878_f(), x, y + 5, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.sliderWidget.x = x + entryWidth - 150;
         }

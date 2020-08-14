@@ -122,7 +122,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         public static final Function<String, ResourceLocation> ITEM_IDENTIFIER_FUNCTION = str -> {
             try {
                 ResourceLocation identifier = new ResourceLocation(str);
-                if (Registry.ITEM.getValue(identifier).isPresent())
+                if (Registry.ITEM.func_241873_b(identifier).isPresent())
                     return identifier;
             } catch (Exception ignored) {
             }
@@ -131,7 +131,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         public static final Function<String, ResourceLocation> BLOCK_IDENTIFIER_FUNCTION = str -> {
             try {
                 ResourceLocation identifier = new ResourceLocation(str);
-                if (Registry.BLOCK.getValue(identifier).isPresent())
+                if (Registry.BLOCK.func_241873_b(identifier).isPresent())
                     return identifier;
             } catch (Exception ignored) {
             }
@@ -139,14 +139,14 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         };
         public static final Function<String, Item> ITEM_FUNCTION = str -> {
             try {
-                return Registry.ITEM.getValue(new ResourceLocation(str)).orElse(null);
+                return Registry.ITEM.func_241873_b(new ResourceLocation(str)).orElse(null);
             } catch (Exception ignored) {
             }
             return null;
         };
         public static final Function<String, Block> BLOCK_FUNCTION = str -> {
             try {
-                return Registry.BLOCK.getValue(new ResourceLocation(str)).orElse(null);
+                return Registry.BLOCK.func_241873_b(new ResourceLocation(str)).orElse(null);
             } catch (Exception ignored) {
             }
             return null;
@@ -365,7 +365,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-                            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
+                            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r).func_241878_f(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                             itemRenderer.renderItemIntoGUI(s, x + 4, y + 2);
                         }
@@ -414,7 +414,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-                            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
+                            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r).func_241878_f(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                             itemRenderer.renderItemIntoGUI(s, x + 4, y + 2);
                         }
@@ -462,7 +462,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-                            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
+                            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r).func_241878_f(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                             itemRenderer.renderItemIntoGUI(s, x + 4, y + 2);
                         }
@@ -510,7 +510,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-                            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
+                            Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, toTextFunction.apply(r).func_241878_f(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
                             itemRenderer.renderItemIntoGUI(s, x + 4, y + 2);
                         }

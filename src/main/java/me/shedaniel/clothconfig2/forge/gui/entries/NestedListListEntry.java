@@ -86,7 +86,7 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
         }
         
         @Override
-        public List<? extends IGuiEventListener> children() {
+        public List<? extends IGuiEventListener> getEventListeners() {
             return Collections.singletonList(nestedEntry);
         }
         

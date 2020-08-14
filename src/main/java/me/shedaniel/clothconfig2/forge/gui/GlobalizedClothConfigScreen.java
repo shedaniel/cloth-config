@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.Tuple;
@@ -68,7 +69,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         int max = 0;
         for (Reference reference : references) {
             ITextComponent referenceText = reference.getText();
-            int width = font.func_238414_a_(new StringTextComponent(StringUtils.repeat("  ", reference.getIndent()) + "- ").func_230529_a_(referenceText));
+            int width = font.func_238414_a_(new StringTextComponent(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(referenceText));
             if (width > max) max = width;
         }
         return Math.min(max + 8, width / 4);
@@ -115,12 +116,12 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         this.children.add(listWidget = new ClothConfigScreen.ListWidget<>(this, minecraft, width - 14, height, 30, height - 32, getBackgroundLocation()));
         this.listWidget.setLeftPos(14);
         this.categorizedEntries.forEach((category, entries) -> {
-            if (!listWidget.children().isEmpty())
-                this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(5));
-            this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(4));
-            this.listWidget.children().add((AbstractConfigEntry) new CategoryTextEntry(category, category.deepCopy().func_240699_a_(TextFormatting.BOLD)));
-            this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(4));
-            this.listWidget.children().addAll((List) entries);
+            if (!listWidget.getEventListeners().isEmpty())
+                this.listWidget.getEventListeners().add((AbstractConfigEntry) new EmptyEntry(5));
+            this.listWidget.getEventListeners().add((AbstractConfigEntry) new EmptyEntry(4));
+            this.listWidget.getEventListeners().add((AbstractConfigEntry) new CategoryTextEntry(category, category.deepCopy().mergeStyle(TextFormatting.BOLD)));
+            this.listWidget.getEventListeners().add((AbstractConfigEntry) new EmptyEntry(4));
+            this.listWidget.getEventListeners().addAll((List) entries);
         });
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
         addButton(cancelButton = new Button(0, height - 26, buttonWidths, 20, isEdited() ? new TranslationTextComponent("text.cloth-config.cancel_discard") : new TranslationTextComponent("gui.cancel"), widget -> quit()));
@@ -183,10 +184,10 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         listWidget.setLeftPos(sliderPosition);
         listWidget.render(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
-        for (AbstractConfigEntry<?> child : listWidget.children())
+        for (AbstractConfigEntry<?> child : listWidget.getEventListeners())
             child.lateRender(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
-        font.func_238407_a_(matrices, title, sliderPosition + (width - sliderPosition) / 2f - font.func_238414_a_(title) / 2f, 12, -1);
+        font.func_238407_a_(matrices, title.func_241878_f(), sliderPosition + (width - sliderPosition) / 2f - font.func_238414_a_(title) / 2f, 12, -1);
         ScissorsHandler.INSTANCE.removeLastScissor();
         cancelButton.x = sliderPosition + (width - sliderPosition) / 2 - cancelButton.getWidth() - 3;
         exitButton.x = sliderPosition + (width - sliderPosition) / 2 + 3;
@@ -248,8 +249,8 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         {
             RenderSystem.enableAlphaTest();
             IRenderTypeBuffer.Impl immediate = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
-            font.func_238426_c_(ITextProperties.func_240652_a_(">"), sliderPosition - 7 - font.getStringWidth(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil((1 - sideSlider.scrollAmount) * 255.0F), 0, 255) << 24, false, matrices.getLast().getMatrix(), immediate, false, 0, 15728880);
-            font.func_238426_c_(ITextProperties.func_240652_a_("<"), sliderPosition - 7 - font.getStringWidth("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil(sideSlider.scrollAmount * 255.0F), 0, 255) << 24, false, matrices.getLast().getMatrix(), immediate, false, 0, 15728880);
+            font.func_238426_c_(ITextComponent.func_244388_a(">").func_241878_f(), sliderPosition - 7 - font.getStringWidth(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil((1 - sideSlider.scrollAmount) * 255.0F), 0, 255) << 24, false, matrices.getLast().getMatrix(), immediate, false, 0, 15728880);
+            font.func_238426_c_(ITextComponent.func_244388_a("<").func_241878_f(), sliderPosition - 7 - font.getStringWidth("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil(sideSlider.scrollAmount * 255.0F), 0, 255) << 24, false, matrices.getLast().getMatrix(), immediate, false, 0, 15728880);
             immediate.finish();
             
             Rectangle scrollerBounds = sideScroller.getBounds();
@@ -259,10 +260,10 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
                 for (Reference reference : references) {
                     matrices.push();
                     matrices.scale(reference.getScale(), reference.getScale(), reference.getScale());
-                    IFormattableTextComponent text = new StringTextComponent(StringUtils.repeat("  ", reference.getIndent()) + "- ").func_230529_a_(reference.getText());
+                    IFormattableTextComponent text = new StringTextComponent(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(reference.getText());
                     if (lastHoveredReference == null && new Rectangle(scrollerBounds.x, (int) (scrollOffset - 4 * reference.getScale()), (int) (font.func_238414_a_(text) * reference.getScale()), (int) ((font.FONT_HEIGHT + 4) * reference.getScale())).contains(mouseX, mouseY))
                         lastHoveredReference = reference;
-                    font.func_238422_b_(matrices, text, scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
+                    font.func_238422_b_(matrices, text.func_241878_f(), scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
                     matrices.pop();
                     scrollOffset += (font.FONT_HEIGHT + 3) * reference.getScale();
                 }
@@ -343,7 +344,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {}
         
         @Override
-        public List<? extends IGuiEventListener> children() {
+        public List<? extends IGuiEventListener> getEventListeners() {
             return Collections.emptyList();
         }
     }
@@ -360,7 +361,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         
         @Override
         public int getItemHeight() {
-            List<ITextProperties> strings = Minecraft.getInstance().fontRenderer.func_238425_b_(text, getParent().getItemWidth());
+            List<IReorderingProcessor> strings = Minecraft.getInstance().fontRenderer.func_238425_b_(text, getParent().getItemWidth());
             if (strings.isEmpty())
                 return 0;
             return 4 + strings.size() * 10;
@@ -382,15 +383,15 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         @Override
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
             int yy = y + 2;
-            List<ITextProperties> texts = Minecraft.getInstance().fontRenderer.func_238425_b_(this.text, getParent().getItemWidth());
-            for (ITextProperties text : texts) {
-                Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, text, x - 4 + entryWidth / 2 - Minecraft.getInstance().fontRenderer.func_238414_a_(text) / 2, yy, -1);
+            List<IReorderingProcessor> texts = Minecraft.getInstance().fontRenderer.func_238425_b_(this.text, getParent().getItemWidth());
+            for (IReorderingProcessor text : texts) {
+                Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, text, x - 4 + entryWidth / 2 - Minecraft.getInstance().fontRenderer.func_243245_a(text) / 2, yy, -1);
                 yy += 10;
             }
         }
         
         @Override
-        public List<? extends IGuiEventListener> children() {
+        public List<? extends IGuiEventListener> getEventListeners() {
             return Collections.emptyList();
         }
     }
@@ -427,7 +428,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         @Override
         public void go() {
             int i = 0;
-            for (AbstractConfigEntry<?> child : listWidget.children()) {
+            for (AbstractConfigEntry<?> child : listWidget.getEventListeners()) {
                 if (child instanceof CategoryTextEntry && ((CategoryTextEntry) child).category == category) {
                     listWidget.scrollTo(i, true);
                     return;
@@ -464,7 +465,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         @Override
         public void go() {
             int[] i = {0};
-            for (AbstractConfigEntry<?> child : listWidget.children()) {
+            for (AbstractConfigEntry<?> child : listWidget.getEventListeners()) {
                 int i1 = i[0];
                 if (goChild(i, null, child)) return;
                 i[0] = i1 + child.getItemHeight();
@@ -480,7 +481,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             i[0] += root.getInitialReferenceOffset();
             boolean expanded = root instanceof Expandable && ((Expandable) root).isExpanded();
             if (root instanceof Expandable) ((Expandable) root).setExpanded(true);
-            List<? extends IGuiEventListener> children = root.children();
+            List<? extends IGuiEventListener> children = root.getEventListeners();
             if (root instanceof Expandable) ((Expandable) root).setExpanded(expanded);
             for (IGuiEventListener child : children) {
                 if (child instanceof ReferenceProvider<?>) {

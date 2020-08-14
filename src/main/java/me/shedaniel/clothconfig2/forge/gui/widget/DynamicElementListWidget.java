@@ -18,7 +18,7 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
     public boolean changeFocus(boolean boolean_1) {
         boolean boolean_2 = super.changeFocus(boolean_1);
         if (boolean_2)
-            this.ensureVisible(this.getFocused());
+            this.ensureVisible(this.getListener());
         return boolean_2;
     }
     
@@ -33,20 +33,24 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         
         public ElementEntry() {
         }
-        
+    
+        @Override
         public boolean isDragging() {
             return this.dragging;
         }
-        
+    
+        @Override
         public void setDragging(boolean boolean_1) {
             this.dragging = boolean_1;
         }
         
-        public IGuiEventListener getFocused() {
+        @Override
+        public IGuiEventListener getListener() {
             return this.focused;
         }
-        
-        public void setFocused(IGuiEventListener element_1) {
+    
+        @Override
+        public void setListener(IGuiEventListener element_1) {
             this.focused = element_1;
         }
     }

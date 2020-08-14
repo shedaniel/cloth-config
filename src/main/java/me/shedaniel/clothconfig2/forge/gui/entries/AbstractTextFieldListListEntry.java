@@ -107,7 +107,7 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         }
         
         @Override
-        public List<? extends IGuiEventListener> children() {
+        public List<? extends IGuiEventListener> getEventListeners() {
             return Collections.singletonList(widget);
         }
     }

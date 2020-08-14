@@ -182,7 +182,7 @@ curseforge {
     if (apiKey != null)
         project {
             id = '348521'
-            releaseType = 'beta'
+            releaseType = 'release'
             addGameVersion '1.16.1'
             addGameVersion 'Forge'
             addGameVersion 'Java 8'

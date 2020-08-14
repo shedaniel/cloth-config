@@ -81,11 +81,12 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @Override
-    public E getFocused() {
-        return (E) super.getFocused();
+    public E getListener() {
+        return (E) super.getListener();
     }
     
-    public final List<E> children() {
+    @Override
+    public final List<E> getEventListeners() {
         return this.entries;
     }
     
@@ -94,7 +95,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected E getItem(int index) {
-        return this.children().get(index);
+        return this.getEventListeners().get(index);
     }
     
     protected int addItem(E item) {
@@ -103,11 +104,11 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected int getItemCount() {
-        return this.children().size();
+        return this.getEventListeners().size();
     }
     
     protected boolean isSelected(int index) {
-        return Objects.equals(this.getSelectedItem(), this.children().get(index));
+        return Objects.equals(this.getSelectedItem(), this.getEventListeners().get(index));
     }
     
     protected final E getItemAtPosition(double mouseX, double mouseY) {
@@ -125,7 +126,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                 break;
             }
         }
-        return mouseX < (double) this.getScrollbarPosition() && mouseX >= minX && mouseX <= maxX && itemIndex >= 0 && currentY >= 0 && itemIndex < this.getItemCount() ? this.children().get(itemIndex) : null;
+        return mouseX < (double) this.getScrollbarPosition() && mouseX >= minX && mouseX <= maxX && itemIndex >= 0 && currentY >= 0 && itemIndex < this.getItemCount() ? this.getEventListeners().get(itemIndex) : null;
     }
     
     public void updateSize(int width, int height, int top, int bottom) {
@@ -264,13 +265,13 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     protected void centerScrollOn(E item) {
         double d = (this.bottom - this.top) / -2d;
-        for (int i = 0; i < this.children().indexOf(item) && i < this.getItemCount(); i++)
+        for (int i = 0; i < this.getEventListeners().indexOf(item) && i < this.getItemCount(); i++)
             d += getItem(i).getItemHeight();
         this.capYPosition(d);
     }
     
     protected void ensureVisible(E item) {
-        int rowTop = this.getRowTop(this.children().indexOf(item));
+        int rowTop = this.getRowTop(this.getEventListeners().indexOf(item));
         int int_2 = rowTop - this.top - 4 - item.getItemHeight();
         if (int_2 < 0)
             this.scroll(int_2);
@@ -317,7 +318,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             E item = this.getItemAtPosition(double_1, double_2);
             if (item != null) {
                 if (item.mouseClicked(double_1, double_2, int_1)) {
-                    this.setFocused(item);
+                    this.setListener(item);
                     this.setDragging(true);
                     return true;
                 }
@@ -332,8 +333,8 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     @Override
     public boolean mouseReleased(double double_1, double double_2, int int_1) {
-        if (this.getFocused() != null) {
-            this.getFocused().mouseReleased(double_1, double_2, int_1);
+        if (this.getListener() != null) {
+            this.getListener().mouseReleased(double_1, double_2, int_1);
         }
         
         return false;
@@ -389,10 +390,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected void moveSelection(int int_1) {
-        if (!this.children().isEmpty()) {
-            int int_2 = this.children().indexOf(this.getSelectedItem());
+        if (!this.getEventListeners().isEmpty()) {
+            int int_2 = this.getEventListeners().indexOf(this.getSelectedItem());
             int int_3 = MathHelper.clamp(int_2 + int_1, 0, this.getItemCount() - 1);
-            E itemListWidget$Item_1 = this.children().get(int_3);
+            E itemListWidget$Item_1 = this.getEventListeners().get(int_3);
             this.selectItem(itemListWidget$Item_1);
             this.ensureVisible(itemListWidget$Item_1);
         }

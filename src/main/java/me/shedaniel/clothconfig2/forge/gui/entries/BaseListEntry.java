@@ -176,7 +176,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
     
     @Override
-    public List<? extends IGuiEventListener> children() {
+    public List<? extends IGuiEventListener> getEventListeners() {
         if (!expanded) {
             List<IGuiEventListener> elements = new ArrayList<>(widgets);
             elements.removeAll(cells);
@@ -242,7 +242,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         Minecraft.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
         RenderHelper.disableStandardItemLighting();
         RenderSystem.color4f(1, 1, 1, 1);
-        BaseListCell focused = !expanded || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
+        BaseListCell focused = !expanded || getListener() == null || !(getListener() instanceof BaseListCell) ? null : (BaseListCell) getListener();
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);
         blit(matrices, x - 15, y + 4, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
@@ -253,11 +253,11 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         resetWidget.y = y;
         resetWidget.active = isEdited();
         resetWidget.render(matrices, mouseX, mouseY, delta);
-        Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, getDisplayedFieldName(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
+        Minecraft.getInstance().fontRenderer.func_238407_a_(matrices, getDisplayedFieldName().func_241878_f(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 5, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
         if (expanded) {
             int yy = y + 24;
             for (BaseListCell cell : cells) {
-                cell.render(matrices, -1, yy, x + 14, entryWidth - 14, cell.getCellHeight(), mouseX, mouseY, getParent().getFocused() != null && getParent().getFocused().equals(this) && getFocused() != null && getFocused().equals(cell), delta);
+                cell.render(matrices, -1, yy, x + 14, entryWidth - 14, cell.getCellHeight(), mouseX, mouseY, getParent().getListener() != null && getParent().getListener().equals(this) && getListener() != null && getListener().equals(cell), delta);
                 yy += cell.getCellHeight();
             }
         }
@@ -266,7 +266,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     @Override
     public void updateSelected(boolean isSelected) {
         for (C cell : cells) {
-            cell.updateSelected(isSelected && getFocused() == cell && expanded);
+            cell.updateSelected(isSelected && getListener() == cell && expanded);
         }
     }
     
@@ -300,7 +300,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                 Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             } else if (isDeleteButtonEnabled() && isInsideDelete(double_1, double_2)) {
-                IGuiEventListener focused = getFocused();
+                IGuiEventListener focused = getListener();
                 if (expanded && focused instanceof BaseListCell) {
                     ((BaseListCell) focused).onDelete();
                     //noinspection SuspiciousMethodCalls

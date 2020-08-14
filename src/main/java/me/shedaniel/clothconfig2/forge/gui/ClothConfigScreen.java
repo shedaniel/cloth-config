@@ -129,7 +129,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         
         children.add(listWidget = new ListWidget(this, minecraft, width, height, isShowingTabs() ? 70 : 30, height - 32, getBackgroundLocation()));
         if (categorizedEntries.size() > selectedCategoryIndex) {
-            listWidget.children().addAll((List) Lists.newArrayList(categorizedEntries.values()).get(selectedCategoryIndex));
+            listWidget.getEventListeners().addAll((List) Lists.newArrayList(categorizedEntries.values()).get(selectedCategoryIndex));
         }
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
         addButton(quitButton = new Button(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? new TranslationTextComponent("text.cloth-config.cancel_discard") : new TranslationTextComponent("gui.cancel"), widget -> quit()));
@@ -233,7 +233,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
         listWidget.render(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
-        for (AbstractConfigEntry child : listWidget.children())
+        for (AbstractConfigEntry child : listWidget.getEventListeners())
             child.lateRender(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
         if (isShowingTabs()) {
@@ -356,7 +356,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         @Override
         protected void renderItem(MatrixStack matrices, R item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             if (item instanceof AbstractConfigEntry)
-                ((AbstractConfigEntry) item).updateSelected(getFocused() == item);
+                ((AbstractConfigEntry) item).updateSelected(getListener() == item);
             super.renderItem(matrices, item, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         }
         
@@ -366,9 +366,9 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             if (!this.isMouseOver(mouseX, mouseY)) {
                 return false;
             } else {
-                for (R entry : children()) {
+                for (R entry : getEventListeners()) {
                     if (entry.mouseClicked(mouseX, mouseY, button)) {
-                        this.setFocused(entry);
+                        this.setListener(entry);
                         this.setDragging(true);
                         return true;
                     }

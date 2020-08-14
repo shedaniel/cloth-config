@@ -76,7 +76,7 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (!smoothScrolling)
             return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-        if ((this.getFocused() != null && this.isDragging() && button == 0) && this.getFocused().mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+        if ((this.getListener() != null && this.isDragging() && button == 0) && this.getListener().mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
             return true;
         } else if (button == 0 && this.scrolling) {
             if (mouseY < (double) this.top) {
@@ -97,7 +97,7 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        for (E entry : children()) {
+        for (E entry : getEventListeners()) {
             if (entry.mouseScrolled(mouseX, mouseY, amount)) {
                 return true;
             }
