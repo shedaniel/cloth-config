@@ -81,11 +81,11 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     private boolean requestingReferenceRebuilding = false;
     
     @ApiStatus.Internal
-    public GlobalizedClothConfigScreen(Screen parent, Text title, Map<Text, List<Object>> entriesMap, Identifier backgroundLocation) {
+    public GlobalizedClothConfigScreen(Screen parent, Text title, Map<Text, ConfigCategory> categoryMap, Identifier backgroundLocation) {
         super(parent, title, backgroundLocation);
-        entriesMap.forEach((categoryName, list) -> {
+        categoryMap.forEach((categoryName, category) -> {
             List<AbstractConfigEntry<?>> entries = Lists.newArrayList();
-            for (Object object : list) {
+            for (Object object : category.getEntries()) {
                 AbstractConfigListEntry<?> entry;
                 if (object instanceof Pair<?, ?>) {
                     entry = (AbstractConfigListEntry<?>) ((Pair<?, ?>) object).getRight();

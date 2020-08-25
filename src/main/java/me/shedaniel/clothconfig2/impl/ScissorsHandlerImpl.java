@@ -10,16 +10,17 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Window;
-import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Collections;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
+@ApiStatus.Internal
 public final class ScissorsHandlerImpl implements ScissorsHandler {
-    
-    @Deprecated public static final ScissorsHandler INSTANCE = new ScissorsHandlerImpl();
+    @ApiStatus.Internal
+    public static final ScissorsHandler INSTANCE = new ScissorsHandlerImpl();
     
     static {
         Executor.runIf(() -> FabricLoader.getInstance().isModLoaded("notenoughcrashes"), () -> () -> {

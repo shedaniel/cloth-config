@@ -19,7 +19,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Language;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.Matrix4f;
 import org.jetbrains.annotations.ApiStatus;
@@ -356,7 +355,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
         for (Tooltip tooltip : tooltips) {
-            renderTooltip(matrices, Language.getInstance().method_30933((List) tooltip.getText()), tooltip.getX(), tooltip.getY());
+            renderTooltip(matrices, tooltip.getText(), tooltip.getX(), tooltip.getY());
         }
         this.tooltips.clear();
     }

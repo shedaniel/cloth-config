@@ -112,4 +112,5 @@ public interface ConfigBuilder {
     
     Screen build();
     
+    boolean hasTransparentBackground();
 }

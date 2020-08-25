@@ -38,9 +38,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean transparentBackground = false;
     private Identifier defaultBackground = DrawableHelper.BACKGROUND_TEXTURE;
     private Consumer<Screen> afterInitConsumer = screen -> {};
-    private final Map<Text, Identifier> categoryBackground = Maps.newHashMap();
-    private final Map<Text, List<Object>> dataMap = Maps.newLinkedHashMap();
-    private final Map<Text, ConfigCategory> categoryMap = Maps.newHashMap();
+    private final Map<Text, ConfigCategory> categoryMap = Maps.newLinkedHashMap();
     private Text fallbackCategory = null;
     private boolean alwaysShowTabs = false;
     
@@ -74,6 +72,11 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     public ConfigBuilder setTransparentBackground(boolean transparentBackground) {
         this.transparentBackground = transparentBackground;
         return this;
+    }
+    
+    @Override
+    public boolean hasTransparentBackground() {
+        return transparentBackground;
     }
     
     @Override
@@ -125,37 +128,32 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     public ConfigCategory getOrCreateCategory(Text categoryKey) {
         if (categoryMap.containsKey(categoryKey))
             return categoryMap.get(categoryKey);
-        dataMap.put(categoryKey, Lists.newArrayList());
         if (fallbackCategory == null)
             fallbackCategory = categoryKey;
-        return categoryMap.computeIfAbsent(categoryKey, key -> new ConfigCategoryImpl(categoryKey, identifier -> {
-            if (transparentBackground)
-                throw new IllegalStateException("Cannot set category background if screen is using transparent background.");
-            categoryBackground.put(categoryKey, identifier);
-        }, () -> dataMap.get(categoryKey), () -> removeCategory(categoryKey)));
+        return categoryMap.computeIfAbsent(categoryKey, key -> new ConfigCategoryImpl(this, categoryKey));
     }
     
     @Override
     public ConfigBuilder removeCategory(Text category) {
-        if (dataMap.containsKey(category) && fallbackCategory.equals(category))
+        if (categoryMap.containsKey(category) && fallbackCategory.equals(category))
             fallbackCategory = null;
-        if (!dataMap.containsKey(category))
+        if (!categoryMap.containsKey(category))
             throw new NullPointerException("Category doesn't exist!");
-        dataMap.remove(category);
+        categoryMap.remove(category);
         return this;
     }
     
     @Override
     public ConfigBuilder removeCategoryIfExists(Text category) {
-        if (dataMap.containsKey(category) && fallbackCategory.equals(category))
+        if (categoryMap.containsKey(category) && fallbackCategory.equals(category))
             fallbackCategory = null;
-        dataMap.remove(category);
+        categoryMap.remove(category);
         return this;
     }
     
     @Override
     public boolean hasCategory(Text category) {
-        return dataMap.containsKey(category);
+        return categoryMap.containsKey(category);
     }
     
     @Override
@@ -215,13 +213,13 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     
     @Override
     public Screen build() {
-        if (dataMap.isEmpty() || fallbackCategory == null)
+        if (categoryMap.isEmpty() || fallbackCategory == null)
             throw new NullPointerException("There cannot be no categories or fallback category!");
         AbstractConfigScreen screen;
         if (globalized) {
-            screen = new GlobalizedClothConfigScreen(parent, title, dataMap, defaultBackground);
+            screen = new GlobalizedClothConfigScreen(parent, title, categoryMap, defaultBackground);
         } else {
-            screen = new ClothConfigScreen(parent, title, dataMap, categoryMap, defaultBackground);
+            screen = new ClothConfigScreen(parent, title,  categoryMap, defaultBackground);
         }
         screen.setSavingRunnable(savingRunnable);
         screen.setEditable(editable);
@@ -232,8 +230,6 @@ public class ConfigBuilderImpl implements ConfigBuilder {
         screen.setAfterInitConsumer(afterInitConsumer);
         if (screen instanceof Expandable)
             ((Expandable) screen).setExpanded(globalizedExpanded);
-        if (screen instanceof TabbedConfigScreen)
-            categoryBackground.forEach(((TabbedConfigScreen) screen)::registerCategoryBackground);
         return screen;
     }
     

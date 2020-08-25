@@ -157,8 +157,9 @@ curseforge {
     if (apiKey != null)
         project {
             id = '319057'
-            releaseType = 'beta'
+            releaseType = 'release'
             addGameVersion '1.16-Snapshot'
+            addGameVersion '1.16.2'
             addGameVersion 'Fabric'
             addGameVersion 'Java 8'
             relations {

@@ -1,32 +1,34 @@
 package me.shedaniel.clothconfig2.impl;
 
+import com.google.common.collect.Lists;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public class ConfigCategoryImpl implements ConfigCategory {
-    
-    private final Supplier<List<Object>> listSupplier;
-    private final Consumer<Identifier> backgroundConsumer;
-    private final Runnable destroyCategory;
+    private final ConfigBuilder builder;
+    private final List<Object> data;
+    @Nullable
+    private Identifier background;
     private final Text categoryKey;
-    @Nullable private Supplier<Optional<Text[]>> tooltipSupplier;
-
-    ConfigCategoryImpl(Text categoryKey, Consumer<Identifier> backgroundConsumer, Supplier<List<Object>> listSupplier, Runnable destroyCategory) {
-        this.listSupplier = listSupplier;
-        this.backgroundConsumer = backgroundConsumer;
+    @Nullable
+    private Supplier<Optional<StringRenderable[]>> description = Optional::empty;
+    
+    ConfigCategoryImpl(ConfigBuilder builder, Text categoryKey) {
+        this.builder = builder;
+        this.data = Lists.newArrayList();
         this.categoryKey = categoryKey;
-        this.destroyCategory = destroyCategory;
     }
     
     @Override
@@ -36,34 +38,47 @@ public class ConfigCategoryImpl implements ConfigCategory {
     
     @Override
     public List<Object> getEntries() {
-        return listSupplier.get();
+        return data;
     }
     
     @Override
     public ConfigCategory addEntry(AbstractConfigListEntry entry) {
-        listSupplier.get().add(entry);
+        data.add(entry);
         return this;
     }
     
     @Override
     public ConfigCategory setCategoryBackground(Identifier identifier) {
-        backgroundConsumer.accept(identifier);
+        if (builder.hasTransparentBackground())
+            throw new IllegalStateException("Cannot set category background if screen is using transparent background.");
+        background = identifier;
         return this;
     }
     
     @Override
     public void removeCategory() {
-        destroyCategory.run();
+        builder.removeCategory(categoryKey);
     }
-
+    
+    @Override
+    public void setBackground(@Nullable Identifier background) {
+        this.background = background;
+    }
+    
+    @Override
     @Nullable
-    public Supplier<Optional<Text[]>> getTooltipSupplier() {
-        return tooltipSupplier;
+    public Identifier getBackground() {
+        return background;
     }
-
-    public ConfigCategory setTooltipSupplier(@Nullable Supplier<Optional<Text[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+    
+    @Nullable
+    @Override
+    public Supplier<Optional<StringRenderable[]>> getDescription() {
+        return description;
     }
-
+    
+    @Override
+    public void setDescription(@Nullable Supplier<Optional<StringRenderable[]>> description) {
+        this.description = description;
+    }
 }

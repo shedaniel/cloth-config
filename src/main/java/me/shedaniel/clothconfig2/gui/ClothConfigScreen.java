@@ -24,6 +24,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -63,11 +64,11 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     private final Map<Text, ConfigCategory> categoryMap;
     
     @ApiStatus.Internal
-    public ClothConfigScreen(Screen parent, Text title, Map<Text, List<Object>> entriesMap, Map<Text, ConfigCategory> categoryMap, Identifier backgroundLocation) {
+    public ClothConfigScreen(Screen parent, Text title, Map<Text, ConfigCategory> categoryMap, Identifier backgroundLocation) {
         super(parent, title, backgroundLocation);
-        entriesMap.forEach((categoryName, list) -> {
+        categoryMap.forEach((categoryName, category) -> {
             List<AbstractConfigEntry<?>> entries = Lists.newArrayList();
-            for (Object object : list) {
+            for (Object object : category.getEntries()) {
                 AbstractConfigListEntry<?> entry;
                 if (object instanceof Pair<?, ?>) {
                     entry = (AbstractConfigListEntry<?>) ((Pair<?, ?>) object).getRight();
@@ -78,8 +79,11 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 entries.add(entry);
             }
             categorizedEntries.put(categoryName, entries);
+            if (category.getBackground() != null) {
+                registerCategoryBackground(categoryName, category.getBackground());
+            }
         });
-
+        
         this.tabs = categorizedEntries.keySet().stream().map(s -> new Pair<>(s, MinecraftClient.getInstance().textRenderer.getWidth(s) + 8)).collect(Collectors.toList());
         this.categoryMap = categoryMap;
     }
@@ -169,7 +173,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             });
             int j = 0;
             for (Pair<Text, Integer> tab : tabs) {
-                tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getRight(), 20, tab.getLeft(), this.categoryMap.get(tab.getLeft()).getTooltipSupplier()));
+                tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getRight(), 20, tab.getLeft(), this.categoryMap.get(tab.getLeft()).getDescription()));
                 j++;
             }
             children.addAll(tabButtons);
@@ -342,6 +346,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         private double currentHeight;
         public Rectangle target;
         public Rectangle thisTimeTarget;
+        public long lastTouch;
         public long start;
         public long duration;
         
@@ -372,9 +377,15 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         protected void renderList(MatrixStack matrices, int startX, int startY, int int_3, int int_4, float delta) {
             thisTimeTarget = null;
             if (hasCurrent) {
-                fillGradient(matrices, currentX, currentY, currentX + currentWidth, currentY + currentHeight, 0x24FFFFFF, 0x24FFFFFF);
+                long timePast = System.currentTimeMillis() - lastTouch;
+                int alpha = timePast <= 200 ? 255 : MathHelper.ceil(255 - Math.min(timePast - 200, 500F) / 500F * 255.0);
+                alpha = (alpha * 36 / 255) << 24;
+                fillGradient(matrices, currentX, currentY, currentX + currentWidth, currentY + currentHeight, 0xFFFFFF | alpha, 0xFFFFFF | alpha);
             }
             super.renderList(matrices, startX, startY, int_3, int_4, delta);
+            if (thisTimeTarget != null && isMouseOver(int_3, int_4)) {
+                lastTouch = System.currentTimeMillis();
+            }
             if (thisTimeTarget != null && !thisTimeTarget.equals(target)) {
                 if (!hasCurrent) {
                     currentX = thisTimeTarget.x;
@@ -384,13 +395,14 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                     hasCurrent = true;
                 }
                 target = thisTimeTarget.clone();
-                start = System.currentTimeMillis();
+                start = lastTouch;
                 this.duration = 40;
             } else if (hasCurrent && target != null) {
-                currentX = (int) ScrollingContainer.ease(currentX, target.x, Math.min((System.currentTimeMillis() - start) / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
-                currentY = (int) ScrollingContainer.ease(currentY, target.y, Math.min((System.currentTimeMillis() - start) / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
-                currentWidth = (int) ScrollingContainer.ease(currentWidth, target.width, Math.min((System.currentTimeMillis() - start) / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
-                currentHeight = (int) ScrollingContainer.ease(currentHeight, target.height, Math.min((System.currentTimeMillis() - start) / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
+                long timePast = System.currentTimeMillis() - start;
+                currentX = (int) ScrollingContainer.ease(currentX, target.x, Math.min(timePast / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
+                currentY = (int) ScrollingContainer.ease(currentY, target.y, Math.min(timePast / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
+                currentWidth = (int) ScrollingContainer.ease(currentWidth, target.width, Math.min(timePast / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
+                currentHeight = (int) ScrollingContainer.ease(currentHeight, target.height, Math.min(timePast / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
             }
         }
         

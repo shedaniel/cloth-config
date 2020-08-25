@@ -7,6 +7,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,13 +19,14 @@ public class ClothConfigTabButton extends AbstractPressableButtonWidget {
     
     private final int index;
     private final ClothConfigScreen screen;
-    @Nullable private final Supplier<Optional<Text[]>> tooltipSupplier;
+    @Nullable 
+    private final Supplier<Optional<StringRenderable[]>> descriptionSupplier;
     
-    public ClothConfigTabButton(ClothConfigScreen screen, int index, int int_1, int int_2, int int_3, int int_4, Text string_1, Supplier<Optional<Text[]>> tooltipSupplier) {
+    public ClothConfigTabButton(ClothConfigScreen screen, int index, int int_1, int int_2, int int_3, int int_4, Text string_1, Supplier<Optional<StringRenderable[]>> descriptionSupplier) {
         super(int_1, int_2, int_3, int_4, string_1);
         this.index = index;
         this.screen = screen;
-        this.tooltipSupplier = tooltipSupplier;
+        this.descriptionSupplier = descriptionSupplier;
     }
 
     public ClothConfigTabButton(ClothConfigScreen screen, int index, int int_1, int int_2, int int_3, int int_4, Text string_1) {
@@ -44,7 +46,7 @@ public class ClothConfigTabButton extends AbstractPressableButtonWidget {
         super.render(matrices, int_1, int_2, float_1);
 
         if (isMouseOver(int_1, int_2)) {
-            Optional<Text[]> tooltip = getTooltip();
+            Optional<StringRenderable[]> tooltip = getTooltip();
             if (tooltip.isPresent() && tooltip.get().length > 0)
                 screen.addTooltip(Tooltip.of(new Point(int_1, int_2), tooltip.get()));
         }
@@ -60,15 +62,10 @@ public class ClothConfigTabButton extends AbstractPressableButtonWidget {
         return this.active && this.visible && double_1 >= this.x && double_2 >= this.y && double_1 < this.x + this.width && double_2 < this.y + this.height && double_1 >= 20 && double_1 < screen.width - 20;
     }
 
-    public Optional<Text[]> getTooltip() {
-        if (tooltipSupplier != null)
-            return tooltipSupplier.get();
+    public Optional<StringRenderable[]> getTooltip() {
+        if (descriptionSupplier != null)
+            return descriptionSupplier.get();
         return Optional.empty();
-    }
-
-    @Nullable
-    public Supplier<Optional<Text[]>> getTooltipSupplier() {
-        return tooltipSupplier;
     }
 
 }
