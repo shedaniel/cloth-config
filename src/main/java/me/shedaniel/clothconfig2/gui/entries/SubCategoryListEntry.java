@@ -87,7 +87,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         DiffuseLighting.disable();
         RenderSystem.color4f(1, 1, 1, 1);
         drawTexture(matrices, x - 15, y + 5, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName(), x, y + 6, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName().method_30937(), x, y + 6, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent((DynamicEntryListWidget) getParent());
             entry.setScreen(getConfigScreen());

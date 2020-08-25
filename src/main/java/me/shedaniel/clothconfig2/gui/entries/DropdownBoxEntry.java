@@ -70,11 +70,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         this.selectionElement.bounds.y = y;
         Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 6, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 6, getPreferredTextColor());
             this.resetButton.x = x;
             this.selectionElement.bounds.x = x + resetButton.getWidth() + 1;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, x, y + 6, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), x, y + 6, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.selectionElement.bounds.x = x + entryWidth - 150 + 1;
         }
@@ -404,7 +404,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             if (currentElements.isEmpty()) {
                 TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
                 Text text = new TranslatableText("text.cloth-config.dropdown.value.unknown");
-                textRenderer.drawWithShadow(matrices, text, lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.getWidth(text) / 2f, lastRectangle.y + lastRectangle.height + 3, -1);
+                textRenderer.drawWithShadow(matrices, text.method_30937(), lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.getWidth(text) / 2f, lastRectangle.y + lastRectangle.height + 3, -1);
             }
             
             if (getMaxScrollPosition() > 6) {
@@ -603,7 +603,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
             if (b)
                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r), x + 6, y + 3, b ? 16777215 : 8947848);
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).method_30937(), x + 6, y + 3, b ? 16777215 : 8947848);
         }
         
         @Override

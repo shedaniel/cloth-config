@@ -6,6 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.math.Rectangle;
+import net.minecraft.class_5481;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
@@ -19,7 +20,10 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.*;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
@@ -187,7 +191,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         for (AbstractConfigEntry<?> child : listWidget.children())
             child.lateRender(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
-        textRenderer.drawWithShadow(matrices, title, sliderPosition + (width - sliderPosition) / 2f - textRenderer.getWidth(title) / 2f, 12, -1);
+        textRenderer.drawWithShadow(matrices, title.method_30937(), sliderPosition + (width - sliderPosition) / 2f - textRenderer.getWidth(title) / 2f, 12, -1);
         ScissorsHandler.INSTANCE.removeLastScissor();
         cancelButton.x = sliderPosition + (width - sliderPosition) / 2 - cancelButton.getWidth() - 3;
         exitButton.x = sliderPosition + (width - sliderPosition) / 2 + 3;
@@ -263,7 +267,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
                     MutableText text = new LiteralText(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(reference.getText());
                     if (lastHoveredReference == null && new Rectangle(scrollerBounds.x, (int) (scrollOffset - 4 * reference.getScale()), (int) (textRenderer.getWidth(text) * reference.getScale()), (int) ((textRenderer.fontHeight + 4) * reference.getScale())).contains(mouseX, mouseY))
                         lastHoveredReference = reference;
-                    textRenderer.draw(matrices, text, scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
+                    textRenderer.draw(matrices, text.method_30937(), scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
                     matrices.pop();
                     scrollOffset += (textRenderer.fontHeight + 3) * reference.getScale();
                 }
@@ -336,7 +340,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public Optional<Object> getDefaultValue() {
             return Optional.empty();
         }
-    
+        
         @Override
         public boolean isMouseInside(int mouseX, int mouseY, int x, int y, int entryWidth, int entryHeight) {
             return false;
@@ -366,7 +370,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         
         @Override
         public int getItemHeight() {
-            List<StringRenderable> strings = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(text, getParent().getItemWidth());
+            List<class_5481> strings = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(text, getParent().getItemWidth());
             if (strings.isEmpty())
                 return 0;
             return 4 + strings.size() * 10;
@@ -394,9 +398,9 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
             super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
             int yy = y + 2;
-            List<StringRenderable> texts = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(this.text, getParent().getItemWidth());
-            for (StringRenderable text : texts) {
-                MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, text, x - 4 + entryWidth / 2 - MinecraftClient.getInstance().textRenderer.getWidth(text) / 2, yy, -1);
+            List<class_5481> texts = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(this.text, getParent().getItemWidth());
+            for (class_5481 text : texts) {
+                MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, text, x - 4 + entryWidth / 2 - MinecraftClient.getInstance().textRenderer.method_30880(text) / 2, yy, -1);
                 yy += 10;
             }
         }

@@ -20,11 +20,10 @@
     ]
   },
   "depends": {
-    "fabricloader": ">=0.4.0"
+    "fabricloader": ">=0.9.0"
   },
-  "accessWidener": "cloth-config2.accessWidener",
+  "accessWidener": "cloth-config.accessWidener",
   "custom": {
-    "modmenu:clientsideOnly": true,
     "modmenu:api": true
   }
 }

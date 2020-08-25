@@ -107,11 +107,11 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         this.textFieldWidget.y = y + 1;
         Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 6, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 6, getPreferredTextColor());
             this.resetButton.x = x;
             this.textFieldWidget.x = x + resetButton.getWidth();
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName, x, y + 6, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), x, y + 6, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.textFieldWidget.x = x + entryWidth - 148;
         }
