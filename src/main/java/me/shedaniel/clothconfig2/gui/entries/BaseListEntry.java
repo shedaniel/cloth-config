@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -102,6 +103,21 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     public boolean isEdited() {
         if (super.isEdited()) return true;
         if (cells.stream().anyMatch(BaseListCell::isEdited)) return true;
+        return false;
+    }
+    
+    public boolean isMatchDefault() {
+        Optional<List<T>> defaultValueOptional = getDefaultValue();
+        if (defaultValueOptional.isPresent()) {
+            List<T> value = getValue();
+            List<T> defaultValue = defaultValueOptional.get();
+            if (value.size() != defaultValue.size()) return false;
+            for (int i = 0; i < value.size(); i++) {
+                if (!Objects.equals(value.get(i), defaultValue.get(i)))
+                    return false;
+            }
+            return true;
+        }
         return false;
     }
     
@@ -238,7 +254,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
             drawTexture(matrices, x - 15 + 26, y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
         resetWidget.x = x + entryWidth - resetWidget.getWidth();
         resetWidget.y = y;
-        resetWidget.active = isEdited() && getDefaultValue().isPresent();
+        resetWidget.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault();
         resetWidget.render(matrices, mouseX, mouseY, delta);
         MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName().method_30937(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 6, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
         if (expanded) {
