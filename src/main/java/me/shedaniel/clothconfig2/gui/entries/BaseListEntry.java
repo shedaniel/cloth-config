@@ -56,17 +56,17 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     protected Text addTooltip = new TranslatableText("text.cloth-config.list.add"), removeTooltip = new TranslatableText("text.cloth-config.list.remove");
     
     @ApiStatus.Internal
-    public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey) {
+    public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @Nullable Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, false);
     }
     
     @ApiStatus.Internal
-    public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey, boolean requiresRestart) {
+    public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @Nullable Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey, boolean requiresRestart) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, requiresRestart, true, true);
     }
     
     @ApiStatus.Internal
-    public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @NotNull Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+    public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @Nullable Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.deleteButtonEnabled = deleteButtonEnabled;
         this.insertInFront = insertInFront;
@@ -105,13 +105,6 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     public boolean isEdited() {
         if (super.isEdited()) return true;
         if (cells.stream().anyMatch(BaseListCell::isEdited)) return true;
-        List<T> value = getValue();
-        List<T> defaultValue = this.defaultValue.get();
-        if (value.size() != defaultValue.size()) return true;
-        for (int i = 0; i < value.size(); i++) {
-            if (!Objects.equals(value.get(i), defaultValue.get(i)))
-                return true;
-        }
         return false;
     }
     
@@ -161,7 +154,11 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     
     @Override
     public Optional<List<T>> getDefaultValue() {
-        return Optional.ofNullable(defaultValue.get());
+        if (defaultValue == null) {
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(defaultValue.get());
+        }
     }
     
     @Override
@@ -218,6 +215,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         return isDeleteButtonEnabled() && mouseX >= labelWidget.rectangle.x + 25 && mouseY >= labelWidget.rectangle.y + 3 && mouseX <= labelWidget.rectangle.x + 25 + 11 && mouseY <= labelWidget.rectangle.y + 3 + 11;
     }
     
+    @Override
     public Optional<Text[]> getTooltip(int mouseX, int mouseY) {
         if (addTooltip != null && isInsideCreateNew(mouseX, mouseY))
             return Optional.of(new Text[]{addTooltip});
@@ -243,7 +241,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
             drawTexture(matrices, x - 15 + 26, y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
         resetWidget.x = x + entryWidth - resetWidget.getWidth();
         resetWidget.y = y;
-        resetWidget.active = isEdited();
+        resetWidget.active = isEdited() && getDefaultValue().isPresent();
         resetWidget.render(matrices, mouseX, mouseY, delta);
         MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName().method_30937(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 6, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
         if (expanded) {

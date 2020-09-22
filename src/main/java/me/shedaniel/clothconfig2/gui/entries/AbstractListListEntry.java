@@ -6,7 +6,10 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -25,11 +28,13 @@ public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.A
     
     protected final BiFunction<T, SELF, C> createNewCell;
     protected Function<T, Optional<Text>> cellErrorSupplier;
+    protected List<T> original;
     
     @ApiStatus.Internal
     public AbstractListListEntry(Text fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, Text resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, SELF, C> createNewCell) {
         super(fieldName, tooltipSupplier, defaultValue, abstractListListEntry -> createNewCell.apply(null, abstractListListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
         this.createNewCell = createNewCell;
+        this.original = new ArrayList<T>(value);
         for (T f : value)
             cells.add(createNewCell.apply(f, this.self()));
         this.widgets.addAll(cells);
@@ -52,6 +57,18 @@ public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.A
     @Override
     protected C getFromValue(T value) {
         return createNewCell.apply(value, this.self());
+    }
+    
+    @Override
+    public boolean isEdited() {
+        if (super.isEdited()) return true;
+        List<T> value = getValue();
+        if (value.size() != original.size()) return true;
+        for (int i = 0; i < value.size(); i++) {
+            if (!Objects.equals(value.get(i), original.get(i)))
+                return true;
+        }
+        return false;
     }
     
     /**
