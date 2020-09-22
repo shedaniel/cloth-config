@@ -3,8 +3,6 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.api.Expandable;
-import me.shedaniel.clothconfig2.api.Tooltip;
-import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -25,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
