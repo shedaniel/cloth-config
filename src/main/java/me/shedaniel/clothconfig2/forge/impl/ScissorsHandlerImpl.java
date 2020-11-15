@@ -2,6 +2,7 @@ package me.shedaniel.clothconfig2.forge.impl;
 
 import com.google.common.collect.Lists;
 import me.shedaniel.clothconfig2.forge.api.ScissorsHandler;
+import me.shedaniel.clothconfig2.forge.api.ScissorsScreen;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
@@ -55,6 +56,18 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
                 r.setBounds(r.intersection(scissorsAreas.get(i)));
             }
             r.setBounds(Math.min(r.x, r.x + r.width), Math.min(r.y, r.y + r.height), Math.abs(r.width), Math.abs(r.height));
+            if (Minecraft.getInstance().currentScreen instanceof ScissorsScreen)
+                _applyScissor(((ScissorsScreen) Minecraft.getInstance().currentScreen).handleScissor(r));
+            else _applyScissor(r);
+        } else {
+            if (Minecraft.getInstance().currentScreen instanceof ScissorsScreen)
+                _applyScissor(((ScissorsScreen) Minecraft.getInstance().currentScreen).handleScissor(null));
+            else _applyScissor(null);
+        }
+    }
+    
+    public void _applyScissor(Rectangle r) {
+        if (r != null && !r.isEmpty()) {
             MainWindow window = Minecraft.getInstance().getMainWindow();
             double scaleFactor = window.getGuiScaleFactor();
             GL11.glEnable(GL11.GL_SCISSOR_TEST);

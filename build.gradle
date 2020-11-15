@@ -149,7 +149,7 @@ bintray {
         repo = "cloth-config-2"
         name = "cloth-config-forge"
         userOrg = "shedaniel"
-        licenses = ["Unlicense"]
+        licenses = ["Apache-2.0"]
         version {
             vcsUrl = 'https://github.com/shedaniel/ClothConfig.git'
         }
@@ -183,7 +183,9 @@ curseforge {
         project {
             id = '348521'
             releaseType = 'release'
-            addGameVersion '1.16.1'
+            addGameVersion '1.16.2'
+            addGameVersion '1.16.3'
+            addGameVersion '1.16.4'
             addGameVersion 'Forge'
             addGameVersion 'Java 8'
             mainArtifact(file("${project.buildDir}/filtered-libs/${project.archivesBaseName}-${project.version}.jar")) {
