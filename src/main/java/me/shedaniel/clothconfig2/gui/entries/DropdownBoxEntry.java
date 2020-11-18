@@ -19,6 +19,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.Window;
@@ -70,11 +71,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         this.selectionElement.bounds.y = y;
         Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 6, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.asOrderedText(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 6, getPreferredTextColor());
             this.resetButton.x = x;
             this.selectionElement.bounds.x = x + resetButton.getWidth() + 1;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), x, y + 6, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.asOrderedText(), x, y + 6, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.selectionElement.bounds.x = x + entryWidth - 150 + 1;
         }
@@ -404,7 +405,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             if (currentElements.isEmpty()) {
                 TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
                 Text text = new TranslatableText("text.cloth-config.dropdown.value.unknown");
-                textRenderer.drawWithShadow(matrices, text.method_30937(), lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.getWidth(text) / 2f, lastRectangle.y + lastRectangle.height + 3, -1);
+                textRenderer.drawWithShadow(matrices, text.asOrderedText(), lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.getWidth(text) / 2f, lastRectangle.y + lastRectangle.height + 3, -1);
             }
             
             if (getMaxScrollPosition() > 6) {
@@ -424,7 +425,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 BufferBuilder buffer = tessellator.getBuffer();
                 
                 // Bottom
-                buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+                buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_TEXTURE_COLOR);
                 buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).texture(0, 1).color(bottomc, bottomc, bottomc, 255).next();
                 buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).texture(1, 1).color(bottomc, bottomc, bottomc, 255).next();
                 buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).texture(1, 0).color(bottomc, bottomc, bottomc, 255).next();
@@ -432,7 +433,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 tessellator.draw();
                 
                 // Top
-                buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+                buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_TEXTURE_COLOR);
                 buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).texture(0, 1).color(topc, topc, topc, 255).next();
                 buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).texture(1, 1).color(topc, topc, topc, 255).next();
                 buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).texture(1, 0).color(topc, topc, topc, 255).next();
@@ -603,7 +604,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
             if (b)
                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).method_30937(), x + 6, y + 3, b ? 16777215 : 8947848);
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).asOrderedText(), x + 6, y + 3, b ? 16777215 : 8947848);
         }
         
         @Override

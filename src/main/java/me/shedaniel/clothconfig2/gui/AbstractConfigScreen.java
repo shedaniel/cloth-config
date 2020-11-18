@@ -10,16 +10,17 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.math.Matrix4f;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -205,7 +206,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         this.focusedBinding = focusedBinding;
         if (focusedBinding != null) {
             startedKeyCode = this.focusedBinding.getValue();
-            startedKeyCode.setKeyCodeAndModifier(InputUtil.UNKNOWN_KEYCODE, Modifier.none());
+            startedKeyCode.setKeyCodeAndModifier(InputUtil.UNKNOWN_KEY, Modifier.none());
         } else
             startedKeyCode = null;
     }
@@ -237,7 +238,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
                 startedKeyCode.setKeyCode(InputUtil.Type.MOUSE.createFromCode(int_1));
             else if (focusedBinding.isAllowModifiers()) {
                 if (startedKeyCode.getType() == InputUtil.Type.KEYSYM) {
-                    int code = startedKeyCode.getKeyCode().getKeyCode();
+                    int code = startedKeyCode.getKeyCode().getCode();
                     if (MinecraftClient.IS_SYSTEM_MAC ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
@@ -269,24 +270,24 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         if (this.focusedBinding != null && (focusedBinding.isAllowKey() || int_1 == 256)) {
             if (int_1 != 256) {
                 if (startedKeyCode.isUnknown())
-                    startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                    startedKeyCode.setKeyCode(InputUtil.fromKeyCode(int_1, int_2));
                 else if (focusedBinding.isAllowModifiers()) {
                     if (startedKeyCode.getType() == InputUtil.Type.KEYSYM) {
-                        int code = startedKeyCode.getKeyCode().getKeyCode();
+                        int code = startedKeyCode.getKeyCode().getCode();
                         if (MinecraftClient.IS_SYSTEM_MAC ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
                             Modifier modifier = startedKeyCode.getModifier();
                             startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
-                            startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                            startedKeyCode.setKeyCode(InputUtil.fromKeyCode(int_1, int_2));
                             return true;
                         } else if (code == 344 || code == 340) {
                             Modifier modifier = startedKeyCode.getModifier();
                             startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
-                            startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                            startedKeyCode.setKeyCode(InputUtil.fromKeyCode(int_1, int_2));
                             return true;
                         } else if (code == 342 || code == 346) {
                             Modifier modifier = startedKeyCode.getModifier();
                             startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
-                            startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                            startedKeyCode.setKeyCode(InputUtil.fromKeyCode(int_1, int_2));
                             return true;
                         }
                     }
@@ -342,8 +343,8 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         boolean edited = isEdited();
         Optional.ofNullable(getQuitButton()).ifPresent(button -> button.setMessage(edited ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel")));
         for (Element child : children())
-            if (child instanceof Tickable)
-                ((Tickable) child).tick();
+            if (child instanceof TickableElement)
+                ((TickableElement) child).tick();
     }
     
     @Nullable
@@ -355,7 +356,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
         for (Tooltip tooltip : tooltips) {
-            renderTooltip(matrices, tooltip.getText(), tooltip.getX(), tooltip.getY());
+            renderOrderedTooltip(matrices, tooltip.getText(), tooltip.getX(), tooltip.getY());
         }
         this.tooltips.clear();
     }
@@ -376,7 +377,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         BufferBuilder buffer = tessellator.getBuffer();
         client.getTextureManager().bindTexture(getBackgroundLocation());
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+        buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_TEXTURE_COLOR);
         buffer.vertex(matrix, rect.getMinX(), rect.getMaxY(), 0.0F).texture(rect.getMinX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();
         buffer.vertex(matrix, rect.getMaxX(), rect.getMaxY(), 0.0F).texture(rect.getMaxX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();
         buffer.vertex(matrix, rect.getMaxX(), rect.getMinY(), 0.0F).texture(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).next();

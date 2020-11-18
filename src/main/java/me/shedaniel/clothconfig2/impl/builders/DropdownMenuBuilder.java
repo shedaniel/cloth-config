@@ -366,7 +366,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-                            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).method_30937(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
+                            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).asOrderedText(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
                             itemRenderer.renderGuiItemIcon(s, x + 4, y + 2);
                         }
@@ -415,7 +415,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-                            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).method_30937(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
+                            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).asOrderedText(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
                             itemRenderer.renderGuiItemIcon(s, x + 4, y + 2);
                         }
@@ -463,7 +463,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-                            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).method_30937(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
+                            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).asOrderedText(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
                             itemRenderer.renderGuiItemIcon(s, x + 4, y + 2);
                         }
@@ -511,7 +511,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-                            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).method_30937(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
+                            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).asOrderedText(), x + 6 + 18, y + 6, b ? 16777215 : 8947848);
                             ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
                             itemRenderer.renderGuiItemIcon(s, x + 4, y + 2);
                         }

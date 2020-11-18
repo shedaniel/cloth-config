@@ -256,7 +256,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         resetWidget.y = y;
         resetWidget.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault();
         resetWidget.render(matrices, mouseX, mouseY, delta);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName().method_30937(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 6, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
+        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName().asOrderedText(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 6, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
         if (expanded) {
             int yy = y + 24;
             for (BaseListCell cell : cells) {

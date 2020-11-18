@@ -1,8 +1,8 @@
 package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.math.Point;
-import net.minecraft.class_5481;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 
 import java.util.List;
@@ -12,11 +12,11 @@ public interface Tooltip {
         return QueuedTooltip.create(location, text);
     }
     
-    static Tooltip of(Point location, StringRenderable... text) {
+    static Tooltip of(Point location, StringVisitable... text) {
         return QueuedTooltip.create(location, text);
     }
     
-    static Tooltip of(Point location, class_5481... text) {
+    static Tooltip of(Point location, OrderedText... text) {
         return QueuedTooltip.create(location, text);
     }
     
@@ -30,5 +30,5 @@ public interface Tooltip {
         return getPoint().getY();
     }
     
-    List<class_5481> getText();
+    List<OrderedText> getText();
 }

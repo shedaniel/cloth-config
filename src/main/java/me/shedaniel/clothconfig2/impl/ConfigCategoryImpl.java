@@ -6,7 +6,7 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +23,7 @@ public class ConfigCategoryImpl implements ConfigCategory {
     private Identifier background;
     private final Text categoryKey;
     @Nullable
-    private Supplier<Optional<StringRenderable[]>> description = Optional::empty;
+    private Supplier<Optional<StringVisitable[]>> description = Optional::empty;
     
     ConfigCategoryImpl(ConfigBuilder builder, Text categoryKey) {
         this.builder = builder;
@@ -73,12 +73,12 @@ public class ConfigCategoryImpl implements ConfigCategory {
     
     @Nullable
     @Override
-    public Supplier<Optional<StringRenderable[]>> getDescription() {
+    public Supplier<Optional<StringVisitable[]>> getDescription() {
         return description;
     }
     
     @Override
-    public void setDescription(@Nullable Supplier<Optional<StringRenderable[]>> description) {
+    public void setDescription(@Nullable Supplier<Optional<StringVisitable[]>> description) {
         this.description = description;
     }
 }

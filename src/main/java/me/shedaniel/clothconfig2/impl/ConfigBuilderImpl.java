@@ -36,7 +36,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean listSmoothScroll = true;
     private boolean doesConfirmSave = true;
     private boolean transparentBackground = false;
-    private Identifier defaultBackground = DrawableHelper.BACKGROUND_TEXTURE;
+    private Identifier defaultBackground = DrawableHelper.OPTIONS_BACKGROUND_TEXTURE;
     private Consumer<Screen> afterInitConsumer = screen -> {};
     private final Map<Text, ConfigCategory> categoryMap = Maps.newLinkedHashMap();
     private Text fallbackCategory = null;

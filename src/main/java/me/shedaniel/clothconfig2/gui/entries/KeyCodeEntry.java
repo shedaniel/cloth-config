@@ -116,11 +116,11 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
             this.buttonWidget.setMessage(new LiteralText("> ").formatted(Formatting.WHITE).append(this.buttonWidget.getMessage().copy().formatted(Formatting.YELLOW)).append(new LiteralText(" <").formatted(Formatting.WHITE)));
         Text displayedFieldName = getDisplayedFieldName();
         if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 6, 16777215);
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.asOrderedText(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 6, 16777215);
             this.resetButton.x = x;
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), x, y + 6, getPreferredTextColor());
+            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.asOrderedText(), x, y + 6, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
         }

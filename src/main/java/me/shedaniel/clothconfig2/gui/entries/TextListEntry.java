@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5481;
+import net.minecraft.text.OrderedText;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
@@ -46,8 +46,8 @@ public class TextListEntry extends TooltipListEntry<Object> {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         this.savedWidth = entryWidth;
         int yy = y + 4;
-        List<class_5481> strings = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(text, savedWidth);
-        for (class_5481 string : strings) {
+        List<OrderedText> strings = MinecraftClient.getInstance().textRenderer.wrapLines(text, savedWidth);
+        for (OrderedText string : strings) {
             MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, string, x, yy, color);
             yy += MinecraftClient.getInstance().textRenderer.fontHeight + 3;
         }
@@ -57,7 +57,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
     public int getItemHeight() {
         if (savedWidth == -1)
             return 12;
-        List<class_5481> strings = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(text, savedWidth);
+        List<OrderedText> strings = MinecraftClient.getInstance().textRenderer.wrapLines(text, savedWidth);
         if (strings.isEmpty())
             return 0;
         return 15 + strings.size() * 12;

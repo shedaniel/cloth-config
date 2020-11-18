@@ -1,5 +1,6 @@
 package me.shedaniel.clothconfig2;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import io.github.prospector.modmenu.api.ConfigScreenFactory;
 import io.github.prospector.modmenu.api.ModMenuApi;
@@ -9,6 +10,7 @@ import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.options.OptionsScreen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -21,11 +23,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ClothConfigModMenuDemo implements ModMenuApi {
-    @Override
-    public String getModId() {
-        return "cloth-config2";
-    }
-    
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
         return screen -> getConfigBuilderWithDemo().build();
@@ -73,7 +70,7 @@ public class ClothConfigModMenuDemo implements ModMenuApi {
         builder.setGlobalized(true);
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory testing = builder.getOrCreateCategory(new TranslatableText("category.cloth-config.testing"));
-        testing.addEntry(entryBuilder.startKeyCodeField(new LiteralText("Cool Key"), InputUtil.UNKNOWN_KEYCODE).setDefaultValue(InputUtil.UNKNOWN_KEYCODE).build());
+        testing.addEntry(entryBuilder.startKeyCodeField(new LiteralText("Cool Key"), InputUtil.UNKNOWN_KEY).setDefaultValue(InputUtil.UNKNOWN_KEY).build());
         testing.addEntry(entryBuilder.startModifierKeyCodeField(new LiteralText("Cool Modifier Key"), ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).setDefaultValue(ModifierKeyCode.of(InputUtil.Type.KEYSYM.createFromCode(79), Modifier.of(false, true, false))).build());
         testing.addEntry(entryBuilder.startDoubleList(new LiteralText("A list of Doubles"), Arrays.asList(1d, 2d, 3d)).setDefaultValue(Arrays.asList(1d, 2d, 3d)).build());
         testing.addEntry(entryBuilder.startLongList(new LiteralText("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).build());
@@ -143,5 +140,10 @@ public class ClothConfigModMenuDemo implements ModMenuApi {
         ));
         builder.transparentBackground();
         return builder;
+    }
+
+    @Override
+    public Map<String, ConfigScreenFactory<?>> getProvidedConfigScreenFactories() {
+        return ImmutableMap.of("cloth-config2", getModConfigScreenFactory());
     }
 }

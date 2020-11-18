@@ -32,6 +32,7 @@ import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.MathHelper;
 
@@ -160,20 +161,20 @@ public abstract class ScrollingContainer {
                 float r = (background >> 16 & 255) / 255.0F;
                 float g = (background >> 8 & 255) / 255.0F;
                 float b = (background & 255) / 255.0F;
-                buffer.begin(7, VertexFormats.POSITION_COLOR);
+                buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_COLOR);
                 buffer.vertex(scrollbarPositionMinX, bounds.getMaxY(), 0.0D).color(r, g, b, a).next();
                 buffer.vertex(scrollbarPositionMaxX, bounds.getMaxY(), 0.0D).color(r, g, b, a).next();
                 buffer.vertex(scrollbarPositionMaxX, bounds.y, 0.0D).color(r, g, b, a).next();
                 buffer.vertex(scrollbarPositionMinX, bounds.y, 0.0D).color(r, g, b, a).next();
             }
             tessellator.draw();
-            buffer.begin(7, VertexFormats.POSITION_COLOR);
+            buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_COLOR);
             buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).color(bottomC, bottomC, bottomC, alpha).next();
             buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).color(bottomC, bottomC, bottomC, alpha).next();
             buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).color(bottomC, bottomC, bottomC, alpha).next();
             buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(bottomC, bottomC, bottomC, alpha).next();
             tessellator.draw();
-            buffer.begin(7, VertexFormats.POSITION_COLOR);
+            buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_COLOR);
             buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).color(topC, topC, topC, alpha).next();
             buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).color(topC, topC, topC, alpha).next();
             buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).color(topC, topC, topC, alpha).next();

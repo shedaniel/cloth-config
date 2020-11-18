@@ -6,7 +6,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.math.Rectangle;
-import net.minecraft.class_5481;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
@@ -15,6 +14,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.NarratorManager;
@@ -22,6 +22,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
@@ -191,7 +192,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         for (AbstractConfigEntry<?> child : listWidget.children())
             child.lateRender(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
-        textRenderer.drawWithShadow(matrices, title.method_30937(), sliderPosition + (width - sliderPosition) / 2f - textRenderer.getWidth(title) / 2f, 12, -1);
+        textRenderer.drawWithShadow(matrices, title.asOrderedText(), sliderPosition + (width - sliderPosition) / 2f - textRenderer.getWidth(title) / 2f, 12, -1);
         ScissorsHandler.INSTANCE.removeLastScissor();
         cancelButton.x = sliderPosition + (width - sliderPosition) / 2 - cancelButton.getWidth() - 3;
         exitButton.x = sliderPosition + (width - sliderPosition) / 2 + 3;
@@ -207,14 +208,14 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             client.getTextureManager().bindTexture(getBackgroundLocation());
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             float f = 32.0F;
-            buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+            buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_TEXTURE_COLOR);
             buffer.vertex(sliderPosition - 14, height, 0.0D).texture(0, height / 32.0F).color(68, 68, 68, 255).next();
             buffer.vertex(sliderPosition, height, 0.0D).texture(14 / 32.0F, height / 32.0F).color(68, 68, 68, 255).next();
             buffer.vertex(sliderPosition, 0, 0.0D).texture(14 / 32.0F, 0).color(68, 68, 68, 255).next();
             buffer.vertex(sliderPosition - 14, 0, 0.0D).texture(0, 0).color(68, 68, 68, 255).next();
             tessellator.draw();
             
-            buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+            buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_TEXTURE_COLOR);
             buffer.vertex(0, height, 0.0D).texture(0, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).next();
             buffer.vertex(sliderPosition - 14, height, 0.0D).texture((sliderPosition - 14) / 32.0F, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).next();
             buffer.vertex(sliderPosition - 14, 0, 0.0D).texture((sliderPosition - 14) / 32.0F, ((int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).next();
@@ -231,14 +232,14 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
             int shadeColor = isTransparentBackground() ? 120 : 160;
-            buffer.begin(7, VertexFormats.POSITION_COLOR);
+            buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_COLOR);
             buffer.vertex(matrix, sliderPosition + 4, 0, 100.0F).color(0, 0, 0, 0).next();
             buffer.vertex(matrix, sliderPosition, 0, 100.0F).color(0, 0, 0, shadeColor).next();
             buffer.vertex(matrix, sliderPosition, height, 100.0F).color(0, 0, 0, shadeColor).next();
             buffer.vertex(matrix, sliderPosition + 4, height, 100.0F).color(0, 0, 0, 0).next();
             tessellator.draw();
             shadeColor /= 2;
-            buffer.begin(7, VertexFormats.POSITION_COLOR);
+            buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_COLOR);
             buffer.vertex(matrix, sliderPosition - 14, 0, 100.0F).color(0, 0, 0, shadeColor).next();
             buffer.vertex(matrix, sliderPosition - 14 - 4, 0, 100.0F).color(0, 0, 0, 0).next();
             buffer.vertex(matrix, sliderPosition - 14 - 4, height, 100.0F).color(0, 0, 0, 0).next();
@@ -253,8 +254,8 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         {
             RenderSystem.enableAlphaTest();
             VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-            textRenderer.drawLayer(">", sliderPosition - 7 - textRenderer.getStringWidth(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil((1 - sideSlider.scrollAmount) * 255.0F), 0, 255) << 24, false, matrices.peek().getModel(), immediate, false, 0, 15728880);
-            textRenderer.drawLayer("<", sliderPosition - 7 - textRenderer.getStringWidth("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil(sideSlider.scrollAmount * 255.0F), 0, 255) << 24, false, matrices.peek().getModel(), immediate, false, 0, 15728880);
+            textRenderer.drawLayer(">", sliderPosition - 7 - textRenderer.getWidth(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil((1 - sideSlider.scrollAmount) * 255.0F), 0, 255) << 24, false, matrices.peek().getModel(), immediate, false, 0, 15728880);
+            textRenderer.drawLayer("<", sliderPosition - 7 - textRenderer.getWidth("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil(sideSlider.scrollAmount * 255.0F), 0, 255) << 24, false, matrices.peek().getModel(), immediate, false, 0, 15728880);
             immediate.draw();
             
             Rectangle scrollerBounds = sideScroller.getBounds();
@@ -267,7 +268,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
                     MutableText text = new LiteralText(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(reference.getText());
                     if (lastHoveredReference == null && new Rectangle(scrollerBounds.x, (int) (scrollOffset - 4 * reference.getScale()), (int) (textRenderer.getWidth(text) * reference.getScale()), (int) ((textRenderer.fontHeight + 4) * reference.getScale())).contains(mouseX, mouseY))
                         lastHoveredReference = reference;
-                    textRenderer.draw(matrices, text.method_30937(), scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
+                    textRenderer.draw(matrices, text.asOrderedText(), scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
                     matrices.pop();
                     scrollOffset += (textRenderer.fontHeight + 3) * reference.getScale();
                 }
@@ -370,7 +371,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         
         @Override
         public int getItemHeight() {
-            List<class_5481> strings = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(text, getParent().getItemWidth());
+            List<OrderedText> strings = MinecraftClient.getInstance().textRenderer.wrapLines(text, getParent().getItemWidth());
             if (strings.isEmpty())
                 return 0;
             return 4 + strings.size() * 10;
@@ -398,9 +399,9 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
             super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
             int yy = y + 2;
-            List<class_5481> texts = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(this.text, getParent().getItemWidth());
-            for (class_5481 text : texts) {
-                MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, text, x - 4 + entryWidth / 2 - MinecraftClient.getInstance().textRenderer.method_30880(text) / 2, yy, -1);
+            List<OrderedText> texts = MinecraftClient.getInstance().textRenderer.wrapLines(this.text, getParent().getItemWidth());
+            for (OrderedText text : texts) {
+                MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, text, x - 4 + entryWidth / 2 - MinecraftClient.getInstance().textRenderer.getWidth(text) / 2, yy, -1);
                 yy += 10;
             }
         }

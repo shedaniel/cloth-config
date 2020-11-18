@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.api;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -28,11 +28,11 @@ public interface ConfigCategory {
     @Nullable Identifier getBackground();
     
     @Nullable
-    Supplier<Optional<StringRenderable[]>> getDescription();
+    Supplier<Optional<StringVisitable[]>> getDescription();
     
-    void setDescription(@Nullable Supplier<Optional<StringRenderable[]>> description);
+    void setDescription(@Nullable Supplier<Optional<StringVisitable[]>> description);
     
-    default void setDescription(@Nullable StringRenderable[] description) {
+    default void setDescription(@Nullable StringVisitable[] description) {
         setDescription(() -> Optional.ofNullable(description));
     }
     

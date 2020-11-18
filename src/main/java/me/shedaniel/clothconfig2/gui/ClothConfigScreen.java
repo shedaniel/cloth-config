@@ -16,6 +16,7 @@ import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.NarratorManager;
@@ -266,13 +267,13 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
                 String text = "§c" + (errors.size() == 1 ? errors.get(0).copy().getString() : I18n.translate("text.cloth-config.multi_error"));
                 if (isTransparentBackground()) {
-                    int stringWidth = client.textRenderer.getStringWidth(text);
+                    int stringWidth = client.textRenderer.getWidth(text);
                     fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + client.textRenderer.fontHeight, 0x68000000, 0x68000000);
                 }
                 drawTexture(matrices, 10, 10, 0, 54, 3, 11);
                 drawStringWithShadow(matrices, client.textRenderer, text, 18, 12, -1);
                 if (errors.size() > 1) {
-                    int stringWidth = client.textRenderer.getStringWidth(text);
+                    int stringWidth = client.textRenderer.getWidth(text);
                     if (mouseX >= 10 && mouseY >= 10 && mouseX <= 18 + stringWidth && mouseY <= 14 + client.textRenderer.fontHeight)
                         addTooltip(Tooltip.of(new Point(mouseX, mouseY), errors.toArray(new Text[0])));
                 }
@@ -282,7 +283,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             String text = "§c" + I18n.translate("text.cloth-config.not_editable");
             if (isTransparentBackground()) {
-                int stringWidth = client.textRenderer.getStringWidth(text);
+                int stringWidth = client.textRenderer.getWidth(text);
                 fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + client.textRenderer.fontHeight, 0x68000000, 0x68000000);
             }
             drawTexture(matrices, 10, 10, 0, 54, 3, 11);
@@ -309,13 +310,13 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         RenderSystem.disableTexture();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+        buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_TEXTURE_COLOR);
         buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY() + 4, 0.0F).texture(0, 1f).color(0, 0, 0, lightColor).next();
         buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY() + 4, 0.0F).texture(1f, 1f).color(0, 0, 0, lightColor).next();
         buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY(), 0.0F).texture(1f, 0).color(0, 0, 0, darkColor).next();
         buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY(), 0.0F).texture(0, 0).color(0, 0, 0, darkColor).next();
         tessellator.draw();
-        buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+        buffer.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_TEXTURE_COLOR);
         buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY(), 0.0F).texture(0, 1f).color(0, 0, 0, darkColor).next();
         buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY(), 0.0F).texture(1f, 1f).color(0, 0, 0, darkColor).next();
         buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0F).texture(1f, 0).color(0, 0, 0, lightColor).next();
@@ -414,7 +415,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             RenderSystem.shadeModel(7425);
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferBuilder = tessellator.getBuffer();
-            bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS /* TODO: figure out whats the deal with drawmode 7 */, VertexFormats.POSITION_COLOR);
             fillGradient(matrices.peek().getModel(), bufferBuilder, xStart, yStart, xEnd, yEnd, this.getZOffset(), colorStart, colorEnd);
             tessellator.draw();
             RenderSystem.shadeModel(7424);

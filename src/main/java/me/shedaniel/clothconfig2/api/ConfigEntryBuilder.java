@@ -89,13 +89,13 @@ public interface ConfigEntryBuilder {
     
     KeyCodeBuilder startModifierKeyCodeField(Text fieldNameKey, ModifierKeyCode value);
     
-    default KeyCodeBuilder startKeyCodeField(Text fieldNameKey, InputUtil.KeyCode value) {
+    default KeyCodeBuilder startKeyCodeField(Text fieldNameKey, InputUtil.Key value) {
         return startModifierKeyCodeField(fieldNameKey, ModifierKeyCode.of(value, Modifier.none())).setAllowModifiers(false);
     }
     
     default KeyCodeBuilder fillKeybindingField(Text fieldNameKey, KeyBinding value) {
-        return startKeyCodeField(fieldNameKey, KeyBindingHelper.getBoundKeyOf(value)).setDefaultValue(value.getDefaultKeyCode()).setSaveConsumer(code -> {
-            value.setKeyCode(code);
+        return startKeyCodeField(fieldNameKey, KeyBindingHelper.getBoundKeyOf(value)).setDefaultValue(value.getDefaultKey()).setSaveConsumer(code -> {
+            value.setBoundKey(code);
             KeyBinding.updateKeysByCode();
             MinecraftClient.getInstance().options.write();
         });

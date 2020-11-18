@@ -10,14 +10,14 @@ import net.minecraft.text.TranslatableText;
 
 @Environment(EnvType.CLIENT)
 public class ModifierKeyCodeImpl implements ModifierKeyCode {
-    private InputUtil.KeyCode keyCode;
+    private InputUtil.Key keyCode;
     private Modifier modifier;
     
     public ModifierKeyCodeImpl() {
     }
     
     @Override
-    public InputUtil.KeyCode getKeyCode() {
+    public InputUtil.Key getKeyCode() {
         return keyCode;
     }
     
@@ -27,9 +27,9 @@ public class ModifierKeyCodeImpl implements ModifierKeyCode {
     }
     
     @Override
-    public ModifierKeyCode setKeyCode(InputUtil.KeyCode keyCode) {
-        this.keyCode = keyCode.getCategory().createFromCode(keyCode.getKeyCode());
-        if (keyCode.equals(InputUtil.UNKNOWN_KEYCODE))
+    public ModifierKeyCode setKeyCode(InputUtil.Key keyCode) {
+        this.keyCode = keyCode.getCategory().createFromCode(keyCode.getCode());
+        if (keyCode.equals(InputUtil.UNKNOWN_KEY))
             setModifier(Modifier.none());
         return this;
     }

@@ -10,7 +10,7 @@ import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public interface ModifierKeyCode {
-    static ModifierKeyCode of(InputUtil.KeyCode keyCode, Modifier modifier) {
+    static ModifierKeyCode of(InputUtil.Key keyCode, Modifier modifier) {
         return new ModifierKeyCodeImpl().setKeyCodeAndModifier(keyCode, modifier);
     }
     
@@ -19,12 +19,12 @@ public interface ModifierKeyCode {
     }
     
     static ModifierKeyCode unknown() {
-        return of(InputUtil.UNKNOWN_KEYCODE, Modifier.none());
+        return of(InputUtil.UNKNOWN_KEY, Modifier.none());
     }
     
-    InputUtil.KeyCode getKeyCode();
+    InputUtil.Key getKeyCode();
     
-    ModifierKeyCode setKeyCode(InputUtil.KeyCode keyCode);
+    ModifierKeyCode setKeyCode(InputUtil.Key keyCode);
     
     default InputUtil.Type getType() {
         return getKeyCode().getCategory();
@@ -39,31 +39,31 @@ public interface ModifierKeyCode {
     }
     
     default boolean matchesMouse(int button) {
-        return !isUnknown() && getType() == InputUtil.Type.MOUSE && getKeyCode().getKeyCode() == button && getModifier().matchesCurrent();
+        return !isUnknown() && getType() == InputUtil.Type.MOUSE && getKeyCode().getCode() == button && getModifier().matchesCurrent();
     }
     
     default boolean matchesKey(int keyCode, int scanCode) {
         if (isUnknown())
             return false;
-        if (keyCode == InputUtil.UNKNOWN_KEYCODE.getKeyCode()) {
-            return getType() == InputUtil.Type.SCANCODE && getKeyCode().getKeyCode() == scanCode && getModifier().matchesCurrent();
+        if (keyCode == InputUtil.UNKNOWN_KEY.getCode()) {
+            return getType() == InputUtil.Type.SCANCODE && getKeyCode().getCode() == scanCode && getModifier().matchesCurrent();
         } else {
-            return getType() == InputUtil.Type.KEYSYM && getKeyCode().getKeyCode() == keyCode && getModifier().matchesCurrent();
+            return getType() == InputUtil.Type.KEYSYM && getKeyCode().getCode() == keyCode && getModifier().matchesCurrent();
         }
     }
     
     default boolean matchesCurrentMouse() {
         if (!isUnknown() && getType() == InputUtil.Type.MOUSE && getModifier().matchesCurrent()) {
-            return GLFW.glfwGetMouseButton(MinecraftClient.getInstance().getWindow().getHandle(), getKeyCode().getKeyCode()) == GLFW.GLFW_PRESS;
+            return GLFW.glfwGetMouseButton(MinecraftClient.getInstance().getWindow().getHandle(), getKeyCode().getCode()) == GLFW.GLFW_PRESS;
         }
         return false;
     }
     
     default boolean matchesCurrentKey() {
-        return !isUnknown() && getType() == InputUtil.Type.KEYSYM && getModifier().matchesCurrent() && InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), getKeyCode().getKeyCode());
+        return !isUnknown() && getType() == InputUtil.Type.KEYSYM && getModifier().matchesCurrent() && InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), getKeyCode().getCode());
     }
     
-    default ModifierKeyCode setKeyCodeAndModifier(InputUtil.KeyCode keyCode, Modifier modifier) {
+    default ModifierKeyCode setKeyCodeAndModifier(InputUtil.Key keyCode, Modifier modifier) {
         setKeyCode(keyCode);
         setModifier(modifier);
         return this;
@@ -78,6 +78,6 @@ public interface ModifierKeyCode {
     Text getLocalizedName();
     
     default boolean isUnknown() {
-        return getKeyCode().equals(InputUtil.UNKNOWN_KEYCODE);
+        return getKeyCode().equals(InputUtil.UNKNOWN_KEY);
     }
 }

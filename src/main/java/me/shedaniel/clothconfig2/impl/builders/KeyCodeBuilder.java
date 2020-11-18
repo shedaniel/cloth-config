@@ -49,7 +49,7 @@ public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> 
         return this;
     }
     
-    public KeyCodeBuilder setErrorSupplier(@Nullable Function<InputUtil.KeyCode, Optional<Text>> errorSupplier) {
+    public KeyCodeBuilder setErrorSupplier(@Nullable Function<InputUtil.Key, Optional<Text>> errorSupplier) {
         return setModifierErrorSupplier(keyCode -> errorSupplier.apply(keyCode.getKeyCode()));
     }
     
@@ -63,11 +63,11 @@ public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> 
         return this;
     }
     
-    public KeyCodeBuilder setSaveConsumer(Consumer<InputUtil.KeyCode> saveConsumer) {
+    public KeyCodeBuilder setSaveConsumer(Consumer<InputUtil.Key> saveConsumer) {
         return setModifierSaveConsumer(keyCode -> saveConsumer.accept(keyCode.getKeyCode()));
     }
     
-    public KeyCodeBuilder setDefaultValue(Supplier<InputUtil.KeyCode> defaultValue) {
+    public KeyCodeBuilder setDefaultValue(Supplier<InputUtil.Key> defaultValue) {
         return setModifierDefaultValue(() -> ModifierKeyCode.of(defaultValue.get(), Modifier.none()));
     }
     
@@ -81,7 +81,7 @@ public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> 
         return this;
     }
     
-    public KeyCodeBuilder setDefaultValue(InputUtil.KeyCode defaultValue) {
+    public KeyCodeBuilder setDefaultValue(InputUtil.Key defaultValue) {
         return setDefaultValue(ModifierKeyCode.of(defaultValue, Modifier.none()));
     }
     
@@ -90,7 +90,7 @@ public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> 
         return this;
     }
     
-    public KeyCodeBuilder setTooltipSupplier(@NotNull Function<InputUtil.KeyCode, Optional<Text[]>> tooltipSupplier) {
+    public KeyCodeBuilder setTooltipSupplier(@NotNull Function<InputUtil.Key, Optional<Text[]>> tooltipSupplier) {
         return setModifierTooltipSupplier(keyCode -> tooltipSupplier.apply(keyCode.getKeyCode()));
     }
     
