@@ -7,7 +7,7 @@ authors="shedaniel"
 license="Apache-2.0"
 [[mods]]
 modId="cloth-config"
-version="4.0"
+version="${version}"
 displayName="Cloth Config v4 API"
 description='''
 An API for config screens.
