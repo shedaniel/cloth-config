@@ -3,11 +3,13 @@ package me.shedaniel.clothconfig2.gui;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.ConfirmChatLinkScreen;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
@@ -16,15 +18,21 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Tickable;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.Matrix4f;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -382,5 +390,43 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         buffer.vertex(matrix, rect.getMaxX(), rect.getMinY(), 0.0F).texture(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).next();
         buffer.vertex(matrix, rect.getMinX(), rect.getMinY(), 0.0F).texture(rect.getMinX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).next();
         tessellator.draw();
+    }
+
+    @Override
+    public void renderTextHoverEffect(MatrixStack matrices, Style style, int x, int y) {
+        super.renderTextHoverEffect(matrices, style, x, y);
+    }
+
+    @Override
+    public boolean handleTextClick(@Nullable Style style) {
+        if (style == null) return false;
+
+        ClickEvent clickEvent = style.getClickEvent();
+
+        if (clickEvent != null && clickEvent.getAction() == ClickEvent.Action.OPEN_URL) {
+            try {
+                URI uri = new URI(clickEvent.getValue());
+                String string = uri.getScheme();
+                if (string == null) {
+                    throw new URISyntaxException(clickEvent.getValue(), "Missing protocol");
+                }
+
+                if (!(string.equalsIgnoreCase("http") || string.equalsIgnoreCase("https"))) {
+                    throw new URISyntaxException(clickEvent.getValue(), "Unsupported protocol: " + string.toLowerCase(Locale.ROOT));
+                }
+
+                MinecraftClient.getInstance().openScreen(new ConfirmChatLinkScreen(openInBrowser -> {
+                    if (openInBrowser) {
+                        Util.getOperatingSystem().open(uri);
+                    }
+
+                    MinecraftClient.getInstance().openScreen(this);
+                }, clickEvent.getValue(), true));
+            } catch (URISyntaxException e) {
+                ClothConfigInitializer.LOGGER.error("Can't open url for {}", clickEvent, e);
+            }
+            return true;
+        }
+        return super.handleTextClick(style);
     }
 }
