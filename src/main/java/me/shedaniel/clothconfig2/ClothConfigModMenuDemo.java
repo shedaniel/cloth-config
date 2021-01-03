@@ -8,13 +8,20 @@ import me.shedaniel.clothconfig2.gui.entries.MultiElementListEntry;
 import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.registry.Registry;
 
 import java.util.*;
@@ -25,41 +32,41 @@ public class ClothConfigModMenuDemo implements ModMenuApi {
     public String getModId() {
         return "cloth-config2";
     }
-    
+
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
         return screen -> getConfigBuilderWithDemo().build();
     }
-    
+
     public static ConfigBuilder getConfigBuilderWithDemo() {
         class Pair<T, R> {
             T t;
             R r;
-            
+
             public Pair(T t, R r) {
                 this.t = t;
                 this.r = r;
             }
-            
+
             public T getLeft() {
                 return t;
             }
-            
+
             public R getRight() {
                 return r;
             }
-            
+
             @Override
             public boolean equals(Object o) {
                 if (this == o) return true;
                 if (o == null || getClass() != o.getClass()) return false;
-                
+
                 Pair<?, ?> pair = (Pair<?, ?>) o;
-                
+
                 if (!Objects.equals(t, pair.t)) return false;
                 return Objects.equals(r, pair.r);
             }
-            
+
             @Override
             public int hashCode() {
                 int result = t != null ? t.hashCode() : 0;
@@ -67,7 +74,7 @@ public class ClothConfigModMenuDemo implements ModMenuApi {
                 return result;
             }
         }
-        
+
         ConfigBuilder builder = ConfigBuilder.create().setParentScreen(MinecraftClient.getInstance().currentScreen).setTitle(new TranslatableText("title.cloth-config.config"));
         builder.setDefaultBackgroundTexture(new Identifier("minecraft:textures/block/oak_planks.png"));
         builder.setGlobalized(true);
@@ -103,7 +110,7 @@ public class ClothConfigModMenuDemo implements ModMenuApi {
                     try {
                         return Integer.parseInt(s);
                     } catch (NumberFormatException ignored) {
-                        
+
                     }
                     return null;
                 })).setDefaultValue(10).setSelections(Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).build());
@@ -112,7 +119,7 @@ public class ClothConfigModMenuDemo implements ModMenuApi {
                     try {
                         return Integer.parseInt(s);
                     } catch (NumberFormatException ignored) {
-                        
+
                     }
                     return null;
                 })).setDefaultValue(5).setSuggestionMode(false).setSelections(Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).build());
@@ -121,7 +128,8 @@ public class ClothConfigModMenuDemo implements ModMenuApi {
                 Lists.newArrayList(new Pair<>(10, 10), new Pair<>(20, 40)),
                 false,
                 Optional::empty,
-                list -> {},
+                list -> {
+                },
                 () -> Lists.newArrayList(new Pair<>(10, 10), new Pair<>(20, 40)),
                 entryBuilder.getResetButtonKey(),
                 true,
@@ -141,6 +149,13 @@ public class ClothConfigModMenuDemo implements ModMenuApi {
                     }
                 }
         ));
+        testing.addEntry(entryBuilder.startTextDescription(
+                new TranslatableText("text.cloth-config.testing.1",
+                        new LiteralText("ClothConfig").styled(s -> s.setBold(true).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackContent(Util.make(new ItemStack(Items.PINK_WOOL), stack -> stack.setCustomName(new LiteralText("(\u30FB\u2200\u30FB)")).addEnchantment(Enchantments.EFFICIENCY, 10)))))),
+                        new TranslatableText("text.cloth-config.testing.2").styled(s -> s.setColor(Formatting.BLUE).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("https://shedaniel.gitbook.io/cloth-config/"))).setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://shedaniel.gitbook.io/cloth-config/"))),
+                        new TranslatableText("text.cloth-config.testing.3").styled(s -> s.setColor(Formatting.GREEN).setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, FabricLoader.getInstance().getConfigDir().resolve("modmenu.json").toString())))
+                )
+        ).build());
         builder.transparentBackground();
         return builder;
     }

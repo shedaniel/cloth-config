@@ -392,7 +392,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         tessellator.draw();
     }
 
-    @Override
+    @Override   // override to expose this protected method to config entries
     public void renderTextHoverEffect(MatrixStack matrices, Style style, int x, int y) {
         super.renderTextHoverEffect(matrices, style, x, y);
     }
