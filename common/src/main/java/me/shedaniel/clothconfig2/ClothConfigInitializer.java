@@ -13,6 +13,8 @@ import org.jetbrains.annotations.ApiStatus;
 public class ClothConfigInitializer {
     public static final Logger LOGGER = LogManager.getFormatterLogger("ClothConfig");
     
+    public static final String MOD_ID = "cloth-config2";
+    
     @Deprecated
     @ApiStatus.ScheduledForRemoval
     public static double handleScrollingPosition(double[] target, double scroll, double maxScroll, float delta, double start, double duration) {

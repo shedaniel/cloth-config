@@ -1,5 +1,6 @@
 package me.shedaniel.clothconfig2.api;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.DefaultSelectionCellCreator;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.SelectionCellCreator;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.SelectionTopCellElement;
@@ -9,13 +10,12 @@ import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder.TopCellElemen
 import me.shedaniel.math.Color;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.TextComponent;
-import com.mojang.blaze3d.platform.InputConstants;
+
 import java.util.List;
 import java.util.function.Function;
 
@@ -93,7 +93,7 @@ public interface ConfigEntryBuilder {
     }
     
     default KeyCodeBuilder fillKeybindingField(Component fieldNameKey, KeyMapping value) {
-        return startKeyCodeField(fieldNameKey, KeyBindingHelper.getBoundKeyOf(value)).setDefaultValue(value.getDefaultKey()).setSaveConsumer(code -> {
+        return startKeyCodeField(fieldNameKey, value.key).setDefaultValue(value.getDefaultKey()).setSaveConsumer(code -> {
             value.setKey(code);
             KeyMapping.resetMapping();
             Minecraft.getInstance().options.save();

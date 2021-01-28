@@ -2,14 +2,11 @@ package me.shedaniel.clothconfig2.impl;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.Window;
-import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.api.ScissorsScreen;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.math.api.Executor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.opengl.GL11;
@@ -23,7 +20,8 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
     @ApiStatus.Internal
     public static final ScissorsHandler INSTANCE = new ScissorsHandlerImpl();
     
-    static {
+    // TODO: should this be reimplemented?
+    /*static {
         Executor.runIf(() -> FabricLoader.getInstance().isModLoaded("notenoughcrashes"), () -> () -> {
             try {
                 Class.forName("fudge.notenoughcrashes.api.NotEnoughCrashesApi").getDeclaredMethod("onEveryCrash", Runnable.class).invoke(null, (Runnable) () -> {
@@ -37,7 +35,7 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
                 throwable.printStackTrace();
             }
         });
-    }
+    }*/
     
     private final List<Rectangle> scissorsAreas;
     

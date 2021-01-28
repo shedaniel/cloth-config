@@ -1,9 +1,10 @@
-package me.shedaniel.clothconfig2;
+package me.shedaniel.clothconfig2.fabric;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.prospector.modmenu.api.ConfigScreenFactory;
 import io.github.prospector.modmenu.api.ModMenuApi;
+import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.gui.entries.MultiElementListEntry;
 import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 public class ClothConfigModMenuDemo implements ModMenuApi {
     @Override
     public String getModId() {
-        return "cloth-config2";
+        return ClothConfigInitializer.MOD_ID;
     }
     
     @Override

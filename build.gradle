@@ -28,7 +28,7 @@ allprojects {
     }
 
     def runNumber = (System.getenv("GITHUB_RUN_NUMBER") == null ? "9999" : System.getenv("GITHUB_RUN_NUMBER"))
-    
+
     if (!ext.isSnapshot) {
         version = rootProject.base_version + "." + runNumber
         archivesBaseName = rootProject.archives_base_name
@@ -36,7 +36,7 @@ allprojects {
         version = rootProject.base_version + "-PR." + System.getenv("PR_NUM") + "." + runNumber
         archivesBaseName = rootProject.archives_base_name_snapshot
     }
-    
+
     group = rootProject.maven_group
 
     tasks.withType(JavaCompile) {
@@ -53,7 +53,7 @@ allprojects {
 
 }
 
-bintray {
+/*bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
     publications = ["MyPublication"]
@@ -77,4 +77,4 @@ bintray {
             }
         }
     }
-}
+}*/
