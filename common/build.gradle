@@ -1,0 +1,44 @@
+loom {
+    accessWidener = file("src/main/resources/architectury.accessWidener")
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
+    mappings minecraft.officialMojangMappings()
+    // We depend on fabric loader here to use the fabric @Environment annotations
+    // Do NOT use other classes from fabric loader
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+}
+
+architectury {
+    common()
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = "sources"
+    from sourceSets.main.allSource
+}
+
+task javadocs(type: Javadoc) {
+    source = sourceSets.main.allJava
+}
+
+task javadocsJar(type: Jar, dependsOn: javadocs) {
+    archiveClassifier.set("javadocs")
+    javadocs.failOnError false
+    from javadocs.destinationDir
+}
+
+publishing {
+    publications {
+        mavenCommon(MavenPublication) {
+            artifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
+                builtBy build
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+            artifact javadocsJar
+        }
+    }
+}
