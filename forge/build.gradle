@@ -1,0 +1,92 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "com.matthewprenger.cursegradle"
+}
+
+configurations {
+    shadow
+    dev
+}
+
+artifacts {
+    dev(jar)
+}
+
+architectury {
+    platformSetupLoomIde()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
+    mappings loom.officialMojangMappings()
+
+    forge "net.minecraftforge:forge:${rootProject.architectury.minecraft}-${rootProject.forge_version}"
+
+    compile("me.shedaniel.cloth:basic-math:0.5.1")
+
+    compileOnly(project(path: ":common")) {
+        transitive = false
+    }
+    runtimeOnly(project(path: ":common", configuration: "transformDevelopmentForge")) {
+        transitive = false
+    }
+    shadow(project(path: ":common", configuration: "transformProductionForge")) {
+        transitive = false
+    }
+}
+
+processResources {
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
+    }
+    inputs.property "META-INF/mods.toml", project.version
+}
+
+shadowJar {
+    exclude "fabric.mod.json"
+    exclude "cloth-config.accessWidener"
+
+    configurations = [project.configurations.shadow]
+    classifier "shadow"
+}
+
+remapJar {
+    dependsOn(shadowJar)
+    input.set(shadowJar.archivePath)
+    archiveClassifier = "forge"
+}
+
+publishing {
+    publications {
+        mavenForge(MavenPublication) {
+            artifact(remapJar.archivePath) {
+                builtBy build
+                classifier "forge"
+            }
+        }
+    }
+}
+
+curseforge {
+    if (project.hasProperty("curse_api_key") || System.getenv("curse_api_key") != null) {
+        apiKey = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
+        project {
+            id = project.curseforge_id_forge
+            releaseType = "release"
+            addGameVersion "1.16.4"
+            addGameVersion "1.16.5"
+            addGameVersion "Java 8"
+            addGameVersion "Forge"
+            mainArtifact(remapJar.archivePath) {
+                displayName = "[Forge $rootProject.supported_version] v$project.version"
+            }
+            afterEvaluate {
+                uploadTask.dependsOn("build")
+            }
+        }
+    }
+    options {
+        forgeGradleIntegration = false
+        javaVersionAutoDetect = false
+    }
+}

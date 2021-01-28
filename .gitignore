@@ -1,27 +1,19 @@
-# Compiled nonsense that does not belong in *source* control
-/build
-/bin
-/.gradle
-/minecraft
-/out
-/run
-/classes
-/old
+build/
+*.ipr
+run/
+*.iws
+out/
+*.iml
+.gradle/
+output/
+bin/
+libs/
 
-# IDE nonsense that could go in source control but really shouldn't
 .classpath
 .project
-.metadata
-.settings
-*.launch
-*.iml
-.idea
-*.ipr
-*.iws
+.settings/org.eclipse.core.resources.prefs
+.idea/
+classes/
 
-# Sekrit files
-private.properties
-
-# Files from bad operating systems :^)
-Thumbs.db
-.DS_Store
+.vscode/
+logs/
