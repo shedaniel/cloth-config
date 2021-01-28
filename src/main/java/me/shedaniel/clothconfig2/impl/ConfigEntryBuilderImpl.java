@@ -8,17 +8,16 @@ import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.SelectionTopCellEl
 import me.shedaniel.clothconfig2.impl.builders.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import java.util.List;
 import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     
-    private Text resetButtonKey = new TranslatableText("text.cloth-config.reset_value");
+    private Component resetButtonKey = new TranslatableComponent("text.cloth-config.reset_value");
     
     private ConfigEntryBuilderImpl() {
     }
@@ -30,132 +29,132 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     public static ConfigEntryBuilderImpl createImmutable() {
         return new ConfigEntryBuilderImpl() {
             @Override
-            public ConfigEntryBuilder setResetButtonKey(Text resetButtonKey) {
+            public ConfigEntryBuilder setResetButtonKey(Component resetButtonKey) {
                 throw new UnsupportedOperationException("This is an immutable entry builder!");
             }
         };
     }
     
     @Override
-    public Text getResetButtonKey() {
+    public Component getResetButtonKey() {
         return resetButtonKey;
     }
     
     @Override
-    public ConfigEntryBuilder setResetButtonKey(Text resetButtonKey) {
+    public ConfigEntryBuilder setResetButtonKey(Component resetButtonKey) {
         this.resetButtonKey = resetButtonKey;
         return this;
     }
     
     @Override
-    public IntListBuilder startIntList(Text fieldNameKey, List<Integer> value) {
+    public IntListBuilder startIntList(Component fieldNameKey, List<Integer> value) {
         return new IntListBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public LongListBuilder startLongList(Text fieldNameKey, List<Long> value) {
+    public LongListBuilder startLongList(Component fieldNameKey, List<Long> value) {
         return new LongListBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public FloatListBuilder startFloatList(Text fieldNameKey, List<Float> value) {
+    public FloatListBuilder startFloatList(Component fieldNameKey, List<Float> value) {
         return new FloatListBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public DoubleListBuilder startDoubleList(Text fieldNameKey, List<Double> value) {
+    public DoubleListBuilder startDoubleList(Component fieldNameKey, List<Double> value) {
         return new DoubleListBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public StringListBuilder startStrList(Text fieldNameKey, List<String> value) {
+    public StringListBuilder startStrList(Component fieldNameKey, List<String> value) {
         return new StringListBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public SubCategoryBuilder startSubCategory(Text fieldNameKey) {
+    public SubCategoryBuilder startSubCategory(Component fieldNameKey) {
         return new SubCategoryBuilder(resetButtonKey, fieldNameKey);
     }
     
     @Override
-    public SubCategoryBuilder startSubCategory(Text fieldNameKey, List<AbstractConfigListEntry> entries) {
+    public SubCategoryBuilder startSubCategory(Component fieldNameKey, List<AbstractConfigListEntry> entries) {
         SubCategoryBuilder builder = new SubCategoryBuilder(resetButtonKey, fieldNameKey);
         builder.addAll(entries);
         return builder;
     }
     
     @Override
-    public BooleanToggleBuilder startBooleanToggle(Text fieldNameKey, boolean value) {
+    public BooleanToggleBuilder startBooleanToggle(Component fieldNameKey, boolean value) {
         return new BooleanToggleBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public StringFieldBuilder startStrField(Text fieldNameKey, String value) {
+    public StringFieldBuilder startStrField(Component fieldNameKey, String value) {
         return new StringFieldBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public ColorFieldBuilder startColorField(Text fieldNameKey, int value) {
+    public ColorFieldBuilder startColorField(Component fieldNameKey, int value) {
         return new ColorFieldBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public TextFieldBuilder startTextField(Text fieldNameKey, String value) {
+    public TextFieldBuilder startTextField(Component fieldNameKey, String value) {
         return new TextFieldBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public TextDescriptionBuilder startTextDescription(Text value) {
-        return new TextDescriptionBuilder(resetButtonKey, new LiteralText(UUID.randomUUID().toString()), value);
+    public TextDescriptionBuilder startTextDescription(Component value) {
+        return new TextDescriptionBuilder(resetButtonKey, new TextComponent(UUID.randomUUID().toString()), value);
     }
     
     @Override
-    public <T extends Enum<?>> EnumSelectorBuilder<T> startEnumSelector(Text fieldNameKey, Class<T> clazz, T value) {
+    public <T extends Enum<?>> EnumSelectorBuilder<T> startEnumSelector(Component fieldNameKey, Class<T> clazz, T value) {
         return new EnumSelectorBuilder<>(resetButtonKey, fieldNameKey, clazz, value);
     }
     
     @Override
-    public <T> SelectorBuilder<T> startSelector(Text fieldNameKey, T[] valuesArray, T value) {
+    public <T> SelectorBuilder<T> startSelector(Component fieldNameKey, T[] valuesArray, T value) {
         return new SelectorBuilder<>(resetButtonKey, fieldNameKey, valuesArray, value);
     }
     
     @Override
-    public IntFieldBuilder startIntField(Text fieldNameKey, int value) {
+    public IntFieldBuilder startIntField(Component fieldNameKey, int value) {
         return new IntFieldBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public LongFieldBuilder startLongField(Text fieldNameKey, long value) {
+    public LongFieldBuilder startLongField(Component fieldNameKey, long value) {
         return new LongFieldBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public FloatFieldBuilder startFloatField(Text fieldNameKey, float value) {
+    public FloatFieldBuilder startFloatField(Component fieldNameKey, float value) {
         return new FloatFieldBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public DoubleFieldBuilder startDoubleField(Text fieldNameKey, double value) {
+    public DoubleFieldBuilder startDoubleField(Component fieldNameKey, double value) {
         return new DoubleFieldBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public IntSliderBuilder startIntSlider(Text fieldNameKey, int value, int min, int max) {
+    public IntSliderBuilder startIntSlider(Component fieldNameKey, int value, int min, int max) {
         return new IntSliderBuilder(resetButtonKey, fieldNameKey, value, min, max);
     }
     
     @Override
-    public LongSliderBuilder startLongSlider(Text fieldNameKey, long value, long min, long max) {
+    public LongSliderBuilder startLongSlider(Component fieldNameKey, long value, long min, long max) {
         return new LongSliderBuilder(resetButtonKey, fieldNameKey, value, min, max);
     }
     
     @Override
-    public KeyCodeBuilder startModifierKeyCodeField(Text fieldNameKey, ModifierKeyCode value) {
+    public KeyCodeBuilder startModifierKeyCodeField(Component fieldNameKey, ModifierKeyCode value) {
         return new KeyCodeBuilder(resetButtonKey, fieldNameKey, value);
     }
     
     @Override
-    public <T> DropdownMenuBuilder<T> startDropdownMenu(Text fieldNameKey, SelectionTopCellElement<T> topCellElement, SelectionCellCreator<T> cellCreator) {
+    public <T> DropdownMenuBuilder<T> startDropdownMenu(Component fieldNameKey, SelectionTopCellElement<T> topCellElement, SelectionCellCreator<T> cellCreator) {
         return new DropdownMenuBuilder<>(resetButtonKey, fieldNameKey, topCellElement, cellCreator);
     }
     

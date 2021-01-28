@@ -2,9 +2,9 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
@@ -31,7 +31,7 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
     
     @ApiStatus.Internal
     @Deprecated
-    public IntegerListEntry(Text fieldName, Integer value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer) {
+    public IntegerListEntry(Component fieldName, Integer value, Component resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
         this.minimum = -Integer.MAX_VALUE;
         this.maximum = Integer.MAX_VALUE;
@@ -40,13 +40,13 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
     
     @ApiStatus.Internal
     @Deprecated
-    public IntegerListEntry(Text fieldName, Integer value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier) {
+    public IntegerListEntry(Component fieldName, Integer value, Component resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier) {
         this(fieldName, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public IntegerListEntry(Text fieldName, Integer value, Text resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
+    public IntegerListEntry(Component fieldName, Integer value, Component resetButtonKey, Supplier<Integer> defaultValue, Consumer<Integer> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
         this.minimum = -Integer.MAX_VALUE;
         this.maximum = Integer.MAX_VALUE;
@@ -59,15 +59,15 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
     }
     
     @Override
-    protected void textFieldPreRender(TextFieldWidget widget) {
+    protected void textFieldPreRender(EditBox widget) {
         try {
-            double i = Integer.parseInt(textFieldWidget.getText());
+            double i = Integer.parseInt(textFieldWidget.getValue());
             if (i < minimum || i > maximum)
-                widget.setEditableColor(16733525);
+                widget.setTextColor(16733525);
             else
-                widget.setEditableColor(14737632);
+                widget.setTextColor(14737632);
         } catch (NumberFormatException ex) {
-            widget.setEditableColor(16733525);
+            widget.setTextColor(16733525);
         }
     }
     
@@ -95,22 +95,22 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
     @Override
     public Integer getValue() {
         try {
-            return Integer.valueOf(textFieldWidget.getText());
+            return Integer.valueOf(textFieldWidget.getValue());
         } catch (Exception e) {
             return 0;
         }
     }
     
     @Override
-    public Optional<Text> getError() {
+    public Optional<Component> getError() {
         try {
-            int i = Integer.parseInt(textFieldWidget.getText());
+            int i = Integer.parseInt(textFieldWidget.getValue());
             if (i > maximum)
-                return Optional.of(new TranslatableText("text.cloth-config.error.too_large", maximum));
+                return Optional.of(new TranslatableComponent("text.cloth-config.error.too_large", maximum));
             else if (i < minimum)
-                return Optional.of(new TranslatableText("text.cloth-config.error.too_small", minimum));
+                return Optional.of(new TranslatableComponent("text.cloth-config.error.too_small", minimum));
         } catch (NumberFormatException ex) {
-            return Optional.of(new TranslatableText("text.cloth-config.error.not_valid_number_int"));
+            return Optional.of(new TranslatableComponent("text.cloth-config.error.not_valid_number_int"));
         }
         return super.getError();
     }

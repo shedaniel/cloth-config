@@ -2,9 +2,9 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
@@ -31,7 +31,7 @@ public class FloatListEntry extends TextFieldListEntry<Float> {
     
     @ApiStatus.Internal
     @Deprecated
-    public FloatListEntry(Text fieldName, Float value, Text resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer) {
+    public FloatListEntry(Component fieldName, Float value, Component resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
         this.minimum = -Float.MAX_VALUE;
         this.maximum = Float.MAX_VALUE;
@@ -40,13 +40,13 @@ public class FloatListEntry extends TextFieldListEntry<Float> {
     
     @ApiStatus.Internal
     @Deprecated
-    public FloatListEntry(Text fieldName, Float value, Text resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier) {
+    public FloatListEntry(Component fieldName, Float value, Component resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier) {
         this(fieldName, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public FloatListEntry(Text fieldName, Float value, Text resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
+    public FloatListEntry(Component fieldName, Float value, Component resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
         this.minimum = -Float.MAX_VALUE;
         this.maximum = Float.MAX_VALUE;
@@ -59,15 +59,15 @@ public class FloatListEntry extends TextFieldListEntry<Float> {
     }
     
     @Override
-    protected void textFieldPreRender(TextFieldWidget widget) {
+    protected void textFieldPreRender(EditBox widget) {
         try {
-            double i = Float.parseFloat(textFieldWidget.getText());
+            double i = Float.parseFloat(textFieldWidget.getValue());
             if (i < minimum || i > maximum)
-                widget.setEditableColor(16733525);
+                widget.setTextColor(16733525);
             else
-                widget.setEditableColor(14737632);
+                widget.setTextColor(14737632);
         } catch (NumberFormatException ex) {
-            widget.setEditableColor(16733525);
+            widget.setTextColor(16733525);
         }
     }
     
@@ -95,22 +95,22 @@ public class FloatListEntry extends TextFieldListEntry<Float> {
     @Override
     public Float getValue() {
         try {
-            return Float.valueOf(textFieldWidget.getText());
+            return Float.valueOf(textFieldWidget.getValue());
         } catch (Exception e) {
             return 0f;
         }
     }
     
     @Override
-    public Optional<Text> getError() {
+    public Optional<Component> getError() {
         try {
-            float i = Float.parseFloat(textFieldWidget.getText());
+            float i = Float.parseFloat(textFieldWidget.getValue());
             if (i > maximum)
-                return Optional.of(new TranslatableText("text.cloth-config.error.too_large", maximum));
+                return Optional.of(new TranslatableComponent("text.cloth-config.error.too_large", maximum));
             else if (i < minimum)
-                return Optional.of(new TranslatableText("text.cloth-config.error.too_small", minimum));
+                return Optional.of(new TranslatableComponent("text.cloth-config.error.too_small", minimum));
         } catch (NumberFormatException ex) {
-            return Optional.of(new TranslatableText("text.cloth-config.error.not_valid_number_float"));
+            return Optional.of(new TranslatableComponent("text.cloth-config.error.not_valid_number_float"));
         }
         return super.getError();
     }

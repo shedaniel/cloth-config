@@ -1,23 +1,23 @@
 package me.shedaniel.clothconfig2.impl;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.clothconfig2.api.Modifier;
 import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 @Environment(EnvType.CLIENT)
 public class ModifierKeyCodeImpl implements ModifierKeyCode {
-    private InputUtil.KeyCode keyCode;
+    private InputConstants.Key keyCode;
     private Modifier modifier;
     
     public ModifierKeyCodeImpl() {
     }
     
     @Override
-    public InputUtil.KeyCode getKeyCode() {
+    public InputConstants.Key getKeyCode() {
         return keyCode;
     }
     
@@ -27,9 +27,9 @@ public class ModifierKeyCodeImpl implements ModifierKeyCode {
     }
     
     @Override
-    public ModifierKeyCode setKeyCode(InputUtil.KeyCode keyCode) {
-        this.keyCode = keyCode.getCategory().createFromCode(keyCode.getKeyCode());
-        if (keyCode.equals(InputUtil.UNKNOWN_KEYCODE))
+    public ModifierKeyCode setKeyCode(InputConstants.Key keyCode) {
+        this.keyCode = keyCode.getType().getOrCreate(keyCode.getValue());
+        if (keyCode.equals(InputConstants.UNKNOWN))
             setModifier(Modifier.none());
         return this;
     }
@@ -46,14 +46,14 @@ public class ModifierKeyCodeImpl implements ModifierKeyCode {
     }
     
     @Override
-    public Text getLocalizedName() {
-        Text base = this.keyCode.getLocalizedText();
+    public Component getLocalizedName() {
+        Component base = this.keyCode.getDisplayName();
         if (modifier.hasShift())
-            base = new TranslatableText("modifier.cloth-config.shift", base);
+            base = new TranslatableComponent("modifier.cloth-config.shift", base);
         if (modifier.hasControl())
-            base = new TranslatableText("modifier.cloth-config.ctrl", base);
+            base = new TranslatableComponent("modifier.cloth-config.ctrl", base);
         if (modifier.hasAlt())
-            base = new TranslatableText("modifier.cloth-config.alt", base);
+            base = new TranslatableComponent("modifier.cloth-config.alt", base);
         return base;
     }
     

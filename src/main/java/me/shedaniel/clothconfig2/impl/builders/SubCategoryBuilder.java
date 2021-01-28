@@ -5,7 +5,7 @@ import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SubCategoryListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,10 +17,10 @@ import java.util.function.Supplier;
 public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntry> implements List<AbstractConfigListEntry> {
     
     private final List<AbstractConfigListEntry> entries;
-    private Function<List<AbstractConfigListEntry>, Optional<Text[]>> tooltipSupplier = list -> Optional.empty();
+    private Function<List<AbstractConfigListEntry>, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();
     private boolean expanded = false;
     
-    public SubCategoryBuilder(Text resetButtonKey, Text fieldNameKey) {
+    public SubCategoryBuilder(Component resetButtonKey, Component fieldNameKey) {
         super(resetButtonKey, fieldNameKey);
         this.entries = Lists.newArrayList();
     }
@@ -30,22 +30,22 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
         throw new UnsupportedOperationException();
     }
     
-    public SubCategoryBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
+    public SubCategoryBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = list -> tooltipSupplier.get();
         return this;
     }
     
-    public SubCategoryBuilder setTooltipSupplier(Function<List<AbstractConfigListEntry>, Optional<Text[]>> tooltipSupplier) {
+    public SubCategoryBuilder setTooltipSupplier(Function<List<AbstractConfigListEntry>, Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public SubCategoryBuilder setTooltip(Optional<Text[]> tooltip) {
+    public SubCategoryBuilder setTooltip(Optional<Component[]> tooltip) {
         this.tooltipSupplier = list -> tooltip;
         return this;
     }
     
-    public SubCategoryBuilder setTooltip(Text... tooltip) {
+    public SubCategoryBuilder setTooltip(Component... tooltip) {
         this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }

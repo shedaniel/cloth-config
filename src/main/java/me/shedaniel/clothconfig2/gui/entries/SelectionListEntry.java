@@ -2,16 +2,16 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.NarratorManager;
-import net.minecraft.client.util.Window;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,33 +29,33 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     private ImmutableList<T> values;
     private AtomicInteger index;
     private final int original;
-    private ButtonWidget buttonWidget, resetButton;
+    private Button buttonWidget, resetButton;
     private Consumer<T> saveConsumer;
     private Supplier<T> defaultValue;
-    private List<Element> widgets;
-    private Function<T, Text> nameProvider;
+    private List<GuiEventListener> widgets;
+    private Function<T, Component> nameProvider;
     
     @ApiStatus.Internal
     @Deprecated
-    public SelectionListEntry(Text fieldName, T[] valuesArray, T value, Text resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer) {
+    public SelectionListEntry(Component fieldName, T[] valuesArray, T value, Component resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer) {
         this(fieldName, valuesArray, value, resetButtonKey, defaultValue, saveConsumer, null);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public SelectionListEntry(Text fieldName, T[] valuesArray, T value, Text resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, Text> nameProvider) {
+    public SelectionListEntry(Component fieldName, T[] valuesArray, T value, Component resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, Component> nameProvider) {
         this(fieldName, valuesArray, value, resetButtonKey, defaultValue, saveConsumer, nameProvider, null);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public SelectionListEntry(Text fieldName, T[] valuesArray, T value, Text resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, Text> nameProvider, Supplier<Optional<Text[]>> tooltipSupplier) {
+    public SelectionListEntry(Component fieldName, T[] valuesArray, T value, Component resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, Component> nameProvider, Supplier<Optional<Component[]>> tooltipSupplier) {
         this(fieldName, valuesArray, value, resetButtonKey, defaultValue, saveConsumer, nameProvider, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public SelectionListEntry(Text fieldName, T[] valuesArray, T value, Text resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, Text> nameProvider, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
+    public SelectionListEntry(Component fieldName, T[] valuesArray, T value, Component resetButtonKey, Supplier<T> defaultValue, Consumer<T> saveConsumer, Function<T, Component> nameProvider, Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
         if (valuesArray != null)
             this.values = ImmutableList.copyOf(valuesArray);
@@ -65,16 +65,16 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
         this.index = new AtomicInteger(this.values.indexOf(value));
         this.index.compareAndSet(-1, 0);
         this.original = this.values.indexOf(value);
-        this.buttonWidget = new ButtonWidget(0, 0, 150, 20, NarratorManager.EMPTY, widget -> {
+        this.buttonWidget = new Button(0, 0, 150, 20, NarratorChatListener.NO_TITLE, widget -> {
             SelectionListEntry.this.index.incrementAndGet();
             SelectionListEntry.this.index.compareAndSet(SelectionListEntry.this.values.size(), 0);
         });
-        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
+        this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             SelectionListEntry.this.index.set(getDefaultIndex());
         });
         this.saveConsumer = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
-        this.nameProvider = nameProvider == null ? (t -> new TranslatableText(t instanceof Translatable ? ((Translatable) t).getKey() : t.toString())) : nameProvider;
+        this.nameProvider = nameProvider == null ? (t -> new TranslatableComponent(t instanceof Translatable ? ((Translatable) t).getKey() : t.toString())) : nameProvider;
     }
     
     @Override
@@ -99,21 +99,21 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
-        Window window = MinecraftClient.getInstance().getWindow();
+        Window window = Minecraft.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && getDefaultIndex() != this.index.get();
         this.resetButton.y = y;
         this.buttonWidget.active = isEditable();
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(nameProvider.apply(getValue()));
-        Text displayedFieldName = getDisplayedFieldName();
-        if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 6, getPreferredTextColor());
+        Component displayedFieldName = getDisplayedFieldName();
+        if (Minecraft.getInstance().font.isBidirectional()) {
+            Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, getPreferredTextColor());
             this.resetButton.x = x;
             this.buttonWidget.x = x + resetButton.getWidth() + 2;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), x, y + 6, getPreferredTextColor());
+            Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), x, y + 6, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.buttonWidget.x = x + entryWidth - 150;
         }
@@ -127,7 +127,7 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public List<? extends Element> children() {
+    public List<? extends GuiEventListener> children() {
         return widgets;
     }
     

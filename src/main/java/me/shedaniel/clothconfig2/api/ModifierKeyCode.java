@@ -1,16 +1,16 @@
 package me.shedaniel.clothconfig2.api;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.clothconfig2.impl.ModifierKeyCodeImpl;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public interface ModifierKeyCode {
-    static ModifierKeyCode of(InputUtil.KeyCode keyCode, Modifier modifier) {
+    static ModifierKeyCode of(InputConstants.Key keyCode, Modifier modifier) {
         return new ModifierKeyCodeImpl().setKeyCodeAndModifier(keyCode, modifier);
     }
     
@@ -19,15 +19,15 @@ public interface ModifierKeyCode {
     }
     
     static ModifierKeyCode unknown() {
-        return of(InputUtil.UNKNOWN_KEYCODE, Modifier.none());
+        return of(InputConstants.UNKNOWN, Modifier.none());
     }
     
-    InputUtil.KeyCode getKeyCode();
+    InputConstants.Key getKeyCode();
     
-    ModifierKeyCode setKeyCode(InputUtil.KeyCode keyCode);
+    ModifierKeyCode setKeyCode(InputConstants.Key keyCode);
     
-    default InputUtil.Type getType() {
-        return getKeyCode().getCategory();
+    default InputConstants.Type getType() {
+        return getKeyCode().getType();
     }
     
     Modifier getModifier();
@@ -39,31 +39,31 @@ public interface ModifierKeyCode {
     }
     
     default boolean matchesMouse(int button) {
-        return !isUnknown() && getType() == InputUtil.Type.MOUSE && getKeyCode().getKeyCode() == button && getModifier().matchesCurrent();
+        return !isUnknown() && getType() == InputConstants.Type.MOUSE && getKeyCode().getValue() == button && getModifier().matchesCurrent();
     }
     
     default boolean matchesKey(int keyCode, int scanCode) {
         if (isUnknown())
             return false;
-        if (keyCode == InputUtil.UNKNOWN_KEYCODE.getKeyCode()) {
-            return getType() == InputUtil.Type.SCANCODE && getKeyCode().getKeyCode() == scanCode && getModifier().matchesCurrent();
+        if (keyCode == InputConstants.UNKNOWN.getValue()) {
+            return getType() == InputConstants.Type.SCANCODE && getKeyCode().getValue() == scanCode && getModifier().matchesCurrent();
         } else {
-            return getType() == InputUtil.Type.KEYSYM && getKeyCode().getKeyCode() == keyCode && getModifier().matchesCurrent();
+            return getType() == InputConstants.Type.KEYSYM && getKeyCode().getValue() == keyCode && getModifier().matchesCurrent();
         }
     }
     
     default boolean matchesCurrentMouse() {
-        if (!isUnknown() && getType() == InputUtil.Type.MOUSE && getModifier().matchesCurrent()) {
-            return GLFW.glfwGetMouseButton(MinecraftClient.getInstance().getWindow().getHandle(), getKeyCode().getKeyCode()) == GLFW.GLFW_PRESS;
+        if (!isUnknown() && getType() == InputConstants.Type.MOUSE && getModifier().matchesCurrent()) {
+            return GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), getKeyCode().getValue()) == GLFW.GLFW_PRESS;
         }
         return false;
     }
     
     default boolean matchesCurrentKey() {
-        return !isUnknown() && getType() == InputUtil.Type.KEYSYM && getModifier().matchesCurrent() && InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), getKeyCode().getKeyCode());
+        return !isUnknown() && getType() == InputConstants.Type.KEYSYM && getModifier().matchesCurrent() && InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), getKeyCode().getValue());
     }
     
-    default ModifierKeyCode setKeyCodeAndModifier(InputUtil.KeyCode keyCode, Modifier modifier) {
+    default ModifierKeyCode setKeyCodeAndModifier(InputConstants.Key keyCode, Modifier modifier) {
         setKeyCode(keyCode);
         setModifier(modifier);
         return this;
@@ -75,9 +75,9 @@ public interface ModifierKeyCode {
     
     String toString();
     
-    Text getLocalizedName();
+    Component getLocalizedName();
     
     default boolean isUnknown() {
-        return getKeyCode().equals(InputUtil.UNKNOWN_KEYCODE);
+        return getKeyCode().equals(InputConstants.UNKNOWN);
     }
 }

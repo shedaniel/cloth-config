@@ -3,9 +3,8 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.FloatListListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,26 +17,26 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEntry> {
     
-    protected Function<Float, Optional<Text>> cellErrorSupplier;
+    protected Function<Float, Optional<Component>> cellErrorSupplier;
     private Consumer<List<Float>> saveConsumer = null;
-    private Function<List<Float>, Optional<Text[]>> tooltipSupplier = list -> Optional.empty();
+    private Function<List<Float>, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();
     private final List<Float> value;
     private boolean expanded = false;
     private Float min = null, max = null;
     private Function<FloatListListEntry, FloatListListEntry.FloatListCell> createNewInstance;
-    private Text addTooltip = new TranslatableText("text.cloth-config.list.add"), removeTooltip = new TranslatableText("text.cloth-config.list.remove");
+    private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
     private boolean deleteButtonEnabled = true, insertInFront = true;
     
-    public FloatListBuilder(Text resetButtonKey, Text fieldNameKey, List<Float> value) {
+    public FloatListBuilder(Component resetButtonKey, Component fieldNameKey, List<Float> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
-    public Function<Float, Optional<Text>> getCellErrorSupplier() {
+    public Function<Float, Optional<Component>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
     
-    public FloatListBuilder setCellErrorSupplier(Function<Float, Optional<Text>> cellErrorSupplier) {
+    public FloatListBuilder setCellErrorSupplier(Function<Float, Optional<Component>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
         return this;
     }
@@ -47,7 +46,7 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         return this;
     }
     
-    public FloatListBuilder setErrorSupplier(Function<List<Float>, Optional<Text>> errorSupplier) {
+    public FloatListBuilder setErrorSupplier(Function<List<Float>, Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -57,12 +56,12 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         return this;
     }
     
-    public FloatListBuilder setAddButtonTooltip(Text addTooltip) {
+    public FloatListBuilder setAddButtonTooltip(Component addTooltip) {
         this.addTooltip = addTooltip;
         return this;
     }
     
-    public FloatListBuilder setRemoveButtonTooltip(Text removeTooltip) {
+    public FloatListBuilder setRemoveButtonTooltip(Component removeTooltip) {
         this.removeTooltip = removeTooltip;
         return this;
     }
@@ -123,22 +122,22 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         return this;
     }
     
-    public FloatListBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
+    public FloatListBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = list -> tooltipSupplier.get();
         return this;
     }
     
-    public FloatListBuilder setTooltipSupplier(Function<List<Float>, Optional<Text[]>> tooltipSupplier) {
+    public FloatListBuilder setTooltipSupplier(Function<List<Float>, Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public FloatListBuilder setTooltip(Optional<Text[]> tooltip) {
+    public FloatListBuilder setTooltip(Optional<Component[]> tooltip) {
         this.tooltipSupplier = list -> tooltip;
         return this;
     }
     
-    public FloatListBuilder setTooltip(Text... tooltip) {
+    public FloatListBuilder setTooltip(Component... tooltip) {
         this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }

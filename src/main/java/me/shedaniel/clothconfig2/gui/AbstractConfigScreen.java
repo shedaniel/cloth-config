@@ -1,26 +1,26 @@
 package me.shedaniel.clothconfig2.gui;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.math.Matrix4f;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import me.shedaniel.math.Rectangle;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.ConfirmScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Tickable;
-import net.minecraft.util.math.Matrix4f;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,16 +30,16 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public abstract class AbstractConfigScreen extends Screen implements ConfigScreen {
-    protected static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
+    protected static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
     private boolean legacyEdited = false;
-    private final Identifier backgroundLocation;
+    private final ResourceLocation backgroundLocation;
     protected boolean legacyRequiresRestart = false;
     protected boolean confirmSave;
     protected final Screen parent;
     private boolean alwaysShowTabs = false;
     private boolean transparentBackground = false;
     @Nullable
-    private Text defaultFallbackCategory = null;
+    private Component defaultFallbackCategory = null;
     public int selectedCategoryIndex = 0;
     private boolean editable = true;
     private KeyCodeEntry focusedBinding;
@@ -50,7 +50,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     @Nullable
     protected Consumer<Screen> afterInitConsumer = null;
     
-    protected AbstractConfigScreen(Screen parent, Text title, Identifier backgroundLocation) {
+    protected AbstractConfigScreen(Screen parent, Component title, ResourceLocation backgroundLocation) {
         super(title);
         this.parent = parent;
         this.backgroundLocation = backgroundLocation;
@@ -67,7 +67,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     }
     
     @Override
-    public Identifier getBackgroundLocation() {
+    public ResourceLocation getBackgroundLocation() {
         return backgroundLocation;
     }
     
@@ -84,7 +84,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         return false;
     }
     
-    public abstract Map<Text, List<AbstractConfigEntry<?>>> getCategorizedEntries();
+    public abstract Map<Component, List<AbstractConfigEntry<?>>> getCategorizedEntries();
     
     @Override
     public boolean isEdited() {
@@ -135,7 +135,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     }
     
     public boolean isTransparentBackground() {
-        return transparentBackground && MinecraftClient.getInstance().world != null;
+        return transparentBackground && Minecraft.getInstance().level != null;
     }
     
     @ApiStatus.Internal
@@ -143,18 +143,18 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         this.transparentBackground = transparentBackground;
     }
     
-    public Text getFallbackCategory() {
+    public Component getFallbackCategory() {
         if (defaultFallbackCategory != null)
             return defaultFallbackCategory;
         return getCategorizedEntries().keySet().iterator().next();
     }
     
     @ApiStatus.Internal
-    public void setFallbackCategory(@Nullable Text defaultFallbackCategory) {
+    public void setFallbackCategory(@Nullable Component defaultFallbackCategory) {
         this.defaultFallbackCategory = defaultFallbackCategory;
-        List<Text> categories = Lists.newArrayList(getCategorizedEntries().keySet());
+        List<Component> categories = Lists.newArrayList(getCategorizedEntries().keySet());
         for (int i = 0; i < categories.size(); i++) {
-            Text category = categories.get(i);
+            Component category = categories.get(i);
             if (category.equals(getFallbackCategory())) {
                 this.selectedCategoryIndex = i;
                 break;
@@ -171,9 +171,9 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         setEdited(false);
         if (openOtherScreens) {
             if (isRequiresRestart())
-                AbstractConfigScreen.this.client.openScreen(new ClothRequiresRestartScreen(parent));
+                AbstractConfigScreen.this.minecraft.setScreen(new ClothRequiresRestartScreen(parent));
             else
-                AbstractConfigScreen.this.client.openScreen(parent);
+                AbstractConfigScreen.this.minecraft.setScreen(parent);
         }
         this.legacyRequiresRestart = false;
     }
@@ -205,7 +205,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         this.focusedBinding = focusedBinding;
         if (focusedBinding != null) {
             startedKeyCode = this.focusedBinding.getValue();
-            startedKeyCode.setKeyCodeAndModifier(InputUtil.UNKNOWN_KEYCODE, Modifier.none());
+            startedKeyCode.setKeyCodeAndModifier(InputConstants.UNKNOWN, Modifier.none());
         } else
             startedKeyCode = null;
     }
@@ -234,24 +234,24 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     public boolean mouseClicked(double double_1, double double_2, int int_1) {
         if (this.focusedBinding != null && this.startedKeyCode != null && focusedBinding.isAllowMouse()) {
             if (startedKeyCode.isUnknown())
-                startedKeyCode.setKeyCode(InputUtil.Type.MOUSE.createFromCode(int_1));
+                startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(int_1));
             else if (focusedBinding.isAllowModifiers()) {
-                if (startedKeyCode.getType() == InputUtil.Type.KEYSYM) {
-                    int code = startedKeyCode.getKeyCode().getKeyCode();
-                    if (MinecraftClient.IS_SYSTEM_MAC ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
+                if (startedKeyCode.getType() == InputConstants.Type.KEYSYM) {
+                    int code = startedKeyCode.getKeyCode().getValue();
+                    if (Minecraft.ON_OSX ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
-                        startedKeyCode.setKeyCode(InputUtil.Type.MOUSE.createFromCode(int_1));
+                        startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(int_1));
                         return true;
                     } else if (code == 344 || code == 340) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
-                        startedKeyCode.setKeyCode(InputUtil.Type.MOUSE.createFromCode(int_1));
+                        startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(int_1));
                         return true;
                     } else if (code == 342 || code == 346) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
-                        startedKeyCode.setKeyCode(InputUtil.Type.MOUSE.createFromCode(int_1));
+                        startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(int_1));
                         return true;
                     }
                 }
@@ -269,28 +269,28 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         if (this.focusedBinding != null && (focusedBinding.isAllowKey() || int_1 == 256)) {
             if (int_1 != 256) {
                 if (startedKeyCode.isUnknown())
-                    startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                    startedKeyCode.setKeyCode(InputConstants.getKey(int_1, int_2));
                 else if (focusedBinding.isAllowModifiers()) {
-                    if (startedKeyCode.getType() == InputUtil.Type.KEYSYM) {
-                        int code = startedKeyCode.getKeyCode().getKeyCode();
-                        if (MinecraftClient.IS_SYSTEM_MAC ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
+                    if (startedKeyCode.getType() == InputConstants.Type.KEYSYM) {
+                        int code = startedKeyCode.getKeyCode().getValue();
+                        if (Minecraft.ON_OSX ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
                             Modifier modifier = startedKeyCode.getModifier();
                             startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
-                            startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                            startedKeyCode.setKeyCode(InputConstants.getKey(int_1, int_2));
                             return true;
                         } else if (code == 344 || code == 340) {
                             Modifier modifier = startedKeyCode.getModifier();
                             startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
-                            startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                            startedKeyCode.setKeyCode(InputConstants.getKey(int_1, int_2));
                             return true;
                         } else if (code == 342 || code == 346) {
                             Modifier modifier = startedKeyCode.getModifier();
                             startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
-                            startedKeyCode.setKeyCode(InputUtil.getKeyCode(int_1, int_2));
+                            startedKeyCode.setKeyCode(InputConstants.getKey(int_1, int_2));
                             return true;
                         }
                     }
-                    if (MinecraftClient.IS_SYSTEM_MAC ? (int_1 == 343 || int_1 == 347) : (int_1 == 341 || int_1 == 345)) {
+                    if (Minecraft.ON_OSX ? (int_1 == 343 || int_1 == 347) : (int_1 == 341 || int_1 == 345)) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
                         return true;
@@ -320,9 +320,9 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     
     protected final boolean quit() {
         if (confirmSave && isEdited())
-            client.openScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableText("text.cloth-config.quit_config"), new TranslatableText("text.cloth-config.quit_config_sure"), new TranslatableText("text.cloth-config.quit_discard"), new TranslatableText("gui.cancel")));
+            minecraft.setScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableComponent("text.cloth-config.quit_config"), new TranslatableComponent("text.cloth-config.quit_config_sure"), new TranslatableComponent("text.cloth-config.quit_discard"), new TranslatableComponent("gui.cancel")));
         else
-            client.openScreen(parent);
+            minecraft.setScreen(parent);
         return true;
     }
     
@@ -330,9 +330,9 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         @Override
         public void accept(boolean t) {
             if (!t)
-                client.openScreen(AbstractConfigScreen.this);
+                minecraft.setScreen(AbstractConfigScreen.this);
             else
-                client.openScreen(parent);
+                minecraft.setScreen(parent);
         }
     }
     
@@ -340,19 +340,19 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     public void tick() {
         super.tick();
         boolean edited = isEdited();
-        Optional.ofNullable(getQuitButton()).ifPresent(button -> button.setMessage(edited ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel")));
-        for (Element child : children())
-            if (child instanceof Tickable)
-                ((Tickable) child).tick();
+        Optional.ofNullable(getQuitButton()).ifPresent(button -> button.setMessage(edited ? new TranslatableComponent("text.cloth-config.cancel_discard") : new TranslatableComponent("gui.cancel")));
+        for (GuiEventListener child : children())
+            if (child instanceof TickableBlockEntity)
+                ((TickableBlockEntity) child).tick();
     }
     
     @Nullable
-    protected AbstractButtonWidget getQuitButton() {
+    protected AbstractWidget getQuitButton() {
         return null;
     }
     
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
         for (Tooltip tooltip : tooltips) {
             renderTooltip(matrices, tooltip.getText(), tooltip.getX(), tooltip.getY());
@@ -365,22 +365,22 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         this.tooltips.add(tooltip);
     }
     
-    protected void overlayBackground(MatrixStack matrices, Rectangle rect, int red, int green, int blue, int startAlpha, int endAlpha) {
-        overlayBackground(matrices.peek().getModel(), rect, red, green, blue, startAlpha, endAlpha);
+    protected void overlayBackground(PoseStack matrices, Rectangle rect, int red, int green, int blue, int startAlpha, int endAlpha) {
+        overlayBackground(matrices.last().pose(), rect, red, green, blue, startAlpha, endAlpha);
     }
     
     protected void overlayBackground(Matrix4f matrix, Rectangle rect, int red, int green, int blue, int startAlpha, int endAlpha) {
         if (isTransparentBackground())
             return;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        client.getTextureManager().bindTexture(getBackgroundLocation());
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        minecraft.getTextureManager().bind(getBackgroundLocation());
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-        buffer.vertex(matrix, rect.getMinX(), rect.getMaxY(), 0.0F).texture(rect.getMinX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();
-        buffer.vertex(matrix, rect.getMaxX(), rect.getMaxY(), 0.0F).texture(rect.getMaxX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).next();
-        buffer.vertex(matrix, rect.getMaxX(), rect.getMinY(), 0.0F).texture(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).next();
-        buffer.vertex(matrix, rect.getMinX(), rect.getMinY(), 0.0F).texture(rect.getMinX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).next();
-        tessellator.draw();
+        buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+        buffer.vertex(matrix, rect.getMinX(), rect.getMaxY(), 0.0F).uv(rect.getMinX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).endVertex();
+        buffer.vertex(matrix, rect.getMaxX(), rect.getMaxY(), 0.0F).uv(rect.getMaxX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).endVertex();
+        buffer.vertex(matrix, rect.getMaxX(), rect.getMinY(), 0.0F).uv(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).endVertex();
+        buffer.vertex(matrix, rect.getMinX(), rect.getMinY(), 0.0F).uv(rect.getMinX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).endVertex();
+        tessellator.end();
     }
 }

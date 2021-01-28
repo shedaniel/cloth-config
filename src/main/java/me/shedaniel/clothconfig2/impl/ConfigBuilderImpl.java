@@ -11,11 +11,11 @@ import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
 import me.shedaniel.clothconfig2.gui.GlobalizedClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 public class ConfigBuilderImpl implements ConfigBuilder {
     private Runnable savingRunnable;
     private Screen parent;
-    private Text title = new TranslatableText("text.cloth-config.config");
+    private Component title = new TranslatableComponent("text.cloth-config.config");
     private boolean globalized = false;
     private boolean globalizedExpanded = true;
     private boolean editable = true;
@@ -36,10 +36,10 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean listSmoothScroll = true;
     private boolean doesConfirmSave = true;
     private boolean transparentBackground = false;
-    private Identifier defaultBackground = DrawableHelper.BACKGROUND_TEXTURE;
+    private ResourceLocation defaultBackground = GuiComponent.BACKGROUND_LOCATION;
     private Consumer<Screen> afterInitConsumer = screen -> {};
-    private final Map<Text, ConfigCategory> categoryMap = Maps.newLinkedHashMap();
-    private Text fallbackCategory = null;
+    private final Map<Component, ConfigCategory> categoryMap = Maps.newLinkedHashMap();
+    private Component fallbackCategory = null;
     private boolean alwaysShowTabs = false;
     
     @ApiStatus.Internal
@@ -103,12 +103,12 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return title;
     }
     
     @Override
-    public ConfigBuilder setTitle(Text title) {
+    public ConfigBuilder setTitle(Component title) {
         this.title = title;
         return this;
     }
@@ -125,7 +125,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public ConfigCategory getOrCreateCategory(Text categoryKey) {
+    public ConfigCategory getOrCreateCategory(Component categoryKey) {
         if (categoryMap.containsKey(categoryKey))
             return categoryMap.get(categoryKey);
         if (fallbackCategory == null)
@@ -134,7 +134,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public ConfigBuilder removeCategory(Text category) {
+    public ConfigBuilder removeCategory(Component category) {
         if (categoryMap.containsKey(category) && fallbackCategory.equals(category))
             fallbackCategory = null;
         if (!categoryMap.containsKey(category))
@@ -144,7 +144,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public ConfigBuilder removeCategoryIfExists(Text category) {
+    public ConfigBuilder removeCategoryIfExists(Component category) {
         if (categoryMap.containsKey(category) && fallbackCategory.equals(category))
             fallbackCategory = null;
         categoryMap.remove(category);
@@ -152,7 +152,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public boolean hasCategory(Text category) {
+    public boolean hasCategory(Component category) {
         return categoryMap.containsKey(category);
     }
     
@@ -190,12 +190,12 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public Identifier getDefaultBackgroundTexture() {
+    public ResourceLocation getDefaultBackgroundTexture() {
         return defaultBackground;
     }
     
     @Override
-    public ConfigBuilder setDefaultBackgroundTexture(Identifier texture) {
+    public ConfigBuilder setDefaultBackgroundTexture(ResourceLocation texture) {
         this.defaultBackground = texture;
         return this;
     }

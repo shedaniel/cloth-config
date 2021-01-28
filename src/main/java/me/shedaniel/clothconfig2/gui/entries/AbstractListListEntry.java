@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,11 +26,11 @@ import java.util.stream.Collectors;
 public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.AbstractListCell<T, C, SELF>, SELF extends AbstractListListEntry<T, C, SELF>> extends BaseListEntry<T, C, SELF> {
     
     protected final BiFunction<T, SELF, C> createNewCell;
-    protected Function<T, Optional<Text>> cellErrorSupplier;
+    protected Function<T, Optional<Component>> cellErrorSupplier;
     protected List<T> original;
     
     @ApiStatus.Internal
-    public AbstractListListEntry(Text fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, Text resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, SELF, C> createNewCell) {
+    public AbstractListListEntry(Component fieldName, List<T> value, boolean defaultExpanded, Supplier<Optional<Component[]>> tooltipSupplier, Consumer<List<T>> saveConsumer, Supplier<List<T>> defaultValue, Component resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront, BiFunction<T, SELF, C> createNewCell) {
         super(fieldName, tooltipSupplier, defaultValue, abstractListListEntry -> createNewCell.apply(null, abstractListListEntry), saveConsumer, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront);
         this.createNewCell = createNewCell;
         this.original = new ArrayList<T>(value);
@@ -40,11 +40,11 @@ public abstract class AbstractListListEntry<T, C extends AbstractListListEntry.A
         setExpanded(defaultExpanded);
     }
     
-    public Function<T, Optional<Text>> getCellErrorSupplier() {
+    public Function<T, Optional<Component>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
     
-    public void setCellErrorSupplier(Function<T, Optional<Text>> cellErrorSupplier) {
+    public void setCellErrorSupplier(Function<T, Optional<Component>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
     }
     

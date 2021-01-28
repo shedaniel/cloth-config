@@ -1,22 +1,21 @@
 package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.math.Point;
-import net.minecraft.class_5481;
-import net.minecraft.text.StringRenderable;
-import net.minecraft.text.Text;
-
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
 import java.util.List;
 
 public interface Tooltip {
-    static Tooltip of(Point location, Text... text) {
+    static Tooltip of(Point location, Component... text) {
         return QueuedTooltip.create(location, text);
     }
     
-    static Tooltip of(Point location, StringRenderable... text) {
+    static Tooltip of(Point location, FormattedText... text) {
         return QueuedTooltip.create(location, text);
     }
     
-    static Tooltip of(Point location, class_5481... text) {
+    static Tooltip of(Point location, FormattedCharSequence... text) {
         return QueuedTooltip.create(location, text);
     }
     
@@ -30,5 +29,5 @@ public interface Tooltip {
         return getPoint().getY();
     }
     
-    List<class_5481> getText();
+    List<FormattedCharSequence> getText();
 }

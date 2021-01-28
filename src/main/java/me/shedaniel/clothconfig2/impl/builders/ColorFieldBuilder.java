@@ -4,8 +4,8 @@ import me.shedaniel.clothconfig2.gui.entries.ColorEntry;
 import me.shedaniel.math.Color;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -18,18 +18,18 @@ import java.util.function.Supplier;
 public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
     
     private Consumer<Integer> saveConsumer = null;
-    private Function<Integer, Optional<Text>> errorSupplier;
-    private Function<Integer, Optional<Text[]>> tooltipSupplier = str -> Optional.empty();
+    private Function<Integer, Optional<Component>> errorSupplier;
+    private Function<Integer, Optional<Component[]>> tooltipSupplier = str -> Optional.empty();
     private final int value;
     private Supplier<Integer> defaultValue;
     private boolean alpha = false;
     
-    public ColorFieldBuilder(Text resetButtonKey, Text fieldNameKey, int value) {
+    public ColorFieldBuilder(Component resetButtonKey, Component fieldNameKey, int value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
-    public ColorFieldBuilder setErrorSupplier(Function<Integer, Optional<Text>> errorSupplier) {
+    public ColorFieldBuilder setErrorSupplier(Function<Integer, Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -65,7 +65,7 @@ public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
     }
     
     public ColorFieldBuilder setDefaultValue3(Supplier<TextColor> defaultValue) {
-        this.defaultValue = () -> defaultValue.get().getRgb();
+        this.defaultValue = () -> defaultValue.get().getValue();
         return this;
     }
     
@@ -80,26 +80,26 @@ public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
     }
     
     public ColorFieldBuilder setDefaultValue(TextColor defaultValue) {
-        this.defaultValue = () -> Objects.requireNonNull(defaultValue).getRgb();
+        this.defaultValue = () -> Objects.requireNonNull(defaultValue).getValue();
         return this;
     }
     
-    public ColorFieldBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
+    public ColorFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = str -> tooltipSupplier.get();
         return this;
     }
     
-    public ColorFieldBuilder setTooltipSupplier(Function<Integer, Optional<Text[]>> tooltipSupplier) {
+    public ColorFieldBuilder setTooltipSupplier(Function<Integer, Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public ColorFieldBuilder setTooltip(Optional<Text[]> tooltip) {
+    public ColorFieldBuilder setTooltip(Optional<Component[]> tooltip) {
         this.tooltipSupplier = str -> tooltip;
         return this;
     }
     
-    public ColorFieldBuilder setTooltip(Text... tooltip) {
+    public ColorFieldBuilder setTooltip(Component... tooltip) {
         this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
         return this;
     }

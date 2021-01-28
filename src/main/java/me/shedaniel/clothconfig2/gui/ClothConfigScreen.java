@@ -3,6 +3,11 @@ package me.shedaniel.clothconfig2.gui;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
@@ -10,22 +15,17 @@ import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.NarratorManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.util.Tuple;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.LinkedHashMap;
@@ -55,23 +55,23 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
     };
     public ListWidget<AbstractConfigEntry<AbstractConfigEntry<?>>> listWidget;
-    private final LinkedHashMap<Text, List<AbstractConfigEntry<?>>> categorizedEntries = Maps.newLinkedHashMap();
-    private final List<Pair<Text, Integer>> tabs;
-    private AbstractButtonWidget quitButton, saveButton, buttonLeftTab, buttonRightTab;
+    private final LinkedHashMap<Component, List<AbstractConfigEntry<?>>> categorizedEntries = Maps.newLinkedHashMap();
+    private final List<Tuple<Component, Integer>> tabs;
+    private AbstractWidget quitButton, saveButton, buttonLeftTab, buttonRightTab;
     private Rectangle tabsBounds, tabsLeftBounds, tabsRightBounds;
     private double tabsMaximumScrolled = -1d;
     private final List<ClothConfigTabButton> tabButtons = Lists.newArrayList();
-    private final Map<Text, ConfigCategory> categoryMap;
+    private final Map<Component, ConfigCategory> categoryMap;
     
     @ApiStatus.Internal
-    public ClothConfigScreen(Screen parent, Text title, Map<Text, ConfigCategory> categoryMap, Identifier backgroundLocation) {
+    public ClothConfigScreen(Screen parent, Component title, Map<Component, ConfigCategory> categoryMap, ResourceLocation backgroundLocation) {
         super(parent, title, backgroundLocation);
         categoryMap.forEach((categoryName, category) -> {
             List<AbstractConfigEntry<?>> entries = Lists.newArrayList();
             for (Object object : category.getEntries()) {
                 AbstractConfigListEntry<?> entry;
-                if (object instanceof Pair<?, ?>) {
-                    entry = (AbstractConfigListEntry<?>) ((Pair<?, ?>) object).getRight();
+                if (object instanceof Tuple<?, ?>) {
+                    entry = (AbstractConfigListEntry<?>) ((Tuple<?, ?>) object).getB();
                 } else {
                     entry = (AbstractConfigListEntry<?>) object;
                 }
@@ -84,17 +84,17 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             }
         });
         
-        this.tabs = categorizedEntries.keySet().stream().map(s -> new Pair<>(s, MinecraftClient.getInstance().textRenderer.getWidth(s) + 8)).collect(Collectors.toList());
+        this.tabs = categorizedEntries.keySet().stream().map(s -> new Tuple<>(s, Minecraft.getInstance().font.width(s) + 8)).collect(Collectors.toList());
         this.categoryMap = categoryMap;
     }
     
     @Override
-    public Text getSelectedCategory() {
-        return tabs.get(selectedCategoryIndex).getLeft();
+    public Component getSelectedCategory() {
+        return tabs.get(selectedCategoryIndex).getA();
     }
     
     @Override
-    public Map<Text, List<AbstractConfigEntry<?>>> getCategorizedEntries() {
+    public Map<Component, List<AbstractConfigEntry<?>>> getCategorizedEntries() {
         return categorizedEntries;
     }
     
@@ -130,15 +130,15 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         super.init();
         this.tabButtons.clear();
         
-        children.add(listWidget = new ListWidget(this, client, width, height, isShowingTabs() ? 70 : 30, height - 32, getBackgroundLocation()));
+        children.add(listWidget = new ListWidget(this, minecraft, width, height, isShowingTabs() ? 70 : 30, height - 32, getBackgroundLocation()));
         if (categorizedEntries.size() > selectedCategoryIndex) {
             listWidget.children().addAll((List) Lists.newArrayList(categorizedEntries.values()).get(selectedCategoryIndex));
         }
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addButton(quitButton = new ButtonWidget(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"), widget -> quit()));
-        addButton(saveButton = new ButtonWidget(width / 2 + 3, height - 26, buttonWidths, 20, NarratorManager.EMPTY, button -> saveAll(true)) {
+        addButton(quitButton = new Button(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? new TranslatableComponent("text.cloth-config.cancel_discard") : new TranslatableComponent("gui.cancel"), widget -> quit()));
+        addButton(saveButton = new Button(width / 2 + 3, height - 26, buttonWidths, 20, NarratorChatListener.NO_TITLE, button -> saveAll(true)) {
             @Override
-            public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+            public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
                 for (List<AbstractConfigEntry<?>> entries : Lists.newArrayList(categorizedEntries.values())) {
                     for (AbstractConfigEntry<?> entry : entries)
@@ -150,7 +150,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                         break;
                 }
                 active = isEdited() && !hasErrors;
-                setMessage(hasErrors ? new TranslatableText("text.cloth-config.error_cannot_save") : new TranslatableText("text.cloth-config.save_and_done"));
+                setMessage(hasErrors ? new TranslatableComponent("text.cloth-config.error_cannot_save") : new TranslatableComponent("text.cloth-config.save_and_done"));
                 super.render(matrices, mouseX, mouseY, delta);
             }
         });
@@ -159,34 +159,34 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             tabsBounds = new Rectangle(0, 41, width, 24);
             tabsLeftBounds = new Rectangle(0, 41, 18, 24);
             tabsRightBounds = new Rectangle(width - 18, 41, 18, 24);
-            children.add(buttonLeftTab = new ButtonWidget(4, 44, 12, 18, NarratorManager.EMPTY, button -> tabsScroller.scrollTo(0, true)) {
+            children.add(buttonLeftTab = new Button(4, 44, 12, 18, NarratorChatListener.NO_TITLE, button -> tabsScroller.scrollTo(0, true)) {
                 @Override
-                public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-                    client.getTextureManager().bindTexture(CONFIG_TEX);
+                public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
+                    minecraft.getTextureManager().bind(CONFIG_TEX);
                     RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
                     int int_3 = this.getYImage(this.isHovered());
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
-                    this.drawTexture(matrices, x, y, 12, 18 * int_3, width, height);
+                    this.blit(matrices, x, y, 12, 18 * int_3, width, height);
                 }
             });
             int j = 0;
-            for (Pair<Text, Integer> tab : tabs) {
-                tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getRight(), 20, tab.getLeft(), this.categoryMap.get(tab.getLeft()).getDescription()));
+            for (Tuple<Component, Integer> tab : tabs) {
+                tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getB(), 20, tab.getA(), this.categoryMap.get(tab.getA()).getDescription()));
                 j++;
             }
             children.addAll(tabButtons);
-            children.add(buttonRightTab = new ButtonWidget(width - 16, 44, 12, 18, NarratorManager.EMPTY, button -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true)) {
+            children.add(buttonRightTab = new Button(width - 16, 44, 12, 18, NarratorChatListener.NO_TITLE, button -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true)) {
                 @Override
-                public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-                    client.getTextureManager().bindTexture(CONFIG_TEX);
+                public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
+                    minecraft.getTextureManager().bind(CONFIG_TEX);
                     RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
                     int int_3 = this.getYImage(this.isHovered());
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
-                    this.drawTexture(matrices, x, y, 0, 18 * int_3, width, height);
+                    this.blit(matrices, x, y, 0, 18 * int_3, width, height);
                 }
             });
         } else {
@@ -207,7 +207,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     public double getTabsMaximumScrolled() {
         if (tabsMaximumScrolled == -1d) {
             int[] i = {0};
-            for (Pair<Text, Integer> pair : tabs) i[0] += pair.getRight() + 2;
+            for (Tuple<Component, Integer> pair : tabs) i[0] += pair.getB() + 2;
             tabsMaximumScrolled = i[0];
         }
         return tabsMaximumScrolled + 6;
@@ -218,7 +218,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     }
     
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
         if (isShowingTabs()) {
             tabsScroller.updatePosition(delta * 3);
             int xx = 24 - (int) tabsScroller.scrollAmount;
@@ -232,7 +232,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         if (isTransparentBackground()) {
             fillGradient(matrices, 0, 0, this.width, this.height, -1072689136, -804253680);
         } else {
-            renderBackgroundTexture(0);
+            renderDirtBackground(0);
         }
         listWidget.render(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
@@ -240,7 +240,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             child.lateRender(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
         if (isShowingTabs()) {
-            drawCenteredText(matrices, client.textRenderer, title, width / 2, 18, -1);
+            drawCenteredString(matrices, minecraft.font, title, width / 2, 18, -1);
             Rectangle onlyInnerTabBounds = new Rectangle(tabsBounds.x + 20, tabsBounds.y, tabsBounds.width - 40, tabsBounds.height);
             ScissorsHandler.INSTANCE.scissor(onlyInnerTabBounds);
             if (isTransparentBackground())
@@ -253,40 +253,40 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             buttonLeftTab.render(matrices, mouseX, mouseY, delta);
             buttonRightTab.render(matrices, mouseX, mouseY, delta);
         } else
-            drawCenteredText(matrices, client.textRenderer, title, width / 2, 12, -1);
+            drawCenteredString(matrices, minecraft.font, title, width / 2, 12, -1);
         
         if (isEditable()) {
-            List<Text> errors = Lists.newArrayList();
+            List<Component> errors = Lists.newArrayList();
             for (List<AbstractConfigEntry<?>> entries : Lists.newArrayList(categorizedEntries.values()))
                 for (AbstractConfigEntry<?> entry : entries)
                     if (entry.getConfigError().isPresent())
                         errors.add(entry.getConfigError().get());
             if (errors.size() > 0) {
-                client.getTextureManager().bindTexture(CONFIG_TEX);
+                minecraft.getTextureManager().bind(CONFIG_TEX);
                 RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-                String text = "§c" + (errors.size() == 1 ? errors.get(0).copy().getString() : I18n.translate("text.cloth-config.multi_error"));
+                String text = "§c" + (errors.size() == 1 ? errors.get(0).plainCopy().getString() : I18n.get("text.cloth-config.multi_error"));
                 if (isTransparentBackground()) {
-                    int stringWidth = client.textRenderer.getStringWidth(text);
-                    fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + client.textRenderer.fontHeight, 0x68000000, 0x68000000);
+                    int stringWidth = minecraft.font.width(text);
+                    fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + minecraft.font.lineHeight, 0x68000000, 0x68000000);
                 }
-                drawTexture(matrices, 10, 10, 0, 54, 3, 11);
-                drawStringWithShadow(matrices, client.textRenderer, text, 18, 12, -1);
+                blit(matrices, 10, 10, 0, 54, 3, 11);
+                drawString(matrices, minecraft.font, text, 18, 12, -1);
                 if (errors.size() > 1) {
-                    int stringWidth = client.textRenderer.getStringWidth(text);
-                    if (mouseX >= 10 && mouseY >= 10 && mouseX <= 18 + stringWidth && mouseY <= 14 + client.textRenderer.fontHeight)
-                        addTooltip(Tooltip.of(new Point(mouseX, mouseY), errors.toArray(new Text[0])));
+                    int stringWidth = minecraft.font.width(text);
+                    if (mouseX >= 10 && mouseY >= 10 && mouseX <= 18 + stringWidth && mouseY <= 14 + minecraft.font.lineHeight)
+                        addTooltip(Tooltip.of(new Point(mouseX, mouseY), errors.toArray(new Component[0])));
                 }
             }
         } else if (!isEditable()) {
-            client.getTextureManager().bindTexture(CONFIG_TEX);
+            minecraft.getTextureManager().bind(CONFIG_TEX);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            String text = "§c" + I18n.translate("text.cloth-config.not_editable");
+            String text = "§c" + I18n.get("text.cloth-config.not_editable");
             if (isTransparentBackground()) {
-                int stringWidth = client.textRenderer.getStringWidth(text);
-                fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + client.textRenderer.fontHeight, 0x68000000, 0x68000000);
+                int stringWidth = minecraft.font.width(text);
+                fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + minecraft.font.lineHeight, 0x68000000, 0x68000000);
             }
-            drawTexture(matrices, 10, 10, 0, 54, 3, 11);
-            drawStringWithShadow(matrices, client.textRenderer, text, 18, 12, -1);
+            blit(matrices, 10, 10, 0, 54, 3, 11);
+            drawString(matrices, minecraft.font, text, 18, 12, -1);
         }
         super.render(matrices, mouseX, mouseY, delta);
     }
@@ -297,8 +297,8 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         super.addTooltip(queuedTooltip);
     }
     
-    private void drawTabsShades(MatrixStack matrices, int lightColor, int darkColor) {
-        drawTabsShades(matrices.peek().getModel(), lightColor, darkColor);
+    private void drawTabsShades(PoseStack matrices, int lightColor, int darkColor) {
+        drawTabsShades(matrices.last().pose(), lightColor, darkColor);
     }
     
     private void drawTabsShades(Matrix4f matrix, int lightColor, int darkColor) {
@@ -307,20 +307,20 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         RenderSystem.disableAlphaTest();
         RenderSystem.shadeModel(7425);
         RenderSystem.disableTexture();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY() + 4, 0.0F).texture(0, 1f).color(0, 0, 0, lightColor).next();
-        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY() + 4, 0.0F).texture(1f, 1f).color(0, 0, 0, lightColor).next();
-        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY(), 0.0F).texture(1f, 0).color(0, 0, 0, darkColor).next();
-        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY(), 0.0F).texture(0, 0).color(0, 0, 0, darkColor).next();
-        tessellator.draw();
-        buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY(), 0.0F).texture(0, 1f).color(0, 0, 0, darkColor).next();
-        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY(), 0.0F).texture(1f, 1f).color(0, 0, 0, darkColor).next();
-        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0F).texture(1f, 0).color(0, 0, 0, lightColor).next();
-        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY() - 4, 0.0F).texture(0, 0).color(0, 0, 0, lightColor).next();
-        tessellator.draw();
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY() + 4, 0.0F).uv(0, 1f).color(0, 0, 0, lightColor).endVertex();
+        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY() + 4, 0.0F).uv(1f, 1f).color(0, 0, 0, lightColor).endVertex();
+        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY(), 0.0F).uv(1f, 0).color(0, 0, 0, darkColor).endVertex();
+        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY(), 0.0F).uv(0, 0).color(0, 0, 0, darkColor).endVertex();
+        tessellator.end();
+        buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY(), 0.0F).uv(0, 1f).color(0, 0, 0, darkColor).endVertex();
+        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY(), 0.0F).uv(1f, 1f).color(0, 0, 0, darkColor).endVertex();
+        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0F).uv(1f, 0).color(0, 0, 0, lightColor).endVertex();
+        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY() - 4, 0.0F).uv(0, 0).color(0, 0, 0, lightColor).endVertex();
+        tessellator.end();
         RenderSystem.enableTexture();
         RenderSystem.shadeModel(7424);
         RenderSystem.enableAlphaTest();
@@ -350,7 +350,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         public long start;
         public long duration;
         
-        public ListWidget(AbstractConfigScreen screen, MinecraftClient client, int width, int height, int top, int bottom, Identifier backgroundLocation) {
+        public ListWidget(AbstractConfigScreen screen, Minecraft client, int width, int height, int top, int bottom, ResourceLocation backgroundLocation) {
             super(client, width, height, top, bottom, backgroundLocation);
             setRenderSelection(false);
             this.screen = screen;
@@ -367,18 +367,18 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
         
         @Override
-        protected void renderItem(MatrixStack matrices, R item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        protected void renderItem(PoseStack matrices, R item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             if (item instanceof AbstractConfigEntry)
                 ((AbstractConfigEntry) item).updateSelected(getFocused() == item);
             super.renderItem(matrices, item, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         }
         
         @Override
-        protected void renderList(MatrixStack matrices, int startX, int startY, int int_3, int int_4, float delta) {
+        protected void renderList(PoseStack matrices, int startX, int startY, int int_3, int int_4, float delta) {
             thisTimeTarget = null;
             if (hasCurrent) {
                 long timePast = System.currentTimeMillis() - lastTouch;
-                int alpha = timePast <= 200 ? 255 : MathHelper.ceil(255 - Math.min(timePast - 200, 500F) / 500F * 255.0);
+                int alpha = timePast <= 200 ? 255 : Mth.ceil(255 - Math.min(timePast - 200, 500F) / 500F * 255.0);
                 alpha = (alpha * 36 / 255) << 24;
                 fillGradient(matrices, currentX, currentY, currentX + currentWidth, currentY + currentHeight, 0xFFFFFF | alpha, 0xFFFFFF | alpha);
             }
@@ -406,17 +406,17 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             }
         }
         
-        protected void fillGradient(MatrixStack matrices, double xStart, double yStart, double xEnd, double yEnd, int colorStart, int colorEnd) {
+        protected void fillGradient(PoseStack matrices, double xStart, double yStart, double xEnd, double yEnd, int colorStart, int colorEnd) {
             RenderSystem.disableTexture();
             RenderSystem.enableBlend();
             RenderSystem.disableAlphaTest();
             RenderSystem.defaultBlendFunc();
             RenderSystem.shadeModel(7425);
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder bufferBuilder = tessellator.getBuffer();
-            bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
-            fillGradient(matrices.peek().getModel(), bufferBuilder, xStart, yStart, xEnd, yEnd, this.getZOffset(), colorStart, colorEnd);
-            tessellator.draw();
+            Tesselator tessellator = Tesselator.getInstance();
+            BufferBuilder bufferBuilder = tessellator.getBuilder();
+            bufferBuilder.begin(7, DefaultVertexFormat.POSITION_COLOR);
+            fillGradient(matrices.last().pose(), bufferBuilder, xStart, yStart, xEnd, yEnd, this.getBlitOffset(), colorStart, colorEnd);
+            tessellator.end();
             RenderSystem.shadeModel(7424);
             RenderSystem.disableBlend();
             RenderSystem.enableAlphaTest();
@@ -432,10 +432,10 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             float n = (float) (k >> 16 & 255) / 255.0F;
             float o = (float) (k >> 8 & 255) / 255.0F;
             float p = (float) (k & 255) / 255.0F;
-            bufferBuilder.vertex(matrix4f, (float) xEnd, (float) yStart, (float) i).color(g, h, l, f).next();
-            bufferBuilder.vertex(matrix4f, (float) xStart, (float) yStart, (float) i).color(g, h, l, f).next();
-            bufferBuilder.vertex(matrix4f, (float) xStart, (float) yEnd, (float) i).color(n, o, p, m).next();
-            bufferBuilder.vertex(matrix4f, (float) xEnd, (float) yEnd, (float) i).color(n, o, p, m).next();
+            bufferBuilder.vertex(matrix4f, (float) xEnd, (float) yStart, (float) i).color(g, h, l, f).endVertex();
+            bufferBuilder.vertex(matrix4f, (float) xStart, (float) yStart, (float) i).color(g, h, l, f).endVertex();
+            bufferBuilder.vertex(matrix4f, (float) xStart, (float) yEnd, (float) i).color(n, o, p, m).endVertex();
+            bufferBuilder.vertex(matrix4f, (float) xEnd, (float) yEnd, (float) i).color(n, o, p, m).endVertex();
         }
         
         @Override
@@ -461,7 +461,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
         
         @Override
-        protected void renderBackBackground(MatrixStack matrices, BufferBuilder buffer, Tessellator tessellator) {
+        protected void renderBackBackground(PoseStack matrices, BufferBuilder buffer, Tesselator tessellator) {
             if (!screen.isTransparentBackground())
                 super.renderBackBackground(matrices, buffer, tessellator);
             else {
@@ -470,7 +470,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
         
         @Override
-        protected void renderHoleBackground(MatrixStack matrices, int y1, int y2, int alpha1, int alpha2) {
+        protected void renderHoleBackground(PoseStack matrices, int y1, int y2, int alpha1, int alpha2) {
             if (!screen.isTransparentBackground())
                 super.renderHoleBackground(matrices, y1, y2, alpha1, alpha2);
         }

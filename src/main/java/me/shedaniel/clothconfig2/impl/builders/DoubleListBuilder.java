@@ -3,9 +3,8 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.DoubleListListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,31 +17,31 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListListEntry> {
     
-    protected Function<Double, Optional<Text>> cellErrorSupplier;
+    protected Function<Double, Optional<Component>> cellErrorSupplier;
     private Consumer<List<Double>> saveConsumer = null;
-    private Function<List<Double>, Optional<Text[]>> tooltipSupplier = list -> Optional.empty();
+    private Function<List<Double>, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();
     private final List<Double> value;
     private boolean expanded = false;
     private Double min = null, max = null;
     private Function<DoubleListListEntry, DoubleListListEntry.DoubleListCell> createNewInstance;
-    private Text addTooltip = new TranslatableText("text.cloth-config.list.add"), removeTooltip = new TranslatableText("text.cloth-config.list.remove");
+    private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
     private boolean deleteButtonEnabled = true, insertInFront = true;
     
-    public DoubleListBuilder(Text resetButtonKey, Text fieldNameKey, List<Double> value) {
+    public DoubleListBuilder(Component resetButtonKey, Component fieldNameKey, List<Double> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
-    public Function<Double, Optional<Text>> getCellErrorSupplier() {
+    public Function<Double, Optional<Component>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
     
-    public DoubleListBuilder setCellErrorSupplier(Function<Double, Optional<Text>> cellErrorSupplier) {
+    public DoubleListBuilder setCellErrorSupplier(Function<Double, Optional<Component>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
         return this;
     }
     
-    public DoubleListBuilder setErrorSupplier(Function<List<Double>, Optional<Text>> errorSupplier) {
+    public DoubleListBuilder setErrorSupplier(Function<List<Double>, Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -57,12 +56,12 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         return this;
     }
     
-    public DoubleListBuilder setAddButtonTooltip(Text addTooltip) {
+    public DoubleListBuilder setAddButtonTooltip(Component addTooltip) {
         this.addTooltip = addTooltip;
         return this;
     }
     
-    public DoubleListBuilder setRemoveButtonTooltip(Text removeTooltip) {
+    public DoubleListBuilder setRemoveButtonTooltip(Component removeTooltip) {
         this.removeTooltip = removeTooltip;
         return this;
     }
@@ -123,22 +122,22 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         return this;
     }
     
-    public DoubleListBuilder setTooltipSupplier(Function<List<Double>, Optional<Text[]>> tooltipSupplier) {
+    public DoubleListBuilder setTooltipSupplier(Function<List<Double>, Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public DoubleListBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
+    public DoubleListBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = list -> tooltipSupplier.get();
         return this;
     }
     
-    public DoubleListBuilder setTooltip(Optional<Text[]> tooltip) {
+    public DoubleListBuilder setTooltip(Optional<Component[]> tooltip) {
         this.tooltipSupplier = list -> tooltip;
         return this;
     }
     
-    public DoubleListBuilder setTooltip(Text... tooltip) {
+    public DoubleListBuilder setTooltip(Component... tooltip) {
         this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }

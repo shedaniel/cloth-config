@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,19 +17,19 @@ public class StringListListEntry extends AbstractTextFieldListListEntry<String, 
     
     @ApiStatus.Internal
     @Deprecated
-    public StringListListEntry(Text fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, Text resetButtonKey) {
+    public StringListListEntry(Component fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<Component[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, Component resetButtonKey) {
         this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public StringListListEntry(Text fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, Text resetButtonKey, boolean requiresRestart) {
+    public StringListListEntry(Component fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<Component[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, Component resetButtonKey, boolean requiresRestart) {
         this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, true, true);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public StringListListEntry(Text fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, Text resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+    public StringListListEntry(Component fieldName, List<String> value, boolean defaultExpanded, Supplier<Optional<Component[]>> tooltipSupplier, Consumer<List<String>> saveConsumer, Supplier<List<String>> defaultValue, Component resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront, StringListCell::new);
     }
     
@@ -60,11 +60,11 @@ public class StringListListEntry extends AbstractTextFieldListListEntry<String, 
         
         @Override
         public String getValue() {
-            return widget.getText();
+            return widget.getValue();
         }
         
         @Override
-        public Optional<Text> getError() {
+        public Optional<Component> getError() {
             return Optional.empty();
         }
         

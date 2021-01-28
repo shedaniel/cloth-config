@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version "0.4-SNAPSHOT"
+    id 'fabric-loom' version "0.5-SNAPSHOT"
     id 'maven-publish'
     id 'maven'
     id 'signing'
@@ -44,7 +44,7 @@ dependencies {
     compile("org.jetbrains:annotations:18.0.0")
 
     minecraft("com.mojang:minecraft:${project.minecraft_version}")
-    mappings("me.shedaniel:legacy-yarn:${project.yarn_mappings}:v2")
+    mappings(minecraft.officialMojangMappings())
 
     modApi("net.fabricmc:fabric-loader:${project.loader_version}")
     modApi("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
@@ -166,7 +166,7 @@ curseforge {
                 requiredDependency 'fabric-api'
             }
             mainArtifact(file("${project.buildDir}/filtered-libs/${project.archivesBaseName}-${project.version}.jar")) {
-                displayName = "[Fabric ${project.supported_version}] ClothConfig2-$project.version"
+                displayName = "[Fabric ${project.minecraft_version}] ClothConfig2-$project.version"
             }
             addArtifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar"))
             afterEvaluate {

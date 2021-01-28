@@ -10,13 +10,12 @@ import me.shedaniel.math.Color;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
-
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.TextComponent;
+import com.mojang.blaze3d.platform.InputConstants;
 import java.util.List;
 import java.util.function.Function;
 
@@ -27,115 +26,115 @@ public interface ConfigEntryBuilder {
         return ConfigEntryBuilderImpl.create();
     }
     
-    Text getResetButtonKey();
+    Component getResetButtonKey();
     
-    ConfigEntryBuilder setResetButtonKey(Text resetButtonKey);
+    ConfigEntryBuilder setResetButtonKey(Component resetButtonKey);
     
-    IntListBuilder startIntList(Text fieldNameKey, List<Integer> value);
+    IntListBuilder startIntList(Component fieldNameKey, List<Integer> value);
     
-    LongListBuilder startLongList(Text fieldNameKey, List<Long> value);
+    LongListBuilder startLongList(Component fieldNameKey, List<Long> value);
     
-    FloatListBuilder startFloatList(Text fieldNameKey, List<Float> value);
+    FloatListBuilder startFloatList(Component fieldNameKey, List<Float> value);
     
-    DoubleListBuilder startDoubleList(Text fieldNameKey, List<Double> value);
+    DoubleListBuilder startDoubleList(Component fieldNameKey, List<Double> value);
     
-    StringListBuilder startStrList(Text fieldNameKey, List<String> value);
+    StringListBuilder startStrList(Component fieldNameKey, List<String> value);
     
-    SubCategoryBuilder startSubCategory(Text fieldNameKey);
+    SubCategoryBuilder startSubCategory(Component fieldNameKey);
     
-    SubCategoryBuilder startSubCategory(Text fieldNameKey, List<AbstractConfigListEntry> entries);
+    SubCategoryBuilder startSubCategory(Component fieldNameKey, List<AbstractConfigListEntry> entries);
     
-    BooleanToggleBuilder startBooleanToggle(Text fieldNameKey, boolean value);
+    BooleanToggleBuilder startBooleanToggle(Component fieldNameKey, boolean value);
     
-    StringFieldBuilder startStrField(Text fieldNameKey, String value);
+    StringFieldBuilder startStrField(Component fieldNameKey, String value);
     
-    ColorFieldBuilder startColorField(Text fieldNameKey, int value);
+    ColorFieldBuilder startColorField(Component fieldNameKey, int value);
     
-    default ColorFieldBuilder startColorField(Text fieldNameKey, TextColor color) {
-        return startColorField(fieldNameKey, color.getRgb());
+    default ColorFieldBuilder startColorField(Component fieldNameKey, TextColor color) {
+        return startColorField(fieldNameKey, color.getValue());
     }
     
-    default ColorFieldBuilder startColorField(Text fieldNameKey, Color color) {
+    default ColorFieldBuilder startColorField(Component fieldNameKey, Color color) {
         return startColorField(fieldNameKey, color.getColor() & 0xFFFFFF);
     }
     
-    default ColorFieldBuilder startAlphaColorField(Text fieldNameKey, int value) {
+    default ColorFieldBuilder startAlphaColorField(Component fieldNameKey, int value) {
         return startColorField(fieldNameKey, value).setAlphaMode(true);
     }
     
-    default ColorFieldBuilder startAlphaColorField(Text fieldNameKey, Color color) {
+    default ColorFieldBuilder startAlphaColorField(Component fieldNameKey, Color color) {
         return startColorField(fieldNameKey, color.getColor());
     }
     
-    TextFieldBuilder startTextField(Text fieldNameKey, String value);
+    TextFieldBuilder startTextField(Component fieldNameKey, String value);
     
-    TextDescriptionBuilder startTextDescription(Text value);
+    TextDescriptionBuilder startTextDescription(Component value);
     
-    <T extends Enum<?>> EnumSelectorBuilder<T> startEnumSelector(Text fieldNameKey, Class<T> clazz, T value);
+    <T extends Enum<?>> EnumSelectorBuilder<T> startEnumSelector(Component fieldNameKey, Class<T> clazz, T value);
     
-    <T> SelectorBuilder<T> startSelector(Text fieldNameKey, T[] valuesArray, T value);
+    <T> SelectorBuilder<T> startSelector(Component fieldNameKey, T[] valuesArray, T value);
     
-    IntFieldBuilder startIntField(Text fieldNameKey, int value);
+    IntFieldBuilder startIntField(Component fieldNameKey, int value);
     
-    LongFieldBuilder startLongField(Text fieldNameKey, long value);
+    LongFieldBuilder startLongField(Component fieldNameKey, long value);
     
-    FloatFieldBuilder startFloatField(Text fieldNameKey, float value);
+    FloatFieldBuilder startFloatField(Component fieldNameKey, float value);
     
-    DoubleFieldBuilder startDoubleField(Text fieldNameKey, double value);
+    DoubleFieldBuilder startDoubleField(Component fieldNameKey, double value);
     
-    IntSliderBuilder startIntSlider(Text fieldNameKey, int value, int min, int max);
+    IntSliderBuilder startIntSlider(Component fieldNameKey, int value, int min, int max);
     
-    LongSliderBuilder startLongSlider(Text fieldNameKey, long value, long min, long max);
+    LongSliderBuilder startLongSlider(Component fieldNameKey, long value, long min, long max);
     
-    KeyCodeBuilder startModifierKeyCodeField(Text fieldNameKey, ModifierKeyCode value);
+    KeyCodeBuilder startModifierKeyCodeField(Component fieldNameKey, ModifierKeyCode value);
     
-    default KeyCodeBuilder startKeyCodeField(Text fieldNameKey, InputUtil.KeyCode value) {
+    default KeyCodeBuilder startKeyCodeField(Component fieldNameKey, InputConstants.Key value) {
         return startModifierKeyCodeField(fieldNameKey, ModifierKeyCode.of(value, Modifier.none())).setAllowModifiers(false);
     }
     
-    default KeyCodeBuilder fillKeybindingField(Text fieldNameKey, KeyBinding value) {
-        return startKeyCodeField(fieldNameKey, KeyBindingHelper.getBoundKeyOf(value)).setDefaultValue(value.getDefaultKeyCode()).setSaveConsumer(code -> {
-            value.setKeyCode(code);
-            KeyBinding.updateKeysByCode();
-            MinecraftClient.getInstance().options.write();
+    default KeyCodeBuilder fillKeybindingField(Component fieldNameKey, KeyMapping value) {
+        return startKeyCodeField(fieldNameKey, KeyBindingHelper.getBoundKeyOf(value)).setDefaultValue(value.getDefaultKey()).setSaveConsumer(code -> {
+            value.setKey(code);
+            KeyMapping.resetMapping();
+            Minecraft.getInstance().options.save();
         });
     }
     
-    <T> DropdownMenuBuilder<T> startDropdownMenu(Text fieldNameKey, SelectionTopCellElement<T> topCellElement, SelectionCellCreator<T> cellCreator);
+    <T> DropdownMenuBuilder<T> startDropdownMenu(Component fieldNameKey, SelectionTopCellElement<T> topCellElement, SelectionCellCreator<T> cellCreator);
     
-    default <T> DropdownMenuBuilder<T> startDropdownMenu(Text fieldNameKey, SelectionTopCellElement<T> topCellElement) {
+    default <T> DropdownMenuBuilder<T> startDropdownMenu(Component fieldNameKey, SelectionTopCellElement<T> topCellElement) {
         return startDropdownMenu(fieldNameKey, topCellElement, new DefaultSelectionCellCreator<>());
     }
     
-    default <T> DropdownMenuBuilder<T> startDropdownMenu(Text fieldNameKey, T value, Function<String, T> toObjectFunction, SelectionCellCreator<T> cellCreator) {
+    default <T> DropdownMenuBuilder<T> startDropdownMenu(Component fieldNameKey, T value, Function<String, T> toObjectFunction, SelectionCellCreator<T> cellCreator) {
         return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, toObjectFunction), cellCreator);
     }
     
-    default <T> DropdownMenuBuilder<T> startDropdownMenu(Text fieldNameKey, T value, Function<String, T> toObjectFunction, Function<T, Text> toTextFunction, SelectionCellCreator<T> cellCreator) {
+    default <T> DropdownMenuBuilder<T> startDropdownMenu(Component fieldNameKey, T value, Function<String, T> toObjectFunction, Function<T, Component> toTextFunction, SelectionCellCreator<T> cellCreator) {
         return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, toObjectFunction, toTextFunction), cellCreator);
     }
     
-    default <T> DropdownMenuBuilder<T> startDropdownMenu(Text fieldNameKey, T value, Function<String, T> toObjectFunction) {
+    default <T> DropdownMenuBuilder<T> startDropdownMenu(Component fieldNameKey, T value, Function<String, T> toObjectFunction) {
         return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, toObjectFunction), new DefaultSelectionCellCreator<>());
     }
     
-    default <T> DropdownMenuBuilder<T> startDropdownMenu(Text fieldNameKey, T value, Function<String, T> toObjectFunction, Function<T, Text> toTextFunction) {
+    default <T> DropdownMenuBuilder<T> startDropdownMenu(Component fieldNameKey, T value, Function<String, T> toObjectFunction, Function<T, Component> toTextFunction) {
         return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, toObjectFunction, toTextFunction), new DefaultSelectionCellCreator<>());
     }
     
-    default DropdownMenuBuilder<String> startStringDropdownMenu(Text fieldNameKey, String value, SelectionCellCreator<String> cellCreator) {
-        return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, s -> s, LiteralText::new), cellCreator);
+    default DropdownMenuBuilder<String> startStringDropdownMenu(Component fieldNameKey, String value, SelectionCellCreator<String> cellCreator) {
+        return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, s -> s, TextComponent::new), cellCreator);
     }
     
-    default DropdownMenuBuilder<String> startStringDropdownMenu(Text fieldNameKey, String value, Function<String, Text> toTextFunction, SelectionCellCreator<String> cellCreator) {
+    default DropdownMenuBuilder<String> startStringDropdownMenu(Component fieldNameKey, String value, Function<String, Component> toTextFunction, SelectionCellCreator<String> cellCreator) {
         return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, s -> s, toTextFunction), cellCreator);
     }
     
-    default DropdownMenuBuilder<String> startStringDropdownMenu(Text fieldNameKey, String value) {
-        return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, s -> s, LiteralText::new), new DefaultSelectionCellCreator<>());
+    default DropdownMenuBuilder<String> startStringDropdownMenu(Component fieldNameKey, String value) {
+        return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, s -> s, TextComponent::new), new DefaultSelectionCellCreator<>());
     }
     
-    default DropdownMenuBuilder<String> startStringDropdownMenu(Text fieldNameKey, String value, Function<String, Text> toTextFunction) {
+    default DropdownMenuBuilder<String> startStringDropdownMenu(Component fieldNameKey, String value, Function<String, Component> toTextFunction) {
         return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, s -> s, toTextFunction), new DefaultSelectionCellCreator<>());
     }
 }

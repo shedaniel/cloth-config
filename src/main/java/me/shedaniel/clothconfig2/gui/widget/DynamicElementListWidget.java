@@ -2,15 +2,15 @@ package me.shedaniel.clothconfig2.gui.widget;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.ParentElement;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
 public abstract class DynamicElementListWidget<E extends DynamicElementListWidget.ElementEntry<E>> extends DynamicNewSmoothScrollingEntryListWidget<E> {
     
-    public DynamicElementListWidget(MinecraftClient client, int width, int height, int top, int bottom, Identifier backgroundLocation) {
+    public DynamicElementListWidget(Minecraft client, int width, int height, int top, int bottom, ResourceLocation backgroundLocation) {
         super(client, width, height, top, bottom, backgroundLocation);
     }
     
@@ -26,8 +26,8 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract static class ElementEntry<E extends ElementEntry<E>> extends Entry<E> implements ParentElement {
-        private Element focused;
+    public abstract static class ElementEntry<E extends ElementEntry<E>> extends Entry<E> implements ContainerEventHandler {
+        private GuiEventListener focused;
         private boolean dragging;
         
         public ElementEntry() {
@@ -41,11 +41,11 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
             this.dragging = boolean_1;
         }
         
-        public Element getFocused() {
+        public GuiEventListener getFocused() {
             return this.focused;
         }
         
-        public void setFocused(Element element_1) {
+        public void setFocused(GuiEventListener element_1) {
             this.focused = element_1;
         }
     }

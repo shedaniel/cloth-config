@@ -6,9 +6,9 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.StringRenderable;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -20,19 +20,19 @@ public class ConfigCategoryImpl implements ConfigCategory {
     private final ConfigBuilder builder;
     private final List<Object> data;
     @Nullable
-    private Identifier background;
-    private final Text categoryKey;
+    private ResourceLocation background;
+    private final Component categoryKey;
     @Nullable
-    private Supplier<Optional<StringRenderable[]>> description = Optional::empty;
+    private Supplier<Optional<FormattedText[]>> description = Optional::empty;
     
-    ConfigCategoryImpl(ConfigBuilder builder, Text categoryKey) {
+    ConfigCategoryImpl(ConfigBuilder builder, Component categoryKey) {
         this.builder = builder;
         this.data = Lists.newArrayList();
         this.categoryKey = categoryKey;
     }
     
     @Override
-    public Text getCategoryKey() {
+    public Component getCategoryKey() {
         return categoryKey;
     }
     
@@ -48,7 +48,7 @@ public class ConfigCategoryImpl implements ConfigCategory {
     }
     
     @Override
-    public ConfigCategory setCategoryBackground(Identifier identifier) {
+    public ConfigCategory setCategoryBackground(ResourceLocation identifier) {
         if (builder.hasTransparentBackground())
             throw new IllegalStateException("Cannot set category background if screen is using transparent background.");
         background = identifier;
@@ -61,24 +61,24 @@ public class ConfigCategoryImpl implements ConfigCategory {
     }
     
     @Override
-    public void setBackground(@Nullable Identifier background) {
+    public void setBackground(@Nullable ResourceLocation background) {
         this.background = background;
     }
     
     @Override
     @Nullable
-    public Identifier getBackground() {
+    public ResourceLocation getBackground() {
         return background;
     }
     
     @Nullable
     @Override
-    public Supplier<Optional<StringRenderable[]>> getDescription() {
+    public Supplier<Optional<FormattedText[]>> getDescription() {
         return description;
     }
     
     @Override
-    public void setDescription(@Nullable Supplier<Optional<StringRenderable[]>> description) {
+    public void setDescription(@Nullable Supplier<Optional<FormattedText[]>> description) {
         this.description = description;
     }
 }

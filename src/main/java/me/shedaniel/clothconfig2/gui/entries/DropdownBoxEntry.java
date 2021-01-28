@@ -2,7 +2,12 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.api.ScrollingContainer;
@@ -10,23 +15,18 @@ import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.AbstractParentElement;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.NarratorManager;
-import net.minecraft.client.util.Window;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +42,7 @@ import static me.shedaniel.clothconfig2.api.ScrollingContainer.handleScrollingPo
 @Environment(EnvType.CLIENT)
 public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     
-    protected ButtonWidget resetButton;
+    protected Button resetButton;
     protected SelectionElement<T> selectionElement;
     @NotNull private Supplier<T> defaultValue;
     @Nullable private Consumer<T> saveConsumer;
@@ -50,31 +50,31 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     
     @ApiStatus.Internal
     @Deprecated
-    public DropdownBoxEntry(Text fieldName, @NotNull Text resetButtonKey, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart, @Nullable Supplier<T> defaultValue, @Nullable Consumer<T> saveConsumer, @Nullable Iterable<T> selections, @NotNull SelectionTopCellElement<T> topRenderer, @NotNull SelectionCellCreator<T> cellCreator) {
+    public DropdownBoxEntry(Component fieldName, @NotNull Component resetButtonKey, @Nullable Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart, @Nullable Supplier<T> defaultValue, @Nullable Consumer<T> saveConsumer, @Nullable Iterable<T> selections, @NotNull SelectionTopCellElement<T> topRenderer, @NotNull SelectionCellCreator<T> cellCreator) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.saveConsumer = saveConsumer;
-        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
+        this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             selectionElement.topRenderer.setValue(defaultValue.get());
         });
         this.selectionElement = new SelectionElement<>(this, new Rectangle(0, 0, 150, 20), new DefaultDropdownMenuElement<>(selections == null ? ImmutableList.of() : ImmutableList.copyOf(selections)), topRenderer, cellCreator);
     }
     
     @Override
-    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
-        Window window = MinecraftClient.getInstance().getWindow();
+        Window window = Minecraft.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && (!defaultValue.get().equals(getValue()) || getConfigError().isPresent());
         this.resetButton.y = y;
         this.selectionElement.active = isEditable();
         this.selectionElement.bounds.y = y;
-        Text displayedFieldName = getDisplayedFieldName();
-        if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 6, getPreferredTextColor());
+        Component displayedFieldName = getDisplayedFieldName();
+        if (Minecraft.getInstance().font.isBidirectional()) {
+            Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, getPreferredTextColor());
             this.resetButton.x = x;
             this.selectionElement.bounds.x = x + resetButton.getWidth() + 1;
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), x, y + 6, getPreferredTextColor());
+            Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), x, y + 6, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.selectionElement.bounds.x = x + entryWidth - 150 + 1;
         }
@@ -129,17 +129,17 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public List<? extends Element> children() {
+    public List<? extends GuiEventListener> children() {
         return Lists.newArrayList(selectionElement, resetButton);
     }
     
     @Override
-    public Optional<Text> getError() {
+    public Optional<Component> getError() {
         return selectionElement.topRenderer.getError();
     }
     
     @Override
-    public void lateRender(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void lateRender(PoseStack matrices, int mouseX, int mouseY, float delta) {
         selectionElement.lateRender(matrices, mouseX, mouseY, delta);
     }
     
@@ -153,7 +153,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         return selectionElement.mouseScrolled(double_1, double_2, double_3);
     }
     
-    public static class SelectionElement<R> extends AbstractParentElement implements Drawable {
+    public static class SelectionElement<R> extends AbstractContainerEventHandler implements Widget {
         protected Rectangle bounds;
         protected boolean active;
         protected SelectionTopCellElement<R> topRenderer;
@@ -173,7 +173,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
             fill(matrices, bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height, topRenderer.isSelected ? -1 : -6250336);
             fill(matrices, bounds.x + 1, bounds.y + 1, bounds.x + bounds.width - 1, bounds.y + bounds.height - 1, -16777216);
             topRenderer.render(matrices, mouseX, mouseY, bounds.x, bounds.y, bounds.width, bounds.height, delta);
@@ -193,7 +193,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             return false;
         }
         
-        public void lateRender(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        public void lateRender(PoseStack matrices, int mouseX, int mouseY, float delta) {
             if (menu.isExpanded())
                 menu.lateRender(matrices, mouseX, mouseY, delta);
         }
@@ -209,7 +209,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return Lists.newArrayList(topRenderer, menu);
         }
         
@@ -225,7 +225,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
     }
     
-    public static abstract class DropdownMenuElement<R> extends AbstractParentElement {
+    public static abstract class DropdownMenuElement<R> extends AbstractContainerEventHandler {
         @Deprecated @NotNull private SelectionCellCreator<R> cellCreator;
         @Deprecated @NotNull private DropdownBoxEntry<R> entry;
         private boolean isSelected;
@@ -245,9 +245,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         public abstract void initCells();
         
-        public abstract void render(MatrixStack matrices, int mouseX, int mouseY, Rectangle rectangle, float delta);
+        public abstract void render(PoseStack matrices, int mouseX, int mouseY, Rectangle rectangle, float delta);
         
-        public abstract void lateRender(MatrixStack matrices, int mouseX, int mouseY, float delta);
+        public abstract void lateRender(PoseStack matrices, int mouseX, int mouseY, float delta);
         
         public abstract int getHeight();
         
@@ -267,7 +267,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         @NotNull protected ImmutableList<R> selections;
         @NotNull protected List<SelectionCellElement<R>> cells;
         @NotNull protected List<SelectionCellElement<R>> currentElements;
-        protected Text lastSearchKeyword = NarratorManager.EMPTY;
+        protected Component lastSearchKeyword = NarratorChatListener.NO_TITLE;
         protected Rectangle lastRectangle;
         protected boolean scrolling;
         protected double scroll, target;
@@ -310,7 +310,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 currentElements.clear();
                 String keyword = this.lastSearchKeyword.getString().toLowerCase();
                 for (SelectionCellElement<R> cell : cells) {
-                    Text key = cell.getSearchKey();
+                    Component key = cell.getSearchKey();
                     if (key == null || key.getString().toLowerCase().contains(keyword))
                         currentElements.add(cell);
                 }
@@ -365,7 +365,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public void render(MatrixStack matrices, int mouseX, int mouseY, Rectangle rectangle, float delta) {
+        public void render(PoseStack matrices, int mouseX, int mouseY, Rectangle rectangle, float delta) {
             if (!getEntry().selectionElement.topRenderer.getSearchTerm().equals(lastSearchKeyword)) {
                 lastSearchKeyword = getEntry().selectionElement.topRenderer.getSearchTerm();
                 search();
@@ -382,7 +382,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public void lateRender(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        public void lateRender(PoseStack matrices, int mouseX, int mouseY, float delta) {
             int last10Height = getHeight();
             int cWidth = getCellCreator().getCellWidth();
             fill(matrices, lastRectangle.x, lastRectangle.y + lastRectangle.height, lastRectangle.x + cWidth, lastRectangle.y + lastRectangle.height + last10Height + 1, isExpanded() ? -1 : -6250336);
@@ -402,9 +402,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             ScissorsHandler.INSTANCE.removeLastScissor();
             
             if (currentElements.isEmpty()) {
-                TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-                Text text = new TranslatableText("text.cloth-config.dropdown.value.unknown");
-                textRenderer.drawWithShadow(matrices, text.method_30937(), lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.getWidth(text) / 2f, lastRectangle.y + lastRectangle.height + 3, -1);
+                Font textRenderer = Minecraft.getInstance().font;
+                Component text = new TranslatableComponent("text.cloth-config.dropdown.value.unknown");
+                textRenderer.drawShadow(matrices, text.getVisualOrderText(), lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.width(text) / 2f, lastRectangle.y + lastRectangle.height + 3, -1);
             }
             
             if (getMaxScrollPosition() > 6) {
@@ -412,7 +412,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 int scrollbarPositionMinX = lastRectangle.x + getCellCreator().getCellWidth() - 6;
                 int scrollbarPositionMaxX = scrollbarPositionMinX + 6;
                 int height = (int) (((last10Height) * (last10Height)) / this.getMaxScrollPosition());
-                height = MathHelper.clamp(height, 32, last10Height - 8);
+                height = Mth.clamp(height, 32, last10Height - 8);
                 height -= Math.min((scroll < 0 ? (int) -scroll : scroll > getMaxScrollPosition() ? (int) scroll - getMaxScrollPosition() : 0), height * .95);
                 height = Math.max(10, height);
                 int minY = (int) Math.min(Math.max((int) scroll * (last10Height - height) / getMaxScrollPosition() + (lastRectangle.y + lastRectangle.height + 1), (lastRectangle.y + lastRectangle.height + 1)), (lastRectangle.y + lastRectangle.height + 1 + last10Height) - height);
@@ -420,24 +420,24 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 int bottomc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 168 : 128;
                 int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 222 : 172;
                 
-                Tessellator tessellator = Tessellator.getInstance();
-                BufferBuilder buffer = tessellator.getBuffer();
+                Tesselator tessellator = Tesselator.getInstance();
+                BufferBuilder buffer = tessellator.getBuilder();
                 
                 // Bottom
-                buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-                buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).texture(0, 1).color(bottomc, bottomc, bottomc, 255).next();
-                buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).texture(1, 1).color(bottomc, bottomc, bottomc, 255).next();
-                buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).texture(1, 0).color(bottomc, bottomc, bottomc, 255).next();
-                buffer.vertex(scrollbarPositionMinX, minY, 0.0D).texture(0, 0).color(bottomc, bottomc, bottomc, 255).next();
-                tessellator.draw();
+                buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+                buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).uv(0, 1).color(bottomc, bottomc, bottomc, 255).endVertex();
+                buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).uv(1, 1).color(bottomc, bottomc, bottomc, 255).endVertex();
+                buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).uv(1, 0).color(bottomc, bottomc, bottomc, 255).endVertex();
+                buffer.vertex(scrollbarPositionMinX, minY, 0.0D).uv(0, 0).color(bottomc, bottomc, bottomc, 255).endVertex();
+                tessellator.end();
                 
                 // Top
-                buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-                buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).texture(0, 1).color(topc, topc, topc, 255).next();
-                buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).texture(1, 1).color(topc, topc, topc, 255).next();
-                buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).texture(1, 0).color(topc, topc, topc, 255).next();
-                buffer.vertex(scrollbarPositionMinX, minY, 0.0D).texture(0, 0).color(topc, topc, topc, 255).next();
-                tessellator.draw();
+                buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+                buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).uv(0, 1).color(topc, topc, topc, 255).endVertex();
+                buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).uv(1, 1).color(topc, topc, topc, 255).endVertex();
+                buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).uv(1, 0).color(topc, topc, topc, 255).endVertex();
+                buffer.vertex(scrollbarPositionMinX, minY, 0.0D).uv(0, 0).color(topc, topc, topc, 255).endVertex();
+                tessellator.end();
                 RenderSystem.enableTexture();
             }
             RenderSystem.translatef(0, 0, -300f);
@@ -466,11 +466,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 } else {
                     double double_5 = Math.max(1, this.getMaxScrollPosition());
                     int int_2 = getHeight();
-                    int int_3 = MathHelper.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
+                    int int_3 = Mth.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
                     double double_6 = Math.max(1.0D, double_5 / (double) (int_2 - int_3));
                     this.offset(double_4 * double_6, false);
                 }
-                target = MathHelper.clamp(target, 0, getMaxScrollPosition());
+                target = Mth.clamp(target, 0, getMaxScrollPosition());
                 return true;
             }
             return false;
@@ -534,14 +534,14 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     public static class DefaultSelectionCellCreator<R> extends SelectionCellCreator<R> {
-        protected Function<R, Text> toTextFunction;
+        protected Function<R, Component> toTextFunction;
         
-        public DefaultSelectionCellCreator(Function<R, Text> toTextFunction) {
+        public DefaultSelectionCellCreator(Function<R, Component> toTextFunction) {
             this.toTextFunction = toTextFunction;
         }
         
         public DefaultSelectionCellCreator() {
-            this(r -> new LiteralText(r.toString()));
+            this(r -> new TextComponent(r.toString()));
         }
         
         @Override
@@ -560,7 +560,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
     }
     
-    public static abstract class SelectionCellElement<R> extends AbstractParentElement {
+    public static abstract class SelectionCellElement<R> extends AbstractContainerEventHandler {
         @SuppressWarnings("NotNullFieldNotInitialized") @Deprecated @NotNull private DropdownBoxEntry<R> entry;
         
         @NotNull
@@ -568,12 +568,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             return entry;
         }
         
-        public abstract void render(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta);
+        public abstract void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta);
         
-        public abstract void dontRender(MatrixStack matrices, float delta);
+        public abstract void dontRender(PoseStack matrices, float delta);
         
         @Nullable
-        public abstract Text getSearchKey();
+        public abstract Component getSearchKey();
         
         @Nullable
         public abstract R getSelection();
@@ -586,15 +586,15 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         protected int width;
         protected int height;
         protected boolean rendering;
-        protected Function<R, Text> toTextFunction;
+        protected Function<R, Component> toTextFunction;
         
-        public DefaultSelectionCellElement(R r, Function<R, Text> toTextFunction) {
+        public DefaultSelectionCellElement(R r, Function<R, Component> toTextFunction) {
             this.r = r;
             this.toTextFunction = toTextFunction;
         }
         
         @Override
-        public void render(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+        public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
             rendering = true;
             this.x = x;
             this.y = y;
@@ -603,17 +603,17 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
             if (b)
                 fill(matrices, x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, toTextFunction.apply(r).method_30937(), x + 6, y + 3, b ? 16777215 : 8947848);
+            Minecraft.getInstance().font.drawShadow(matrices, toTextFunction.apply(r).getVisualOrderText(), x + 6, y + 3, b ? 16777215 : 8947848);
         }
         
         @Override
-        public void dontRender(MatrixStack matrices, float delta) {
+        public void dontRender(PoseStack matrices, float delta) {
             rendering = false;
         }
         
         @Nullable
         @Override
-        public Text getSearchKey() {
+        public Component getSearchKey() {
             return toTextFunction.apply(r);
         }
         
@@ -624,7 +624,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return Collections.emptyList();
         }
         
@@ -641,7 +641,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
     }
     
-    public static abstract class SelectionTopCellElement<R> extends AbstractParentElement {
+    public static abstract class SelectionTopCellElement<R> extends AbstractContainerEventHandler {
         @Deprecated private DropdownBoxEntry<R> entry;
         protected boolean isSelected = false;
         
@@ -649,15 +649,15 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         public abstract void setValue(R value);
         
-        public abstract Text getSearchTerm();
+        public abstract Component getSearchTerm();
         
         public boolean isEdited() {
             return getConfigError().isPresent();
         }
         
-        public abstract Optional<Text> getError();
+        public abstract Optional<Component> getError();
         
-        public final Optional<Text> getConfigError() {
+        public final Optional<Component> getConfigError() {
             return entry.getConfigError();
         }
         
@@ -692,24 +692,24 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             }
         }
         
-        public abstract void render(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta);
+        public abstract void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta);
     }
     
     public static class DefaultSelectionTopCellElement<R> extends SelectionTopCellElement<R> {
-        protected TextFieldWidget textFieldWidget;
+        protected EditBox textFieldWidget;
         protected Function<String, R> toObjectFunction;
-        protected Function<R, Text> toTextFunction;
+        protected Function<R, Component> toTextFunction;
         protected final R original;
         protected R value;
         
-        public DefaultSelectionTopCellElement(R value, Function<String, R> toObjectFunction, Function<R, Text> toTextFunction) {
+        public DefaultSelectionTopCellElement(R value, Function<String, R> toObjectFunction, Function<R, Component> toTextFunction) {
             this.original = Objects.requireNonNull(value);
             this.value = Objects.requireNonNull(value);
             this.toObjectFunction = Objects.requireNonNull(toObjectFunction);
             this.toTextFunction = Objects.requireNonNull(toTextFunction);
-            textFieldWidget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 148, 18, NarratorManager.EMPTY) {
+            textFieldWidget = new EditBox(Minecraft.getInstance().font, 0, 0, 148, 18, NarratorChatListener.NO_TITLE) {
                 @Override
-                public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+                public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
                     setFocused(isSuggestionMode() && isSelected && DefaultSelectionTopCellElement.this.getParent().getFocused() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.getFocused() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.getFocused() == this);
                     super.render(matrices, mouseX, mouseY, delta);
                 }
@@ -728,9 +728,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                     return isSuggestionMode() && super.charTyped(chr, keyCode);
                 }
             };
-            textFieldWidget.setHasBorder(false);
+            textFieldWidget.setBordered(false);
             textFieldWidget.setMaxLength(999999);
-            textFieldWidget.setText(toTextFunction.apply(value).getString());
+            textFieldWidget.setValue(toTextFunction.apply(value).getString());
         }
         
         @Override
@@ -739,12 +739,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public void render(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+        public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
             textFieldWidget.x = x + 4;
             textFieldWidget.y = y + 6;
             textFieldWidget.setWidth(width - 8);
             textFieldWidget.setEditable(getParent().isEditable());
-            textFieldWidget.setEditableColor(getPreferredTextColor());
+            textFieldWidget.setTextColor(getPreferredTextColor());
             textFieldWidget.render(matrices, mouseX, mouseY, delta);
         }
         
@@ -752,29 +752,29 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public R getValue() {
             if (hasError())
                 return value;
-            return toObjectFunction.apply(textFieldWidget.getText());
+            return toObjectFunction.apply(textFieldWidget.getValue());
         }
         
         @Override
         public void setValue(R value) {
-            textFieldWidget.setText(toTextFunction.apply(value).getString());
-            textFieldWidget.setCursor(0);
+            textFieldWidget.setValue(toTextFunction.apply(value).getString());
+            textFieldWidget.moveCursorTo(0);
         }
         
         @Override
-        public Text getSearchTerm() {
-            return new LiteralText(textFieldWidget.getText());
+        public Component getSearchTerm() {
+            return new TextComponent(textFieldWidget.getValue());
         }
         
         @Override
-        public Optional<Text> getError() {
-            if (toObjectFunction.apply(textFieldWidget.getText()) != null)
+        public Optional<Component> getError() {
+            if (toObjectFunction.apply(textFieldWidget.getValue()) != null)
                 return Optional.empty();
-            return Optional.of(new LiteralText("Invalid Value!"));
+            return Optional.of(new TextComponent("Invalid Value!"));
         }
         
         @Override
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return Collections.singletonList(textFieldWidget);
         }
     }

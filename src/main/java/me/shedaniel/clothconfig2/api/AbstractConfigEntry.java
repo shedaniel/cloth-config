@@ -5,14 +5,13 @@ import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
+import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 @Environment(EnvType.CLIENT)
 public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> implements ReferenceProvider<T> {
     private AbstractConfigScreen screen;
-    private Supplier<Optional<Text>> errorSupplier;
+    private Supplier<Optional<Component>> errorSupplier;
     @Nullable
     private List<ReferenceProvider<?>> referencableEntries = null;
     
@@ -65,36 +64,36 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     
     public abstract void setRequiresRestart(boolean requiresRestart);
     
-    public abstract Text getFieldName();
+    public abstract Component getFieldName();
     
-    public Text getDisplayedFieldName() {
-        MutableText text = getFieldName().shallowCopy();
+    public Component getDisplayedFieldName() {
+        MutableComponent text = getFieldName().copy();
         boolean hasError = getConfigError().isPresent();
         boolean isEdited = isEdited();
         if (hasError)
-            text = text.formatted(Formatting.RED);
+            text = text.withStyle(ChatFormatting.RED);
         if (isEdited)
-            text = text.formatted(Formatting.ITALIC);
+            text = text.withStyle(ChatFormatting.ITALIC);
         if (!hasError && !isEdited)
-            text = text.formatted(Formatting.GRAY);
+            text = text.withStyle(ChatFormatting.GRAY);
         return text;
     }
     
     public abstract T getValue();
     
-    public final Optional<Text> getConfigError() {
+    public final Optional<Component> getConfigError() {
         if (errorSupplier != null && errorSupplier.get().isPresent())
             return errorSupplier.get();
         return getError();
     }
     
-    public void lateRender(MatrixStack matrices, int mouseX, int mouseY, float delta) {}
+    public void lateRender(PoseStack matrices, int mouseX, int mouseY, float delta) {}
     
-    public void setErrorSupplier(Supplier<Optional<Text>> errorSupplier) {
+    public void setErrorSupplier(Supplier<Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;
     }
     
-    public Optional<Text> getError() {
+    public Optional<Component> getError() {
         return Optional.empty();
     }
     

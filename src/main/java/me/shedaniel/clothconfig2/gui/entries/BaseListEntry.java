@@ -1,22 +1,22 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.Expandable;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,39 +39,39 @@ import java.util.stream.Collectors;
 @Environment(EnvType.CLIENT)
 public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends BaseListEntry<T, C, SELF>> extends TooltipListEntry<List<T>> implements Expandable {
     
-    protected static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
+    protected static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
     @NotNull protected final List<C> cells;
-    @NotNull protected final List<Element> widgets;
+    @NotNull protected final List<GuiEventListener> widgets;
     protected boolean expanded;
     protected boolean deleteButtonEnabled;
     protected boolean insertInFront;
     @Nullable protected Consumer<List<T>> saveConsumer;
     protected ListLabelWidget labelWidget;
-    protected AbstractButtonWidget resetWidget;
+    protected AbstractWidget resetWidget;
     @NotNull protected Function<SELF, C> createNewInstance;
     @NotNull protected Supplier<List<T>> defaultValue;
     @Nullable
-    protected Text addTooltip = new TranslatableText("text.cloth-config.list.add"), removeTooltip = new TranslatableText("text.cloth-config.list.remove");
+    protected Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
     
     @ApiStatus.Internal
-    public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @Nullable Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey) {
+    public BaseListEntry(@NotNull Component fieldName, @Nullable Supplier<Optional<Component[]>> tooltipSupplier, @Nullable Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Component resetButtonKey) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, false);
     }
     
     @ApiStatus.Internal
-    public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @Nullable Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey, boolean requiresRestart) {
+    public BaseListEntry(@NotNull Component fieldName, @Nullable Supplier<Optional<Component[]>> tooltipSupplier, @Nullable Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Component resetButtonKey, boolean requiresRestart) {
         this(fieldName, tooltipSupplier, defaultValue, createNewInstance, saveConsumer, resetButtonKey, requiresRestart, true, true);
     }
     
     @ApiStatus.Internal
-    public BaseListEntry(@NotNull Text fieldName, @Nullable Supplier<Optional<Text[]>> tooltipSupplier, @Nullable Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Text resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+    public BaseListEntry(@NotNull Component fieldName, @Nullable Supplier<Optional<Component[]>> tooltipSupplier, @Nullable Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Component resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.deleteButtonEnabled = deleteButtonEnabled;
         this.insertInFront = insertInFront;
         this.cells = Lists.newArrayList();
         this.labelWidget = new ListLabelWidget();
         this.widgets = Lists.newArrayList(labelWidget);
-        this.resetWidget = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
+        this.resetWidget = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             widgets.removeAll(cells);
             for (C cell : cells) {
                 cell.onDelete();
@@ -148,20 +148,20 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
     
     @Nullable
-    public Text getAddTooltip() {
+    public Component getAddTooltip() {
         return addTooltip;
     }
     
-    public void setAddTooltip(@Nullable Text addTooltip) {
+    public void setAddTooltip(@Nullable Component addTooltip) {
         this.addTooltip = addTooltip;
     }
     
     @Nullable
-    public Text getRemoveTooltip() {
+    public Component getRemoveTooltip() {
         return removeTooltip;
     }
     
-    public void setRemoveTooltip(@Nullable Text removeTooltip) {
+    public void setRemoveTooltip(@Nullable Component removeTooltip) {
         this.removeTooltip = removeTooltip;
     }
     
@@ -186,9 +186,9 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
     
     @Override
-    public List<? extends Element> children() {
+    public List<? extends GuiEventListener> children() {
         if (!expanded) {
-            List<Element> elements = new ArrayList<>(widgets);
+            List<GuiEventListener> elements = new ArrayList<>(widgets);
             elements.removeAll(cells);
             return elements;
         }
@@ -196,11 +196,11 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
     
     @Override
-    public Optional<Text> getError() {
-        List<Text> errors = cells.stream().map(C::getConfigError).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+    public Optional<Component> getError() {
+        List<Component> errors = cells.stream().map(C::getConfigError).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
         
         if (errors.size() > 1)
-            return Optional.of(new TranslatableText("text.cloth-config.multi_error"));
+            return Optional.of(new TranslatableComponent("text.cloth-config.multi_error"));
         else
             return errors.stream().findFirst();
     }
@@ -229,34 +229,34 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
     
     @Override
-    public Optional<Text[]> getTooltip(int mouseX, int mouseY) {
+    public Optional<Component[]> getTooltip(int mouseX, int mouseY) {
         if (addTooltip != null && isInsideCreateNew(mouseX, mouseY))
-            return Optional.of(new Text[]{addTooltip});
+            return Optional.of(new Component[]{addTooltip});
         if (removeTooltip != null && isInsideDelete(mouseX, mouseY))
-            return Optional.of(new Text[]{removeTooltip});
+            return Optional.of(new Component[]{removeTooltip});
         if (getTooltipSupplier() != null)
             return getTooltipSupplier().get();
         return Optional.empty();
     }
     
     @Override
-    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
-        MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
-        DiffuseLighting.disable();
+        Minecraft.getInstance().getTextureManager().bind(CONFIG_TEX);
+        Lighting.turnOff();
         RenderSystem.color4f(1, 1, 1, 1);
         BaseListCell focused = !expanded || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);
-        drawTexture(matrices, x - 15, y + 5, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        drawTexture(matrices, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
+        blit(matrices, x - 15, y + 5, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
+        blit(matrices, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
         if (isDeleteButtonEnabled())
-            drawTexture(matrices, x - 15 + 26, y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
+            blit(matrices, x - 15 + 26, y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
         resetWidget.x = x + entryWidth - resetWidget.getWidth();
         resetWidget.y = y;
         resetWidget.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault();
         resetWidget.render(matrices, mouseX, mouseY, delta);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName().method_30937(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 6, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
+        Minecraft.getInstance().font.drawShadow(matrices, getDisplayedFieldName().getVisualOrderText(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 6, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
         if (expanded) {
             int yy = y + 24;
             for (BaseListCell cell : cells) {
@@ -282,7 +282,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         return insertInFront;
     }
     
-    public class ListLabelWidget implements Element {
+    public class ListLabelWidget implements GuiEventListener {
         protected Rectangle rectangle = new Rectangle();
         
         @Override
@@ -300,21 +300,21 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                     widgets.add(cell);
                 }
                 cell.onAdd();
-                MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             } else if (isDeleteButtonEnabled() && isInsideDelete(double_1, double_2)) {
-                Element focused = getFocused();
+                GuiEventListener focused = getFocused();
                 if (expanded && focused instanceof BaseListCell) {
                     ((BaseListCell) focused).onDelete();
                     //noinspection SuspiciousMethodCalls
                     cells.remove(focused);
                     widgets.remove(focused);
-                    MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                    Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 }
                 return true;
             } else if (rectangle.contains(double_1, double_2)) {
                 expanded = !expanded;
-                MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             }
             return false;

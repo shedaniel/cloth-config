@@ -2,9 +2,9 @@ package me.shedaniel.clothconfig2.api;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.StringRenderable;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -14,25 +14,25 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public interface ConfigCategory {
     
-    Text getCategoryKey();
+    Component getCategoryKey();
     
     @Deprecated
     List<Object> getEntries();
     
     ConfigCategory addEntry(AbstractConfigListEntry entry);
     
-    ConfigCategory setCategoryBackground(Identifier identifier);
+    ConfigCategory setCategoryBackground(ResourceLocation identifier);
     
-    void setBackground(@Nullable Identifier background);
+    void setBackground(@Nullable ResourceLocation background);
     
-    @Nullable Identifier getBackground();
+    @Nullable ResourceLocation getBackground();
     
     @Nullable
-    Supplier<Optional<StringRenderable[]>> getDescription();
+    Supplier<Optional<FormattedText[]>> getDescription();
     
-    void setDescription(@Nullable Supplier<Optional<StringRenderable[]>> description);
+    void setDescription(@Nullable Supplier<Optional<FormattedText[]>> description);
     
-    default void setDescription(@Nullable StringRenderable[] description) {
+    default void setDescription(@Nullable FormattedText[] description) {
         setDescription(() -> Optional.ofNullable(description));
     }
     

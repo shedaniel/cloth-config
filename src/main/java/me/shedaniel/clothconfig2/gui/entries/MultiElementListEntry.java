@@ -1,21 +1,21 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.Expandable;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
@@ -27,15 +27,15 @@ import java.util.stream.Collectors;
 @Environment(EnvType.CLIENT)
 public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Expandable {
     
-    private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
+    private static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
     private final T object;
     private List<AbstractConfigListEntry<?>> entries;
     private MultiElementListEntry<T>.CategoryLabelWidget widget;
-    private List<Element> children;
+    private List<GuiEventListener> children;
     private boolean expanded;
     
     @ApiStatus.Internal
-    public MultiElementListEntry(Text categoryName, T object, List<AbstractConfigListEntry<?>> entries, boolean defaultExpanded) {
+    public MultiElementListEntry(Component categoryName, T object, List<AbstractConfigListEntry<?>> entries, boolean defaultExpanded) {
         super(categoryName, null);
         this.object = object;
         this.entries = entries;
@@ -74,7 +74,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         return super.mouseClicked(mouseX, mouseY, button);
     }
     
-    public Text getCategoryName() {
+    public Component getCategoryName() {
         return getFieldName();
     }
     
@@ -89,13 +89,13 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     }
     
     @Override
-    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
-        MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
-        DiffuseLighting.disable();
+        Minecraft.getInstance().getTextureManager().bind(CONFIG_TEX);
+        Lighting.turnOff();
         RenderSystem.color4f(1, 1, 1, 1);
-        drawTexture(matrices, x - 15, y + 5, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, getDisplayedFieldName().method_30937(), x, y + 6, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        blit(matrices, x - 15, y + 5, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
+        Minecraft.getInstance().font.drawShadow(matrices, getDisplayedFieldName().getVisualOrderText(), x, y + 6, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry entry : entries) {
             entry.setParent(getParent());
             entry.setScreen(getConfigScreen());
@@ -143,7 +143,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     }
     
     @Override
-    public void lateRender(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void lateRender(PoseStack matrices, int mouseX, int mouseY, float delta) {
         if (expanded) {
             for (AbstractConfigListEntry<?> entry : entries) {
                 entry.lateRender(matrices, mouseX, mouseY, delta);
@@ -168,7 +168,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     }
     
     @Override
-    public List<? extends Element> children() {
+    public List<? extends GuiEventListener> children() {
         return expanded ? children : Collections.singletonList(widget);
     }
     
@@ -178,11 +178,11 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     }
     
     @Override
-    public Optional<Text> getError() {
-        List<Text> errors = entries.stream().map(AbstractConfigListEntry::getConfigError).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+    public Optional<Component> getError() {
+        List<Component> errors = entries.stream().map(AbstractConfigListEntry::getConfigError).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
         
         if (errors.size() > 1)
-            return Optional.of(new TranslatableText("text.cloth-config.multi_error"));
+            return Optional.of(new TranslatableComponent("text.cloth-config.multi_error"));
         else
             return errors.stream().findFirst();
     }
@@ -197,14 +197,14 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         this.expanded = expanded;
     }
     
-    public class CategoryLabelWidget implements Element {
+    public class CategoryLabelWidget implements GuiEventListener {
         private Rectangle rectangle = new Rectangle();
         
         @Override
         public boolean mouseClicked(double double_1, double double_2, int int_1) {
             if (rectangle.contains(double_1, double_2)) {
                 expanded = !expanded;
-                MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             }
             return false;

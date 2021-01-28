@@ -1,16 +1,16 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.NarratorManager;
-import net.minecraft.client.util.Window;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -20,75 +20,75 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     
-    protected TextFieldWidget textFieldWidget;
-    protected ButtonWidget resetButton;
+    protected EditBox textFieldWidget;
+    protected Button resetButton;
     protected Supplier<T> defaultValue;
     protected T original;
-    protected List<Element> widgets;
+    protected List<GuiEventListener> widgets;
     private boolean isSelected = false;
     
     @ApiStatus.Internal
     @Deprecated
-    protected TextFieldListEntry(Text fieldName, T original, Text resetButtonKey, Supplier<T> defaultValue) {
+    protected TextFieldListEntry(Component fieldName, T original, Component resetButtonKey, Supplier<T> defaultValue) {
         this(fieldName, original, resetButtonKey, defaultValue, null);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    protected TextFieldListEntry(Text fieldName, T original, Text resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<Text[]>> tooltipSupplier) {
+    protected TextFieldListEntry(Component fieldName, T original, Component resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<Component[]>> tooltipSupplier) {
         this(fieldName, original, resetButtonKey, defaultValue, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    protected TextFieldListEntry(Text fieldName, T original, Text resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
+    protected TextFieldListEntry(Component fieldName, T original, Component resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.original = original;
-        this.textFieldWidget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 148, 18, NarratorManager.EMPTY) {
+        this.textFieldWidget = new EditBox(Minecraft.getInstance().font, 0, 0, 148, 18, NarratorChatListener.NO_TITLE) {
             @Override
-            public void render(MatrixStack matrices, int int_1, int int_2, float float_1) {
+            public void render(PoseStack matrices, int int_1, int int_2, float float_1) {
                 setFocused(isSelected && TextFieldListEntry.this.getFocused() == this);
                 textFieldPreRender(this);
                 super.render(matrices, int_1, int_2, float_1);
             }
             
             @Override
-            public void write(String string_1) {
-                super.write(stripAddText(string_1));
+            public void insertText(String string_1) {
+                super.insertText(stripAddText(string_1));
             }
         };
         textFieldWidget.setMaxLength(999999);
-        textFieldWidget.setText(String.valueOf(original));
-        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
-            TextFieldListEntry.this.textFieldWidget.setText(String.valueOf(defaultValue.get()));
+        textFieldWidget.setValue(String.valueOf(original));
+        this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
+            TextFieldListEntry.this.textFieldWidget.setValue(String.valueOf(defaultValue.get()));
         });
         this.widgets = Lists.newArrayList(textFieldWidget, resetButton);
     }
     
     @Override
     public boolean isEdited() {
-        return isChanged(original, textFieldWidget.getText());
+        return isChanged(original, textFieldWidget.getValue());
     }
     
     protected boolean isChanged(T original, String s) {
         return !String.valueOf(original).equals(s);
     }
     
-    protected static void setTextFieldWidth(TextFieldWidget widget, int width) {
+    protected static void setTextFieldWidth(EditBox widget, int width) {
         widget.setWidth(width);
     }
     
     @Deprecated
     public void setValue(String s) {
-        textFieldWidget.setText(String.valueOf(s));
+        textFieldWidget.setValue(String.valueOf(s));
     }
     
     protected String stripAddText(String s) {
         return s;
     }
     
-    protected void textFieldPreRender(TextFieldWidget widget) {
+    protected void textFieldPreRender(EditBox widget) {
         
     }
     
@@ -98,20 +98,20 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
-        Window window = MinecraftClient.getInstance().getWindow();
-        this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault(textFieldWidget.getText());
+        Window window = Minecraft.getInstance().getWindow();
+        this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault(textFieldWidget.getValue());
         this.resetButton.y = y;
         this.textFieldWidget.setEditable(isEditable());
         this.textFieldWidget.y = y + 1;
-        Text displayedFieldName = getDisplayedFieldName();
-        if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getWidth(displayedFieldName), y + 6, getPreferredTextColor());
+        Component displayedFieldName = getDisplayedFieldName();
+        if (Minecraft.getInstance().font.isBidirectional()) {
+            Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, getPreferredTextColor());
             this.resetButton.x = x;
             this.textFieldWidget.x = x + resetButton.getWidth();
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, displayedFieldName.method_30937(), x, y + 6, getPreferredTextColor());
+            Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), x, y + 6, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.textFieldWidget.x = x + entryWidth - 148;
         }
@@ -128,7 +128,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public List<? extends Element> children() {
+    public List<? extends GuiEventListener> children() {
         return widgets;
     }
     

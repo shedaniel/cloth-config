@@ -3,7 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.FloatListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -15,16 +15,16 @@ import java.util.function.Supplier;
 public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
     
     private Consumer<Float> saveConsumer = null;
-    private Function<Float, Optional<Text[]>> tooltipSupplier = f -> Optional.empty();
+    private Function<Float, Optional<Component[]>> tooltipSupplier = f -> Optional.empty();
     private final float value;
     private Float min = null, max = null;
     
-    public FloatFieldBuilder(Text resetButtonKey, Text fieldNameKey, float value) {
+    public FloatFieldBuilder(Component resetButtonKey, Component fieldNameKey, float value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
-    public FloatFieldBuilder setErrorSupplier(Function<Float, Optional<Text>> errorSupplier) {
+    public FloatFieldBuilder setErrorSupplier(Function<Float, Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -49,22 +49,22 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
         return this;
     }
     
-    public FloatFieldBuilder setTooltipSupplier(Function<Float, Optional<Text[]>> tooltipSupplier) {
+    public FloatFieldBuilder setTooltipSupplier(Function<Float, Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public FloatFieldBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
+    public FloatFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = f -> tooltipSupplier.get();
         return this;
     }
     
-    public FloatFieldBuilder setTooltip(Optional<Text[]> tooltip) {
+    public FloatFieldBuilder setTooltip(Optional<Component[]> tooltip) {
         this.tooltipSupplier = f -> tooltip;
         return this;
     }
     
-    public FloatFieldBuilder setTooltip(Text... tooltip) {
+    public FloatFieldBuilder setTooltip(Component... tooltip) {
         this.tooltipSupplier = f -> Optional.ofNullable(tooltip);
         return this;
     }

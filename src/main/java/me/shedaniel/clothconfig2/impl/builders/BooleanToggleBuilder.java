@@ -3,7 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,16 +16,16 @@ import java.util.function.Supplier;
 public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry> {
     
     @Nullable private Consumer<Boolean> saveConsumer = null;
-    @NotNull private Function<Boolean, Optional<Text[]>> tooltipSupplier = bool -> Optional.empty();
+    @NotNull private Function<Boolean, Optional<Component[]>> tooltipSupplier = bool -> Optional.empty();
     private final boolean value;
-    @Nullable private Function<Boolean, Text> yesNoTextSupplier = null;
+    @Nullable private Function<Boolean, Component> yesNoTextSupplier = null;
     
-    public BooleanToggleBuilder(Text resetButtonKey, Text fieldNameKey, boolean value) {
+    public BooleanToggleBuilder(Component resetButtonKey, Component fieldNameKey, boolean value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
-    public BooleanToggleBuilder setErrorSupplier(@Nullable Function<Boolean, Optional<Text>> errorSupplier) {
+    public BooleanToggleBuilder setErrorSupplier(@Nullable Function<Boolean, Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -50,32 +50,32 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
         return this;
     }
     
-    public BooleanToggleBuilder setTooltipSupplier(@NotNull Function<Boolean, Optional<Text[]>> tooltipSupplier) {
+    public BooleanToggleBuilder setTooltipSupplier(@NotNull Function<Boolean, Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public BooleanToggleBuilder setTooltipSupplier(@NotNull Supplier<Optional<Text[]>> tooltipSupplier) {
+    public BooleanToggleBuilder setTooltipSupplier(@NotNull Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = bool -> tooltipSupplier.get();
         return this;
     }
     
-    public BooleanToggleBuilder setTooltip(Optional<Text[]> tooltip) {
+    public BooleanToggleBuilder setTooltip(Optional<Component[]> tooltip) {
         this.tooltipSupplier = bool -> tooltip;
         return this;
     }
     
-    public BooleanToggleBuilder setTooltip(@Nullable Text... tooltip) {
+    public BooleanToggleBuilder setTooltip(@Nullable Component... tooltip) {
         this.tooltipSupplier = bool -> Optional.ofNullable(tooltip);
         return this;
     }
     
     @Nullable
-    public Function<Boolean, Text> getYesNoTextSupplier() {
+    public Function<Boolean, Component> getYesNoTextSupplier() {
         return yesNoTextSupplier;
     }
     
-    public BooleanToggleBuilder setYesNoTextSupplier(@Nullable Function<Boolean, Text> yesNoTextSupplier) {
+    public BooleanToggleBuilder setYesNoTextSupplier(@Nullable Function<Boolean, Component> yesNoTextSupplier) {
         this.yesNoTextSupplier = yesNoTextSupplier;
         return this;
     }
@@ -85,7 +85,7 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
     public BooleanListEntry build() {
         BooleanListEntry entry = new BooleanListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart()) {
             @Override
-            public Text getYesNoText(boolean bool) {
+            public Component getYesNoText(boolean bool) {
                 if (yesNoTextSupplier == null)
                     return super.getYesNoText(bool);
                 return yesNoTextSupplier.apply(bool);

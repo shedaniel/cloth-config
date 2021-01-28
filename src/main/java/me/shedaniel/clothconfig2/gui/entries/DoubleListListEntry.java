@@ -2,8 +2,8 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,19 +20,19 @@ public class DoubleListListEntry extends AbstractTextFieldListListEntry<Double, 
     
     @ApiStatus.Internal
     @Deprecated
-    public DoubleListListEntry(Text fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, Text resetButtonKey) {
+    public DoubleListListEntry(Component fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<Component[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, Component resetButtonKey) {
         this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public DoubleListListEntry(Text fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, Text resetButtonKey, boolean requiresRestart) {
+    public DoubleListListEntry(Component fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<Component[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, Component resetButtonKey, boolean requiresRestart) {
         this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, true, true);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public DoubleListListEntry(Text fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, Text resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+    public DoubleListListEntry(Component fieldName, List<Double> value, boolean defaultExpanded, Supplier<Optional<Component[]>> tooltipSupplier, Consumer<List<Double>> saveConsumer, Supplier<List<Double>> defaultValue, Component resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront, DoubleListCell::new);
         this.minimum = Double.NEGATIVE_INFINITY;
         this.maximum = Double.POSITIVE_INFINITY;
@@ -75,22 +75,22 @@ public class DoubleListListEntry extends AbstractTextFieldListListEntry<Double, 
         
         public Double getValue() {
             try {
-                return Double.valueOf(widget.getText());
+                return Double.valueOf(widget.getValue());
             } catch (NumberFormatException e) {
                 return 0d;
             }
         }
         
         @Override
-        public Optional<Text> getError() {
+        public Optional<Component> getError() {
             try {
-                double i = Double.parseDouble(widget.getText());
+                double i = Double.parseDouble(widget.getValue());
                 if (i > listListEntry.maximum)
-                    return Optional.of(new TranslatableText("text.cloth-config.error.too_large", listListEntry.maximum));
+                    return Optional.of(new TranslatableComponent("text.cloth-config.error.too_large", listListEntry.maximum));
                 else if (i < listListEntry.minimum)
-                    return Optional.of(new TranslatableText("text.cloth-config.error.too_small", listListEntry.minimum));
+                    return Optional.of(new TranslatableComponent("text.cloth-config.error.too_small", listListEntry.minimum));
             } catch (NumberFormatException ex) {
-                return Optional.of(new TranslatableText("text.cloth-config.error.not_valid_number_double"));
+                return Optional.of(new TranslatableComponent("text.cloth-config.error.not_valid_number_double"));
             }
             return Optional.empty();
         }

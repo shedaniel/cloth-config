@@ -3,7 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.TextListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,13 +11,13 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class TextDescriptionBuilder extends FieldBuilder<Text, TextListEntry> {
+public class TextDescriptionBuilder extends FieldBuilder<Component, TextListEntry> {
     
     private int color = -1;
-    @Nullable private Supplier<Optional<Text[]>> tooltipSupplier = null;
-    private final Text value;
+    @Nullable private Supplier<Optional<Component[]>> tooltipSupplier = null;
+    private final Component value;
     
-    public TextDescriptionBuilder(Text resetButtonKey, Text fieldNameKey, Text value) {
+    public TextDescriptionBuilder(Component resetButtonKey, Component fieldNameKey, Component value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
@@ -27,17 +27,17 @@ public class TextDescriptionBuilder extends FieldBuilder<Text, TextListEntry> {
         throw new UnsupportedOperationException();
     }
     
-    public TextDescriptionBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
+    public TextDescriptionBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public TextDescriptionBuilder setTooltip(Optional<Text[]> tooltip) {
+    public TextDescriptionBuilder setTooltip(Optional<Component[]> tooltip) {
         this.tooltipSupplier = () -> tooltip;
         return this;
     }
     
-    public TextDescriptionBuilder setTooltip(Text... tooltip) {
+    public TextDescriptionBuilder setTooltip(Component... tooltip) {
         this.tooltipSupplier = () -> Optional.ofNullable(tooltip);
         return this;
     }

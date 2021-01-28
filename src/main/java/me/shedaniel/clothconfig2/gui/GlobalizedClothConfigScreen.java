@@ -3,32 +3,32 @@ package me.shedaniel.clothconfig2.gui;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.math.Rectangle;
-import net.minecraft.class_5481;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.NarratorManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
+import net.minecraft.util.Tuple;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -36,8 +36,8 @@ import java.util.*;
 
 public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements ReferenceBuildingConfigScreen, Expandable {
     public ClothConfigScreen.ListWidget<AbstractConfigEntry<AbstractConfigEntry<?>>> listWidget;
-    private AbstractButtonWidget cancelButton, exitButton;
-    private final LinkedHashMap<Text, List<AbstractConfigEntry<?>>> categorizedEntries = Maps.newLinkedHashMap();
+    private AbstractWidget cancelButton, exitButton;
+    private final LinkedHashMap<Component, List<AbstractConfigEntry<?>>> categorizedEntries = Maps.newLinkedHashMap();
     private final ScrollingContainer sideScroller = new ScrollingContainer() {
         @Override
         public Rectangle getBounds() {
@@ -49,7 +49,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             int i = 0;
             for (Reference reference : references) {
                 if (i != 0) i += 3 * reference.getScale();
-                i += textRenderer.fontHeight * reference.getScale();
+                i += font.lineHeight * reference.getScale();
             }
             return i;
         }
@@ -72,8 +72,8 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     private final LazyResettable<Integer> sideExpandLimit = new LazyResettable<>(() -> {
         int max = 0;
         for (Reference reference : references) {
-            Text referenceText = reference.getText();
-            int width = textRenderer.getWidth(new LiteralText(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(referenceText));
+            Component referenceText = reference.getText();
+            int width = font.width(new TextComponent(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(referenceText));
             if (width > max) max = width;
         }
         return Math.min(max + 8, width / 4);
@@ -81,14 +81,14 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     private boolean requestingReferenceRebuilding = false;
     
     @ApiStatus.Internal
-    public GlobalizedClothConfigScreen(Screen parent, Text title, Map<Text, ConfigCategory> categoryMap, Identifier backgroundLocation) {
+    public GlobalizedClothConfigScreen(Screen parent, Component title, Map<Component, ConfigCategory> categoryMap, ResourceLocation backgroundLocation) {
         super(parent, title, backgroundLocation);
         categoryMap.forEach((categoryName, category) -> {
             List<AbstractConfigEntry<?>> entries = Lists.newArrayList();
             for (Object object : category.getEntries()) {
                 AbstractConfigListEntry<?> entry;
-                if (object instanceof Pair<?, ?>) {
-                    entry = (AbstractConfigListEntry<?>) ((Pair<?, ?>) object).getRight();
+                if (object instanceof Tuple<?, ?>) {
+                    entry = (AbstractConfigListEntry<?>) ((Tuple<?, ?>) object).getB();
                 } else {
                     entry = (AbstractConfigListEntry<?>) object;
                 }
@@ -106,7 +106,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     }
     
     @Override
-    public Map<Text, List<AbstractConfigEntry<?>>> getCategorizedEntries() {
+    public Map<Component, List<AbstractConfigEntry<?>>> getCategorizedEntries() {
         return this.categorizedEntries;
     }
     
@@ -117,21 +117,21 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         this.sideExpandLimit.reset();
         this.references.clear();
         buildReferences();
-        this.children.add(listWidget = new ClothConfigScreen.ListWidget<>(this, client, width - 14, height, 30, height - 32, getBackgroundLocation()));
+        this.children.add(listWidget = new ClothConfigScreen.ListWidget<>(this, minecraft, width - 14, height, 30, height - 32, getBackgroundLocation()));
         this.listWidget.setLeftPos(14);
         this.categorizedEntries.forEach((category, entries) -> {
             if (!listWidget.children().isEmpty())
                 this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(5));
             this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(4));
-            this.listWidget.children().add((AbstractConfigEntry) new CategoryTextEntry(category, category.shallowCopy().formatted(Formatting.BOLD)));
+            this.listWidget.children().add((AbstractConfigEntry) new CategoryTextEntry(category, category.copy().withStyle(ChatFormatting.BOLD)));
             this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(4));
             this.listWidget.children().addAll((List) entries);
         });
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addButton(cancelButton = new ButtonWidget(0, height - 26, buttonWidths, 20, isEdited() ? new TranslatableText("text.cloth-config.cancel_discard") : new TranslatableText("gui.cancel"), widget -> quit()));
-        addButton(exitButton = new ButtonWidget(0, height - 26, buttonWidths, 20, NarratorManager.EMPTY, button -> saveAll(true)) {
+        addButton(cancelButton = new Button(0, height - 26, buttonWidths, 20, isEdited() ? new TranslatableComponent("text.cloth-config.cancel_discard") : new TranslatableComponent("gui.cancel"), widget -> quit()));
+        addButton(exitButton = new Button(0, height - 26, buttonWidths, 20, NarratorChatListener.NO_TITLE, button -> saveAll(true)) {
             @Override
-            public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+            public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
                 label:
                 for (List<AbstractConfigEntry<?>> entries : categorizedEntries.values()) {
@@ -143,7 +143,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
                     }
                 }
                 active = isEdited() && !hasErrors;
-                setMessage(hasErrors ? new TranslatableText("text.cloth-config.error_cannot_save") : new TranslatableText("text.cloth-config.save_and_done"));
+                setMessage(hasErrors ? new TranslatableComponent("text.cloth-config.error_cannot_save") : new TranslatableComponent("text.cloth-config.save_and_done"));
                 super.render(matrices, mouseX, mouseY, delta);
             }
         });
@@ -169,7 +169,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     
     @SuppressWarnings("deprecation")
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
         this.lastHoveredReference = null;
         if (requestingReferenceRebuilding) {
             this.references.clear();
@@ -181,7 +181,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         if (isTransparentBackground()) {
             fillGradient(matrices, 14, 0, width, height, -1072689136, -804253680);
         } else {
-            renderBackgroundTexture(0);
+            renderDirtBackground(0);
             overlayBackground(matrices, new Rectangle(14, 0, width, height), 64, 64, 64, 255, 255);
         }
         listWidget.width = width - sliderPosition;
@@ -191,7 +191,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         for (AbstractConfigEntry<?> child : listWidget.children())
             child.lateRender(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
-        textRenderer.drawWithShadow(matrices, title.method_30937(), sliderPosition + (width - sliderPosition) / 2f - textRenderer.getWidth(title) / 2f, 12, -1);
+        font.drawShadow(matrices, title.getVisualOrderText(), sliderPosition + (width - sliderPosition) / 2f - font.width(title) / 2f, 12, -1);
         ScissorsHandler.INSTANCE.removeLastScissor();
         cancelButton.x = sliderPosition + (width - sliderPosition) / 2 - cancelButton.getWidth() - 3;
         exitButton.x = sliderPosition + (width - sliderPosition) / 2 + 3;
@@ -202,48 +202,48 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             fillGradient(matrices, 0, 0, sliderPosition, height, -1240461296, -972025840);
             fillGradient(matrices, 0, 0, sliderPosition - 14, height, 1744830464, 1744830464);
         } else {
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-            client.getTextureManager().bindTexture(getBackgroundLocation());
+            Tesselator tessellator = Tesselator.getInstance();
+            BufferBuilder buffer = tessellator.getBuilder();
+            minecraft.getTextureManager().bind(getBackgroundLocation());
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             float f = 32.0F;
-            buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-            buffer.vertex(sliderPosition - 14, height, 0.0D).texture(0, height / 32.0F).color(68, 68, 68, 255).next();
-            buffer.vertex(sliderPosition, height, 0.0D).texture(14 / 32.0F, height / 32.0F).color(68, 68, 68, 255).next();
-            buffer.vertex(sliderPosition, 0, 0.0D).texture(14 / 32.0F, 0).color(68, 68, 68, 255).next();
-            buffer.vertex(sliderPosition - 14, 0, 0.0D).texture(0, 0).color(68, 68, 68, 255).next();
-            tessellator.draw();
+            buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+            buffer.vertex(sliderPosition - 14, height, 0.0D).uv(0, height / 32.0F).color(68, 68, 68, 255).endVertex();
+            buffer.vertex(sliderPosition, height, 0.0D).uv(14 / 32.0F, height / 32.0F).color(68, 68, 68, 255).endVertex();
+            buffer.vertex(sliderPosition, 0, 0.0D).uv(14 / 32.0F, 0).color(68, 68, 68, 255).endVertex();
+            buffer.vertex(sliderPosition - 14, 0, 0.0D).uv(0, 0).color(68, 68, 68, 255).endVertex();
+            tessellator.end();
             
-            buffer.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-            buffer.vertex(0, height, 0.0D).texture(0, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).next();
-            buffer.vertex(sliderPosition - 14, height, 0.0D).texture((sliderPosition - 14) / 32.0F, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).next();
-            buffer.vertex(sliderPosition - 14, 0, 0.0D).texture((sliderPosition - 14) / 32.0F, ((int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).next();
-            buffer.vertex(0, 0, 0.0D).texture(0, ((int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).next();
-            tessellator.draw();
+            buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+            buffer.vertex(0, height, 0.0D).uv(0, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
+            buffer.vertex(sliderPosition - 14, height, 0.0D).uv((sliderPosition - 14) / 32.0F, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
+            buffer.vertex(sliderPosition - 14, 0, 0.0D).uv((sliderPosition - 14) / 32.0F, ((int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
+            buffer.vertex(0, 0, 0.0D).uv(0, ((int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
+            tessellator.end();
         }
         {
-            Matrix4f matrix = matrices.peek().getModel();
+            Matrix4f matrix = matrices.last().pose();
             RenderSystem.disableTexture();
             RenderSystem.enableBlend();
             RenderSystem.disableAlphaTest();
             RenderSystem.defaultBlendFunc();
             RenderSystem.shadeModel(7425);
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
+            Tesselator tessellator = Tesselator.getInstance();
+            BufferBuilder buffer = tessellator.getBuilder();
             int shadeColor = isTransparentBackground() ? 120 : 160;
-            buffer.begin(7, VertexFormats.POSITION_COLOR);
-            buffer.vertex(matrix, sliderPosition + 4, 0, 100.0F).color(0, 0, 0, 0).next();
-            buffer.vertex(matrix, sliderPosition, 0, 100.0F).color(0, 0, 0, shadeColor).next();
-            buffer.vertex(matrix, sliderPosition, height, 100.0F).color(0, 0, 0, shadeColor).next();
-            buffer.vertex(matrix, sliderPosition + 4, height, 100.0F).color(0, 0, 0, 0).next();
-            tessellator.draw();
+            buffer.begin(7, DefaultVertexFormat.POSITION_COLOR);
+            buffer.vertex(matrix, sliderPosition + 4, 0, 100.0F).color(0, 0, 0, 0).endVertex();
+            buffer.vertex(matrix, sliderPosition, 0, 100.0F).color(0, 0, 0, shadeColor).endVertex();
+            buffer.vertex(matrix, sliderPosition, height, 100.0F).color(0, 0, 0, shadeColor).endVertex();
+            buffer.vertex(matrix, sliderPosition + 4, height, 100.0F).color(0, 0, 0, 0).endVertex();
+            tessellator.end();
             shadeColor /= 2;
-            buffer.begin(7, VertexFormats.POSITION_COLOR);
-            buffer.vertex(matrix, sliderPosition - 14, 0, 100.0F).color(0, 0, 0, shadeColor).next();
-            buffer.vertex(matrix, sliderPosition - 14 - 4, 0, 100.0F).color(0, 0, 0, 0).next();
-            buffer.vertex(matrix, sliderPosition - 14 - 4, height, 100.0F).color(0, 0, 0, 0).next();
-            buffer.vertex(matrix, sliderPosition - 14, height, 100.0F).color(0, 0, 0, shadeColor).next();
-            tessellator.draw();
+            buffer.begin(7, DefaultVertexFormat.POSITION_COLOR);
+            buffer.vertex(matrix, sliderPosition - 14, 0, 100.0F).color(0, 0, 0, shadeColor).endVertex();
+            buffer.vertex(matrix, sliderPosition - 14 - 4, 0, 100.0F).color(0, 0, 0, 0).endVertex();
+            buffer.vertex(matrix, sliderPosition - 14 - 4, height, 100.0F).color(0, 0, 0, 0).endVertex();
+            buffer.vertex(matrix, sliderPosition - 14, height, 100.0F).color(0, 0, 0, shadeColor).endVertex();
+            tessellator.end();
             RenderSystem.shadeModel(7424);
             RenderSystem.disableBlend();
             RenderSystem.enableAlphaTest();
@@ -252,24 +252,24 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         Rectangle slideArrowBounds = new Rectangle(sliderPosition - 14, 0, 14, height);
         {
             RenderSystem.enableAlphaTest();
-            VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-            textRenderer.drawLayer(">", sliderPosition - 7 - textRenderer.getStringWidth(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil((1 - sideSlider.scrollAmount) * 255.0F), 0, 255) << 24, false, matrices.peek().getModel(), immediate, false, 0, 15728880);
-            textRenderer.drawLayer("<", sliderPosition - 7 - textRenderer.getStringWidth("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | MathHelper.clamp(MathHelper.ceil(sideSlider.scrollAmount * 255.0F), 0, 255) << 24, false, matrices.peek().getModel(), immediate, false, 0, 15728880);
-            immediate.draw();
+            MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+            font.renderText(">", sliderPosition - 7 - font.width(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil((1 - sideSlider.scrollAmount) * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, false, 0, 15728880);
+            font.renderText("<", sliderPosition - 7 - font.width("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil(sideSlider.scrollAmount * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, false, 0, 15728880);
+            immediate.endBatch();
             
             Rectangle scrollerBounds = sideScroller.getBounds();
             if (!scrollerBounds.isEmpty()) {
                 ScissorsHandler.INSTANCE.scissor(new Rectangle(0, 0, sliderPosition - 14, height));
                 int scrollOffset = (int) (scrollerBounds.y - sideScroller.scrollAmount);
                 for (Reference reference : references) {
-                    matrices.push();
+                    matrices.pushPose();
                     matrices.scale(reference.getScale(), reference.getScale(), reference.getScale());
-                    MutableText text = new LiteralText(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(reference.getText());
-                    if (lastHoveredReference == null && new Rectangle(scrollerBounds.x, (int) (scrollOffset - 4 * reference.getScale()), (int) (textRenderer.getWidth(text) * reference.getScale()), (int) ((textRenderer.fontHeight + 4) * reference.getScale())).contains(mouseX, mouseY))
+                    MutableComponent text = new TextComponent(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(reference.getText());
+                    if (lastHoveredReference == null && new Rectangle(scrollerBounds.x, (int) (scrollOffset - 4 * reference.getScale()), (int) (font.width(text) * reference.getScale()), (int) ((font.lineHeight + 4) * reference.getScale())).contains(mouseX, mouseY))
                         lastHoveredReference = reference;
-                    textRenderer.draw(matrices, text.method_30937(), scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
-                    matrices.pop();
-                    scrollOffset += (textRenderer.fontHeight + 3) * reference.getScale();
+                    font.draw(matrices, text.getVisualOrderText(), scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
+                    matrices.popPose();
+                    scrollOffset += (font.lineHeight + 3) * reference.getScale();
                 }
                 ScissorsHandler.INSTANCE.removeLastScissor();
                 sideScroller.renderScrollBar();
@@ -281,14 +281,14 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         Rectangle slideBounds = new Rectangle(0, 0, getSideSliderPosition() - 14, height);
         if (button == 0 && slideBounds.contains(mouseX, mouseY) && lastHoveredReference != null) {
-            client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             lastHoveredReference.go();
             return true;
         }
         Rectangle slideArrowBounds = new Rectangle(getSideSliderPosition() - 14, 0, 14, height);
         if (button == 0 && slideArrowBounds.contains(mouseX, mouseY)) {
             setExpanded(!isExpanded());
-            client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
@@ -322,7 +322,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         private final int height;
         
         public EmptyEntry(int height) {
-            super(new LiteralText(UUID.randomUUID().toString()), false);
+            super(new TextComponent(UUID.randomUUID().toString()), false);
             this.height = height;
         }
         
@@ -350,27 +350,27 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public void save() {}
         
         @Override
-        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {}
+        public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {}
         
         @Override
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return Collections.emptyList();
         }
     }
     
     private static class CategoryTextEntry extends AbstractConfigListEntry<Object> {
-        private final Text category;
-        private final Text text;
+        private final Component category;
+        private final Component text;
         
-        public CategoryTextEntry(Text category, Text text) {
-            super(new LiteralText(UUID.randomUUID().toString()), false);
+        public CategoryTextEntry(Component category, Component text) {
+            super(new TextComponent(UUID.randomUUID().toString()), false);
             this.category = category;
             this.text = text;
         }
         
         @Override
         public int getItemHeight() {
-            List<class_5481> strings = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(text, getParent().getItemWidth());
+            List<FormattedCharSequence> strings = Minecraft.getInstance().font.split(text, getParent().getItemWidth());
             if (strings.isEmpty())
                 return 0;
             return 4 + strings.size() * 10;
@@ -395,18 +395,18 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         }
         
         @Override
-        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+        public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
             super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
             int yy = y + 2;
-            List<class_5481> texts = MinecraftClient.getInstance().textRenderer.wrapStringToWidthAsList(this.text, getParent().getItemWidth());
-            for (class_5481 text : texts) {
-                MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, text, x - 4 + entryWidth / 2 - MinecraftClient.getInstance().textRenderer.method_30880(text) / 2, yy, -1);
+            List<FormattedCharSequence> texts = Minecraft.getInstance().font.split(this.text, getParent().getItemWidth());
+            for (FormattedCharSequence text : texts) {
+                Minecraft.getInstance().font.drawShadow(matrices, text, x - 4 + entryWidth / 2 - Minecraft.getInstance().font.width(text) / 2, yy, -1);
                 yy += 10;
             }
         }
         
         @Override
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return Collections.emptyList();
         }
     }
@@ -416,7 +416,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             return 0;
         }
         
-        Text getText();
+        Component getText();
         
         float getScale();
         
@@ -424,14 +424,14 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     }
     
     private class CategoryReference implements Reference {
-        private Text category;
+        private Component category;
         
-        public CategoryReference(Text category) {
+        public CategoryReference(Component category) {
             this.category = category;
         }
         
         @Override
-        public Text getText() {
+        public Component getText() {
             return category;
         }
         
@@ -468,7 +468,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         }
         
         @Override
-        public Text getText() {
+        public Component getText() {
             return entry.getFieldName();
         }
         
@@ -496,9 +496,9 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             i[0] += root.getInitialReferenceOffset();
             boolean expanded = root instanceof Expandable && ((Expandable) root).isExpanded();
             if (root instanceof Expandable) ((Expandable) root).setExpanded(true);
-            List<? extends Element> children = root.children();
+            List<? extends GuiEventListener> children = root.children();
             if (root instanceof Expandable) ((Expandable) root).setExpanded(expanded);
-            for (Element child : children) {
+            for (GuiEventListener child : children) {
                 if (child instanceof ReferenceProvider<?>) {
                     int i1 = i[0];
                     if (goChild(i, expandedParent != null ? expandedParent : root instanceof Expandable && !expanded ? j : null, ((ReferenceProvider<?>) child).provideReferenceEntry())) {

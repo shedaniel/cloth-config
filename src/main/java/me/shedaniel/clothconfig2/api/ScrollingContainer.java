@@ -25,15 +25,15 @@
 package me.shedaniel.clothconfig2.api;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 public abstract class ScrollingContainer {
     public double scrollAmount;
@@ -71,7 +71,7 @@ public abstract class ScrollingContainer {
     }
     
     public final double clamp(double v, double clampExtension) {
-        return MathHelper.clamp(v, -clampExtension, (double) this.getMaxScroll() + clampExtension);
+        return Mth.clamp(v, -clampExtension, (double) this.getMaxScroll() + clampExtension);
     }
     
     public final void offset(double value, boolean animated) {
@@ -124,7 +124,7 @@ public abstract class ScrollingContainer {
     }
     
     public static double clampExtension(double v, double maxScroll, double clampExtension) {
-        return MathHelper.clamp(v, -clampExtension, maxScroll + clampExtension);
+        return Mth.clamp(v, -clampExtension, maxScroll + clampExtension);
     }
     
     public void renderScrollBar() {
@@ -137,7 +137,7 @@ public abstract class ScrollingContainer {
             Rectangle bounds = getBounds();
             int maxScroll = getMaxScroll();
             int height = bounds.height * bounds.height / getMaxScrollHeight();
-            height = MathHelper.clamp(height, 32, bounds.height);
+            height = Mth.clamp(height, 32, bounds.height);
             height -= Math.min((scrollAmount < 0 ? (int) -scrollAmount : scrollAmount > maxScroll ? (int) scrollAmount - maxScroll : 0), height * .95);
             height = Math.max(10, height);
             int minY = Math.min(Math.max((int) scrollAmount * (bounds.height - height) / maxScroll + bounds.y, bounds.y), bounds.getMaxY() - height);
@@ -153,32 +153,32 @@ public abstract class ScrollingContainer {
             RenderSystem.disableAlphaTest();
             RenderSystem.blendFuncSeparate(770, 771, 1, 0);
             RenderSystem.shadeModel(7425);
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
+            Tesselator tessellator = Tesselator.getInstance();
+            BufferBuilder buffer = tessellator.getBuilder();
             {
                 float a = (background >> 24 & 255) / 255.0F;
                 float r = (background >> 16 & 255) / 255.0F;
                 float g = (background >> 8 & 255) / 255.0F;
                 float b = (background & 255) / 255.0F;
-                buffer.begin(7, VertexFormats.POSITION_COLOR);
-                buffer.vertex(scrollbarPositionMinX, bounds.getMaxY(), 0.0D).color(r, g, b, a).next();
-                buffer.vertex(scrollbarPositionMaxX, bounds.getMaxY(), 0.0D).color(r, g, b, a).next();
-                buffer.vertex(scrollbarPositionMaxX, bounds.y, 0.0D).color(r, g, b, a).next();
-                buffer.vertex(scrollbarPositionMinX, bounds.y, 0.0D).color(r, g, b, a).next();
+                buffer.begin(7, DefaultVertexFormat.POSITION_COLOR);
+                buffer.vertex(scrollbarPositionMinX, bounds.getMaxY(), 0.0D).color(r, g, b, a).endVertex();
+                buffer.vertex(scrollbarPositionMaxX, bounds.getMaxY(), 0.0D).color(r, g, b, a).endVertex();
+                buffer.vertex(scrollbarPositionMaxX, bounds.y, 0.0D).color(r, g, b, a).endVertex();
+                buffer.vertex(scrollbarPositionMinX, bounds.y, 0.0D).color(r, g, b, a).endVertex();
             }
-            tessellator.draw();
-            buffer.begin(7, VertexFormats.POSITION_COLOR);
-            buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).color(bottomC, bottomC, bottomC, alpha).next();
-            buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).color(bottomC, bottomC, bottomC, alpha).next();
-            buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).color(bottomC, bottomC, bottomC, alpha).next();
-            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(bottomC, bottomC, bottomC, alpha).next();
-            tessellator.draw();
-            buffer.begin(7, VertexFormats.POSITION_COLOR);
-            buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).color(topC, topC, topC, alpha).next();
-            buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).color(topC, topC, topC, alpha).next();
-            buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).color(topC, topC, topC, alpha).next();
-            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(topC, topC, topC, alpha).next();
-            tessellator.draw();
+            tessellator.end();
+            buffer.begin(7, DefaultVertexFormat.POSITION_COLOR);
+            buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
+            buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
+            buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
+            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
+            tessellator.end();
+            buffer.begin(7, DefaultVertexFormat.POSITION_COLOR);
+            buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).color(topC, topC, topC, alpha).endVertex();
+            buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).color(topC, topC, topC, alpha).endVertex();
+            buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).color(topC, topC, topC, alpha).endVertex();
+            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(topC, topC, topC, alpha).endVertex();
+            tessellator.end();
             RenderSystem.shadeModel(7424);
             RenderSystem.disableBlend();
             RenderSystem.enableAlphaTest();
@@ -197,9 +197,9 @@ public abstract class ScrollingContainer {
             int actualHeight = bounds.height;
             if (mouseY >= bounds.y && mouseY <= bounds.getMaxY()) {
                 double maxScroll = Math.max(1, getMaxScroll());
-                double int_3 = MathHelper.clamp(((double) (actualHeight * actualHeight) / (double) height), 32, actualHeight - 8);
+                double int_3 = Mth.clamp(((double) (actualHeight * actualHeight) / (double) height), 32, actualHeight - 8);
                 double double_6 = Math.max(1.0D, maxScroll / (actualHeight - int_3));
-                float to = MathHelper.clamp((float) (scrollAmount + dy * double_6), 0, getMaxScroll());
+                float to = Mth.clamp((float) (scrollAmount + dy * double_6), 0, getMaxScroll());
                 if (snapToRows) {
                     double nearestRow = Math.round(to / rowSize) * rowSize;
                     scrollTo(nearestRow, false);

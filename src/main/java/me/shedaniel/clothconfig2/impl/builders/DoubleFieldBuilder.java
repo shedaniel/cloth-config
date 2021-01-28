@@ -3,7 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.DoubleListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -15,16 +15,16 @@ import java.util.function.Supplier;
 public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
     
     private Consumer<Double> saveConsumer = null;
-    private Function<Double, Optional<Text[]>> tooltipSupplier = d -> Optional.empty();
+    private Function<Double, Optional<Component[]>> tooltipSupplier = d -> Optional.empty();
     private final double value;
     private Double min = null, max = null;
     
-    public DoubleFieldBuilder(Text resetButtonKey, Text fieldNameKey, double value) {
+    public DoubleFieldBuilder(Component resetButtonKey, Component fieldNameKey, double value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
-    public DoubleFieldBuilder setErrorSupplier(Function<Double, Optional<Text>> errorSupplier) {
+    public DoubleFieldBuilder setErrorSupplier(Function<Double, Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -69,22 +69,22 @@ public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
         return this;
     }
     
-    public DoubleFieldBuilder setTooltipSupplier(Function<Double, Optional<Text[]>> tooltipSupplier) {
+    public DoubleFieldBuilder setTooltipSupplier(Function<Double, Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public DoubleFieldBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
+    public DoubleFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = d -> tooltipSupplier.get();
         return this;
     }
     
-    public DoubleFieldBuilder setTooltip(Optional<Text[]> tooltip) {
+    public DoubleFieldBuilder setTooltip(Optional<Component[]> tooltip) {
         this.tooltipSupplier = d -> tooltip;
         return this;
     }
     
-    public DoubleFieldBuilder setTooltip(Text... tooltip) {
+    public DoubleFieldBuilder setTooltip(Component... tooltip) {
         this.tooltipSupplier = d -> Optional.ofNullable(tooltip);
         return this;
     }

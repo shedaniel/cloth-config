@@ -2,9 +2,9 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
@@ -31,7 +31,7 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     
     @ApiStatus.Internal
     @Deprecated
-    public LongListEntry(Text fieldName, Long value, Text resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer) {
+    public LongListEntry(Component fieldName, Long value, Component resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
         this.minimum = -Long.MAX_VALUE;
         this.maximum = Long.MAX_VALUE;
@@ -40,13 +40,13 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     
     @ApiStatus.Internal
     @Deprecated
-    public LongListEntry(Text fieldName, Long value, Text resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier) {
+    public LongListEntry(Component fieldName, Long value, Component resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier) {
         this(fieldName, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public LongListEntry(Text fieldName, Long value, Text resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
+    public LongListEntry(Component fieldName, Long value, Component resetButtonKey, Supplier<Long> defaultValue, Consumer<Long> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
         this.minimum = -Long.MAX_VALUE;
         this.maximum = Long.MAX_VALUE;
@@ -59,15 +59,15 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     }
     
     @Override
-    protected void textFieldPreRender(TextFieldWidget widget) {
+    protected void textFieldPreRender(EditBox widget) {
         try {
-            double i = Long.parseLong(textFieldWidget.getText());
+            double i = Long.parseLong(textFieldWidget.getValue());
             if (i < minimum || i > maximum)
-                widget.setEditableColor(16733525);
+                widget.setTextColor(16733525);
             else
-                widget.setEditableColor(14737632);
+                widget.setTextColor(14737632);
         } catch (NumberFormatException ex) {
-            widget.setEditableColor(16733525);
+            widget.setTextColor(16733525);
         }
     }
     
@@ -95,22 +95,22 @@ public class LongListEntry extends TextFieldListEntry<Long> {
     @Override
     public Long getValue() {
         try {
-            return Long.valueOf(textFieldWidget.getText());
+            return Long.valueOf(textFieldWidget.getValue());
         } catch (Exception e) {
             return 0L;
         }
     }
     
     @Override
-    public Optional<Text> getError() {
+    public Optional<Component> getError() {
         try {
-            long i = Long.parseLong(textFieldWidget.getText());
+            long i = Long.parseLong(textFieldWidget.getValue());
             if (i > maximum)
-                return Optional.of(new TranslatableText("text.cloth-config.error.too_large", maximum));
+                return Optional.of(new TranslatableComponent("text.cloth-config.error.too_large", maximum));
             else if (i < minimum)
-                return Optional.of(new TranslatableText("text.cloth-config.error.too_small", minimum));
+                return Optional.of(new TranslatableComponent("text.cloth-config.error.too_small", minimum));
         } catch (NumberFormatException ex) {
-            return Optional.of(new TranslatableText("text.cloth-config.error.not_valid_number_long"));
+            return Optional.of(new TranslatableComponent("text.cloth-config.error.not_valid_number_long"));
         }
         return super.getError();
     }

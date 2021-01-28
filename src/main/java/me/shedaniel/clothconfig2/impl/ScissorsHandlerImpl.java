@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.impl;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.Window;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.api.ScissorsScreen;
@@ -9,8 +10,7 @@ import me.shedaniel.math.api.Executor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.Window;
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.opengl.GL11;
 
@@ -77,22 +77,22 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
                 r.setBounds(r.intersection(scissorsAreas.get(i)));
             }
             r.setBounds(Math.min(r.x, r.x + r.width), Math.min(r.y, r.y + r.height), Math.abs(r.width), Math.abs(r.height));
-            if (MinecraftClient.getInstance().currentScreen instanceof ScissorsScreen)
-                _applyScissor(((ScissorsScreen) MinecraftClient.getInstance().currentScreen).handleScissor(r));
+            if (Minecraft.getInstance().screen instanceof ScissorsScreen)
+                _applyScissor(((ScissorsScreen) Minecraft.getInstance().screen).handleScissor(r));
             else _applyScissor(r);
         } else {
-            if (MinecraftClient.getInstance().currentScreen instanceof ScissorsScreen)
-                _applyScissor(((ScissorsScreen) MinecraftClient.getInstance().currentScreen).handleScissor(null));
+            if (Minecraft.getInstance().screen instanceof ScissorsScreen)
+                _applyScissor(((ScissorsScreen) Minecraft.getInstance().screen).handleScissor(null));
             else _applyScissor(null);
         }
     }
     
     public void _applyScissor(Rectangle r) {
         if (r != null && !r.isEmpty()) {
-            Window window = MinecraftClient.getInstance().getWindow();
-            double scaleFactor = window.getScaleFactor();
+            Window window = Minecraft.getInstance().getWindow();
+            double scaleFactor = window.getGuiScale();
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
-            GL11.glScissor((int) (r.x * scaleFactor), (int) ((window.getScaledHeight() - r.height - r.y) * scaleFactor), (int) (r.width * scaleFactor), (int) (r.height * scaleFactor));
+            GL11.glScissor((int) (r.x * scaleFactor), (int) ((window.getGuiScaledHeight() - r.height - r.y) * scaleFactor), (int) (r.width * scaleFactor), (int) (r.height * scaleFactor));
         } else
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }

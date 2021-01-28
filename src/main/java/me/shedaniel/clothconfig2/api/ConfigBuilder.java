@@ -4,10 +4,9 @@ import me.shedaniel.clothconfig2.impl.ConfigBuilderImpl;
 import me.shedaniel.clothconfig2.impl.ConfigEntryBuilderImpl;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)
@@ -23,21 +22,21 @@ public interface ConfigBuilder {
     
     ConfigBuilder setParentScreen(Screen parent);
     
-    Text getTitle();
+    Component getTitle();
     
-    ConfigBuilder setTitle(Text title);
+    ConfigBuilder setTitle(Component title);
     
     boolean isEditable();
     
     ConfigBuilder setEditable(boolean editable);
     
-    ConfigCategory getOrCreateCategory(Text categoryKey);
+    ConfigCategory getOrCreateCategory(Component categoryKey);
     
-    ConfigBuilder removeCategory(Text categoryKey);
+    ConfigBuilder removeCategory(Component categoryKey);
     
-    ConfigBuilder removeCategoryIfExists(Text categoryKey);
+    ConfigBuilder removeCategoryIfExists(Component categoryKey);
     
-    boolean hasCategory(Text category);
+    boolean hasCategory(Component category);
     
     ConfigBuilder setShouldTabsSmoothScroll(boolean shouldTabsSmoothScroll);
     
@@ -67,9 +66,9 @@ public interface ConfigBuilder {
         return false;
     }
     
-    Identifier getDefaultBackgroundTexture();
+    ResourceLocation getDefaultBackgroundTexture();
     
-    ConfigBuilder setDefaultBackgroundTexture(Identifier texture);
+    ConfigBuilder setDefaultBackgroundTexture(ResourceLocation texture);
     
     Runnable getSavingRunnable();
     

@@ -2,8 +2,8 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,19 +20,19 @@ public class LongListListEntry extends AbstractTextFieldListListEntry<Long, Long
     
     @ApiStatus.Internal
     @Deprecated
-    public LongListListEntry(Text fieldName, List<Long> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, Text resetButtonKey) {
+    public LongListListEntry(Component fieldName, List<Long> value, boolean defaultExpanded, Supplier<Optional<Component[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, Component resetButtonKey) {
         this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public LongListListEntry(Text fieldName, List<Long> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, Text resetButtonKey, boolean requiresRestart) {
+    public LongListListEntry(Component fieldName, List<Long> value, boolean defaultExpanded, Supplier<Optional<Component[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, Component resetButtonKey, boolean requiresRestart) {
         this(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, true, true);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public LongListListEntry(Text fieldName, List<Long> value, boolean defaultExpanded, Supplier<Optional<Text[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, Text resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
+    public LongListListEntry(Component fieldName, List<Long> value, boolean defaultExpanded, Supplier<Optional<Component[]>> tooltipSupplier, Consumer<List<Long>> saveConsumer, Supplier<List<Long>> defaultValue, Component resetButtonKey, boolean requiresRestart, boolean deleteButtonEnabled, boolean insertInFront) {
         super(fieldName, value, defaultExpanded, tooltipSupplier, saveConsumer, defaultValue, resetButtonKey, requiresRestart, deleteButtonEnabled, insertInFront, LongListCell::new);
         this.minimum = Long.MIN_VALUE;
         this.maximum = Long.MAX_VALUE;
@@ -75,22 +75,22 @@ public class LongListListEntry extends AbstractTextFieldListListEntry<Long, Long
         
         public Long getValue() {
             try {
-                return Long.valueOf(widget.getText());
+                return Long.valueOf(widget.getValue());
             } catch (NumberFormatException e) {
                 return 0L;
             }
         }
         
         @Override
-        public Optional<Text> getError() {
+        public Optional<Component> getError() {
             try {
-                long l = Long.parseLong(widget.getText());
+                long l = Long.parseLong(widget.getValue());
                 if (l > listListEntry.maximum)
-                    return Optional.of(new TranslatableText("text.cloth-config.error.too_large", listListEntry.maximum));
+                    return Optional.of(new TranslatableComponent("text.cloth-config.error.too_large", listListEntry.maximum));
                 else if (l < listListEntry.minimum)
-                    return Optional.of(new TranslatableText("text.cloth-config.error.too_small", listListEntry.minimum));
+                    return Optional.of(new TranslatableComponent("text.cloth-config.error.too_small", listListEntry.minimum));
             } catch (NumberFormatException ex) {
-                return Optional.of(new TranslatableText("text.cloth-config.error.not_valid_number_long"));
+                return Optional.of(new TranslatableComponent("text.cloth-config.error.not_valid_number_long"));
             }
             return Optional.empty();
         }

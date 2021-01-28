@@ -3,8 +3,8 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.IntegerListListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,31 +17,31 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListEntry> {
     
-    protected Function<Integer, Optional<Text>> cellErrorSupplier;
+    protected Function<Integer, Optional<Component>> cellErrorSupplier;
     private Consumer<List<Integer>> saveConsumer = null;
-    private Function<List<Integer>, Optional<Text[]>> tooltipSupplier = list -> Optional.empty();
+    private Function<List<Integer>, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();
     private final List<Integer> value;
     private boolean expanded = false;
     private Integer min = null, max = null;
     private Function<IntegerListListEntry, IntegerListListEntry.IntegerListCell> createNewInstance;
-    private Text addTooltip = new TranslatableText("text.cloth-config.list.add"), removeTooltip = new TranslatableText("text.cloth-config.list.remove");
+    private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
     private boolean deleteButtonEnabled = true, insertInFront = true;
     
-    public IntListBuilder(Text resetButtonKey, Text fieldNameKey, List<Integer> value) {
+    public IntListBuilder(Component resetButtonKey, Component fieldNameKey, List<Integer> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
-    public Function<Integer, Optional<Text>> getCellErrorSupplier() {
+    public Function<Integer, Optional<Component>> getCellErrorSupplier() {
         return cellErrorSupplier;
     }
     
-    public IntListBuilder setCellErrorSupplier(Function<Integer, Optional<Text>> cellErrorSupplier) {
+    public IntListBuilder setCellErrorSupplier(Function<Integer, Optional<Component>> cellErrorSupplier) {
         this.cellErrorSupplier = cellErrorSupplier;
         return this;
     }
     
-    public IntListBuilder setErrorSupplier(Function<List<Integer>, Optional<Text>> errorSupplier) {
+    public IntListBuilder setErrorSupplier(Function<List<Integer>, Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -56,12 +56,12 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
         return this;
     }
     
-    public IntListBuilder setAddButtonTooltip(Text addTooltip) {
+    public IntListBuilder setAddButtonTooltip(Component addTooltip) {
         this.addTooltip = addTooltip;
         return this;
     }
     
-    public IntListBuilder setRemoveButtonTooltip(Text removeTooltip) {
+    public IntListBuilder setRemoveButtonTooltip(Component removeTooltip) {
         this.removeTooltip = removeTooltip;
         return this;
     }
@@ -122,22 +122,22 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
         return this;
     }
     
-    public IntListBuilder setTooltipSupplier(Function<List<Integer>, Optional<Text[]>> tooltipSupplier) {
+    public IntListBuilder setTooltipSupplier(Function<List<Integer>, Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public IntListBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
+    public IntListBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = list -> tooltipSupplier.get();
         return this;
     }
     
-    public IntListBuilder setTooltip(Optional<Text[]> tooltip) {
+    public IntListBuilder setTooltip(Optional<Component[]> tooltip) {
         this.tooltipSupplier = list -> tooltip;
         return this;
     }
     
-    public IntListBuilder setTooltip(Text... tooltip) {
+    public IntListBuilder setTooltip(Component... tooltip) {
         this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
         return this;
     }

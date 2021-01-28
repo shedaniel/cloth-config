@@ -3,7 +3,7 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -16,16 +16,16 @@ import java.util.function.Supplier;
 public class TextFieldBuilder extends FieldBuilder<String, StringListEntry> {
     
     private Consumer<String> saveConsumer = null;
-    private Function<String, Optional<Text[]>> tooltipSupplier = str -> Optional.empty();
+    private Function<String, Optional<Component[]>> tooltipSupplier = str -> Optional.empty();
     private final String value;
     
-    public TextFieldBuilder(Text resetButtonKey, Text fieldNameKey, String value) {
+    public TextFieldBuilder(Component resetButtonKey, Component fieldNameKey, String value) {
         super(resetButtonKey, fieldNameKey);
         Objects.requireNonNull(value);
         this.value = value;
     }
     
-    public TextFieldBuilder setErrorSupplier(Function<String, Optional<Text>> errorSupplier) {
+    public TextFieldBuilder setErrorSupplier(Function<String, Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
     }
@@ -50,22 +50,22 @@ public class TextFieldBuilder extends FieldBuilder<String, StringListEntry> {
         return this;
     }
     
-    public TextFieldBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
+    public TextFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = str -> tooltipSupplier.get();
         return this;
     }
     
-    public TextFieldBuilder setTooltipSupplier(Function<String, Optional<Text[]>> tooltipSupplier) {
+    public TextFieldBuilder setTooltipSupplier(Function<String, Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
         return this;
     }
     
-    public TextFieldBuilder setTooltip(Optional<Text[]> tooltip) {
+    public TextFieldBuilder setTooltip(Optional<Component[]> tooltip) {
         this.tooltipSupplier = str -> tooltip;
         return this;
     }
     
-    public TextFieldBuilder setTooltip(Text... tooltip) {
+    public TextFieldBuilder setTooltip(Component... tooltip) {
         this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
         return this;
     }
