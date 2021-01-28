@@ -1,0 +1,7 @@
+{
+    "_comment": "This file is here to make fabric loader load this on the Knot classloader.",
+    "schemaVersion": 1,
+    "id": "cloth-config-common",
+    "version": "0.0.1",
+    "accessWidener": "cloth-config.accessWidener"
+}
