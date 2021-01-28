@@ -53,28 +53,25 @@ allprojects {
 
 }
 
-/*bintray {
+bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
-    publications = ["MyPublication"]
+    publications = ["mavenCommon", "mavenFabric", "mavenForge"]
     publish = true
     pkg {
         repo = "cloth-config-2"
         name = "config-2"
         userOrg = "shedaniel"
-        licenses = ["Unlicense"]
+        licenses = ["LPGL v3"]
         version {
             name = project.version
             vcsTag = project.version
             released = new Date()
             desc = "Cloth Config API for Minecraft"
-            githubRepo = 'shedaniel/ClothConfig'
-            websiteUrl = 'https://github.com/shedaniel/ClothConfig'
-            issueTrackerUrl = 'https://github.com/shedaniel/ClothConfig/issues'
-            vcsUrl = 'https://github.com/shedaniel/ClothConfig.git'
-            gpg {
-                sign = true
-            }
+            githubRepo = 'architectury/ClothConfig'
+            websiteUrl = 'https://github.com/architectury/ClothConfig'
+            issueTrackerUrl = 'https://github.com/architectury/ClothConfig/issues'
+            vcsUrl = 'https://github.com/architectury/ClothConfig.git'
         }
     }
-}*/
+}
