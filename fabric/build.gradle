@@ -1,0 +1,67 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "com.matthewprenger.cursegradle"
+}
+
+loom {
+    accessWidener = file("src/main/resources/cloth-config.accessWidener")
+}
+
+configurations {
+    shadow
+    dev
+}
+
+artifacts {
+    dev(jar)
+}
+
+architectury {
+    platformSetupLoomIde()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
+    mappings loom.officialMojangMappings()
+
+    modApi "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+
+    modApi("me.shedaniel.cloth:basic-math:0.5.1")
+    include("me.shedaniel.cloth:basic-math:0.5.1")
+
+    modCompileOnly("io.github.prospector:modmenu:${mod_menu_version}") {
+        transitive(false)
+    }
+    modRuntime("io.github.prospector:modmenu:${mod_menu_version}") {
+        transitive(false)
+    }
+
+    compileOnly(project(path: ":common")) {
+        transitive = false
+    }
+    runtimeOnly(project(path: ":common", configuration: "transformDevelopmentFabric")) {
+        transitive = false
+    }
+    shadow(project(path: ":common", configuration: "transformProductionFabric")) {
+        transitive = false
+    }
+}
+
+processResources {
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+    inputs.property "version", project.version
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+    classifier "shadow"
+}
+
+remapJar {
+    dependsOn(shadowJar)
+    input.set(shadowJar.archiveFile)
+    archiveClassifier = "fabric"
+}
