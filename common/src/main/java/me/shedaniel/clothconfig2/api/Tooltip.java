@@ -23,6 +23,7 @@ import me.shedaniel.math.Point;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
+
 import java.util.List;
 
 public interface Tooltip {

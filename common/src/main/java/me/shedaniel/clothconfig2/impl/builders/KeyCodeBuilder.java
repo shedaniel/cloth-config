@@ -19,6 +19,7 @@
 
 package me.shedaniel.clothconfig2.impl.builders;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.clothconfig2.api.Modifier;
 import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
@@ -27,7 +28,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.mojang.blaze3d.platform.InputConstants;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;

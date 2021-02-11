@@ -19,11 +19,12 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.network.chat.Component;
-import com.mojang.blaze3d.vertex.PoseStack;
+
 import java.util.Optional;
 import java.util.function.Supplier;
 

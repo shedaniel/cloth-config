@@ -24,4 +24,4 @@ jobs:
                   !contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.pull_request.title, '[ci skip]')
               env:
                   MAVEN_PASS: ${{ secrets.MAVEN_PASS }}
-                  curse_api_key: ${{ secrets.CURSE_API_KEY }}
+                  curse_api_key: ${{ secrets.CF_API_KEY }}

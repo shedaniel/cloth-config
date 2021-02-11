@@ -36,6 +36,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

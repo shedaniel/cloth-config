@@ -28,7 +28,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
-import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget.Entries;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -39,7 +38,6 @@ import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.AbstractList;
 import java.util.ArrayList;

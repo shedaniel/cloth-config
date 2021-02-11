@@ -24,6 +24,7 @@ import me.shedaniel.clothconfig2.api.TabbedConfigScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+
 import java.util.Map;
 
 public abstract class AbstractTabbedConfigScreen extends AbstractConfigScreen implements TabbedConfigScreen {

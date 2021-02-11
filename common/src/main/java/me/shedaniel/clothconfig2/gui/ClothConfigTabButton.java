@@ -19,6 +19,7 @@
 
 package me.shedaniel.clothconfig2.gui;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.Tooltip;
 import me.shedaniel.math.Point;
 import net.fabricmc.api.EnvType;
@@ -28,7 +29,7 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import org.jetbrains.annotations.Nullable;
-import com.mojang.blaze3d.vertex.PoseStack;
+
 import java.util.Optional;
 import java.util.function.Supplier;
 

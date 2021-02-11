@@ -19,6 +19,7 @@
 
 package me.shedaniel.clothconfig2.api;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
@@ -30,7 +31,7 @@ import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.mojang.blaze3d.vertex.PoseStack;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;

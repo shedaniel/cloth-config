@@ -19,11 +19,11 @@
 
 package me.shedaniel.clothconfig2.api;
 
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
 
 public interface ConfigScreen {
     void setSavingRunnable(@Nullable Runnable savingRunnable);

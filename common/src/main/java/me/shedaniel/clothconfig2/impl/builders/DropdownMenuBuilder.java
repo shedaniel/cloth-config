@@ -19,6 +19,7 @@
 
 package me.shedaniel.clothconfig2.impl.builders;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.DefaultSelectionCellCreator;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry.DefaultSelectionTopCellElement;
@@ -37,7 +38,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
-import com.mojang.blaze3d.vertex.PoseStack;
+
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;

@@ -26,6 +26,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+
 import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)
