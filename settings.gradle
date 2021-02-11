@@ -13,4 +13,4 @@ include("common")
 include("fabric")
 include("forge")
 
-rootProject.name = 'ClothConfig'
+rootProject.name = 'cloth-config'
