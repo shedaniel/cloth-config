@@ -15,6 +15,9 @@
     "license": "GNU LGPLv3",
     "icon": "icon.png",
     "entrypoints": {
+        "client": [
+            "me.shedaniel.autoconfig.example.ExampleInits::exampleCommonInit"
+        ],
         "modmenu": [
             "me.shedaniel.clothconfig2.fabric.ClothConfigModMenuDemo"
         ]

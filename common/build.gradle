@@ -10,6 +10,10 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
     implementation("me.shedaniel.cloth:basic-math:0.5.1")
+
+    implementation("blue.endless:jankson:${rootProject.jankson_version}")
+    implementation("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
+    implementation("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
 }
 
 architectury {
@@ -41,6 +45,18 @@ publishing {
                 builtBy remapSourcesJar
             }
             artifact javadocsJar
+        }
+    }
+    
+    repositories {
+        if (System.getenv("MAVEN_PASS") != null) {
+            maven {
+                url = "https://deploy.shedaniel.me/"
+                credentials {
+                    username = "shedaniel"
+                    password = System.getenv("MAVEN_PASS")
+                }
+            }
         }
     }
 }

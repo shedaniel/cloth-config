@@ -1,3 +1,22 @@
+/*
+ * This file is part of Cloth Config.
+ * Copyright (C) 2020 - 2021 shedaniel
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 package me.shedaniel.clothconfig2;
 
 import com.google.common.collect.Lists;
@@ -14,21 +33,12 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.fml.ExtensionPoint;
-import net.minecraftforge.fml.ModLoadingContext;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ClothConfigForgeDemo {
-    
-    public static void registerModsPage() {
-        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> (client, parent) -> {
-            return ClothConfigForgeDemo.getConfigBuilderWithDemo(parent).build();
-        });
-    }
-    
-    public static ConfigBuilder getConfigBuilderWithDemo(Screen parent) {
+public class ClothConfigDemo {
+    public static ConfigBuilder getConfigBuilderWithDemo() {
         class Pair<T, R> {
             T t;
             R r;
@@ -65,7 +75,7 @@ public class ClothConfigForgeDemo {
             }
         }
         
-        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(new TranslatableComponent("title.cloth-config.config"));
+        ConfigBuilder builder = ConfigBuilder.create().setTitle(new TranslatableComponent("title.cloth-config.config"));
         builder.setDefaultBackgroundTexture(new ResourceLocation("minecraft:textures/block/oak_planks.png"));
 //        builder.setGlobalized(true);
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();

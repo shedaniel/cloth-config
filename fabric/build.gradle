@@ -9,15 +9,19 @@ loom {
 
 configurations {
     shadow
-    dev
-}
-
-artifacts {
-    dev(jar)
 }
 
 architectury {
     platformSetupLoomIde()
+}
+
+repositories {
+    maven {
+        url "https://maven.terraformersmc.com/releases/"
+        content {
+            includeGroup "com.terraformersmc"
+        }
+    }
 }
 
 dependencies {
@@ -30,10 +34,19 @@ dependencies {
     modApi("me.shedaniel.cloth:basic-math:0.5.1")
     include("me.shedaniel.cloth:basic-math:0.5.1")
 
-    modCompileOnly("io.github.prospector:modmenu:${mod_menu_version}") {
+    implementation("blue.endless:jankson:${rootProject.jankson_version}")
+    implementation("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
+    implementation("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
+    shadow("blue.endless:jankson:${rootProject.jankson_version}")
+    shadow("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}") {
+        exclude(module: "gson")
+    }
+    shadow("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
+
+    modCompileOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
-    modRuntime("io.github.prospector:modmenu:${mod_menu_version}") {
+    modRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
 
@@ -56,6 +69,10 @@ processResources {
 }
 
 shadowJar {
+    relocate "blue.endless.jankson", "${rootProject.maven_group}.${rootProject.archives_base_name}.shadowed.blue.endless.jankson"
+    relocate "com.moandjiezana.toml", "${rootProject.maven_group}.${rootProject.archives_base_name}.shadowed.com.moandjiezana.toml"
+    relocate "org.yaml.snakeyaml", "${rootProject.maven_group}.${rootProject.archives_base_name}.shadowed.org.yaml.snakeyaml"
+    
     configurations = [project.configurations.shadow]
     classifier "shadow"
 }
@@ -64,6 +81,8 @@ remapJar {
     dependsOn(shadowJar)
     input.set(shadowJar.archiveFile)
     archiveClassifier = "fabric"
+    
+    from rootProject.file("LICENSE.md")
 }
 
 publishing {
@@ -72,6 +91,18 @@ publishing {
             artifact(remapJar.archivePath) {
                 builtBy build
                 classifier "fabric"
+            }
+        }
+    }
+
+    repositories {
+        if (System.getenv("MAVEN_PASS") != null) {
+            maven {
+                url = "https://deploy.shedaniel.me/"
+                credentials {
+                    username = "shedaniel"
+                    password = System.getenv("MAVEN_PASS")
+                }
             }
         }
     }

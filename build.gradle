@@ -1,9 +1,9 @@
 plugins {
-    id "architectury-plugin" version "2.0.65"
-    id "forgified-fabric-loom" version "0.6.54" apply false
-    id 'com.jfrog.bintray' version '1.8.4'
-    id 'com.matthewprenger.cursegradle' version '1.4.0' apply false
-    id 'maven-publish'
+    id "architectury-plugin" version "2.0.68"
+    id "forgified-fabric-loom" version "0.6.64" apply false
+    id "com.matthewprenger.cursegradle" version "1.4.0" apply false
+    id "maven-publish"
+    id "org.cadixdev.licenser" version "0.5.0" apply false
 }
 
 architectury {
@@ -22,20 +22,12 @@ subprojects {
 allprojects {
     apply plugin: 'java'
     apply plugin: 'architectury-plugin'
-
-    ext {
-        isSnapshot = System.getenv("PR_NUM") != null
-    }
+    apply plugin: 'org.cadixdev.licenser'
 
     def runNumber = (System.getenv("GITHUB_RUN_NUMBER") == null ? "9999" : System.getenv("GITHUB_RUN_NUMBER"))
 
-    if (!ext.isSnapshot) {
-        version = rootProject.base_version + "." + runNumber
-        archivesBaseName = rootProject.archives_base_name
-    } else {
-        version = rootProject.base_version + "-PR." + System.getenv("PR_NUM") + "." + runNumber
-        archivesBaseName = rootProject.archives_base_name_snapshot
-    }
+    version = rootProject.base_version + "." + runNumber
+    archivesBaseName = rootProject.archives_base_name
 
     group = rootProject.maven_group
 
@@ -51,27 +43,20 @@ allprojects {
         }
     }
 
-}
+    license {
+        header = rootProject.file("HEADER")
 
-bintray {
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
-    publications = ["mavenCommon", "mavenFabric", "mavenForge"]
-    publish = true
-    pkg {
-        repo = "cloth-config-2"
-        name = "config-2"
-        userOrg = "shedaniel"
-        licenses = ["LPGL v3"]
-        version {
-            name = project.version
-            vcsTag = project.version
-            released = new Date()
-            desc = "Cloth Config API for Minecraft"
-            githubRepo = 'architectury/ClothConfig'
-            websiteUrl = 'https://github.com/architectury/ClothConfig'
-            issueTrackerUrl = 'https://github.com/architectury/ClothConfig/issues'
-            vcsUrl = 'https://github.com/architectury/ClothConfig.git'
+        ext {
+            name = "shedaniel"
+            year = "2020 - 2021"
         }
+
+        include "**/*.java"
+        exclude "**/ScrollingContainer.java"
+
+        ignoreFailures = true
     }
 }
+
+task licenseFormatAll
+subprojects { licenseFormatAll.dependsOn("${path}:licenseFormat") }
