@@ -60,3 +60,5 @@ allprojects {
 
 task licenseFormatAll
 subprojects { licenseFormatAll.dependsOn("${path}:licenseFormat") }
+
+task curseforgePublish

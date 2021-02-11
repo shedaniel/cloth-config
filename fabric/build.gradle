@@ -135,3 +135,5 @@ curseforge {
         javaVersionAutoDetect = false
     }
 }
+
+rootProject.tasks.getByName("curseforgePublish").dependsOn tasks.getByName("curseforge")
