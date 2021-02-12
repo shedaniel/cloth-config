@@ -69,9 +69,9 @@ processResources {
 }
 
 shadowJar {
-    relocate "blue.endless.jankson", "${rootProject.maven_group}.clothconfig2.shadowed.blue.endless.jankson"
-    relocate "com.moandjiezana.toml", "${rootProject.maven_group}.clothconfig2.shadowed.com.moandjiezana.toml"
-    relocate "org.yaml.snakeyaml", "${rootProject.maven_group}.clothconfig2.shadowed.org.yaml.snakeyaml"
+    relocate "blue.endless.jankson", "${rootProject.maven_group}.clothconfig.shadowed.blue.endless.jankson"
+    relocate "com.moandjiezana.toml", "${rootProject.maven_group}.clothconfig.shadowed.com.moandjiezana.toml"
+    relocate "org.yaml.snakeyaml", "${rootProject.maven_group}.clothconfig.shadowed.org.yaml.snakeyaml"
     
     configurations = [project.configurations.shadow]
     classifier "shadow"
