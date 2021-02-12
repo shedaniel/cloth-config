@@ -1,5 +1,13 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.0.0"
+}
+
 loom {
     accessWidener = file("src/main/resources/cloth-config.accessWidener")
+}
+
+configurations {
+    shadow
 }
 
 dependencies {
@@ -11,9 +19,14 @@ dependencies {
 
     implementation("me.shedaniel.cloth:basic-math:0.5.1")
 
-    implementation("blue.endless:jankson:${rootProject.jankson_version}")
-    implementation("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
-    implementation("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
+    compileOnly("blue.endless:jankson:${rootProject.jankson_version}")
+    compileOnly("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
+    compileOnly("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
+    shadow("blue.endless:jankson:${rootProject.jankson_version}")
+    shadow("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}") {
+        exclude(module: "gson")
+    }
+    shadow("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
 }
 
 architectury {
@@ -35,12 +48,23 @@ task javadocsJar(type: Jar, dependsOn: javadocs) {
     from javadocs.destinationDir
 }
 
+shadowJar {
+    relocate "blue.endless.jankson", "${rootProject.maven_group}.clothconfig.shadowed.blue.endless.jankson"
+    relocate "com.moandjiezana.toml", "${rootProject.maven_group}.clothconfig.shadowed.com.moandjiezana.toml"
+    relocate "org.yaml.snakeyaml", "${rootProject.maven_group}.clothconfig.shadowed.org.yaml.snakeyaml"
+
+    configurations = [project.configurations.shadow]
+    classifier null
+}
+
+build {
+    dependsOn shadowJar
+}
+
 publishing {
     publications {
         mavenCommon(MavenPublication) {
-            artifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
-                builtBy build
-            }
+            artifact(shadowJar)
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
             }
