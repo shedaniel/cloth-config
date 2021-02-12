@@ -28,22 +28,30 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import me.shedaniel.math.Rectangle;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -401,5 +409,43 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         buffer.vertex(matrix, rect.getMaxX(), rect.getMinY(), 0.0F).uv(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).endVertex();
         buffer.vertex(matrix, rect.getMinX(), rect.getMinY(), 0.0F).uv(rect.getMinX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).endVertex();
         tessellator.end();
+    }
+    
+    @Override   // override to expose this protected method to config entries
+    public void renderComponentHoverEffect(PoseStack matrices, Style style, int x, int y) {
+        super.renderComponentHoverEffect(matrices, style, x, y);
+    }
+    
+    @Override
+    public boolean handleComponentClicked(@Nullable Style style) {
+        if (style == null) return false;
+        
+        ClickEvent clickEvent = style.getClickEvent();
+        
+        if (clickEvent != null && clickEvent.getAction() == ClickEvent.Action.OPEN_URL) {
+            try {
+                URI uri = new URI(clickEvent.getValue());
+                String string = uri.getScheme();
+                if (string == null) {
+                    throw new URISyntaxException(clickEvent.getValue(), "Missing protocol");
+                }
+                
+                if (!(string.equalsIgnoreCase("http") || string.equalsIgnoreCase("https"))) {
+                    throw new URISyntaxException(clickEvent.getValue(), "Unsupported protocol: " + string.toLowerCase(Locale.ROOT));
+                }
+                
+                Minecraft.getInstance().setScreen(new ConfirmLinkScreen(openInBrowser -> {
+                    if (openInBrowser) {
+                        Util.getPlatform().openUri(uri);
+                    }
+    
+                    Minecraft.getInstance().setScreen(this);
+                }, clickEvent.getValue(), true));
+            } catch (URISyntaxException e) {
+                ClothConfigInitializer.LOGGER.error("Can't open url for {}", clickEvent, e);
+            }
+            return true;
+        }
+        return super.handleComponentClicked(style);
     }
 }
