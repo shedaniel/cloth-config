@@ -1,5 +1,6 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "maven-publish"
 }
 
 loom {
@@ -38,16 +39,6 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
-task javadocs(type: Javadoc) {
-    source = sourceSets.main.allJava
-}
-
-task javadocsJar(type: Jar, dependsOn: javadocs) {
-    archiveClassifier.set("javadocs")
-    javadocs.failOnError false
-    from javadocs.destinationDir
-}
-
 shadowJar {
     relocate "blue.endless.jankson", "${rootProject.maven_group}.clothconfig.shadowed.blue.endless.jankson"
     relocate "com.moandjiezana.toml", "${rootProject.maven_group}.clothconfig.shadowed.com.moandjiezana.toml"
@@ -64,14 +55,16 @@ build {
 publishing {
     publications {
         mavenCommon(MavenPublication) {
-            artifact(shadowJar)
+            artifactId = rootProject.archives_base_name
+            artifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
+                builtBy shadowJar
+            }
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
             }
-            artifact javadocsJar
         }
     }
-    
+
     repositories {
         if (System.getenv("MAVEN_PASS") != null) {
             maven {

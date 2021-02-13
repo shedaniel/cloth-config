@@ -1,6 +1,7 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "5.0.0"
     id "com.matthewprenger.cursegradle"
+    id "maven-publish"
 }
 
 loom {
@@ -88,6 +89,7 @@ remapJar {
 publishing {
     publications {
         mavenFabric(MavenPublication) {
+            artifactId = rootProject.archives_base_name
             artifact(remapJar.archivePath) {
                 builtBy build
                 classifier "fabric"

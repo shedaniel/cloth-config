@@ -1,6 +1,7 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "5.0.0"
     id "com.matthewprenger.cursegradle"
+    id "maven-publish"
 }
 
 configurations {
@@ -22,7 +23,7 @@ dependencies {
 
     forge "net.minecraftforge:forge:${rootProject.architectury.minecraft}-${rootProject.forge_version}"
 
-    compile("me.shedaniel.cloth:basic-math:0.5.1")
+    modApi("me.shedaniel.cloth:basic-math:0.5.1")
     shadow("me.shedaniel.cloth:basic-math:0.5.1")
 
     implementation("blue.endless:jankson:${rootProject.jankson_version}")
@@ -75,6 +76,7 @@ remapJar {
 publishing {
     publications {
         mavenForge(MavenPublication) {
+            artifactId = rootProject.archives_base_name
             artifact(remapJar.archivePath) {
                 builtBy build
                 classifier "forge"
