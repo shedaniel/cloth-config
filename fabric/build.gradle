@@ -14,6 +14,7 @@ configurations {
 
 architectury {
     platformSetupLoomIde()
+    fabric()
 }
 
 repositories {
@@ -51,10 +52,10 @@ dependencies {
         transitive(false)
     }
 
-    compileOnly(project(path: ":common")) {
+    implementation(project(path: ":common")) {
         transitive = false
     }
-    runtimeOnly(project(path: ":common", configuration: "transformDevelopmentFabric")) {
+    developmentFabric(project(path: ":common")) {
         transitive = false
     }
     shadow(project(path: ":common", configuration: "transformProductionFabric")) {

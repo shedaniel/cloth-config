@@ -15,6 +15,7 @@ artifacts {
 
 architectury {
     platformSetupLoomIde()
+    forge()
 }
 
 dependencies {
@@ -35,10 +36,10 @@ dependencies {
     }
     shadow("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
 
-    compileOnly(project(path: ":common")) {
+    implementation(project(path: ":common")) {
         transitive = false
     }
-    runtimeOnly(project(path: ":common", configuration: "transformDevelopmentForge")) {
+    developmentForge(project(path: ":common")) {
         transitive = false
     }
     shadow(project(path: ":common", configuration: "transformProductionForge")) {
