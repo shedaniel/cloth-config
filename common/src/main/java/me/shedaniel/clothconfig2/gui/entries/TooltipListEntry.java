@@ -25,16 +25,18 @@ import me.shedaniel.clothconfig2.api.Tooltip;
 import me.shedaniel.math.Point;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
-    
     @Nullable private Supplier<Optional<Component[]>> tooltipSupplier;
     
     @ApiStatus.Internal
@@ -56,8 +58,13 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
         if (isMouseInside(mouseX, mouseY, x, y, entryWidth, entryHeight)) {
             Optional<Component[]> tooltip = getTooltip(mouseX, mouseY);
             if (tooltip.isPresent() && tooltip.get().length > 0)
-                addTooltip(Tooltip.of(new Point(mouseX, mouseY), tooltip.get()));
+                addTooltip(Tooltip.of(new Point(mouseX, mouseY), postProcessTooltip(tooltip.get())));
         }
+    }
+    
+    private FormattedCharSequence[] postProcessTooltip(Component[] tooltip) {
+        return Arrays.stream(tooltip).flatMap(component -> Minecraft.getInstance().font.split(component, getConfigScreen().width).stream())
+                .toArray(FormattedCharSequence[]::new);
     }
     
     public Optional<Component[]> getTooltip() {
