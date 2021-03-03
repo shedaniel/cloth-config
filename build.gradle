@@ -56,6 +56,23 @@ allprojects {
 
         ignoreFailures = true
     }
+
+    javadoc {
+        options.source = 8
+
+        options.tags = [
+            "apiNote:a:API Note:",
+            "implSpec:a:Implementation Requirements:",
+            "implNote:a:Implementation Note:"
+        ]
+
+        options.links = [
+            'https://docs.oracle.com/javase/8/docs/api/'
+        ]
+
+        options.group('AutoConfig', ['me.shedaniel.autoconfig', 'me.shedaniel.autoconfig.*'])
+        options.group('Cloth Config', ['me.shedaniel.clothconfig2', 'me.shedaniel.clothconfig2.*'])
+    }
 }
 
 task licenseFormatAll

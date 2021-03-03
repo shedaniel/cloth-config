@@ -56,9 +56,9 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
     }
     
     /**
-     * @param <T>           the configuration object type
-     * @param <SELF>        the "curiously recurring template pattern" type parameter for this class
-     * @param <OUTER_SELF>> the "curiously recurring template pattern" type parameter for the outer class
+     * @param <T>          the configuration object type
+     * @param <SELF>       the "curiously recurring template pattern" type parameter for this class
+     * @param <OUTER_SELF> the "curiously recurring template pattern" type parameter for the outer class
      * @see AbstractTextFieldListListEntry
      */
     @ApiStatus.Internal

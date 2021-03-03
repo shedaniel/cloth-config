@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
  * @param <T>    the configuration object type
  * @param <C>    the cell type
  * @param <SELF> the "curiously recurring template pattern" type parameter
- * @implNote See <a href="https://stackoverflow.com/questions/7354740/is-there-a-way-to-refer-to-the-current-type-with-a-type-variable">Is there a way to refer to the current type with a type variable?</href> on Stack Overflow.
+ * @implNote See <a href="https://stackoverflow.com/questions/7354740/is-there-a-way-to-refer-to-the-current-type-with-a-type-variable">Is there a way to refer to the current type with a type variable?</a> on Stack Overflow.
  */
 @Environment(EnvType.CLIENT)
 public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends BaseListEntry<T, C, SELF>> extends TooltipListEntry<List<T>> implements Expandable {
