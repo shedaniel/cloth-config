@@ -103,8 +103,12 @@ public interface ConfigEntryBuilder {
     
     IntSliderBuilder startIntSlider(Component fieldNameKey, int value, int min, int max);
     
+    IntSliderListBuilder startIntSliderList(Component fieldNameKey, List<Integer> value, int min, int max);
+
     LongSliderBuilder startLongSlider(Component fieldNameKey, long value, long min, long max);
     
+    LongSliderListBuilder startLongSliderList(Component fieldNameKey, List<Long> value, long min, long max);
+
     KeyCodeBuilder startModifierKeyCodeField(Component fieldNameKey, ModifierKeyCode value);
     
     default KeyCodeBuilder startKeyCodeField(Component fieldNameKey, InputConstants.Key value) {

@@ -164,10 +164,20 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     }
     
     @Override
+    public IntSliderListBuilder startIntSliderList(Component fieldNameKey, List<Integer> value, int min, int max) {
+        return new IntSliderListBuilder(resetButtonKey, fieldNameKey, value, min, max);
+    }
+
+    @Override
     public LongSliderBuilder startLongSlider(Component fieldNameKey, long value, long min, long max) {
         return new LongSliderBuilder(resetButtonKey, fieldNameKey, value, min, max);
     }
     
+    @Override
+    public LongSliderListBuilder startLongSliderList(Component fieldNameKey, List<Long> value, long min, long max) {
+        return new LongSliderListBuilder(resetButtonKey, fieldNameKey, value, min, max);
+    }
+
     @Override
     public KeyCodeBuilder startModifierKeyCodeField(Component fieldNameKey, ModifierKeyCode value) {
         return new KeyCodeBuilder(resetButtonKey, fieldNameKey, value);

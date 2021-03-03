@@ -107,6 +107,132 @@ public class DefaultGuiProviders {
         );
         
         registry.registerAnnotationProvider(
+            (i13n, field, config, defaults, guiProvider) -> {
+                ConfigEntry.BoundedDiscrete bounds
+                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
+
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startIntSliderList(
+                        new TranslatableComponent(i13n),
+                        getUnsafely(field, config, Collections.emptyList()),
+                        (int) bounds.min(),
+                        (int) bounds.max()
+                    )
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                        .build()
+                );
+            },
+            isListOfType(Integer.class),
+            ConfigEntry.BoundedDiscrete.class
+        );
+
+        registry.registerAnnotationProvider(
+            (i13n, field, config, defaults, guiProvider) -> {
+                ConfigEntry.BoundedDiscrete bounds
+                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
+
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startIntSliderList(
+                        new TranslatableComponent(i13n),
+                        Lists.newArrayList(getUnsafely(field, config, new Integer[0])),
+                        (int) bounds.min(),
+                        (int) bounds.max()
+                    )
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue.toArray(new Integer[0])))
+                        .build()
+                );
+            },
+            field -> field.getType() == Integer[].class,
+            ConfigEntry.BoundedDiscrete.class
+        );
+
+        registry.registerAnnotationProvider(
+            (i13n, field, config, defaults, guiProvider) -> {
+                ConfigEntry.BoundedDiscrete bounds
+                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
+
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startIntSliderList(
+                        new TranslatableComponent(i13n),
+                        Arrays.stream(getUnsafely(field, config, new int[0])).boxed().collect(Collectors.toList()),
+                        (int) bounds.min(),
+                        (int) bounds.max()
+                    )
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue.stream().mapToInt(Integer::intValue).toArray()))
+                        .build()
+                );
+            },
+            field -> field.getType() == int[].class,
+            ConfigEntry.BoundedDiscrete.class
+        );
+
+        registry.registerAnnotationProvider(
+            (i13n, field, config, defaults, guiProvider) -> {
+                ConfigEntry.BoundedDiscrete bounds
+                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
+
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startLongSliderList(
+                        new TranslatableComponent(i13n),
+                        getUnsafely(field, config, Collections.emptyList()),
+                        bounds.min(),
+                        bounds.max()
+                    )
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                        .build()
+                );
+            },
+            isListOfType(Long.class),
+            ConfigEntry.BoundedDiscrete.class
+        );
+
+        registry.registerAnnotationProvider(
+            (i13n, field, config, defaults, guiProvider) -> {
+                ConfigEntry.BoundedDiscrete bounds
+                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
+
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startLongSliderList(
+                        new TranslatableComponent(i13n),
+                        Lists.newArrayList(getUnsafely(field, config, new Long[0])),
+                        bounds.min(),
+                        bounds.max()
+                    )
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue.toArray(new Long[0])))
+                        .build()
+                );
+            },
+            field -> field.getType() == Long[].class,
+            ConfigEntry.BoundedDiscrete.class
+        );
+
+        registry.registerAnnotationProvider(
+            (i13n, field, config, defaults, guiProvider) -> {
+                ConfigEntry.BoundedDiscrete bounds
+                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
+
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startLongSliderList(
+                        new TranslatableComponent(i13n),
+                        Arrays.stream(getUnsafely(field, config, new long[0])).boxed().collect(Collectors.toList()),
+                        bounds.min(),
+                        bounds.max()
+                    )
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue.stream().mapToLong(Long::longValue).toArray()))
+                        .build()
+                );
+            },
+            field -> field.getType() == long[].class,
+            ConfigEntry.BoundedDiscrete.class
+        );
+
+        registry.registerAnnotationProvider(
                 (i13n, field, config, defaults, guiProvider) -> {
                     ConfigEntry.ColorPicker colorPicker
                             = field.getAnnotation(ConfigEntry.ColorPicker.class);

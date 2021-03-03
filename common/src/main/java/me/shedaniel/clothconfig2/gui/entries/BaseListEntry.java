@@ -278,7 +278,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         if (expanded) {
             int yy = y + 24;
             for (BaseListCell cell : cells) {
-                cell.render(matrices, -1, yy, x + 14, entryWidth - 14, cell.getCellHeight(), mouseX, mouseY, getParent().getFocused() != null && getParent().getFocused().equals(this) && getFocused() != null && getFocused().equals(cell), delta);
+                cell.render(matrices, -1, yy, x + 14, entryWidth - 14, cell.getCellHeight(), mouseX, mouseY, Objects.equals(getParent().getFocused(), this) && Objects.equals(getFocused(), cell), delta);
                 yy += cell.getCellHeight();
             }
         }
