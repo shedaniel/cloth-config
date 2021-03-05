@@ -25,6 +25,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -34,13 +35,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
-    
-    private Consumer<Integer> saveConsumer = null;
-    private Function<Integer, Optional<Component>> errorSupplier;
-    private Function<Integer, Optional<Component[]>> tooltipSupplier = str -> Optional.empty();
+public class ColorFieldBuilder extends FieldBuilder<Integer, ColorEntry, ColorFieldBuilder> {
     private final int value;
-    private Supplier<Integer> defaultValue;
     private boolean alpha = false;
     
     public ColorFieldBuilder(Component resetButtonKey, Component fieldNameKey, int value) {
@@ -49,18 +45,17 @@ public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
     }
     
     public ColorFieldBuilder setErrorSupplier(Function<Integer, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public ColorFieldBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requiresRestart();
     }
     
     public ColorFieldBuilder setSaveConsumer(Consumer<Integer> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
     public ColorFieldBuilder setSaveConsumer2(Consumer<Color> saveConsumer) {
@@ -74,8 +69,7 @@ public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
     }
     
     public ColorFieldBuilder setDefaultValue(Supplier<Integer> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public ColorFieldBuilder setDefaultValue2(Supplier<Color> defaultValue) {
@@ -94,8 +88,7 @@ public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
     }
     
     public ColorFieldBuilder setDefaultValue(int defaultValue) {
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public ColorFieldBuilder setDefaultValue(TextColor defaultValue) {
@@ -103,24 +96,24 @@ public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
         return this;
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public ColorFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = str -> tooltipSupplier.get();
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public ColorFieldBuilder setTooltipSupplier(Function<Integer, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
     public ColorFieldBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = str -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public ColorFieldBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @NotNull

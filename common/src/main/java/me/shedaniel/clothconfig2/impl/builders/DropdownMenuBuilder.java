@@ -37,6 +37,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -47,11 +48,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>> {
+public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>, DropdownMenuBuilder<T>> {
     protected SelectionTopCellElement<T> topCellElement;
     protected SelectionCellCreator<T> cellCreator;
-    protected Function<T, Optional<Component[]>> tooltipSupplier = str -> Optional.empty();
-    protected Consumer<T> saveConsumer = null;
     protected Iterable<T> selections = Collections.emptyList();
     protected boolean suggestionMode = true;
     
@@ -67,48 +66,45 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
     }
     
     public DropdownMenuBuilder<T> setDefaultValue(Supplier<T> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public DropdownMenuBuilder<T> setDefaultValue(T defaultValue) {
-        this.defaultValue = () -> Objects.requireNonNull(defaultValue);
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public DropdownMenuBuilder<T> setSaveConsumer(Consumer<T> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public DropdownMenuBuilder<T> setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = str -> tooltipSupplier.get();
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public DropdownMenuBuilder<T> setTooltipSupplier(Function<T, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
     public DropdownMenuBuilder<T> setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = str -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public DropdownMenuBuilder<T> setTooltip(Component... tooltip) {
-        this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public DropdownMenuBuilder<T> requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requiresRestart();
     }
     
     public DropdownMenuBuilder<T> setErrorSupplier(Function<T, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
     public DropdownMenuBuilder<T> setSuggestionMode(boolean suggestionMode) {

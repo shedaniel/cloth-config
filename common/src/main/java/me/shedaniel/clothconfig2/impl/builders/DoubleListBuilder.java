@@ -34,11 +34,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListListEntry> {
+public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListListEntry, DoubleListBuilder> {
     
     protected Function<Double, Optional<Component>> cellErrorSupplier;
-    private Consumer<List<Double>> saveConsumer = null;
-    private Function<List<Double>, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();
     private final List<Double> value;
     private boolean expanded = false;
     private Double min = null, max = null;
@@ -61,8 +59,7 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
     }
     
     public DoubleListBuilder setErrorSupplier(Function<List<Double>, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
     public DoubleListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
@@ -85,6 +82,8 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         return this;
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public DoubleListBuilder requireRestart() {
         requireRestart(true);
         return this;
@@ -107,13 +106,11 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
     }
     
     public DoubleListBuilder setSaveConsumer(Consumer<List<Double>> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
     public DoubleListBuilder setDefaultValue(Supplier<List<Double>> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public DoubleListBuilder setMin(double min) {
@@ -137,28 +134,27 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
     }
     
     public DoubleListBuilder setDefaultValue(List<Double> defaultValue) {
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public DoubleListBuilder setTooltipSupplier(Function<List<Double>, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public DoubleListBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = list -> tooltipSupplier.get();
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
     public DoubleListBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = list -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public DoubleListBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @NotNull

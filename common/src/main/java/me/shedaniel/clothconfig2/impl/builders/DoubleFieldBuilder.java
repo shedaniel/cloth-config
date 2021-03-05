@@ -23,6 +23,7 @@ import me.shedaniel.clothconfig2.gui.entries.DoubleListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -31,10 +32,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
-    
-    private Consumer<Double> saveConsumer = null;
-    private Function<Double, Optional<Component[]>> tooltipSupplier = d -> Optional.empty();
+public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry, DoubleFieldBuilder> {
     private final double value;
     private Double min = null, max = null;
     
@@ -44,28 +42,25 @@ public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
     }
     
     public DoubleFieldBuilder setErrorSupplier(Function<Double, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public DoubleFieldBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requiresRestart();
     }
     
     public DoubleFieldBuilder setSaveConsumer(Consumer<Double> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
     public DoubleFieldBuilder setDefaultValue(Supplier<Double> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public DoubleFieldBuilder setDefaultValue(double defaultValue) {
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public DoubleFieldBuilder setMin(double min) {
@@ -88,24 +83,24 @@ public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
         return this;
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public DoubleFieldBuilder setTooltipSupplier(Function<Double, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public DoubleFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = d -> tooltipSupplier.get();
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
     public DoubleFieldBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = d -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public DoubleFieldBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = d -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @NotNull

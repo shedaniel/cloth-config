@@ -23,6 +23,7 @@ import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,10 +33,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry> {
-    
-    @Nullable private Consumer<Boolean> saveConsumer = null;
-    @NotNull private Function<Boolean, Optional<Component[]>> tooltipSupplier = bool -> Optional.empty();
+public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry, BooleanToggleBuilder> {
     private final boolean value;
     @Nullable private Function<Boolean, Component> yesNoTextSupplier = null;
     
@@ -45,48 +43,46 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
     }
     
     public BooleanToggleBuilder setErrorSupplier(@Nullable Function<Boolean, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public BooleanToggleBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return requiresRestart();
     }
     
     public BooleanToggleBuilder setSaveConsumer(Consumer<Boolean> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
     public BooleanToggleBuilder setDefaultValue(Supplier<Boolean> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
+    // we can't really deprecate this
     public BooleanToggleBuilder setDefaultValue(boolean defaultValue) {
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public BooleanToggleBuilder setTooltipSupplier(@NotNull Function<Boolean, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public BooleanToggleBuilder setTooltipSupplier(@NotNull Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = bool -> tooltipSupplier.get();
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
     public BooleanToggleBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = bool -> tooltip;
-        return this;
+       return super.setTooltip(tooltip);
     }
     
     public BooleanToggleBuilder setTooltip(@Nullable Component... tooltip) {
-        this.tooltipSupplier = bool -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @Nullable

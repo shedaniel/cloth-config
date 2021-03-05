@@ -34,11 +34,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListEntry> {
+public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListEntry, IntListBuilder> {
     
     protected Function<Integer, Optional<Component>> cellErrorSupplier;
-    private Consumer<List<Integer>> saveConsumer = null;
-    private Function<List<Integer>, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();
     private final List<Integer> value;
     private boolean expanded = false;
     private Integer min = null, max = null;
@@ -61,8 +59,7 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
     }
     
     public IntListBuilder setErrorSupplier(Function<List<Integer>, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
     public IntListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
@@ -85,9 +82,10 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
         return this;
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public IntListBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return requiresRestart();
     }
     
     public IntListBuilder setCreateNewInstance(Function<IntegerListListEntry, IntegerListListEntry.IntegerListCell> createNewInstance) {
@@ -107,13 +105,11 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
     }
     
     public IntListBuilder setSaveConsumer(Consumer<List<Integer>> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
     public IntListBuilder setDefaultValue(Supplier<List<Integer>> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public IntListBuilder setMin(int min) {
@@ -137,28 +133,25 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
     }
     
     public IntListBuilder setDefaultValue(List<Integer> defaultValue) {
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public IntListBuilder setTooltipSupplier(Function<List<Integer>, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
     public IntListBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = list -> tooltipSupplier.get();
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
     public IntListBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = list -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public IntListBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @NotNull

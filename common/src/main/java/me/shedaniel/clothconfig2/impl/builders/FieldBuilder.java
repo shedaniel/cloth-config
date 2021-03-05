@@ -23,21 +23,26 @@ import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public abstract class FieldBuilder<T, A extends AbstractConfigListEntry> {
+@SuppressWarnings({"unchecked", "OptionalUsedAsFieldOrParameterType"})
+public abstract class FieldBuilder<T, A extends AbstractConfigListEntry<?>, B extends FieldBuilder<T, A, B>> {
     @NotNull private final Component fieldNameKey;
     @NotNull private final Component resetButtonKey;
     protected boolean requireRestart = false;
     @Nullable protected Supplier<T> defaultValue = null;
     @Nullable protected Function<T, Optional<Component>> errorSupplier;
+    @Nullable protected Consumer<T> saveConsumer = null;
+    protected Function<T, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();
     
     protected FieldBuilder(Component resetButtonKey, Component fieldNameKey) {
         this.resetButtonKey = Objects.requireNonNull(resetButtonKey);
@@ -72,8 +77,59 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry> {
         return requireRestart;
     }
     
+    public B setErrorSupplier(@Nullable Function<T, Optional<Component>> errorSupplier) {
+        this.errorSupplier = errorSupplier;
+        return (B) this;
+    }
+    
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public void requireRestart(boolean requireRestart) {
         this.requireRestart = requireRestart;
     }
     
+    public B requiresRestart(boolean requireRestart) {
+        this.requireRestart = requireRestart;
+        return (B) this;
+    }
+    
+    public B requiresRestart() {
+        this.requireRestart = true;
+        return (B) this;
+    }
+    
+    public B setSaveConsumer(Consumer<T> saveConsumer) {
+        this.saveConsumer = saveConsumer;
+        return (B) this;
+    }
+    
+    public B setDefaultValue(Supplier<T> defaultValue) {
+        this.defaultValue = defaultValue;
+        return (B) this;
+    }
+    
+    public B setDefaultValue(T defaultValue) {
+        this.defaultValue = () -> defaultValue;
+        return (B) this;
+    }
+    
+    public B setTooltip(Supplier<Optional<Component[]>> tooltipSupplier) {
+        this.tooltipSupplier = str -> tooltipSupplier.get();
+        return (B) this;
+    }
+    
+    public B setTooltip(Function<T, Optional<Component[]>> tooltipSupplier) {
+        this.tooltipSupplier = tooltipSupplier;
+        return (B) this;
+    }
+    
+    public B setTooltip(Optional<Component[]> tooltip) {
+        this.tooltipSupplier = str -> tooltip;
+        return (B) this;
+    }
+    
+    public B setTooltip(Component... tooltip) {
+        this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
+        return (B) this;
+    }
 }

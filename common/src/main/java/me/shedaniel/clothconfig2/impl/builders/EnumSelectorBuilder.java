@@ -23,6 +23,7 @@ import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -32,10 +33,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, EnumListEntry<T>> {
-    
-    private Consumer<T> saveConsumer = null;
-    private Function<T, Optional<Component[]>> tooltipSupplier = e -> Optional.empty();
+public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, EnumListEntry<T>, EnumSelectorBuilder<T>> {
     private final T value;
     private final Class<T> clazz;
     private Function<Enum, Component> enumNameProvider = EnumListEntry.DEFAULT_NAME_PROVIDER;
@@ -49,39 +47,38 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends FieldBuilder<T, Enum
     }
     
     public EnumSelectorBuilder<T> setErrorSupplier(Function<T, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public EnumSelectorBuilder<T> requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requiresRestart();
     }
     
     public EnumSelectorBuilder<T> setSaveConsumer(Consumer<T> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
     public EnumSelectorBuilder<T> setDefaultValue(Supplier<T> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public EnumSelectorBuilder<T> setDefaultValue(T defaultValue) {
         Objects.requireNonNull(defaultValue);
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public EnumSelectorBuilder<T> setTooltipSupplier(Function<T, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public EnumSelectorBuilder<T> setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = e -> tooltipSupplier.get();
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
     public EnumSelectorBuilder<T> setTooltip(Optional<Component[]> tooltip) {

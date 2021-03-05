@@ -23,6 +23,7 @@ import me.shedaniel.clothconfig2.gui.entries.IntegerListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -31,10 +32,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
+public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry, IntFieldBuilder> {
     
-    private Consumer<Integer> saveConsumer = null;
-    private Function<Integer, Optional<Component[]>> tooltipSupplier = i -> Optional.empty();
     private final int value;
     private Integer min = null, max = null;
     
@@ -43,49 +42,46 @@ public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
         this.value = value;
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public IntFieldBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requiresRestart();
     }
     
     public IntFieldBuilder setErrorSupplier(Function<Integer, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
     public IntFieldBuilder setSaveConsumer(Consumer<Integer> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
     public IntFieldBuilder setDefaultValue(Supplier<Integer> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public IntFieldBuilder setDefaultValue(int defaultValue) {
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public IntFieldBuilder setTooltipSupplier(Function<Integer, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public IntFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = i -> tooltipSupplier.get();
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
     public IntFieldBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = i -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public IntFieldBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public IntFieldBuilder setMin(int min) {

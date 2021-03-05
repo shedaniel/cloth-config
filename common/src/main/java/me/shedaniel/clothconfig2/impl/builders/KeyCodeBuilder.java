@@ -35,7 +35,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> {
+public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry, KeyCodeBuilder> {
     
     @Nullable private Consumer<ModifierKeyCode> saveConsumer = null;
     @NotNull private Function<ModifierKeyCode, Optional<Component[]>> tooltipSupplier = bool -> Optional.empty();

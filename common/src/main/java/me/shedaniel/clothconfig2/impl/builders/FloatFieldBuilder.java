@@ -23,6 +23,7 @@ import me.shedaniel.clothconfig2.gui.entries.FloatListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -31,10 +32,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
-    
-    private Consumer<Float> saveConsumer = null;
-    private Function<Float, Optional<Component[]>> tooltipSupplier = f -> Optional.empty();
+public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry, FloatFieldBuilder> {
     private final float value;
     private Float min = null, max = null;
     
@@ -44,48 +42,45 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
     }
     
     public FloatFieldBuilder setErrorSupplier(Function<Float, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public FloatFieldBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requiresRestart();
     }
     
     public FloatFieldBuilder setSaveConsumer(Consumer<Float> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
     public FloatFieldBuilder setDefaultValue(Supplier<Float> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public FloatFieldBuilder setDefaultValue(float defaultValue) {
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public FloatFieldBuilder setTooltipSupplier(Function<Float, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public FloatFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = f -> tooltipSupplier.get();
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
     public FloatFieldBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = f -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public FloatFieldBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = f -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public FloatFieldBuilder setMin(float min) {

@@ -34,11 +34,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEntry> {
+public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEntry, FloatListBuilder> {
     
     protected Function<Float, Optional<Component>> cellErrorSupplier;
-    private Consumer<List<Float>> saveConsumer = null;
-    private Function<List<Float>, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();
     private final List<Float> value;
     private boolean expanded = false;
     private Float min = null, max = null;
@@ -66,8 +64,7 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
     }
     
     public FloatListBuilder setErrorSupplier(Function<List<Float>, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
     public FloatListBuilder setInsertInFront(boolean insertInFront) {
@@ -85,9 +82,10 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         return this;
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public FloatListBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requiresRestart();
     }
     
     public FloatListBuilder setCreateNewInstance(Function<FloatListListEntry, FloatListListEntry.FloatListCell> createNewInstance) {
@@ -107,13 +105,11 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
     }
     
     public FloatListBuilder setSaveConsumer(Consumer<List<Float>> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+       return super.setSaveConsumer(saveConsumer);
     }
     
     public FloatListBuilder setDefaultValue(Supplier<List<Float>> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public FloatListBuilder setMin(float min) {
@@ -137,28 +133,27 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
     }
     
     public FloatListBuilder setDefaultValue(List<Float> defaultValue) {
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public FloatListBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = list -> tooltipSupplier.get();
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     public FloatListBuilder setTooltipSupplier(Function<List<Float>, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltip(tooltipSupplier);
     }
     
     public FloatListBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = list -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public FloatListBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @NotNull
