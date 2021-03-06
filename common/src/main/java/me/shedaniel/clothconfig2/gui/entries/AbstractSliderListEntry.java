@@ -1,19 +1,17 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
+import me.shedaniel.clothconfig2.gui.widget.ManagedSliderWidget;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.chat.NarratorChatListener;
-import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -36,8 +34,6 @@ import static java.util.Objects.requireNonNull;
  */
 @Environment(EnvType.CLIENT)
 public abstract class AbstractSliderListEntry<T, C extends AbstractSliderListEntry.AbstractSliderListCell<T, C, SELF>, SELF extends AbstractSliderListEntry<T, C, SELF>> extends AbstractListListEntry<T, C, SELF> {
-    private static final ResourceLocation WIDGETS_TEX = new ResourceLocation("textures/gui/widgets.png");
-
     protected final T minimum, maximum, cellDefaultValue;
     protected Function<T, Component> textGetter;
 
@@ -57,7 +53,7 @@ public abstract class AbstractSliderListEntry<T, C extends AbstractSliderListEnt
 
     /**
      * A config entry within a parent {@link AbstractSliderListEntry}
-     * containing a single bounded value with an {@link AbstractSliderButton}
+     * containing a single bounded value with an {@link ManagedSliderWidget}
      * for user display and input.
      *
      * Any bounded value that can be respresented as a {@code double} can be
@@ -71,12 +67,19 @@ public abstract class AbstractSliderListEntry<T, C extends AbstractSliderListEnt
      * @see AbstractSliderListEntry
      */
     public abstract static class AbstractSliderListCell<T, SELF extends AbstractSliderListEntry.AbstractSliderListCell<T, SELF, OUTER_SELF>, OUTER_SELF extends AbstractSliderListEntry<T, SELF, OUTER_SELF>> extends AbstractListListEntry.AbstractListCell<T, SELF, OUTER_SELF> {
-        protected final Slider sliderWidget;
+        protected final ManagedSliderWidget sliderWidget;
         private boolean isSelected;
 
         public AbstractSliderListCell(T value, OUTER_SELF listListEntry) {
             super(value, listListEntry);
-            this.sliderWidget = new Slider(0, 0, 152, 20, 0);
+            this.sliderWidget = new ManagedSliderWidget(0, 0, 152, 20, sliderContext()) {
+                @Override
+                protected void renderBgHighlight(PoseStack matrices, Minecraft client, int mouseX, int mouseY) {
+                    if (isSelected && listListEntry.isEditable())
+                        fill(matrices, x, y + 19, x + width, y + 20, getConfigError().isPresent() ? 0xffff5555 : 0xffa0a0a0);
+                }
+
+            };
         }
 
         protected abstract double getValueForSlider();
@@ -84,7 +87,7 @@ public abstract class AbstractSliderListEntry<T, C extends AbstractSliderListEnt
         protected abstract void setValueFromSlider(double value);
 
         protected void syncValueToSlider() {
-            sliderWidget.syncValueFromCell();
+            sliderWidget.syncValueFromContext();
         }
 
         protected Component getValueForMessage() {
@@ -130,68 +133,24 @@ public abstract class AbstractSliderListEntry<T, C extends AbstractSliderListEnt
             return Collections.singletonList(sliderWidget);
         }
 
-        private class Slider extends AbstractSliderButton {
-            protected Slider(int x, int y, int width, int height, double value) {
-                super(x, y, width, height, NarratorChatListener.NO_TITLE, value);
-            }
-
-            protected void syncValueFromCell() {
-                this.value = AbstractSliderListCell.this.getValueForSlider();
-                updateMessage();
-            }
-
-            @Override
-            public void updateMessage() {
-                if (AbstractSliderListCell.this.listListEntry.textGetter != null) {
-                    setMessage(AbstractSliderListCell.this.getValueForMessage());
-                }
-            }
-
-            @Override
-            protected void applyValue() {
-                AbstractSliderListCell.this.setValueFromSlider(value);
-            }
-
-            @Override
-            public boolean keyPressed(int keyCode, int int_2, int int_3) {
-                if (!listListEntry.isEditable())
-                    return false;
-                return super.keyPressed(keyCode, int_2, int_3);
-            }
-
-            @Override
-            public boolean mouseDragged(double mouseX, double mouseY, int mouseButton, double deltaX, double deltaY) {
-                if (!listListEntry.isEditable())
-                    return false;
-                return super.mouseDragged(mouseX, mouseY, mouseButton, deltaX, deltaY);
-            }
-
-            @Override
-            protected void renderBg(PoseStack matrices, Minecraft client, int mouseX, int mouseY) {
-                /*
-                 * If the width is greater than 200, then fill in the gap in the middle with more button bg
-                 */
-                int gap = width - 200;
-                if (gap > 0) {
-                    client.getTextureManager().bind(WIDGETS_TEX);
-
-                    int offset = 100;
-                    do {
-                        blit(matrices, x + offset, y, 1, 46 + 0 * 20, Math.min(gap, 198), height);
-
-                        offset += 198;
-                        gap -= 198;
-                    } while (gap > 0);
+        private ManagedSliderWidget.Context sliderContext() {
+            return new ManagedSliderWidget.Context() {
+                public Component message() {
+                    return getValueForMessage();
                 }
 
-                // Note: the non-error highlight color here is a bit darker
-                // than the normal highlight of 0xffe0e0e0 to let the scrubber stand out
-                if (isSelected && listListEntry.isEditable())
-                    fill(matrices, x, y + 19, x + width, y + 20, getConfigError().isPresent() ? 0xffff5555 : 0xffa0a0a0);
+                public double value() {
+                    return getValueForSlider();
+                }
 
-                // Render the scrubber on top of anything we've drawn
-                super.renderBg(matrices, client, mouseX, mouseY);
-            }
+                public void valueApplied(double value) {
+                    setValueFromSlider(value);
+                }
+
+                public boolean editable() {
+                    return listListEntry.isEditable();
+                }
+            };
         }
     }
 }
