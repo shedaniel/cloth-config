@@ -8,6 +8,7 @@ on:
             - '**/src/**'
         branches:
             - v4
+            - v5
 
 jobs:
     build:
