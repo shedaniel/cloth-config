@@ -84,10 +84,10 @@ public class TextListEntry extends TooltipListEntry<Object> {
             Minecraft.getInstance().font.drawShadow(matrices, string, x, yy, color);
             yy += Minecraft.getInstance().font.lineHeight + 3;
         }
-    
+        
         Style style = this.getTextAt(mouseX, mouseY);
         AbstractConfigScreen configScreen = this.getConfigScreen();
-    
+        
         if (style != null && configScreen != null) {
             configScreen.renderComponentHoverEffect(matrices, style, mouseX, mouseY);
         }

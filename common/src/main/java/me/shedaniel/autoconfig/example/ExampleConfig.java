@@ -70,9 +70,9 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
         
         @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
         public PairOfIntPairs anObject = new PairOfIntPairs(new PairOfInts(), new PairOfInts(3, 4));
-    
+        
         public List<Integer> list = Arrays.asList(1, 2, 3);
-    
+        
         public List<PairOfInts> complexList = Arrays.asList(new PairOfInts(0, 1), new PairOfInts(3, 7));
     }
     
@@ -102,11 +102,11 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     public static class PairOfInts {
         public int foo;
         public int bar;
-    
+        
         public PairOfInts() {
             this(1, 2);
         }
-    
+        
         public PairOfInts(int foo, int bar) {
             this.foo = foo;
             this.bar = bar;
@@ -119,11 +119,11 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
         
         @ConfigEntry.Gui.CollapsibleObject()
         public PairOfInts second;
-    
+        
         public PairOfIntPairs() {
             this(new PairOfInts(), new PairOfInts());
         }
-    
+        
         public PairOfIntPairs(PairOfInts first, PairOfInts second) {
             this.first = first;
             this.second = second;

@@ -38,7 +38,7 @@ public class ClothConfigTabButton extends AbstractButton {
     
     private final int index;
     private final ClothConfigScreen screen;
-    @Nullable 
+    @Nullable
     private final Supplier<Optional<FormattedText[]>> descriptionSupplier;
     
     public ClothConfigTabButton(ClothConfigScreen screen, int index, int int_1, int int_2, int int_3, int int_4, Component string_1, Supplier<Optional<FormattedText[]>> descriptionSupplier) {
@@ -47,7 +47,7 @@ public class ClothConfigTabButton extends AbstractButton {
         this.screen = screen;
         this.descriptionSupplier = descriptionSupplier;
     }
-
+    
     public ClothConfigTabButton(ClothConfigScreen screen, int index, int int_1, int int_2, int int_3, int int_4, Component string_1) {
         this(screen, index, int_1, int_2, int_3, int_4, string_1, null);
     }
@@ -63,7 +63,7 @@ public class ClothConfigTabButton extends AbstractButton {
     public void render(PoseStack matrices, int int_1, int int_2, float float_1) {
         active = index != screen.selectedCategoryIndex;
         super.render(matrices, int_1, int_2, float_1);
-
+        
         if (isMouseOver(int_1, int_2)) {
             Optional<FormattedText[]> tooltip = getTooltip();
             if (tooltip.isPresent() && tooltip.get().length > 0)
@@ -80,11 +80,11 @@ public class ClothConfigTabButton extends AbstractButton {
     public boolean isMouseOver(double double_1, double double_2) {
         return this.visible && double_1 >= this.x && double_2 >= this.y && double_1 < this.x + this.width && double_2 < this.y + this.height && double_1 >= 20 && double_1 < screen.width - 20;
     }
-
+    
     public Optional<FormattedText[]> getTooltip() {
         if (descriptionSupplier != null)
             return descriptionSupplier.get();
         return Optional.empty();
     }
-
+    
 }

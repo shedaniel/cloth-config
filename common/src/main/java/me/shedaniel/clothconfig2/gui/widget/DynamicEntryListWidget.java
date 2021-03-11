@@ -249,7 +249,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             if (int_10 < this.top) {
                 int_10 = this.top;
             }
-    
+            
             RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
             RenderSystem.setShaderTexture(0, AbstractSelectionList.WHITE_TEXTURE_LOCATION);
             RenderSystem.disableTexture();
