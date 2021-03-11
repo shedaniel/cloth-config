@@ -100,12 +100,6 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         return this;
     }
     
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public DoubleListBuilder setExpended(boolean expanded) {
-        return setExpanded(expanded);
-    }
-    
     public DoubleListBuilder setSaveConsumer(Consumer<List<Double>> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;

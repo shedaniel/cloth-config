@@ -20,7 +20,9 @@
 package me.shedaniel.clothconfig2.impl;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.api.ScissorsScreen;
 import me.shedaniel.math.Rectangle;
@@ -108,9 +110,10 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
         if (r != null && !r.isEmpty()) {
             Window window = Minecraft.getInstance().getWindow();
             double scaleFactor = window.getGuiScale();
-            GL11.glEnable(GL11.GL_SCISSOR_TEST);
-            GL11.glScissor((int) (r.x * scaleFactor), (int) ((window.getGuiScaledHeight() - r.height - r.y) * scaleFactor), (int) (r.width * scaleFactor), (int) (r.height * scaleFactor));
-        } else
-            GL11.glDisable(GL11.GL_SCISSOR_TEST);
+            GlStateManager._enableScissorTest();
+            GlStateManager._scissorBox((int) (r.x * scaleFactor), (int) ((window.getGuiScaledHeight() - r.height - r.y) * scaleFactor), (int) (r.width * scaleFactor), (int) (r.height * scaleFactor));
+        } else {
+            GlStateManager._disableScissorTest();
+        }
     }
 }

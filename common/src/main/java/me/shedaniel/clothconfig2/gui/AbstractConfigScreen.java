@@ -22,10 +22,7 @@ package me.shedaniel.clothconfig2.gui;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
@@ -35,16 +32,17 @@ import me.shedaniel.math.Rectangle;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.TickableWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,9 +56,7 @@ import java.util.function.Consumer;
 
 public abstract class AbstractConfigScreen extends Screen implements ConfigScreen {
     protected static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
-    private boolean legacyEdited = false;
     private final ResourceLocation backgroundLocation;
-    protected boolean legacyRequiresRestart = false;
     protected boolean confirmSave;
     protected final Screen parent;
     private boolean alwaysShowTabs = false;
@@ -100,7 +96,6 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     
     @Override
     public boolean isRequiresRestart() {
-        if (legacyRequiresRestart) return true;
         for (List<AbstractConfigEntry<?>> entries : getCategorizedEntries().values()) {
             for (AbstractConfigEntry<?> entry : entries) {
                 if (!entry.getConfigError().isPresent() && entry.isEdited() && entry.isRequiresRestart()) {
@@ -115,7 +110,6 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     
     @Override
     public boolean isEdited() {
-        if (legacyEdited) return true;
         for (List<AbstractConfigEntry<?>> entries : getCategorizedEntries().values()) {
             for (AbstractConfigEntry<?> entry : entries) {
                 if (entry.isEdited()) {
@@ -124,28 +118,6 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
             }
         }
         return false;
-    }
-    
-    /**
-     * Override #isEdited please
-     */
-    @Override
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public void setEdited(boolean edited) {
-        this.legacyEdited = edited;
-    }
-    
-    /**
-     * Override #isEdited please
-     */
-    @Override
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public void setEdited(boolean edited, boolean legacyRequiresRestart) {
-        setEdited(edited);
-        if (!this.legacyRequiresRestart && legacyRequiresRestart)
-            this.legacyRequiresRestart = legacyRequiresRestart;
     }
     
     public boolean isShowingTabs() {
@@ -195,14 +167,12 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
             for (AbstractConfigEntry<?> entry : entries)
                 entry.save();
         save();
-        setEdited(false);
         if (openOtherScreens) {
             if (isRequiresRestart())
                 AbstractConfigScreen.this.minecraft.setScreen(new ClothRequiresRestartScreen(parent));
             else
                 AbstractConfigScreen.this.minecraft.setScreen(parent);
         }
-        this.legacyRequiresRestart = false;
     }
     
     public void save() {
@@ -369,8 +339,8 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         boolean edited = isEdited();
         Optional.ofNullable(getQuitButton()).ifPresent(button -> button.setMessage(edited ? new TranslatableComponent("text.cloth-config.cancel_discard") : new TranslatableComponent("gui.cancel")));
         for (GuiEventListener child : children())
-            if (child instanceof TickableBlockEntity)
-                ((TickableBlockEntity) child).tick();
+            if (child instanceof TickableWidget)
+                ((TickableWidget) child).tick();
     }
     
     @Nullable
@@ -399,16 +369,17 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     protected void overlayBackground(Matrix4f matrix, Rectangle rect, int red, int green, int blue, int startAlpha, int endAlpha) {
         if (isTransparentBackground())
             return;
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.getBuilder();
-        minecraft.getTextureManager().bind(getBackgroundLocation());
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder buffer = tesselator.getBuilder();
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShaderTexture(0, getBackgroundLocation());
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         buffer.vertex(matrix, rect.getMinX(), rect.getMaxY(), 0.0F).uv(rect.getMinX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).endVertex();
         buffer.vertex(matrix, rect.getMaxX(), rect.getMaxY(), 0.0F).uv(rect.getMaxX() / 32.0F, rect.getMaxY() / 32.0F).color(red, green, blue, endAlpha).endVertex();
         buffer.vertex(matrix, rect.getMaxX(), rect.getMinY(), 0.0F).uv(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).endVertex();
         buffer.vertex(matrix, rect.getMinX(), rect.getMinY(), 0.0F).uv(rect.getMinX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).endVertex();
-        tessellator.end();
+        tesselator.end();
     }
     
     @Override   // override to expose this protected method to config entries
@@ -438,7 +409,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
                     if (openInBrowser) {
                         Util.getPlatform().openUri(uri);
                     }
-    
+                    
                     Minecraft.getInstance().setScreen(this);
                 }, clickEvent.getValue(), true));
             } catch (URISyntaxException e) {

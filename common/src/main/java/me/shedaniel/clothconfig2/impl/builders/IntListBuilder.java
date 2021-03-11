@@ -100,12 +100,6 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
         return this;
     }
     
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public IntListBuilder setExpended(boolean expanded) {
-        return setExpanded(expanded);
-    }
-    
     public IntListBuilder setSaveConsumer(Consumer<List<Integer>> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;

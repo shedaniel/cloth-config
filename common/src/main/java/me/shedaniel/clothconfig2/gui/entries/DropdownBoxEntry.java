@@ -23,10 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.*;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.api.ScrollingContainer;
@@ -37,11 +34,13 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -406,8 +405,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             int cWidth = getCellCreator().getCellWidth();
             fill(matrices, lastRectangle.x, lastRectangle.y + lastRectangle.height, lastRectangle.x + cWidth, lastRectangle.y + lastRectangle.height + last10Height + 1, isExpanded() ? -1 : -6250336);
             fill(matrices, lastRectangle.x + 1, lastRectangle.y + lastRectangle.height + 1, lastRectangle.x + cWidth - 1, lastRectangle.y + lastRectangle.height + last10Height, -16777216);
-            RenderSystem.pushMatrix();
-            RenderSystem.translatef(0, 0, 300f);
+            matrices.pushPose();
+            matrices.translate(0, 0, 300f);
             
             ScissorsHandler.INSTANCE.scissor(new Rectangle(lastRectangle.x, lastRectangle.y + lastRectangle.height + 1, cWidth - 6, last10Height - 1));
             double yy = lastRectangle.y + lastRectangle.height - scroll;
@@ -427,6 +426,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             }
             
             if (getMaxScrollPosition() > 6) {
+                RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+                RenderSystem.setShaderTexture(0, AbstractSelectionList.WHITE_TEXTURE_LOCATION);
                 RenderSystem.disableTexture();
                 int scrollbarPositionMinX = lastRectangle.x + getCellCreator().getCellWidth() - 6;
                 int scrollbarPositionMaxX = scrollbarPositionMinX + 6;
@@ -443,15 +444,13 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 BufferBuilder buffer = tessellator.getBuilder();
                 
                 // Bottom
-                buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+                buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
                 buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).uv(0, 1).color(bottomc, bottomc, bottomc, 255).endVertex();
                 buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).uv(1, 1).color(bottomc, bottomc, bottomc, 255).endVertex();
                 buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).uv(1, 0).color(bottomc, bottomc, bottomc, 255).endVertex();
                 buffer.vertex(scrollbarPositionMinX, minY, 0.0D).uv(0, 0).color(bottomc, bottomc, bottomc, 255).endVertex();
-                tessellator.end();
                 
                 // Top
-                buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
                 buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).uv(0, 1).color(topc, topc, topc, 255).endVertex();
                 buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).uv(1, 1).color(topc, topc, topc, 255).endVertex();
                 buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).uv(1, 0).color(topc, topc, topc, 255).endVertex();
@@ -459,8 +458,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 tessellator.end();
                 RenderSystem.enableTexture();
             }
-            RenderSystem.translatef(0, 0, -300f);
-            RenderSystem.popMatrix();
+            matrices.popPose();
         }
         
         @Override

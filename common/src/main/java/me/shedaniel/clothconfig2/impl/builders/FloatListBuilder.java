@@ -100,12 +100,6 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         return this;
     }
     
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public FloatListBuilder setExpended(boolean expanded) {
-        return setExpanded(expanded);
-    }
-    
     public FloatListBuilder setSaveConsumer(Consumer<List<Float>> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;

@@ -48,9 +48,9 @@ dependencies {
     modCompileOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
-    modRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
-        transitive(false)
-    }
+//    modRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
+//        transitive(false)
+//    }
 
     implementation(project(path: ":common")) {
         transitive = false
@@ -116,9 +116,8 @@ curseforge {
         apiKey = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
         project {
             id = project.curseforge_id_fabric
-            releaseType = "release"
-            addGameVersion "1.16.4"
-            addGameVersion "1.16.5"
+            releaseType = "beta"
+            addGameVersion "1.17"
             addGameVersion "Java 8"
             addGameVersion "Fabric"
             // may be needed in the future, but not right now

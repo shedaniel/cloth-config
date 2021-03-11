@@ -99,12 +99,6 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
         return this;
     }
     
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public StringListBuilder setExpended(boolean expanded) {
-        return setExpanded(expanded);
-    }
-    
     public StringListBuilder setSaveConsumer(Consumer<List<String>> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;

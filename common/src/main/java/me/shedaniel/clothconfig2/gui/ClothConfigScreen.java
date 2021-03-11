@@ -22,10 +22,7 @@ package me.shedaniel.clothconfig2.gui;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
@@ -39,6 +36,7 @@ import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -118,33 +116,6 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     }
     
     @Override
-    public boolean isEdited() {
-        return super.isEdited();
-    }
-    
-    /**
-     * Override #isEdited please
-     */
-    @Deprecated
-    public void setEdited(boolean edited) {
-        super.setEdited(edited);
-    }
-    
-    /**
-     * Override #isEdited please
-     */
-    @Override
-    @Deprecated
-    public void setEdited(boolean edited, boolean requiresRestart) {
-        super.setEdited(edited, requiresRestart);
-    }
-    
-    @Override
-    public void saveAll(boolean openOtherScreens) {
-        super.saveAll(openOtherScreens);
-    }
-    
-    @Override
     protected void init() {
         super.init();
         this.tabButtons.clear();
@@ -181,8 +152,9 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             children.add(buttonLeftTab = new Button(4, 44, 12, 18, NarratorChatListener.NO_TITLE, button -> tabsScroller.scrollTo(0, true)) {
                 @Override
                 public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
-                    minecraft.getTextureManager().bind(CONFIG_TEX);
-                    RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+                    RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                    RenderSystem.setShaderTexture(0, CONFIG_TEX);
+                    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
                     int int_3 = this.getYImage(this.isHovered());
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
@@ -199,8 +171,9 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             children.add(buttonRightTab = new Button(width - 16, 44, 12, 18, NarratorChatListener.NO_TITLE, button -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true)) {
                 @Override
                 public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
-                    minecraft.getTextureManager().bind(CONFIG_TEX);
-                    RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+                    RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                    RenderSystem.setShaderTexture(0, CONFIG_TEX);
+                    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
                     int int_3 = this.getYImage(this.isHovered());
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
@@ -281,8 +254,9 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                     if (entry.getConfigError().isPresent())
                         errors.add(entry.getConfigError().get());
             if (errors.size() > 0) {
-                minecraft.getTextureManager().bind(CONFIG_TEX);
-                RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+                RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                RenderSystem.setShaderTexture(0, CONFIG_TEX);
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 String text = "§c" + (errors.size() == 1 ? errors.get(0).plainCopy().getString() : I18n.get("text.cloth-config.multi_error"));
                 if (isTransparentBackground()) {
                     int stringWidth = minecraft.font.width(text);
@@ -297,8 +271,9 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 }
             }
         } else if (!isEditable()) {
-            minecraft.getTextureManager().bind(CONFIG_TEX);
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShaderTexture(0, CONFIG_TEX);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             String text = "§c" + I18n.get("text.cloth-config.not_editable");
             if (isTransparentBackground()) {
                 int stringWidth = minecraft.font.width(text);
@@ -310,12 +285,6 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         super.render(matrices, mouseX, mouseY, delta);
     }
     
-    @ApiStatus.ScheduledForRemoval
-    @Deprecated
-    public void queueTooltip(QueuedTooltip queuedTooltip) {
-        super.addTooltip(queuedTooltip);
-    }
-    
     private void drawTabsShades(PoseStack matrices, int lightColor, int darkColor) {
         drawTabsShades(matrices.last().pose(), lightColor, darkColor);
     }
@@ -323,26 +292,22 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     private void drawTabsShades(Matrix4f matrix, int lightColor, int darkColor) {
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 0, 1);
-        RenderSystem.disableAlphaTest();
-        RenderSystem.shadeModel(7425);
         RenderSystem.disableTexture();
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder buffer = tesselator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY() + 4, 0.0F).uv(0, 1f).color(0, 0, 0, lightColor).endVertex();
         buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY() + 4, 0.0F).uv(1f, 1f).color(0, 0, 0, lightColor).endVertex();
         buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY(), 0.0F).uv(1f, 0).color(0, 0, 0, darkColor).endVertex();
         buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY(), 0.0F).uv(0, 0).color(0, 0, 0, darkColor).endVertex();
-        tessellator.end();
-        buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+        tesselator.end();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY(), 0.0F).uv(0, 1f).color(0, 0, 0, darkColor).endVertex();
         buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY(), 0.0F).uv(1f, 1f).color(0, 0, 0, darkColor).endVertex();
         buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0F).uv(1f, 0).color(0, 0, 0, lightColor).endVertex();
         buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY() - 4, 0.0F).uv(0, 0).color(0, 0, 0, lightColor).endVertex();
-        tessellator.end();
+        tesselator.end();
         RenderSystem.enableTexture();
-        RenderSystem.shadeModel(7424);
-        RenderSystem.enableAlphaTest();
         RenderSystem.disableBlend();
     }
     
@@ -428,17 +393,13 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         protected void fillGradient(PoseStack matrices, double xStart, double yStart, double xEnd, double yEnd, int colorStart, int colorEnd) {
             RenderSystem.disableTexture();
             RenderSystem.enableBlend();
-            RenderSystem.disableAlphaTest();
             RenderSystem.defaultBlendFunc();
-            RenderSystem.shadeModel(7425);
-            Tesselator tessellator = Tesselator.getInstance();
-            BufferBuilder bufferBuilder = tessellator.getBuilder();
-            bufferBuilder.begin(7, DefaultVertexFormat.POSITION_COLOR);
+            Tesselator tesselator = Tesselator.getInstance();
+            BufferBuilder bufferBuilder = tesselator.getBuilder();
+            bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             fillGradient(matrices.last().pose(), bufferBuilder, xStart, yStart, xEnd, yEnd, this.getBlitOffset(), colorStart, colorEnd);
-            tessellator.end();
-            RenderSystem.shadeModel(7424);
+            tesselator.end();
             RenderSystem.disableBlend();
-            RenderSystem.enableAlphaTest();
             RenderSystem.enableTexture();
         }
         

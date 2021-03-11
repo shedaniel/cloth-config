@@ -100,12 +100,6 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
         return this;
     }
     
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public LongListBuilder setExpended(boolean expanded) {
-        return setExpanded(expanded);
-    }
-    
     public LongListBuilder setSaveConsumer(Consumer<List<Long>> saveConsumer) {
         this.saveConsumer = saveConsumer;
         return this;

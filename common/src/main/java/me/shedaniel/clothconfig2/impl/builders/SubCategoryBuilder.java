@@ -74,12 +74,6 @@ public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntr
         return this;
     }
     
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public SubCategoryBuilder setExpended(boolean expanded) {
-        return setExpanded(expanded);
-    }
-    
     @NotNull
     @Override
     public SubCategoryListEntry build() {

@@ -31,6 +31,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -260,9 +261,8 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     @Override
     public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
-        Minecraft.getInstance().getTextureManager().bind(CONFIG_TEX);
-        Lighting.turnOff();
-        RenderSystem.color4f(1, 1, 1, 1);
+        RenderSystem.setShaderTexture(0, CONFIG_TEX);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         BaseListCell focused = !expanded || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);

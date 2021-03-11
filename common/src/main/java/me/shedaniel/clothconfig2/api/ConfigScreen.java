@@ -36,18 +36,6 @@ public interface ConfigScreen {
     
     boolean isEdited();
     
-    /**
-     * Override #isEdited please
-     */
-    @Deprecated
-    void setEdited(boolean edited);
-    
-    /**
-     * Override #isEdited please
-     */
-    @Deprecated
-    void setEdited(boolean edited, boolean legacyRequiresRestart);
-    
     void saveAll(boolean openOtherScreens);
     
     void addTooltip(Tooltip tooltip);

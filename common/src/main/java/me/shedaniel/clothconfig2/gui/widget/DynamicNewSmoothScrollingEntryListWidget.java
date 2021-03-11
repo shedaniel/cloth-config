@@ -19,10 +19,8 @@
 
 package me.shedaniel.clothconfig2.gui.widget;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.math.Rectangle;
@@ -30,6 +28,8 @@ import me.shedaniel.math.impl.PointHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
@@ -131,7 +131,6 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
         super.render(matrices, mouseX, mouseY, delta);
     }
     
-    @SuppressWarnings("deprecation")
     @Override
     protected void renderScrollBar(PoseStack matrices, Tesselator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
         if (!smoothScrolling)
@@ -145,31 +144,32 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
             
             int bottomc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 168 : 128;
             int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 222 : 172;
-            
+    
+            RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+            RenderSystem.setShaderTexture(0, AbstractSelectionList.WHITE_TEXTURE_LOCATION);
+            RenderSystem.disableTexture();
             Matrix4f matrix = matrices.last().pose();
             // Black Bar
-            buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
             buffer.vertex(matrix, scrollbarPositionMinX, this.bottom, 0.0F).uv(0, 1).color(0, 0, 0, 255).endVertex();
             buffer.vertex(matrix, scrollbarPositionMaxX, this.bottom, 0.0F).uv(1, 1).color(0, 0, 0, 255).endVertex();
             buffer.vertex(matrix, scrollbarPositionMaxX, this.top, 0.0F).uv(1, 0).color(0, 0, 0, 255).endVertex();
             buffer.vertex(matrix, scrollbarPositionMinX, this.top, 0.0F).uv(0, 0).color(0, 0, 0, 255).endVertex();
-            tessellator.end();
             
             // Bottom
-            buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
             buffer.vertex(matrix, scrollbarPositionMinX, minY + height, 0.0F).uv(0, 1).color(bottomc, bottomc, bottomc, 255).endVertex();
             buffer.vertex(matrix, scrollbarPositionMaxX, minY + height, 0.0F).uv(1, 1).color(bottomc, bottomc, bottomc, 255).endVertex();
             buffer.vertex(matrix, scrollbarPositionMaxX, minY, 0.0F).uv(1, 0).color(bottomc, bottomc, bottomc, 255).endVertex();
             buffer.vertex(matrix, scrollbarPositionMinX, minY, 0.0F).uv(0, 0).color(bottomc, bottomc, bottomc, 255).endVertex();
-            tessellator.end();
             
             // Top
-            buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
             buffer.vertex(matrix, scrollbarPositionMinX, (minY + height - 1), 0.0F).uv(0, 1).color(topc, topc, topc, 255).endVertex();
             buffer.vertex(matrix, (scrollbarPositionMaxX - 1), (minY + height - 1), 0.0F).uv(1, 1).color(topc, topc, topc, 255).endVertex();
             buffer.vertex(matrix, (scrollbarPositionMaxX - 1), minY, 0.0F).uv(1, 0).color(topc, topc, topc, 255).endVertex();
             buffer.vertex(matrix, scrollbarPositionMinX, minY, 0.0F).uv(0, 0).color(topc, topc, topc, 255).endVertex();
             tessellator.end();
+            RenderSystem.disableBlend();
+            RenderSystem.enableTexture();
         }
     }
     

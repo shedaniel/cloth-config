@@ -44,12 +44,6 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     @Nullable
     private List<ReferenceProvider<?>> referencableEntries = null;
     
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public final void setReferencableEntries(@Nullable List<AbstractConfigEntry<?>> referencableEntries) {
-        setReferenceProviderEntries(referencableEntries.stream().map(AbstractConfigEntry::provideReferenceEntry).collect(Collectors.toList()));
-    }
-    
     public final void setReferenceProviderEntries(@Nullable List<ReferenceProvider<?>> referencableEntries) {
         this.referencableEntries = referencableEntries;
     }
@@ -64,14 +58,6 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     @Override
     public @NotNull AbstractConfigEntry<T> provideReferenceEntry() {
         return this;
-    }
-    
-    @Nullable
-    @ApiStatus.Internal
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public final List<AbstractConfigEntry<?>> getReferencableEntries() {
-        return referencableEntries.stream().map(ReferenceProvider::provideReferenceEntry).collect(Collectors.toList());
     }
     
     @Nullable
@@ -118,15 +104,6 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     }
     
     public abstract Optional<T> getDefaultValue();
-    
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    @Nullable
-    public final ClothConfigScreen getScreen() {
-        if (screen instanceof ClothConfigScreen)
-            return (ClothConfigScreen) screen;
-        return null;
-    }
     
     @Nullable
     public final AbstractConfigScreen getConfigScreen() {

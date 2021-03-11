@@ -110,9 +110,8 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     @Override
     public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
-        Minecraft.getInstance().getTextureManager().bind(CONFIG_TEX);
-        Lighting.turnOff();
-        RenderSystem.color4f(1, 1, 1, 1);
+        RenderSystem.setShaderTexture(0, CONFIG_TEX);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         blit(matrices, x - 15, y + 5, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
         Minecraft.getInstance().font.drawShadow(matrices, getDisplayedFieldName().getVisualOrderText(), x, y + 6, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry entry : entries) {

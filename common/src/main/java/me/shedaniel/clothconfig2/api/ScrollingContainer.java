@@ -28,12 +28,16 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
+import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
+import org.lwjgl.opengl.GL20;
 
 public abstract class ScrollingContainer {
     public double scrollAmount;
@@ -131,7 +135,6 @@ public abstract class ScrollingContainer {
         renderScrollBar(0, 1, 1);
     }
     
-    @SuppressWarnings("deprecation")
     public void renderScrollBar(int background, float alpha, float scrollBarAlphaOffset) {
         if (hasScrollBar()) {
             Rectangle bounds = getBounds();
@@ -147,41 +150,33 @@ public abstract class ScrollingContainer {
             boolean hovered = (new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height)).contains(PointHelper.ofMouse());
             float bottomC = (hovered ? .67f : .5f) * scrollBarAlphaOffset;
             float topC = (hovered ? .87f : .67f) * scrollBarAlphaOffset;
-            
+    
+            RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+            RenderSystem.setShaderTexture(0, AbstractSelectionList.WHITE_TEXTURE_LOCATION);
             RenderSystem.disableTexture();
-            RenderSystem.enableBlend();
-            RenderSystem.disableAlphaTest();
-            RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-            RenderSystem.shadeModel(7425);
-            Tesselator tessellator = Tesselator.getInstance();
-            BufferBuilder buffer = tessellator.getBuilder();
+            Tesselator tesselator = Tesselator.getInstance();
+            BufferBuilder buffer = tesselator.getBuilder();
+            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             {
                 float a = (background >> 24 & 255) / 255.0F;
                 float r = (background >> 16 & 255) / 255.0F;
                 float g = (background >> 8 & 255) / 255.0F;
                 float b = (background & 255) / 255.0F;
-                buffer.begin(7, DefaultVertexFormat.POSITION_COLOR);
                 buffer.vertex(scrollbarPositionMinX, bounds.getMaxY(), 0.0D).color(r, g, b, a).endVertex();
                 buffer.vertex(scrollbarPositionMaxX, bounds.getMaxY(), 0.0D).color(r, g, b, a).endVertex();
                 buffer.vertex(scrollbarPositionMaxX, bounds.y, 0.0D).color(r, g, b, a).endVertex();
                 buffer.vertex(scrollbarPositionMinX, bounds.y, 0.0D).color(r, g, b, a).endVertex();
             }
-            tessellator.end();
-            buffer.begin(7, DefaultVertexFormat.POSITION_COLOR);
             buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
             buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
             buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
             buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
-            tessellator.end();
-            buffer.begin(7, DefaultVertexFormat.POSITION_COLOR);
             buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).color(topC, topC, topC, alpha).endVertex();
             buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).color(topC, topC, topC, alpha).endVertex();
             buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).color(topC, topC, topC, alpha).endVertex();
             buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(topC, topC, topC, alpha).endVertex();
-            tessellator.end();
-            RenderSystem.shadeModel(7424);
+            tesselator.end();
             RenderSystem.disableBlend();
-            RenderSystem.enableAlphaTest();
             RenderSystem.enableTexture();
         }
     }
