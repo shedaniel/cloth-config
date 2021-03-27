@@ -91,7 +91,15 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
         if (!scissorsAreas.isEmpty()) {
             Rectangle r = scissorsAreas.get(0).clone();
             for (int i = 1; i < scissorsAreas.size(); i++) {
-                r.setBounds(r.intersection(scissorsAreas.get(i)));
+                Rectangle r1 = scissorsAreas.get(i);
+                if (r.intersects(r1)) {
+                    r.setBounds(r.intersection(r1));
+                } else {
+                    if (Minecraft.getInstance().screen instanceof ScissorsScreen)
+                        _applyScissor(((ScissorsScreen) Minecraft.getInstance().screen).handleScissor(null));
+                    else _applyScissor(null);
+                    return;
+                }
             }
             r.setBounds(Math.min(r.x, r.x + r.width), Math.min(r.y, r.y + r.height), Math.abs(r.width), Math.abs(r.height));
             if (Minecraft.getInstance().screen instanceof ScissorsScreen)
