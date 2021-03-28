@@ -96,8 +96,8 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
                     r.setBounds(r.intersection(r1));
                 } else {
                     if (Minecraft.getInstance().screen instanceof ScissorsScreen)
-                        _applyScissor(((ScissorsScreen) Minecraft.getInstance().screen).handleScissor(null));
-                    else _applyScissor(null);
+                        _applyScissor(((ScissorsScreen) Minecraft.getInstance().screen).handleScissor(new Rectangle()));
+                    else _applyScissor(new Rectangle());
                     return;
                 }
             }
@@ -113,12 +113,17 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
     }
     
     public void _applyScissor(Rectangle r) {
-        if (r != null && !r.isEmpty()) {
-            Window window = Minecraft.getInstance().getWindow();
-            double scaleFactor = window.getGuiScale();
+        if (r != null) {
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
-            GL11.glScissor((int) (r.x * scaleFactor), (int) ((window.getGuiScaledHeight() - r.height - r.y) * scaleFactor), (int) (r.width * scaleFactor), (int) (r.height * scaleFactor));
-        } else
+            if (r.isEmpty()) {
+                GL11.glScissor(0, 0, 0, 0);
+            } else {
+                Window window = Minecraft.getInstance().getWindow();
+                double scaleFactor = window.getGuiScale();
+                GL11.glScissor((int) (r.x * scaleFactor), (int) ((window.getGuiScaledHeight() - r.height - r.y) * scaleFactor), (int) (r.width * scaleFactor), (int) (r.height * scaleFactor));
+            }
+        } else {
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
+        }
     }
 }
