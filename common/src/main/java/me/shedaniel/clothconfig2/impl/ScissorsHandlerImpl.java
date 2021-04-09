@@ -22,7 +22,6 @@ package me.shedaniel.clothconfig2.impl;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.api.ScissorsScreen;
 import me.shedaniel.math.Rectangle;
@@ -93,7 +92,15 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
         if (!scissorsAreas.isEmpty()) {
             Rectangle r = scissorsAreas.get(0).clone();
             for (int i = 1; i < scissorsAreas.size(); i++) {
-                r.setBounds(r.intersection(scissorsAreas.get(i)));
+                Rectangle r1 = scissorsAreas.get(i);
+                if (r.intersects(r1)) {
+                    r.setBounds(r.intersection(r1));
+                } else {
+                    if (Minecraft.getInstance().screen instanceof ScissorsScreen)
+                        _applyScissor(((ScissorsScreen) Minecraft.getInstance().screen).handleScissor(new Rectangle()));
+                    else _applyScissor(new Rectangle());
+                    return;
+                }
             }
             r.setBounds(Math.min(r.x, r.x + r.width), Math.min(r.y, r.y + r.height), Math.abs(r.width), Math.abs(r.height));
             if (Minecraft.getInstance().screen instanceof ScissorsScreen)
@@ -107,11 +114,15 @@ public final class ScissorsHandlerImpl implements ScissorsHandler {
     }
     
     public void _applyScissor(Rectangle r) {
-        if (r != null && !r.isEmpty()) {
-            Window window = Minecraft.getInstance().getWindow();
-            double scaleFactor = window.getGuiScale();
+        if (r != null) {
             GlStateManager._enableScissorTest();
-            GlStateManager._scissorBox((int) (r.x * scaleFactor), (int) ((window.getGuiScaledHeight() - r.height - r.y) * scaleFactor), (int) (r.width * scaleFactor), (int) (r.height * scaleFactor));
+            if (r.isEmpty()) {
+                GlStateManager._scissorBox(0, 0, 0, 0);
+            } else {
+                Window window = Minecraft.getInstance().getWindow();
+                double scaleFactor = window.getGuiScale();
+                GlStateManager._scissorBox((int) (r.x * scaleFactor), (int) ((window.getGuiScaledHeight() - r.height - r.y) * scaleFactor), (int) (r.width * scaleFactor), (int) (r.height * scaleFactor));
+            }
         } else {
             GlStateManager._disableScissorTest();
         }
