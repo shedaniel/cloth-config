@@ -48,9 +48,9 @@ dependencies {
     modCompileOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
-//    modRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
-//        transitive(false)
-//    }
+    modRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
+        transitive(false)
+    }
 
     implementation(project(path: ":common")) {
         transitive = false
