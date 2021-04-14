@@ -151,7 +151,7 @@ public abstract class ScrollingContainer {
             float bottomC = (hovered ? .67f : .5f) * scrollBarAlphaOffset;
             float topC = (hovered ? .87f : .67f) * scrollBarAlphaOffset;
             
-            RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
             RenderSystem.setShaderTexture(0, AbstractSelectionList.WHITE_TEXTURE_LOCATION);
             RenderSystem.disableTexture();
             Tesselator tesselator = Tesselator.getInstance();
