@@ -440,8 +440,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 int bottomc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 168 : 128;
                 int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 222 : 172;
                 
-                Tesselator tessellator = Tesselator.getInstance();
-                BufferBuilder buffer = tessellator.getBuilder();
+                Tesselator tesselator = Tesselator.getInstance();
+                BufferBuilder buffer = tesselator.getBuilder();
                 
                 // Bottom
                 buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
@@ -455,7 +455,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).uv(1, 1).color(topc, topc, topc, 255).endVertex();
                 buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).uv(1, 0).color(topc, topc, topc, 255).endVertex();
                 buffer.vertex(scrollbarPositionMinX, minY, 0.0D).uv(0, 0).color(topc, topc, topc, 255).endVertex();
-                tessellator.end();
+                tesselator.end();
                 RenderSystem.enableTexture();
             }
             matrices.popPose();

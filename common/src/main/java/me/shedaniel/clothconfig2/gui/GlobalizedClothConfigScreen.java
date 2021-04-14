@@ -219,8 +219,8 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             fillGradient(matrices, 0, 0, sliderPosition, height, -1240461296, -972025840);
             fillGradient(matrices, 0, 0, sliderPosition - 14, height, 1744830464, 1744830464);
         } else {
-            Tesselator tessellator = Tesselator.getInstance();
-            BufferBuilder buffer = tessellator.getBuilder();
+            Tesselator tesselator = Tesselator.getInstance();
+            BufferBuilder buffer = tesselator.getBuilder();
             RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
             RenderSystem.setShaderTexture(0, getBackgroundLocation());
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -230,20 +230,19 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             buffer.vertex(sliderPosition, height, 0.0D).uv(14 / 32.0F, height / 32.0F).color(68, 68, 68, 255).endVertex();
             buffer.vertex(sliderPosition, 0, 0.0D).uv(14 / 32.0F, 0).color(68, 68, 68, 255).endVertex();
             buffer.vertex(sliderPosition - 14, 0, 0.0D).uv(0, 0).color(68, 68, 68, 255).endVertex();
-            tessellator.end();
             
-            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
             buffer.vertex(0, height, 0.0D).uv(0, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
             buffer.vertex(sliderPosition - 14, height, 0.0D).uv((sliderPosition - 14) / 32.0F, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
             buffer.vertex(sliderPosition - 14, 0, 0.0D).uv((sliderPosition - 14) / 32.0F, ((int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
             buffer.vertex(0, 0, 0.0D).uv(0, ((int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
-            tessellator.end();
+            tesselator.end();
         }
         {
             Matrix4f matrix = matrices.last().pose();
             RenderSystem.disableTexture();
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
             Tesselator tesselator = Tesselator.getInstance();
             BufferBuilder buffer = tesselator.getBuilder();
             int shadeColor = isTransparentBackground() ? 120 : 160;
