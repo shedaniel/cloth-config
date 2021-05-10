@@ -8,7 +8,7 @@ loom {
 }
 
 configurations {
-    shadow
+    shadowCommon
 }
 
 dependencies {
@@ -23,11 +23,11 @@ dependencies {
     compileOnly("blue.endless:jankson:${rootProject.jankson_version}")
     compileOnly("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
     compileOnly("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
-    shadow("blue.endless:jankson:${rootProject.jankson_version}")
-    shadow("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}") {
+    shadowCommon("blue.endless:jankson:${rootProject.jankson_version}")
+    shadowCommon("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}") {
         exclude(module: "gson")
     }
-    shadow("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
+    shadowCommon("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
 }
 
 architectury {
@@ -44,21 +44,23 @@ shadowJar {
     relocate "com.moandjiezana.toml", "${rootProject.maven_group}.clothconfig.shadowed.com.moandjiezana.toml"
     relocate "org.yaml.snakeyaml", "${rootProject.maven_group}.clothconfig.shadowed.org.yaml.snakeyaml"
 
-    configurations = [project.configurations.shadow]
-    classifier null
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier = "shadow"
 }
 
-build {
-    dependsOn shadowJar
+remapJar {
+    dependsOn(shadowJar)
+    input.set(shadowJar.archiveFile)
+    archiveClassifier = null
+
+    from rootProject.file("LICENSE.md")
 }
 
 publishing {
     publications {
         mavenCommon(MavenPublication) {
             artifactId = rootProject.archives_base_name
-            artifact(file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}.jar")) {
-                builtBy shadowJar
-            }
+            artifact(remapJar)
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
             }
