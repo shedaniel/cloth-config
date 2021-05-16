@@ -54,6 +54,10 @@ remapJar {
     archiveClassifier = null
 
     from rootProject.file("LICENSE.md")
+
+    afterEvaluate {
+        remapAccessWidener = false
+    }
 }
 
 publishing {
