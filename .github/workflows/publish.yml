@@ -6,6 +6,7 @@ on:
             - '**.gradle'
             - '**.properties'
             - '**/src/**'
+            - '.github/**'
         branches:
             - v4
             - v5
