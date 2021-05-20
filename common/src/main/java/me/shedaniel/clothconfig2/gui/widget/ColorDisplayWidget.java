@@ -23,6 +23,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 
 public class ColorDisplayWidget extends AbstractWidget {
     
@@ -50,6 +51,11 @@ public class ColorDisplayWidget extends AbstractWidget {
     
     @Override
     public void onRelease(double mouseX, double mouseY) {
+    }
+    
+    @Override
+    public void updateNarration(NarrationElementOutput narrationElementOutput) {
+        
     }
     
     public void setColor(int color) {

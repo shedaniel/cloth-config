@@ -32,7 +32,7 @@ import me.shedaniel.math.Rectangle;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.TickableWidget;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -79,6 +79,10 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         this.backgroundLocation = backgroundLocation;
     }
     
+    public List<GuiEventListener> childrenL() {
+        return (List<GuiEventListener>) super.children();
+    }
+    
     @Override
     public void setSavingRunnable(@Nullable Runnable savingRunnable) {
         this.savingRunnable = savingRunnable;
@@ -98,7 +102,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     public boolean isRequiresRestart() {
         for (List<AbstractConfigEntry<?>> entries : getCategorizedEntries().values()) {
             for (AbstractConfigEntry<?> entry : entries) {
-                if (!entry.getConfigError().isPresent() && entry.isEdited() && entry.isRequiresRestart()) {
+                if (entry.getConfigError().isEmpty() && entry.isEdited() && entry.isRequiresRestart()) {
                     return true;
                 }
             }
@@ -338,9 +342,12 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         super.tick();
         boolean edited = isEdited();
         Optional.ofNullable(getQuitButton()).ifPresent(button -> button.setMessage(edited ? new TranslatableComponent("text.cloth-config.cancel_discard") : new TranslatableComponent("gui.cancel")));
-        for (GuiEventListener child : children())
-            if (child instanceof TickableWidget)
-                ((TickableWidget) child).tick();
+        for (GuiEventListener child : children()) {
+            if (child instanceof EditBox box)
+                box.tick();
+            if (child instanceof TickableWidget widget)
+                widget.tick();
+        }
     }
     
     @Nullable

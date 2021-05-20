@@ -427,7 +427,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             
             if (getMaxScrollPosition() > 6) {
                 RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-                RenderSystem.setShaderTexture(0, AbstractSelectionList.WHITE_TEXTURE_LOCATION);
                 RenderSystem.disableTexture();
                 int scrollbarPositionMinX = lastRectangle.x + getCellCreator().getCellWidth() - 6;
                 int scrollbarPositionMaxX = scrollbarPositionMinX + 6;
@@ -444,17 +443,17 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 BufferBuilder buffer = tesselator.getBuilder();
                 
                 // Bottom
-                buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-                buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).uv(0, 1).color(bottomc, bottomc, bottomc, 255).endVertex();
-                buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).uv(1, 1).color(bottomc, bottomc, bottomc, 255).endVertex();
-                buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).uv(1, 0).color(bottomc, bottomc, bottomc, 255).endVertex();
-                buffer.vertex(scrollbarPositionMinX, minY, 0.0D).uv(0, 0).color(bottomc, bottomc, bottomc, 255).endVertex();
+                buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+                buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).color(bottomc, bottomc, bottomc, 255).endVertex();
+                buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).color(bottomc, bottomc, bottomc, 255).endVertex();
+                buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).color(bottomc, bottomc, bottomc, 255).endVertex();
+                buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(bottomc, bottomc, bottomc, 255).endVertex();
                 
                 // Top
-                buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).uv(0, 1).color(topc, topc, topc, 255).endVertex();
-                buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).uv(1, 1).color(topc, topc, topc, 255).endVertex();
-                buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).uv(1, 0).color(topc, topc, topc, 255).endVertex();
-                buffer.vertex(scrollbarPositionMinX, minY, 0.0D).uv(0, 0).color(topc, topc, topc, 255).endVertex();
+                buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).color(topc, topc, topc, 255).endVertex();
+                buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).color(topc, topc, topc, 255).endVertex();
+                buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).color(topc, topc, topc, 255).endVertex();
+                buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(topc, topc, topc, 255).endVertex();
                 tesselator.end();
                 RenderSystem.enableTexture();
             }

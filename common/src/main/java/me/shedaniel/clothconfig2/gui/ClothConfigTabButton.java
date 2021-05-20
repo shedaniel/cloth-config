@@ -26,6 +26,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import org.jetbrains.annotations.Nullable;
@@ -87,4 +88,8 @@ public class ClothConfigTabButton extends AbstractButton {
         return Optional.empty();
     }
     
+    @Override
+    public void updateNarration(NarrationElementOutput narrationElementOutput) {
+        
+    }
 }

@@ -146,27 +146,26 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
             int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 222 : 172;
             
             RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-            RenderSystem.setShaderTexture(0, AbstractSelectionList.WHITE_TEXTURE_LOCATION);
             RenderSystem.disableTexture();
             Matrix4f matrix = matrices.last().pose();
             // Black Bar
-            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-            buffer.vertex(matrix, scrollbarPositionMinX, this.bottom, 0.0F).uv(0, 1).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, this.bottom, 0.0F).uv(1, 1).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, this.top, 0.0F).uv(1, 0).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMinX, this.top, 0.0F).uv(0, 0).color(0, 0, 0, 255).endVertex();
+            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            buffer.vertex(matrix, scrollbarPositionMinX, this.bottom, 0.0F).color(0, 0, 0, 255).endVertex();
+            buffer.vertex(matrix, scrollbarPositionMaxX, this.bottom, 0.0F).color(0, 0, 0, 255).endVertex();
+            buffer.vertex(matrix, scrollbarPositionMaxX, this.top, 0.0F).color(0, 0, 0, 255).endVertex();
+            buffer.vertex(matrix, scrollbarPositionMinX, this.top, 0.0F).color(0, 0, 0, 255).endVertex();
             
             // Bottom
-            buffer.vertex(matrix, scrollbarPositionMinX, minY + height, 0.0F).uv(0, 1).color(bottomc, bottomc, bottomc, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, minY + height, 0.0F).uv(1, 1).color(bottomc, bottomc, bottomc, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, minY, 0.0F).uv(1, 0).color(bottomc, bottomc, bottomc, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMinX, minY, 0.0F).uv(0, 0).color(bottomc, bottomc, bottomc, 255).endVertex();
+            buffer.vertex(matrix, scrollbarPositionMinX, minY + height, 0.0F).color(bottomc, bottomc, bottomc, 255).endVertex();
+            buffer.vertex(matrix, scrollbarPositionMaxX, minY + height, 0.0F).color(bottomc, bottomc, bottomc, 255).endVertex();
+            buffer.vertex(matrix, scrollbarPositionMaxX, minY, 0.0F).color(bottomc, bottomc, bottomc, 255).endVertex();
+            buffer.vertex(matrix, scrollbarPositionMinX, minY, 0.0F).color(bottomc, bottomc, bottomc, 255).endVertex();
             
             // Top
-            buffer.vertex(matrix, scrollbarPositionMinX, (minY + height - 1), 0.0F).uv(0, 1).color(topc, topc, topc, 255).endVertex();
-            buffer.vertex(matrix, (scrollbarPositionMaxX - 1), (minY + height - 1), 0.0F).uv(1, 1).color(topc, topc, topc, 255).endVertex();
-            buffer.vertex(matrix, (scrollbarPositionMaxX - 1), minY, 0.0F).uv(1, 0).color(topc, topc, topc, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMinX, minY, 0.0F).uv(0, 0).color(topc, topc, topc, 255).endVertex();
+            buffer.vertex(matrix, scrollbarPositionMinX, (minY + height - 1), 0.0F).color(topc, topc, topc, 255).endVertex();
+            buffer.vertex(matrix, (scrollbarPositionMaxX - 1), (minY + height - 1), 0.0F).color(topc, topc, topc, 255).endVertex();
+            buffer.vertex(matrix, (scrollbarPositionMaxX - 1), minY, 0.0F).color(topc, topc, topc, 255).endVertex();
+            buffer.vertex(matrix, scrollbarPositionMinX, minY, 0.0F).color(topc, topc, topc, 255).endVertex();
             tessellator.end();
             RenderSystem.disableBlend();
             RenderSystem.enableTexture();

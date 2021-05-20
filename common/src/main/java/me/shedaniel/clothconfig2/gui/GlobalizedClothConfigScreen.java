@@ -134,7 +134,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         this.sideExpandLimit.reset();
         this.references.clear();
         buildReferences();
-        this.children.add(listWidget = new ClothConfigScreen.ListWidget<>(this, minecraft, width - 14, height, 30, height - 32, getBackgroundLocation()));
+        this.childrenL().add(listWidget = new ClothConfigScreen.ListWidget<>(this, minecraft, width - 14, height, 30, height - 32, getBackgroundLocation()));
         this.listWidget.setLeftPos(14);
         this.categorizedEntries.forEach((category, entries) -> {
             if (!listWidget.children().isEmpty())
@@ -145,8 +145,8 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             this.listWidget.children().addAll((List) entries);
         });
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addButton(cancelButton = new Button(0, height - 26, buttonWidths, 20, isEdited() ? new TranslatableComponent("text.cloth-config.cancel_discard") : new TranslatableComponent("gui.cancel"), widget -> quit()));
-        addButton(exitButton = new Button(0, height - 26, buttonWidths, 20, NarratorChatListener.NO_TITLE, button -> saveAll(true)) {
+        addRenderableWidget(cancelButton = new Button(0, height - 26, buttonWidths, 20, isEdited() ? new TranslatableComponent("text.cloth-config.cancel_discard") : new TranslatableComponent("gui.cancel"), widget -> quit()));
+        addRenderableWidget(exitButton = new Button(0, height - 26, buttonWidths, 20, NarratorChatListener.NO_TITLE, button -> saveAll(true)) {
             @Override
             public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
