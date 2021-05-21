@@ -28,8 +28,10 @@ import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import org.jetbrains.annotations.ApiStatus;
@@ -42,14 +44,13 @@ import java.util.function.Supplier;
 @SuppressWarnings("DuplicatedCode")
 @Environment(EnvType.CLIENT)
 public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
-    
     private ModifierKeyCode value;
     private final ModifierKeyCode original;
     private final Button buttonWidget;
     private final Button resetButton;
     private final Consumer<ModifierKeyCode> saveConsumer;
     private final Supplier<ModifierKeyCode> defaultValue;
-    private final List<GuiEventListener> widgets;
+    private final List<AbstractWidget> widgets;
     private boolean allowMouse = true, allowKey = true, allowModifiers = true;
     
     @ApiStatus.Internal
@@ -154,4 +155,8 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
         return widgets;
     }
     
+    @Override
+    public List<? extends NarratableEntry> narratables() {
+        return widgets;
+    }
 }

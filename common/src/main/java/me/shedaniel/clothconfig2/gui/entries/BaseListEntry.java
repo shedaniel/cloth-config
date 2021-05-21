@@ -31,6 +31,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -61,7 +62,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     
     protected static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
     @NotNull protected final List<C> cells;
-    @NotNull protected final List<GuiEventListener> widgets;
+    @NotNull protected final List<Object> widgets; // GuiEventListener & NarratableEntry
     protected boolean expanded;
     protected boolean deleteButtonEnabled;
     protected boolean insertInFront;
@@ -207,11 +208,16 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     @Override
     public List<? extends GuiEventListener> children() {
         if (!expanded) {
-            List<GuiEventListener> elements = new ArrayList<>(widgets);
+            List<GuiEventListener> elements = new ArrayList<>((List<GuiEventListener>) (List<?>) widgets);
             elements.removeAll(cells);
             return elements;
         }
-        return widgets;
+        return (List<GuiEventListener>) (List<?>) widgets;
+    }
+    
+    @Override
+    public List<? extends NarratableEntry> narratables() {
+        return (List<NarratableEntry>) (List<?>) widgets;
     }
     
     @Override

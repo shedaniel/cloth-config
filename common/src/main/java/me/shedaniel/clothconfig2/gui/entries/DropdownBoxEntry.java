@@ -40,6 +40,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -149,6 +150,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     @Override
     public List<? extends GuiEventListener> children() {
         return Lists.newArrayList(selectionElement, resetButton);
+    }
+    
+    @Override
+    public List<? extends NarratableEntry> narratables() {
+        return Collections.singletonList(resetButton);
     }
     
     @Override

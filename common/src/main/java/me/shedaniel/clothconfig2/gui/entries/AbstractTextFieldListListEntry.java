@@ -26,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -66,6 +67,7 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         
         protected EditBox widget;
         private boolean isSelected;
+        private boolean isHovered;
         
         public AbstractTextFieldListCell(@Nullable T value, OUTER_SELF listListEntry) {
             super(value, listListEntry);
@@ -123,6 +125,7 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             widget.y = y + 1;
             widget.setEditable(listListEntry.isEditable());
             widget.render(matrices, mouseX, mouseY, delta);
+            isHovered = widget.isMouseOver(mouseX, mouseY);
             if (isSelected && listListEntry.isEditable())
                 fill(matrices, x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
@@ -130,6 +133,16 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         @Override
         public List<? extends GuiEventListener> children() {
             return Collections.singletonList(widget);
+        }
+    
+        @Override
+        public NarrationPriority narrationPriority() {
+            return isSelected ? NarrationPriority.FOCUSED : isHovered ? NarrationPriority.HOVERED : NarrationPriority.NONE;
+        }
+    
+        @Override
+        public void updateNarration(NarrationElementOutput narrationElementOutput) {
+            widget.updateNarration(narrationElementOutput);
         }
     }
     

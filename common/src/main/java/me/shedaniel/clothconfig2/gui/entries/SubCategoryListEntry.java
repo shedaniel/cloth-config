@@ -31,6 +31,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -48,7 +51,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     private static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
     private final List<AbstractConfigListEntry> entries;
     private final CategoryLabelWidget widget;
-    private final List<GuiEventListener> children;
+    private final List<Object> children; // GuiEventListener & NarratableEntry
     private boolean expanded;
     
     @Deprecated
@@ -188,7 +191,12 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     
     @Override
     public List<? extends GuiEventListener> children() {
-        return expanded ? children : Collections.singletonList(widget);
+        return expanded ? (List) children : Collections.singletonList(widget);
+    }
+    
+    @Override
+    public List<? extends NarratableEntry> narratables() {
+        return expanded ? (List) children : Collections.singletonList(widget);
     }
     
     @Override
@@ -210,17 +218,28 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         return Optional.ofNullable(error);
     }
     
-    public class CategoryLabelWidget implements GuiEventListener {
+    public class CategoryLabelWidget implements GuiEventListener, NarratableEntry {
         private final Rectangle rectangle = new Rectangle();
+        private boolean isHovered;
         
         @Override
         public boolean mouseClicked(double double_1, double double_2, int int_1) {
             if (rectangle.contains(double_1, double_2)) {
                 expanded = !expanded;
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-                return true;
+                return isHovered = true;
             }
-            return false;
+            return isHovered = false;
+        }
+    
+        @Override
+        public NarrationPriority narrationPriority() {
+            return isHovered ? NarrationPriority.HOVERED : NarrationPriority.NONE;
+        }
+    
+        @Override
+        public void updateNarration(NarrationElementOutput narrationElementOutput) {
+            narrationElementOutput.add(NarratedElementType.TITLE, getFieldName());
         }
     }
     

@@ -26,9 +26,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -43,7 +45,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     protected Button resetButton;
     protected Supplier<T> defaultValue;
     protected T original;
-    protected List<GuiEventListener> widgets;
+    protected List<AbstractWidget> widgets;
     private boolean isSelected = false;
     
     @ApiStatus.Internal
@@ -151,4 +153,8 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         return widgets;
     }
     
+    @Override
+    public List<? extends NarratableEntry> narratables() {
+        return widgets;
+    }
 }

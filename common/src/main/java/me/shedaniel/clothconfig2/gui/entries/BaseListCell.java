@@ -23,13 +23,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public abstract class BaseListCell extends AbstractContainerEventHandler {
+public abstract class BaseListCell extends AbstractContainerEventHandler implements NarratableEntry {
     private Supplier<Optional<Component>> errorSupplier;
     
     public final int getPreferredTextColor() {

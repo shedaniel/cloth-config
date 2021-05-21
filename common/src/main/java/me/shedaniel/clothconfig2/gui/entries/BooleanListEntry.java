@@ -26,8 +26,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
@@ -47,7 +49,7 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     private final Button resetButton;
     private final Consumer<Boolean> saveConsumer;
     private final Supplier<Boolean> defaultValue;
-    private final List<GuiEventListener> widgets;
+    private final List<AbstractWidget> widgets;
     
     @ApiStatus.Internal
     @Deprecated
@@ -132,4 +134,8 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
         return widgets;
     }
     
+    @Override
+    public List<? extends NarratableEntry> narratables() {
+        return widgets;
+    }
 }

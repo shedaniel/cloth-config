@@ -29,6 +29,7 @@ import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -136,6 +137,16 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
             super.onDelete();
             listListEntry.referencableEntries.remove(nestedEntry);
             listListEntry.requestReferenceRebuilding();
+        }
+    
+        @Override
+        public NarrationPriority narrationPriority() {
+            return NarrationPriority.NONE;
+        }
+    
+        @Override
+        public void updateNarration(NarrationElementOutput narrationElementOutput) {
+        
         }
     }
 }

@@ -26,6 +26,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
@@ -151,4 +152,8 @@ public class TextListEntry extends TooltipListEntry<Object> {
         return Collections.emptyList();
     }
     
+    @Override
+    public List<? extends NarratableEntry> narratables() {
+        return Collections.emptyList();
+    }
 }

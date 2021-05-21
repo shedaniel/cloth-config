@@ -27,8 +27,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
@@ -52,7 +54,7 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     private final Button resetButton;
     private final Consumer<T> saveConsumer;
     private final Supplier<T> defaultValue;
-    private final List<GuiEventListener> widgets;
+    private final List<AbstractWidget> widgets;
     private final Function<T, Component> nameProvider;
     
     @ApiStatus.Internal
@@ -148,6 +150,11 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     
     @Override
     public List<? extends GuiEventListener> children() {
+        return widgets;
+    }
+    
+    @Override
+    public List<? extends NarratableEntry> narratables() {
         return widgets;
     }
     

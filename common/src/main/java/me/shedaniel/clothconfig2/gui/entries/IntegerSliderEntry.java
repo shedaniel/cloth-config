@@ -27,8 +27,10 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Mth;
@@ -52,7 +54,7 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     private final Consumer<Integer> saveConsumer;
     private final Supplier<Integer> defaultValue;
     private Function<Integer, Component> textGetter = integer -> new TextComponent(String.format("Value: %d", integer));
-    private final List<GuiEventListener> widgets;
+    private final List<AbstractWidget> widgets;
     
     @ApiStatus.Internal
     @Deprecated
@@ -124,6 +126,11 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     
     @Override
     public List<? extends GuiEventListener> children() {
+        return widgets;
+    }
+    
+    @Override
+    public List<? extends NarratableEntry> narratables() {
         return widgets;
     }
     

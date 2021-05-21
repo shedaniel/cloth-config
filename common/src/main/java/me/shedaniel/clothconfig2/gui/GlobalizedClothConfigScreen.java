@@ -33,6 +33,7 @@ import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -342,7 +343,12 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public int getItemHeight() {
             return height;
         }
-        
+    
+        @Override
+        public List<? extends NarratableEntry> narratables() {
+            return Collections.emptyList();
+        }
+    
         @Override
         public Object getValue() {
             return null;
@@ -419,6 +425,11 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         
         @Override
         public List<? extends GuiEventListener> children() {
+            return Collections.emptyList();
+        }
+    
+        @Override
+        public List<? extends NarratableEntry> narratables() {
             return Collections.emptyList();
         }
     }
