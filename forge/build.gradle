@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
     id "com.matthewprenger.cursegradle"
     id "maven-publish"
 }
@@ -71,7 +71,6 @@ remapJar {
     input.set(shadowJar.archivePath)
     archiveClassifier = "forge"
 
-    from zipTree(file("cloth-config-forge-4.1.3.jar"))
     from rootProject.file("LICENSE.md")
 }
 
