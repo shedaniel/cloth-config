@@ -5,7 +5,7 @@ plugins {
 }
 
 configurations {
-    shadow
+    shadowCommon
     dev
 }
 
@@ -25,16 +25,17 @@ dependencies {
     forge "net.minecraftforge:forge:${rootProject.architectury.minecraft}-${rootProject.forge_version}"
 
     modApi("me.shedaniel.cloth:basic-math:0.5.1")
-    shadow("me.shedaniel.cloth:basic-math:0.5.1")
+    forgeDependencies(shadowCommon("me.shedaniel.cloth:basic-math:0.5.1"))
 
+    forgeDependencies("cpw.mods:securejarhandler:0.9.48")
     implementation("blue.endless:jankson:${rootProject.jankson_version}")
     implementation("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
     implementation("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
-    shadow("blue.endless:jankson:${rootProject.jankson_version}")
-    shadow("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}") {
+    forgeDependencies(shadowCommon("blue.endless:jankson:${rootProject.jankson_version}"))
+    forgeDependencies(shadowCommon("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}") {
         exclude(module: "gson")
-    }
-    shadow("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
+    })
+    forgeDependencies(shadowCommon("org.yaml:snakeyaml:${rootProject.snakeyaml_version}"))
 
     implementation(project(path: ":common")) {
         transitive = false
@@ -42,7 +43,7 @@ dependencies {
     developmentForge(project(path: ":common")) {
         transitive = false
     }
-    shadow(project(path: ":common", configuration: "transformProductionForge")) {
+    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
         transitive = false
     }
 }
@@ -61,7 +62,7 @@ shadowJar {
     relocate "com.moandjiezana.toml", "${rootProject.maven_group}.clothconfig.shadowed.com.moandjiezana.toml"
     relocate "org.yaml.snakeyaml", "${rootProject.maven_group}.clothconfig.shadowed.org.yaml.snakeyaml"
 
-    configurations = [project.configurations.shadow]
+    configurations = [project.configurations.shadowCommon]
     classifier "shadow"
 }
 
@@ -69,7 +70,7 @@ remapJar {
     dependsOn(shadowJar)
     input.set(shadowJar.archivePath)
     archiveClassifier = "forge"
-    
+
     from zipTree(file("cloth-config-forge-4.1.3.jar"))
     from rootProject.file("LICENSE.md")
 }
@@ -104,9 +105,9 @@ curseforge {
         project {
             id = project.curseforge_id_forge
             releaseType = "release"
-            addGameVersion "1.16.4"
-            addGameVersion "1.16.5"
-            addGameVersion "Java 8"
+            addGameVersion "1.17"
+            addGameVersion "1.17.1"
+            addGameVersion "Java 16"
             addGameVersion "Forge"
             mainArtifact(remapJar.archivePath) {
                 displayName = "[Forge $rootProject.supported_version] v$project.version"

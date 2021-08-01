@@ -32,7 +32,7 @@ import org.jetbrains.annotations.ApiStatus;
 public class ClothConfigInitializer {
     public static final Logger LOGGER = LogManager.getFormatterLogger("ClothConfig");
     
-    public static final String MOD_ID = "cloth-config";
+    public static final String MOD_ID = "cloth_config";
     
     @Deprecated
     @ApiStatus.ScheduledForRemoval
