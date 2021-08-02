@@ -24,7 +24,7 @@ dependencies {
 
     forge "net.minecraftforge:forge:${rootProject.architectury.minecraft}-${rootProject.forge_version}"
 
-    modApi("me.shedaniel.cloth:basic-math:0.5.1")
+    modRuntime("me.shedaniel.cloth:basic-math:0.5.1")
     forgeDependencies(shadowCommon("me.shedaniel.cloth:basic-math:0.5.1"))
 
     forgeDependencies("cpw.mods:securejarhandler:0.9.48")
