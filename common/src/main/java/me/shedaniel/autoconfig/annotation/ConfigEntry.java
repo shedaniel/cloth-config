@@ -61,18 +61,30 @@ public class ConfigEntry {
     public @interface ColorPicker {
         boolean allowAlpha() default false;
     }
-
-//    /**
-//     * Applies to float and double fields.
-//     * In a future version it will enforce bounds at deserialization.
-//     */
-//    @Retention(RetentionPolicy.RUNTIME)
-//    @Target(ElementType.FIELD)
-//    public @interface BoundedFloating {
-//        double min() default 0;
-//
-//        double max();
-//    }
+    
+    /**
+     * Applies to double fields.
+     * In a future version it will enforce bounds at deserialization.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface BoundedDouble {
+        double min() default 0;
+        
+        double max();
+    }
+    
+    /**
+     * Applies to float fields.
+     * In a future version it will enforce bounds at deserialization.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface BoundedFloat {
+        float min() default 0;
+        
+        float max();
+    }
     
     public static class Gui {
         private Gui() {

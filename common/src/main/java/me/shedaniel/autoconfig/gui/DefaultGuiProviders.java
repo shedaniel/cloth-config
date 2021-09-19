@@ -106,6 +106,52 @@ public class DefaultGuiProviders {
                 ConfigEntry.BoundedDiscrete.class
         );
         
+        //Bounded float/Double Fields
+        registry.registerAnnotationProvider(
+                (i13n, field, config, defaults, guiProvider) -> {
+                    ConfigEntry.BoundedFloat bounds
+                            = field.getAnnotation(ConfigEntry.BoundedFloat.class);
+                
+                    return Collections.singletonList(
+                            ENTRY_BUILDER.startFloatField(
+                                            new TranslatableComponent(i13n),
+                                            getUnsafely(field, config, 0f)
+                                            
+                                    )
+                                    .setMax(bounds.max())
+                                    .setMin(bounds.min())
+                                    .setDefaultValue(() -> getUnsafely(field, defaults))
+                                    .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                                    .build()
+                    );
+                },
+                field -> field.getType() == float.class || field.getType() == Float.class,
+                ConfigEntry.BoundedFloat.class
+        );
+    
+        registry.registerAnnotationProvider(
+                (i13n, field, config, defaults, guiProvider) -> {
+                    ConfigEntry.BoundedDouble bounds
+                            = field.getAnnotation(ConfigEntry.BoundedDouble.class);
+                
+                    return Collections.singletonList(
+                            ENTRY_BUILDER.startDoubleField(
+                                            new TranslatableComponent(i13n),
+                                            getUnsafely(field, config, 0f)
+                                
+                                    )
+                                    .setMax(bounds.max())
+                                    .setMin(bounds.min())
+                                    .setDefaultValue(() -> getUnsafely(field, defaults))
+                                    .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                                    .build()
+                    );
+                },
+                field -> field.getType() == double.class || field.getType() == Double.class,
+                ConfigEntry.BoundedDouble.class
+        );
+        //End of Bounded float/Double Fields
+        
         registry.registerAnnotationProvider(
                 (i13n, field, config, defaults, guiProvider) -> {
                     ConfigEntry.ColorPicker colorPicker
