@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
-    "id": "cloth-config2",
-    "name": "Cloth Config v5",
+    "id": "cloth-config",
+    "name": "Cloth Config v6",
     "description": "An API for config screens.",
     "version": "${version}",
     "authors": [
@@ -22,6 +22,9 @@
             "me.shedaniel.clothconfig2.fabric.ClothConfigModMenuDemo"
         ]
     },
+    "provides": [
+        "cloth-config2"
+    ],
     "depends": {
         "fabricloader": ">=0.9.0"
     },
