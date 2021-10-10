@@ -24,17 +24,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-public class ConfigEntry {
-    
-    private ConfigEntry() {
-    }
+public @interface ConfigEntry {
     
     /**
      * Sets the category name of the config entry. Categories are created in order.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public @interface Category {
+    @interface Category {
         String value();
     }
     
@@ -45,7 +42,7 @@ public class ConfigEntry {
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public @interface BoundedDiscrete {
+    @interface BoundedDiscrete {
         long min() default 0;
         
         long max();
@@ -58,7 +55,7 @@ public class ConfigEntry {
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public @interface ColorPicker {
+    @interface ColorPicker {
         boolean allowAlpha() default false;
     }
 
@@ -74,7 +71,7 @@ public class ConfigEntry {
 //        double max();
 //    }
     
-    public static class Gui {
+    class Gui {
         private Gui() {
         }
         
