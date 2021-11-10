@@ -33,8 +33,8 @@ dependencies {
     modApi "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
-    modApi("me.shedaniel.cloth:basic-math:0.5.1")
-    include("me.shedaniel.cloth:basic-math:0.5.1")
+    modApi("me.shedaniel.cloth:basic-math:0.6.0")
+    include("me.shedaniel.cloth:basic-math:0.6.0")
 
     implementation("blue.endless:jankson:${rootProject.jankson_version}")
     implementation("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
