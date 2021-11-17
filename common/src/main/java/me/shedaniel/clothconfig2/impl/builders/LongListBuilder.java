@@ -44,7 +44,7 @@ public class LongListBuilder extends FieldBuilder<List<Long>, LongListListEntry>
     private Long min = null, max = null;
     private Function<LongListListEntry, LongListListEntry.LongListCell> createNewInstance;
     private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
-    private boolean deleteButtonEnabled = true, insertInFront = true;
+    private boolean deleteButtonEnabled = true, insertInFront = false;
     
     public LongListBuilder(Component resetButtonKey, Component fieldNameKey, List<Long> value) {
         super(resetButtonKey, fieldNameKey);

@@ -253,7 +253,7 @@ public class DefaultGuiProviders {
                             () -> getUnsafely(field, defaults),
                             ENTRY_BUILDER.getResetButtonKey(),
                             true,
-                            true,
+                            false,
                             (elem, nestedListListEntry) -> {
                                 if (elem == null) {
                                     Object newDefaultElemValue = Utils.constructUnsafely(fieldTypeParam);
