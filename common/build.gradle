@@ -31,7 +31,7 @@ dependencies {
 }
 
 architectury {
-    common(false)
+    common()
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

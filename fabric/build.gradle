@@ -8,13 +8,17 @@ loom {
     accessWidener = file("src/main/resources/cloth-config.accessWidener")
 }
 
-configurations {
-    shadowCommon
-}
-
 architectury {
     platformSetupLoomIde()
     fabric()
+}
+
+configurations {
+    common
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
 }
 
 repositories {
@@ -52,15 +56,8 @@ dependencies {
         transitive(false)
     }
 
-    implementation(project(path: ":common")) {
-        transitive = false
-    }
-    developmentFabric(project(path: ":common")) {
-        transitive = false
-    }
-    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) {
-        transitive = false
-    }
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 }
 
 processResources {
@@ -117,7 +114,9 @@ curseforge {
         project {
             id = project.curseforge_id_fabric
             releaseType = "beta"
+            addGameVersion "1.18"
             addGameVersion "1.18-Snapshot"
+            addGameVersion "Java 17"
             addGameVersion "Fabric"
             // may be needed in the future, but not right now
             /*relations {

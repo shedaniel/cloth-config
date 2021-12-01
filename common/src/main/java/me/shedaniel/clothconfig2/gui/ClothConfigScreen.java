@@ -156,7 +156,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);
                     RenderSystem.setShaderTexture(0, CONFIG_TEX);
                     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
-                    int int_3 = this.getYImage(this.isHovered());
+                    int int_3 = this.getYImage(this.isHovered);
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
@@ -175,7 +175,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);
                     RenderSystem.setShaderTexture(0, CONFIG_TEX);
                     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
-                    int int_3 = this.getYImage(this.isHovered());
+                    int int_3 = this.getYImage(this.isHovered);
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
