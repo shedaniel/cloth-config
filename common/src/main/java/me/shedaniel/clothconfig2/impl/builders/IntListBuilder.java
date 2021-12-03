@@ -44,7 +44,7 @@ public class IntListBuilder extends FieldBuilder<List<Integer>, IntegerListListE
     private Integer min = null, max = null;
     private Function<IntegerListListEntry, IntegerListListEntry.IntegerListCell> createNewInstance;
     private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
-    private boolean deleteButtonEnabled = true, insertInFront = true;
+    private boolean deleteButtonEnabled = true, insertInFront = false;
     
     public IntListBuilder(Component resetButtonKey, Component fieldNameKey, List<Integer> value) {
         super(resetButtonKey, fieldNameKey);

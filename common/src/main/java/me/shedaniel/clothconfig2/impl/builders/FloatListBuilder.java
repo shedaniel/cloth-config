@@ -44,7 +44,7 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
     private Float min = null, max = null;
     private Function<FloatListListEntry, FloatListListEntry.FloatListCell> createNewInstance;
     private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
-    private boolean deleteButtonEnabled = true, insertInFront = true;
+    private boolean deleteButtonEnabled = true, insertInFront = false;
     
     public FloatListBuilder(Component resetButtonKey, Component fieldNameKey, List<Float> value) {
         super(resetButtonKey, fieldNameKey);
