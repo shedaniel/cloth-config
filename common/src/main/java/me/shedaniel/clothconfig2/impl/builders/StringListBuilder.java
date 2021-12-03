@@ -43,7 +43,7 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
     private boolean expanded = false;
     private Function<StringListListEntry, StringListListEntry.StringListCell> createNewInstance;
     private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
-    private boolean deleteButtonEnabled = true, insertInFront = true;
+    private boolean deleteButtonEnabled = true, insertInFront = false;
     
     public StringListBuilder(Component resetButtonKey, Component fieldNameKey, List<String> value) {
         super(resetButtonKey, fieldNameKey);

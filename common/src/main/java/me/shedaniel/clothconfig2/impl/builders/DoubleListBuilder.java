@@ -44,7 +44,7 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
     private Double min = null, max = null;
     private Function<DoubleListListEntry, DoubleListListEntry.DoubleListCell> createNewInstance;
     private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
-    private boolean deleteButtonEnabled = true, insertInFront = true;
+    private boolean deleteButtonEnabled = true, insertInFront = false;
     
     public DoubleListBuilder(Component resetButtonKey, Component fieldNameKey, List<Double> value) {
         super(resetButtonKey, fieldNameKey);
