@@ -24,6 +24,7 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.Expandable;
+import me.shedaniel.clothconfig2.api.ReferenceProvider;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -225,6 +226,11 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     
     @Override
     public void save() {
+        for (C cell : cells) {
+            if (cell instanceof ReferenceProvider)
+                ((ReferenceProvider<?>) cell).provideReferenceEntry().save();
+        }
+        
         if (saveConsumer != null)
             saveConsumer.accept(getValue());
     }

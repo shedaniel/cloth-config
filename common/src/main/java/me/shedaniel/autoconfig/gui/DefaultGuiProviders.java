@@ -248,8 +248,7 @@ public class DefaultGuiProviders {
                             configValue,
                             false,
                             null,
-                            abstractConfigListEntries -> {
-                            },
+                            newValue -> setUnsafely(field, config, newValue),
                             () -> getUnsafely(field, defaults),
                             ENTRY_BUILDER.getResetButtonKey(),
                             true,
