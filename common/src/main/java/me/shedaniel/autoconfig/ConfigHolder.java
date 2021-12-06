@@ -44,4 +44,8 @@ public interface ConfigHolder<T extends ConfigData> extends Supplier<T> {
     default T get() {
         return getConfig();
     }
+
+    void resetToDefault();
+
+    void setConfig(T config);
 }
