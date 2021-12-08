@@ -30,7 +30,6 @@ public interface ConfigHolder<T extends ConfigData> extends Supplier<T> {
     @NotNull
     Class<T> getConfigClass();
 
-
     void save();
     
     boolean load();
