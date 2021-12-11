@@ -248,12 +248,11 @@ public class DefaultGuiProviders {
                             configValue,
                             false,
                             null,
-                            abstractConfigListEntries -> {
-                            },
+                            newValue -> setUnsafely(field, config, newValue),
                             () -> getUnsafely(field, defaults),
                             ENTRY_BUILDER.getResetButtonKey(),
                             true,
-                            true,
+                            false,
                             (elem, nestedListListEntry) -> {
                                 if (elem == null) {
                                     Object newDefaultElemValue = Utils.constructUnsafely(fieldTypeParam);

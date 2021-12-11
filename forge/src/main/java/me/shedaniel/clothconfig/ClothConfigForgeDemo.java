@@ -20,8 +20,8 @@
 package me.shedaniel.clothconfig;
 
 import me.shedaniel.clothconfig2.ClothConfigDemo;
+import net.minecraftforge.client.ConfigGuiHandler;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fmlclient.ConfigGuiHandler;
 
 public class ClothConfigForgeDemo {
     public static void registerModsPage() {
