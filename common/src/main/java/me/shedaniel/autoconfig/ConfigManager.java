@@ -107,12 +107,7 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
             return true;
         } catch (ConfigSerializer.SerializationException | ConfigData.ValidationException e) {
             logger.error("Failed to load config '{}', using default!", configClass, e);
-            config = serializer.createDefault();
-            try {
-                config.validatePostLoad();
-            } catch (ConfigData.ValidationException v) {
-                throw new RuntimeException("result of createDefault() was invalid!", v);
-            }
+            resetToDefault();
             return false;
         }
     }
@@ -126,7 +121,22 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
     public void registerLoadListener(ConfigSerializeEvent.Load<T> load) {
         this.loadEvent.add(load);
     }
-    
+
+    @Override
+    public void resetToDefault() {
+        config = serializer.createDefault();
+        try {
+            config.validatePostLoad();
+        } catch (ConfigData.ValidationException v) {
+            throw new RuntimeException("result of createDefault() was invalid!", v);
+        }
+    }
+
+    @Override
+    public void setConfig(T config) {
+        this.config = config;
+    }
+
     @Override
     public void registerSaveListener(ConfigSerializeEvent.Save<T> save) {
         this.saveEvent.add(save);
