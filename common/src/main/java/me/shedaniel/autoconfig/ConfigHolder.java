@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 public interface ConfigHolder<T extends ConfigData> extends Supplier<T> {
     @NotNull
     Class<T> getConfigClass();
-    
+
     void save();
     
     boolean load();
@@ -44,4 +44,18 @@ public interface ConfigHolder<T extends ConfigData> extends Supplier<T> {
     default T get() {
         return getConfig();
     }
+
+    /**
+     * Resets the config held by this holder to its default values.
+     * <br>
+     * Does not save the reset config to file, for that use {@link #save()}.
+     */
+    void resetToDefault();
+
+    /**
+     * Sets the config held by this holder.
+     * <br>
+     * Does not save the set config to file, for that use {@link #save()}.
+     */
+    void setConfig(T config);
 }
