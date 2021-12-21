@@ -30,7 +30,7 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public interface GuiProvider {
     List<AbstractConfigListEntry> get(
-            String i13n,
+            String i18n,
             Field field,
             Object config,
             Object defaults,

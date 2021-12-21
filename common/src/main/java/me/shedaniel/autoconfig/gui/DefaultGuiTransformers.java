@@ -49,7 +49,7 @@ public class DefaultGuiTransformers {
     public static GuiRegistry apply(GuiRegistry registry) {
         
         registry.registerAnnotationTransformer(
-                (guis, i13n, field, config, defaults, guiProvider) -> guis.stream()
+                (guis, i18n, field, config, defaults, guiProvider) -> guis.stream()
                         .peek(gui -> {
                             if (!(gui instanceof TextListEntry)) {
                                 ConfigEntry.Gui.Tooltip tooltip = field.getAnnotation(ConfigEntry.Gui.Tooltip.class);
@@ -59,13 +59,13 @@ public class DefaultGuiTransformers {
                                     tryApplyTooltip(
                                             gui,
                                             new Component[]{
-                                                    new TranslatableComponent(String.format("%s.%s", i13n, "@Tooltip"))
+                                                    new TranslatableComponent(String.format("%s.%s", i18n, "@Tooltip"))
                                             }
                                     );
                                 } else {
                                     tryApplyTooltip(
                                             gui, IntStream.range(0, tooltip.count()).boxed()
-                                                    .map(i -> String.format("%s.%s[%d]", i13n, "@Tooltip", i))
+                                                    .map(i -> String.format("%s.%s[%d]", i18n, "@Tooltip", i))
                                                     .map(TranslatableComponent::new)
                                                     .toArray(Component[]::new)
                                     );
@@ -77,7 +77,7 @@ public class DefaultGuiTransformers {
         );
         
         registry.registerAnnotationTransformer(
-                (guis, i13n, field, config, defaults, guiProvider) -> guis.stream()
+                (guis, i18n, field, config, defaults, guiProvider) -> guis.stream()
                         .peek(gui -> {
                             if (!(gui instanceof TextListEntry)) {
                                 Comment tooltip = field.getAnnotation(Comment.class);
@@ -91,7 +91,7 @@ public class DefaultGuiTransformers {
         );
         
         registry.registerAnnotationTransformer(
-                (guis, i13n, field, config, defaults, guiProvider) -> guis.stream()
+                (guis, i18n, field, config, defaults, guiProvider) -> guis.stream()
                         .peek(gui -> {
                             if (!(gui instanceof TextListEntry)) {
                                 tryRemoveTooltip(gui);
@@ -102,9 +102,9 @@ public class DefaultGuiTransformers {
         );
         
         registry.registerAnnotationTransformer(
-                (guis, i13n, field, config, defaults, guiProvider) -> {
+                (guis, i18n, field, config, defaults, guiProvider) -> {
                     ArrayList<AbstractConfigListEntry> ret = new ArrayList<>(guis);
-                    String text = String.format("%s.%s", i13n, "@PrefixText");
+                    String text = String.format("%s.%s", i18n, "@PrefixText");
                     ret.add(0, ENTRY_BUILDER.startTextDescription(new TranslatableComponent(text)).build());
                     return Collections.unmodifiableList(ret);
                 },
@@ -112,7 +112,7 @@ public class DefaultGuiTransformers {
         );
         
         registry.registerAnnotationTransformer(
-                (guis, i13n, field, config, defaults, guiProvider) -> {
+                (guis, i18n, field, config, defaults, guiProvider) -> {
                     for (AbstractConfigListEntry gui : guis) {
                         gui.setRequiresRestart(field.getAnnotation(ConfigEntry.Gui.RequiresRestart.class).value());
                     }

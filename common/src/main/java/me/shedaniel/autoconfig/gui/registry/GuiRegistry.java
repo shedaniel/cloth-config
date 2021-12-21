@@ -56,7 +56,7 @@ public final class GuiRegistry implements GuiRegistryAccess {
     
     @Override
     public List<AbstractConfigListEntry> get(
-            String i13n,
+            String i18n,
             Field field,
             Object config,
             Object defaults,
@@ -71,14 +71,14 @@ public final class GuiRegistry implements GuiRegistryAccess {
                                                 .findFirst()
                         )
         )
-                .map(entry -> entry.provider.get(i13n, field, config, defaults, registry))
+                .map(entry -> entry.provider.get(i18n, field, config, defaults, registry))
                 .orElse(null);
     }
     
     @Override
     public List<AbstractConfigListEntry> transform(
             List<AbstractConfigListEntry> guis,
-            String i13n,
+            String i18n,
             Field field,
             Object config,
             Object defaults,
@@ -90,7 +90,7 @@ public final class GuiRegistry implements GuiRegistryAccess {
                 .collect(Collectors.toList());
         
         for (GuiTransformer transformer : matchedTransformers) {
-            guis = transformer.transform(guis, i13n, field, config, defaults, registry);
+            guis = transformer.transform(guis, i18n, field, config, defaults, registry);
         }
         
         return guis;
