@@ -40,13 +40,13 @@ public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
     
     @Override
     public List<AbstractConfigListEntry> get(
-            String i13n,
+            String i18n,
             Field field,
             Object config,
             Object defaults,
             GuiRegistryAccess registry) {
         return children.stream()
-                .map(child -> child.get(i13n, field, config, defaults, registry))
+                .map(child -> child.get(i18n, field, config, defaults, registry))
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No ConfigGuiProvider match!"));
@@ -55,14 +55,14 @@ public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
     @Override
     public List<AbstractConfigListEntry> transform(
             List<AbstractConfigListEntry> guis,
-            String i13n,
+            String i18n,
             Field field,
             Object config,
             Object defaults,
             GuiRegistryAccess registry
     ) {
         for (GuiRegistryAccess child : children) {
-            guis = child.transform(guis, i13n, field, config, defaults, registry);
+            guis = child.transform(guis, i18n, field, config, defaults, registry);
         }
         return guis;
     }

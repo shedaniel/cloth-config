@@ -31,7 +31,7 @@ import java.util.List;
 public interface GuiTransformer {
     List<AbstractConfigListEntry> transform(
             List<AbstractConfigListEntry> guis,
-            String i13n,
+            String i18n,
             Field field,
             Object config,
             Object defaults,
