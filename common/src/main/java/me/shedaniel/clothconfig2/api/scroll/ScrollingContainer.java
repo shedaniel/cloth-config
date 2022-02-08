@@ -28,14 +28,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.animator.NumberAnimator;
 import me.shedaniel.clothconfig2.api.animator.ValueAnimator;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
 
 public abstract class ScrollingContainer {
@@ -111,7 +109,7 @@ public abstract class ScrollingContainer {
     }
     
     public void updatePosition(float delta) {
-        scroll.setTarget(handleBounceBack(this.scrollTarget(), this.scrollAmount(), this.getMaxScroll(), delta));
+        scroll.setTarget(handleBounceBack(this.scrollTarget(), this.getMaxScroll(), delta));
         this.scroll.update(delta);
     }
     
