@@ -84,7 +84,8 @@ public class ClothConfigDemo {
         
         ConfigBuilder builder = ConfigBuilder.create().setTitle(new TranslatableComponent("title.cloth-config.config"));
         builder.setDefaultBackgroundTexture(new ResourceLocation("minecraft:textures/block/oak_planks.png"));
-//        builder.setGlobalized(true);
+        builder.setGlobalized(true);
+        builder.setGlobalizedExpanded(false);
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory testing = builder.getOrCreateCategory(new TranslatableComponent("category.cloth-config.testing"));
         testing.addEntry(entryBuilder.startKeyCodeField(new TextComponent("Cool Key"), InputConstants.UNKNOWN).setDefaultValue(InputConstants.UNKNOWN).build());
