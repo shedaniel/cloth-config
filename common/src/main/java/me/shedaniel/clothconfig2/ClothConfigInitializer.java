@@ -63,7 +63,7 @@ public class ClothConfigInitializer {
     }
     
     public static long getScrollDuration() {
-        return 0;
+        return 600;
     }
     
     public static double getScrollStep() {
