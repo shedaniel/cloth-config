@@ -17,8 +17,33 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package me.shedaniel.clothconfig2.api;
+package me.shedaniel.clothconfig2.api.animator;
 
-public interface TickableWidget {
-    void tick();
+import org.jetbrains.annotations.ApiStatus;
+
+@ApiStatus.Internal
+final class ConstantValueProvider<T> implements ValueProvider<T> {
+    private final T value;
+    
+    public ConstantValueProvider(T value) {
+        this.value = value;
+    }
+    
+    @Override
+    public T value() {
+        return value;
+    }
+    
+    @Override
+    public T target() {
+        return value;
+    }
+    
+    @Override
+    public void completeImmediately() {
+    }
+    
+    @Override
+    public void update(double delta) {
+    }
 }

@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package me.shedaniel.clothconfig2.api;
+package me.shedaniel.clothconfig2.api.scroll;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -30,20 +30,21 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
+import me.shedaniel.clothconfig2.api.animator.NumberAnimator;
+import me.shedaniel.clothconfig2.api.animator.ValueAnimator;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
-import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
 
-@Deprecated
 public abstract class ScrollingContainer {
-    public double scrollAmount;
-    public double scrollTarget;
-    public long start;
-    public long duration;
-    public boolean draggingScrollBar = false;
+    private final NumberAnimator<Double> scroll = ValueAnimator.ofDouble();
+    private boolean draggingScrollBar = false;
+    private long scrollDuration = ClothConfigInitializer.getScrollDuration();
+    
+    public ScrollingContainer() {
+    }
     
     public abstract Rectangle getBounds();
     
@@ -55,8 +56,8 @@ public abstract class ScrollingContainer {
         return bounds;
     }
     
-    public int getScrollBarX() {
-        return hasScrollBar() ? getBounds().getMaxX() - 6 : getBounds().getMaxX();
+    public int getScrollBarX(int maxX) {
+        return hasScrollBar() ? maxX - 6 : maxX;
     }
     
     public boolean hasScrollBar() {
@@ -64,6 +65,22 @@ public abstract class ScrollingContainer {
     }
     
     public abstract int getMaxScrollHeight();
+    
+    public final double scrollAmount() {
+        return scroll.value();
+    }
+    
+    public final int scrollAmountInt() {
+        return (int) Math.round(scroll.value());
+    }
+    
+    public final double scrollTarget() {
+        return scroll.target();
+    }
+    
+    public void setScrollDuration(long scrollDuration) {
+        this.scrollDuration = scrollDuration;
+    }
     
     public final int getMaxScroll() {
         return Math.max(0, getMaxScrollHeight() - getBounds().height);
@@ -78,48 +95,41 @@ public abstract class ScrollingContainer {
     }
     
     public final void offset(double value, boolean animated) {
-        scrollTo(scrollTarget + value, animated);
+        scrollTo(scroll.target() + value, animated);
     }
     
     public final void scrollTo(double value, boolean animated) {
-        scrollTo(value, animated, ClothConfigInitializer.getScrollDuration());
+        scrollTo(value, animated, scrollDuration);
     }
     
     public final void scrollTo(double value, boolean animated, long duration) {
-        scrollTarget = clamp(value);
-        
         if (animated) {
-            start = System.currentTimeMillis();
-            this.duration = duration;
-        } else
-            scrollAmount = scrollTarget;
+            scroll.setTo(value, duration);
+        } else {
+            scroll.setAs(value);
+        }
     }
     
     public void updatePosition(float delta) {
-        double[] target = new double[]{this.scrollTarget};
-        this.scrollAmount = handleScrollingPosition(target, this.scrollAmount, this.getMaxScroll(), delta, this.start, this.duration);
-        this.scrollTarget = target[0];
+        scroll.setTarget(handleBounceBack(this.scrollTarget(), this.scrollAmount(), this.getMaxScroll(), delta));
+        this.scroll.update(delta);
     }
     
-    public static double handleScrollingPosition(double[] target, double scroll, double maxScroll, float delta, double start, double duration) {
-        return handleScrollingPosition(target, scroll, maxScroll, delta, start, duration, ClothConfigInitializer.getBounceBackMultiplier(), ClothConfigInitializer.getEasingMethod());
+    public static double handleBounceBack(double target, double maxScroll, float delta) {
+        return handleBounceBack(target, maxScroll, delta, ClothConfigInitializer.getBounceBackMultiplier());
     }
     
-    public static double handleScrollingPosition(double[] target, double scroll, double maxScroll, float delta, double start, double duration, double bounceBackMultiplier, EasingMethod easingMethod) {
+    public static double handleBounceBack(double target, double maxScroll, float delta, double bounceBackMultiplier) {
         if (bounceBackMultiplier >= 0) {
-            target[0] = clampExtension(target[0], maxScroll);
-            if (target[0] < 0) {
-                target[0] -= target[0] * (1 - bounceBackMultiplier) * delta / 3;
-            } else if (target[0] > maxScroll) {
-                target[0] = (target[0] - maxScroll) * (1 - (1 - bounceBackMultiplier) * delta / 3) + maxScroll;
+            target = clampExtension(target, maxScroll);
+            if (target < 0) {
+                target -= target * (1 - bounceBackMultiplier) * delta / 3;
+            } else if (target > maxScroll) {
+                target = (target - maxScroll) * (1 - (1 - bounceBackMultiplier) * delta / 3) + maxScroll;
             }
         } else
-            target[0] = clampExtension(target[0], maxScroll, 0);
-        return ease(scroll, target[0], Math.min((System.currentTimeMillis() - start) / duration * delta * 3, 1), easingMethod);
-    }
-    
-    public static double ease(double start, double end, double amount, EasingMethod easingMethod) {
-        return start + (end - start) * easingMethod.apply(amount);
+            target = clampExtension(target, maxScroll, 0);
+        return target;
     }
     
     public static double clampExtension(double value, double maxScroll) {
@@ -140,11 +150,11 @@ public abstract class ScrollingContainer {
             int maxScroll = getMaxScroll();
             int height = bounds.height * bounds.height / getMaxScrollHeight();
             height = Mth.clamp(height, 32, bounds.height);
-            height -= Math.min((scrollAmount < 0 ? (int) -scrollAmount : scrollAmount > maxScroll ? (int) scrollAmount - maxScroll : 0), height * .95);
+            height -= Math.min((scrollAmount() < 0 ? (int) -scrollAmount() : scrollAmount() > maxScroll ? (int) scrollAmount() - maxScroll : 0), height * .95);
             height = Math.max(10, height);
-            int minY = Math.min(Math.max((int) scrollAmount * (bounds.height - height) / maxScroll + bounds.y, bounds.y), bounds.getMaxY() - height);
+            int minY = Math.min(Math.max((int) scrollAmount() * (bounds.height - height) / maxScroll + bounds.y, bounds.y), bounds.getMaxY() - height);
             
-            int scrollbarPositionMinX = getScrollBarX();
+            int scrollbarPositionMinX = getScrollBarX(bounds.getMaxX());
             int scrollbarPositionMaxX = scrollbarPositionMinX + 6;
             boolean hovered = (new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height)).contains(PointHelper.ofMouse());
             float bottomC = (hovered ? .67f : .5f) * scrollBarAlphaOffset;
@@ -192,7 +202,7 @@ public abstract class ScrollingContainer {
                 double maxScroll = Math.max(1, getMaxScroll());
                 double int_3 = Mth.clamp(((double) (actualHeight * actualHeight) / (double) height), 32, actualHeight - 8);
                 double double_6 = Math.max(1.0D, maxScroll / (actualHeight - int_3));
-                float to = Mth.clamp((float) (scrollAmount + dy * double_6), 0, getMaxScroll());
+                float to = Mth.clamp((float) (scrollAmount() + dy * double_6), 0, getMaxScroll());
                 if (snapToRows) {
                     double nearestRow = Math.round(to / rowSize) * rowSize;
                     scrollTo(nearestRow, false);
@@ -211,7 +221,7 @@ public abstract class ScrollingContainer {
         Rectangle bounds = getBounds();
         int actualHeight = bounds.height;
         if (height > actualHeight && mouseY >= bounds.y && mouseY <= bounds.getMaxY()) {
-            double scrollbarPositionMinX = getScrollBarX();
+            double scrollbarPositionMinX = getScrollBarX(bounds.getMaxX());
             if (mouseX >= scrollbarPositionMinX - 1 & mouseX <= scrollbarPositionMinX + 8) {
                 this.draggingScrollBar = true;
                 return true;
