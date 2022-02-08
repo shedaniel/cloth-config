@@ -26,6 +26,7 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
+import me.shedaniel.clothconfig2.api.scroll.ScrollingContainer;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -232,10 +233,10 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             buffer.vertex(sliderPosition, 0, 0.0D).uv(14 / 32.0F, 0).color(68, 68, 68, 255).endVertex();
             buffer.vertex(sliderPosition - 14, 0, 0.0D).uv(0, 0).color(68, 68, 68, 255).endVertex();
             
-            buffer.vertex(0, height, 0.0D).uv(0, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
-            buffer.vertex(sliderPosition - 14, height, 0.0D).uv((sliderPosition - 14) / 32.0F, (height + (int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
-            buffer.vertex(sliderPosition - 14, 0, 0.0D).uv((sliderPosition - 14) / 32.0F, ((int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
-            buffer.vertex(0, 0, 0.0D).uv(0, ((int) sideScroller.scrollAmount) / 32.0F).color(32, 32, 32, 255).endVertex();
+            buffer.vertex(0, height, 0.0D).uv(0, (height + sideScroller.scrollAmountInt()) / 32.0F).color(32, 32, 32, 255).endVertex();
+            buffer.vertex(sliderPosition - 14, height, 0.0D).uv((sliderPosition - 14) / 32.0F, (height + sideScroller.scrollAmountInt()) / 32.0F).color(32, 32, 32, 255).endVertex();
+            buffer.vertex(sliderPosition - 14, 0, 0.0D).uv((sliderPosition - 14) / 32.0F, sideScroller.scrollAmountInt() / 32.0F).color(32, 32, 32, 255).endVertex();
+            buffer.vertex(0, 0, 0.0D).uv(0, sideScroller.scrollAmountInt() / 32.0F).color(32, 32, 32, 255).endVertex();
             tesselator.end();
         }
         {
@@ -266,14 +267,14 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         Rectangle slideArrowBounds = new Rectangle(sliderPosition - 14, 0, 14, height);
         {
             MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-            font.renderText(">", sliderPosition - 7 - font.width(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil((1 - sideSlider.scrollAmount) * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, false, 0, 15728880);
-            font.renderText("<", sliderPosition - 7 - font.width("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil(sideSlider.scrollAmount * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, false, 0, 15728880);
+            font.renderText(">", sliderPosition - 7 - font.width(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil((1 - sideSlider.scrollAmount()) * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, false, 0, 15728880);
+            font.renderText("<", sliderPosition - 7 - font.width("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil(sideSlider.scrollAmount() * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, false, 0, 15728880);
             immediate.endBatch();
             
             Rectangle scrollerBounds = sideScroller.getBounds();
             if (!scrollerBounds.isEmpty()) {
                 ScissorsHandler.INSTANCE.scissor(new Rectangle(0, 0, sliderPosition - 14, height));
-                int scrollOffset = (int) (scrollerBounds.y - sideScroller.scrollAmount);
+                int scrollOffset = scrollerBounds.y - sideScroller.scrollAmountInt();
                 for (Reference reference : references) {
                     matrices.pushPose();
                     matrices.scale(reference.getScale(), reference.getScale(), reference.getScale());
@@ -309,7 +310,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     
     @Override
     public boolean isExpanded() {
-        return sideSlider.scrollTarget == 1;
+        return sideSlider.scrollTarget() == 1;
     }
     
     @Override
@@ -328,7 +329,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     }
     
     private int getSideSliderPosition() {
-        return (int) (sideSlider.scrollAmount * sideExpandLimit.get() + 14);
+        return (int) (sideSlider.scrollAmount() * sideExpandLimit.get() + 14);
     }
     
     private static class EmptyEntry extends AbstractConfigListEntry<Object> {
@@ -343,12 +344,12 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public int getItemHeight() {
             return height;
         }
-    
+        
         @Override
         public List<? extends NarratableEntry> narratables() {
             return Collections.emptyList();
         }
-    
+        
         @Override
         public Object getValue() {
             return null;
@@ -427,7 +428,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public List<? extends GuiEventListener> children() {
             return Collections.emptyList();
         }
-    
+        
         @Override
         public List<? extends NarratableEntry> narratables() {
             return Collections.emptyList();

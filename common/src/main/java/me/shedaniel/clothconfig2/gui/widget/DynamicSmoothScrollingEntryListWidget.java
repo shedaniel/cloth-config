@@ -23,29 +23,27 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
+import me.shedaniel.clothconfig2.api.animator.NumberAnimator;
+import me.shedaniel.clothconfig2.api.animator.ValueAnimator;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
-import static me.shedaniel.clothconfig2.api.ScrollingContainer.clampExtension;
-import static me.shedaniel.clothconfig2.api.ScrollingContainer.handleScrollingPosition;
+import static me.shedaniel.clothconfig2.api.scroll.ScrollingContainer.clampExtension;
+import static me.shedaniel.clothconfig2.api.scroll.ScrollingContainer.handleBounceBack;
 
 @Environment(EnvType.CLIENT)
-@Deprecated
-public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends DynamicEntryListWidget<E> {
+public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends DynamicEntryListWidget<E> {
     
-    protected double target;
     protected boolean smoothScrolling = true;
-    protected long start;
-    protected long duration;
+    protected final NumberAnimator<Double> scrollAnimator = ValueAnimator.ofDouble();
     
-    public DynamicNewSmoothScrollingEntryListWidget(Minecraft client, int width, int height, int top, int bottom, ResourceLocation backgroundLocation) {
+    public DynamicSmoothScrollingEntryListWidget(Minecraft client, int width, int height, int top, int bottom, ResourceLocation backgroundLocation) {
         super(client, width, height, top, bottom, backgroundLocation);
     }
     
@@ -58,12 +56,11 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     }
     
     @Override
-    public void capYPosition(double double_1) {
-        if (!smoothScrolling)
-            this.scroll = Mth.clamp(double_1, 0.0D, this.getMaxScroll());
-        else {
-            scroll = clampExtension(double_1, getMaxScroll());
-            target = clampExtension(double_1, getMaxScroll());
+    public void capYPosition(double scroll) {
+        if (!smoothScrolling) {
+            scrollAnimator.setAs(Mth.clamp(scroll, 0.0D, this.getMaxScroll()));
+        } else {
+            scrollAnimator.setAs(clampExtension(scroll, getMaxScroll()));
         }
     }
     
@@ -107,7 +104,7 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     }
     
     public void offset(double value, boolean animated) {
-        scrollTo(target + value, animated);
+        scrollTo(scrollAnimator.target() + value, animated);
     }
     
     public void scrollTo(double value, boolean animated) {
@@ -115,20 +112,18 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     }
     
     public void scrollTo(double value, boolean animated, long duration) {
-        target = clampExtension(value, getMaxScroll());
-        
         if (animated) {
-            start = System.currentTimeMillis();
-            this.duration = duration;
-        } else
-            scroll = target;
+            scrollAnimator.setTo(value, duration);
+        } else {
+            scrollAnimator.setAs(value);
+        }
     }
     
     @Override
     public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        double[] target = {this.target};
-        scroll = handleScrollingPosition(target, scroll, getMaxScroll(), delta, start, duration);
-        this.target = target[0];
+        scrollAnimator.setTarget(handleBounceBack(this.scrollAnimator.target(), this.getMaxScroll(), delta));
+        this.scrollAnimator.update(delta);
+        this.scroll = scrollAnimator.value();
         super.render(matrices, mouseX, mouseY, delta);
     }
     

@@ -17,8 +17,29 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package me.shedaniel.clothconfig2.api;
+package me.shedaniel.clothconfig2.api.animator;
 
-public interface TickableWidget {
-    void tick();
+import org.jetbrains.annotations.ApiStatus;
+
+import java.util.function.Function;
+
+@ApiStatus.Experimental
+public interface ProgressValueAnimator<T> extends ValueAnimator<T> {
+    double progress();
+    
+    @Override
+    default ProgressValueAnimator<T> setAs(T value) {
+        ValueAnimator.super.setAs(value);
+        return this;
+    }
+    
+    @Override
+    ProgressValueAnimator<T> setTo(T value, long duration);
+    
+    @Override
+    ProgressValueAnimator<T> setTarget(T target);
+    
+    static <R> ProgressValueAnimator<R> mapProgress(NumberAnimator<?> parent, Function<Double, R> converter, Function<R, Double> backwardsConverter) {
+        return new MappingProgressValueAnimator<>(parent.asDouble(), converter, backwardsConverter);
+    }
 }
