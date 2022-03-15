@@ -130,7 +130,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         if (Minecraft.getInstance().font.isBidirectional()) {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, getPreferredTextColor());
             this.resetButton.x = x;
-            this.textFieldWidget.x = x + resetButton.getWidth();
+            this.textFieldWidget.x = x + resetButton.getWidth() + 1;
         } else {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), x, y + 6, getPreferredTextColor());
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
