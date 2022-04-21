@@ -35,12 +35,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
@@ -126,7 +124,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             listWidget.children().addAll((List) Lists.newArrayList(categorizedEntries.values()).get(selectedCategoryIndex));
         }
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addRenderableWidget(quitButton = new Button(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? new TranslatableComponent("text.cloth-config.cancel_discard") : new TranslatableComponent("gui.cancel"), widget -> quit()));
+        addRenderableWidget(quitButton = new Button(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()));
         addRenderableWidget(saveButton = new Button(width / 2 + 3, height - 26, buttonWidths, 20, NarratorChatListener.NO_TITLE, button -> saveAll(true)) {
             @Override
             public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
@@ -141,7 +139,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                         break;
                 }
                 active = isEdited() && !hasErrors;
-                setMessage(hasErrors ? new TranslatableComponent("text.cloth-config.error_cannot_save") : new TranslatableComponent("text.cloth-config.save_and_done"));
+                setMessage(hasErrors ? Component.translatable("text.cloth-config.error_cannot_save") : Component.translatable("text.cloth-config.save_and_done"));
                 super.render(matrices, mouseX, mouseY, delta);
             }
         });

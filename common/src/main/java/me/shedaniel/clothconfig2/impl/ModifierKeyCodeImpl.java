@@ -25,7 +25,6 @@ import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 
 @Environment(EnvType.CLIENT)
 public class ModifierKeyCodeImpl implements ModifierKeyCode {
@@ -68,11 +67,11 @@ public class ModifierKeyCodeImpl implements ModifierKeyCode {
     public Component getLocalizedName() {
         Component base = this.keyCode.getDisplayName();
         if (modifier.hasShift())
-            base = new TranslatableComponent("modifier.cloth-config.shift", base);
+            base = Component.translatable("modifier.cloth-config.shift", base);
         if (modifier.hasControl())
-            base = new TranslatableComponent("modifier.cloth-config.ctrl", base);
+            base = Component.translatable("modifier.cloth-config.ctrl", base);
         if (modifier.hasAlt())
-            base = new TranslatableComponent("modifier.cloth-config.alt", base);
+            base = Component.translatable("modifier.cloth-config.alt", base);
         return base;
     }
     

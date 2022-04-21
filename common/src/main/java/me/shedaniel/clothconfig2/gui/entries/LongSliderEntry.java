@@ -32,7 +32,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -53,7 +52,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     private long minimum, maximum;
     private final Consumer<Long> saveConsumer;
     private final Supplier<Long> defaultValue;
-    private Function<Long, Component> textGetter = value -> new TextComponent(String.format("Value: %d", value));
+    private Function<Long, Component> textGetter = value -> Component.literal(String.format("Value: %d", value));
     private final List<AbstractWidget> widgets;
     
     @ApiStatus.Internal

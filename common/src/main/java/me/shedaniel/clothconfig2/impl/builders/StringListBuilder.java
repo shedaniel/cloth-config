@@ -23,8 +23,6 @@ import me.shedaniel.clothconfig2.gui.entries.StringListListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -42,7 +40,7 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
     private final List<String> value;
     private boolean expanded = false;
     private Function<StringListListEntry, StringListListEntry.StringListCell> createNewInstance;
-    private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
+    private Component addTooltip = Component.translatable("text.cloth-config.list.add"), removeTooltip = Component.translatable("text.cloth-config.list.remove");
     private boolean deleteButtonEnabled = true, insertInFront = false;
     
     public StringListBuilder(Component resetButtonKey, Component fieldNameKey, List<String> value) {

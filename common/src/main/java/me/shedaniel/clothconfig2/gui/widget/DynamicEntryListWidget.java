@@ -20,7 +20,6 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
@@ -30,8 +29,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.AbstractSelectionList;
-import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -40,7 +37,7 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
@@ -116,7 +113,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             }
         }
         
-        narrationElementOutput.add(NarratedElementType.USAGE, new TranslatableComponent("narration.component_list.usage"));
+        narrationElementOutput.add(NarratedElementType.USAGE, Component.translatable("narration.component_list.usage"));
     }
     
     protected void narrateListElementPosition(NarrationElementOutput narrationElementOutput, E entry) {
@@ -124,7 +121,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         if (list.size() > 1) {
             int i = list.indexOf(entry);
             if (i != -1) {
-                narrationElementOutput.add(NarratedElementType.POSITION, new TranslatableComponent("narrator.position.list", i + 1, list.size()));
+                narrationElementOutput.add(NarratedElementType.POSITION, Component.translatable("narrator.position.list", i + 1, list.size()));
             }
         }
     }
@@ -585,9 +582,9 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                 }
                 
                 if (list.size() > 1) {
-                    narrationElementOutput.add(NarratedElementType.POSITION, new TranslatableComponent("narrator.position.object_list", narratableSearchResult.index + 1, list.size()));
+                    narrationElementOutput.add(NarratedElementType.POSITION, Component.translatable("narrator.position.object_list", narratableSearchResult.index + 1, list.size()));
                     if (narratableSearchResult.priority == NarrationPriority.FOCUSED) {
-                        narrationElementOutput.add(NarratedElementType.USAGE, new TranslatableComponent("narration.component_list.usage"));
+                        narrationElementOutput.add(NarratedElementType.USAGE, Component.translatable("narration.component_list.usage"));
                     }
                 }
                 

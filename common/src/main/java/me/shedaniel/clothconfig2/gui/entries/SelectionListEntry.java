@@ -32,7 +32,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -96,7 +95,7 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
         });
         this.saveConsumer = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
-        this.nameProvider = nameProvider == null ? (t -> new TranslatableComponent(t instanceof Translatable ? ((Translatable) t).getKey() : t.toString())) : nameProvider;
+        this.nameProvider = nameProvider == null ? (t -> Component.translatable(t instanceof Translatable ? ((Translatable) t).getKey() : t.toString())) : nameProvider;
     }
     
     @Override

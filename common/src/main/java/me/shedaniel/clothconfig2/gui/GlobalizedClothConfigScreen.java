@@ -41,8 +41,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
@@ -92,7 +90,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         int max = 0;
         for (Reference reference : references) {
             Component referenceText = reference.getText();
-            int width = font.width(new TextComponent(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(referenceText));
+            int width = font.width(Component.literal(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(referenceText));
             if (width > max) max = width;
         }
         return Math.min(max + 8, width / 4);
@@ -147,7 +145,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             this.listWidget.children().addAll((List) entries);
         });
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addRenderableWidget(cancelButton = new Button(0, height - 26, buttonWidths, 20, isEdited() ? new TranslatableComponent("text.cloth-config.cancel_discard") : new TranslatableComponent("gui.cancel"), widget -> quit()));
+        addRenderableWidget(cancelButton = new Button(0, height - 26, buttonWidths, 20, isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()));
         addRenderableWidget(exitButton = new Button(0, height - 26, buttonWidths, 20, NarratorChatListener.NO_TITLE, button -> saveAll(true)) {
             @Override
             public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
@@ -162,7 +160,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
                     }
                 }
                 active = isEdited() && !hasErrors;
-                setMessage(hasErrors ? new TranslatableComponent("text.cloth-config.error_cannot_save") : new TranslatableComponent("text.cloth-config.save_and_done"));
+                setMessage(hasErrors ? Component.translatable("text.cloth-config.error_cannot_save") : Component.translatable("text.cloth-config.save_and_done"));
                 super.render(matrices, mouseX, mouseY, delta);
             }
         });
@@ -278,7 +276,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
                 for (Reference reference : references) {
                     matrices.pushPose();
                     matrices.scale(reference.getScale(), reference.getScale(), reference.getScale());
-                    MutableComponent text = new TextComponent(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(reference.getText());
+                    MutableComponent text = Component.literal(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(reference.getText());
                     if (lastHoveredReference == null && new Rectangle(scrollerBounds.x, (int) (scrollOffset - 4 * reference.getScale()), (int) (font.width(text) * reference.getScale()), (int) ((font.lineHeight + 4) * reference.getScale())).contains(mouseX, mouseY))
                         lastHoveredReference = reference;
                     font.draw(matrices, text.getVisualOrderText(), scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
@@ -336,7 +334,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         private final int height;
         
         public EmptyEntry(int height) {
-            super(new TextComponent(UUID.randomUUID().toString()), false);
+            super(Component.literal(UUID.randomUUID().toString()), false);
             this.height = height;
         }
         
@@ -382,7 +380,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         private final Component text;
         
         public CategoryTextEntry(Component category, Component text) {
-            super(new TextComponent(UUID.randomUUID().toString()), false);
+            super(Component.literal(UUID.randomUUID().toString()), false);
             this.category = category;
             this.text = text;
         }

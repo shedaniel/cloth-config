@@ -5,7 +5,7 @@ plugins {
 }
 
 loom {
-    accessWidener = file("src/main/resources/cloth-config.accessWidener")
+    accessWidenerPath = file("src/main/resources/cloth-config.accessWidener")
 }
 
 architectury {
@@ -52,7 +52,7 @@ dependencies {
     modCompileOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
-    modRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
+    modRuntimeOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
 
@@ -114,8 +114,7 @@ curseforge {
         project {
             id = project.curseforge_id_fabric
             releaseType = "beta"
-            addGameVersion "1.18"
-            addGameVersion "1.18-Snapshot"
+            addGameVersion "1.19-Snapshot"
             addGameVersion "Java 17"
             addGameVersion "Fabric"
             // may be needed in the future, but not right now

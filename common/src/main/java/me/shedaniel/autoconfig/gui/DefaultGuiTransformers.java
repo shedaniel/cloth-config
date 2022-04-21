@@ -29,8 +29,6 @@ import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,14 +57,14 @@ public class DefaultGuiTransformers {
                                     tryApplyTooltip(
                                             gui,
                                             new Component[]{
-                                                    new TranslatableComponent(String.format("%s.%s", i18n, "@Tooltip"))
+                                                    Component.translatable(String.format("%s.%s", i18n, "@Tooltip"))
                                             }
                                     );
                                 } else {
                                     tryApplyTooltip(
                                             gui, IntStream.range(0, tooltip.count()).boxed()
                                                     .map(i -> String.format("%s.%s[%d]", i18n, "@Tooltip", i))
-                                                    .map(TranslatableComponent::new)
+                                                    .map(Component::translatable)
                                                     .toArray(Component[]::new)
                                     );
                                 }
@@ -81,7 +79,7 @@ public class DefaultGuiTransformers {
                         .peek(gui -> {
                             if (!(gui instanceof TextListEntry)) {
                                 Comment tooltip = field.getAnnotation(Comment.class);
-                                Component[] text = new Component[]{new TextComponent(tooltip.value())};
+                                Component[] text = new Component[]{Component.literal(tooltip.value())};
                                 tryApplyTooltip(gui, text);
                             }
                         })
@@ -105,7 +103,7 @@ public class DefaultGuiTransformers {
                 (guis, i18n, field, config, defaults, guiProvider) -> {
                     ArrayList<AbstractConfigListEntry> ret = new ArrayList<>(guis);
                     String text = String.format("%s.%s", i18n, "@PrefixText");
-                    ret.add(0, ENTRY_BUILDER.startTextDescription(new TranslatableComponent(text)).build());
+                    ret.add(0, ENTRY_BUILDER.startTextDescription(Component.translatable(text)).build());
                     return Collections.unmodifiableList(ret);
                 },
                 ConfigEntry.Gui.PrefixText.class

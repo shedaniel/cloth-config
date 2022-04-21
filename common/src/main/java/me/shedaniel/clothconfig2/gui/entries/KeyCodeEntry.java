@@ -33,7 +33,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -134,7 +133,7 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
         this.buttonWidget.y = y;
         this.buttonWidget.setMessage(getLocalizedName());
         if (getConfigScreen().getFocusedBinding() == this)
-            this.buttonWidget.setMessage(new TextComponent("> ").withStyle(ChatFormatting.WHITE).append(this.buttonWidget.getMessage().plainCopy().withStyle(ChatFormatting.YELLOW)).append(new TextComponent(" <").withStyle(ChatFormatting.WHITE)));
+            this.buttonWidget.setMessage(Component.literal("> ").withStyle(ChatFormatting.WHITE).append(this.buttonWidget.getMessage().plainCopy().withStyle(ChatFormatting.YELLOW)).append(Component.literal(" <").withStyle(ChatFormatting.WHITE)));
         Component displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().font.isBidirectional()) {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, 16777215);

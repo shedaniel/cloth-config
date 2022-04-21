@@ -20,7 +20,6 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
@@ -35,7 +34,6 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.ApiStatus;
@@ -208,7 +206,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         List<Component> errors = entries.stream().map(AbstractConfigListEntry::getConfigError).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
         
         if (errors.size() > 1)
-            return Optional.of(new TranslatableComponent("text.cloth-config.multi_error"));
+            return Optional.of(Component.translatable("text.cloth-config.multi_error"));
         else
             return errors.stream().findFirst();
     }

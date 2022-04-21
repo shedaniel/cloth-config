@@ -34,7 +34,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.chat.NarratorChatListener;
-import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Widget;
@@ -43,8 +42,6 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -427,7 +424,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             
             if (currentElements.isEmpty()) {
                 Font textRenderer = Minecraft.getInstance().font;
-                Component text = new TranslatableComponent("text.cloth-config.dropdown.value.unknown");
+                Component text = Component.translatable("text.cloth-config.dropdown.value.unknown");
                 textRenderer.drawShadow(matrices, text.getVisualOrderText(), lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.width(text) / 2f, lastRectangle.y + lastRectangle.height + 3, -1);
             }
             
@@ -563,7 +560,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         public DefaultSelectionCellCreator() {
-            this(r -> new TextComponent(r.toString()));
+            this(r -> Component.literal(r.toString()));
         }
         
         @Override
@@ -785,14 +782,14 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         @Override
         public Component getSearchTerm() {
-            return new TextComponent(textFieldWidget.getValue());
+            return Component.literal(textFieldWidget.getValue());
         }
         
         @Override
         public Optional<Component> getError() {
             if (toObjectFunction.apply(textFieldWidget.getValue()) != null)
                 return Optional.empty();
-            return Optional.of(new TextComponent("Invalid Value!"));
+            return Optional.of(Component.literal("Invalid Value!"));
         }
         
         @Override

@@ -22,7 +22,6 @@ package me.shedaniel.clothconfig2.gui.entries;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
@@ -33,7 +32,7 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public class EnumListEntry<T extends Enum<?>> extends SelectionListEntry<T> {
     
-    public static final Function<Enum, Component> DEFAULT_NAME_PROVIDER = t -> new TranslatableComponent(t instanceof Translatable ? ((Translatable) t).getKey() : t.toString());
+    public static final Function<Enum, Component> DEFAULT_NAME_PROVIDER = t -> Component.translatable(t instanceof Translatable ? ((Translatable) t).getKey() : t.toString());
     
     @ApiStatus.Internal
     @Deprecated

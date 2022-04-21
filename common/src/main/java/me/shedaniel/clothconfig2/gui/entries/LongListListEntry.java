@@ -22,7 +22,6 @@ package me.shedaniel.clothconfig2.gui.entries;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -105,11 +104,11 @@ public class LongListListEntry extends AbstractTextFieldListListEntry<Long, Long
             try {
                 long l = Long.parseLong(widget.getValue());
                 if (l > listListEntry.maximum)
-                    return Optional.of(new TranslatableComponent("text.cloth-config.error.too_large", listListEntry.maximum));
+                    return Optional.of(Component.translatable("text.cloth-config.error.too_large", listListEntry.maximum));
                 else if (l < listListEntry.minimum)
-                    return Optional.of(new TranslatableComponent("text.cloth-config.error.too_small", listListEntry.minimum));
+                    return Optional.of(Component.translatable("text.cloth-config.error.too_small", listListEntry.minimum));
             } catch (NumberFormatException ex) {
-                return Optional.of(new TranslatableComponent("text.cloth-config.error.not_valid_number_long"));
+                return Optional.of(Component.translatable("text.cloth-config.error.not_valid_number_long"));
             }
             return Optional.empty();
         }

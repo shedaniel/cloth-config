@@ -31,7 +31,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -126,7 +125,7 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     }
     
     public Component getYesNoText(boolean bool) {
-        return new TranslatableComponent("text.cloth-config.boolean.value." + bool);
+        return Component.translatable("text.cloth-config.boolean.value." + bool);
     }
     
     @Override

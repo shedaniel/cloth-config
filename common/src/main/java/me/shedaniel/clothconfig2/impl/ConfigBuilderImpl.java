@@ -31,7 +31,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -44,7 +43,7 @@ import java.util.function.Consumer;
 public class ConfigBuilderImpl implements ConfigBuilder {
     private Runnable savingRunnable;
     private Screen parent;
-    private Component title = new TranslatableComponent("text.cloth-config.config");
+    private Component title = Component.translatable("text.cloth-config.config");
     private boolean globalized = false;
     private boolean globalizedExpanded = true;
     private boolean editable = true;

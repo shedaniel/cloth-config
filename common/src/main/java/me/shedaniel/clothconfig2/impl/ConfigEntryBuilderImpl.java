@@ -28,8 +28,6 @@ import me.shedaniel.clothconfig2.impl.builders.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +35,7 @@ import java.util.UUID;
 @Environment(EnvType.CLIENT)
 public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     
-    private Component resetButtonKey = new TranslatableComponent("text.cloth-config.reset_value");
+    private Component resetButtonKey = Component.translatable("text.cloth-config.reset_value");
     
     private ConfigEntryBuilderImpl() {
     }
@@ -125,7 +123,7 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     
     @Override
     public TextDescriptionBuilder startTextDescription(Component value) {
-        return new TextDescriptionBuilder(resetButtonKey, new TextComponent(UUID.randomUUID().toString()), value);
+        return new TextDescriptionBuilder(resetButtonKey, Component.literal(UUID.randomUUID().toString()), value);
     }
     
     @Override

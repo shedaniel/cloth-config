@@ -32,7 +32,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -53,7 +52,7 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     private int minimum, maximum;
     private final Consumer<Integer> saveConsumer;
     private final Supplier<Integer> defaultValue;
-    private Function<Integer, Component> textGetter = integer -> new TextComponent(String.format("Value: %d", integer));
+    private Function<Integer, Component> textGetter = integer -> Component.literal(String.format("Value: %d", integer));
     private final List<AbstractWidget> widgets;
     
     @ApiStatus.Internal

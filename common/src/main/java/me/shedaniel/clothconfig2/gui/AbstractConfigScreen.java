@@ -41,7 +41,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -321,7 +320,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     
     protected final boolean quit() {
         if (confirmSave && isEdited())
-            minecraft.setScreen(new ConfirmScreen(new QuitSaveConsumer(), new TranslatableComponent("text.cloth-config.quit_config"), new TranslatableComponent("text.cloth-config.quit_config_sure"), new TranslatableComponent("text.cloth-config.quit_discard"), new TranslatableComponent("gui.cancel")));
+            minecraft.setScreen(new ConfirmScreen(new QuitSaveConsumer(), Component.translatable("text.cloth-config.quit_config"), Component.translatable("text.cloth-config.quit_config_sure"), Component.translatable("text.cloth-config.quit_discard"), Component.translatable("gui.cancel")));
         else
             minecraft.setScreen(parent);
         return true;
@@ -341,7 +340,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     public void tick() {
         super.tick();
         boolean edited = isEdited();
-        Optional.ofNullable(getQuitButton()).ifPresent(button -> button.setMessage(edited ? new TranslatableComponent("text.cloth-config.cancel_discard") : new TranslatableComponent("gui.cancel")));
+        Optional.ofNullable(getQuitButton()).ifPresent(button -> button.setMessage(edited ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel")));
         for (GuiEventListener child : children()) {
             if (child instanceof EditBox box)
                 box.tick();

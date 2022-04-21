@@ -23,7 +23,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
@@ -125,11 +124,11 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
         try {
             int i = Integer.parseInt(textFieldWidget.getValue());
             if (i > maximum)
-                return Optional.of(new TranslatableComponent("text.cloth-config.error.too_large", maximum));
+                return Optional.of(Component.translatable("text.cloth-config.error.too_large", maximum));
             else if (i < minimum)
-                return Optional.of(new TranslatableComponent("text.cloth-config.error.too_small", minimum));
+                return Optional.of(Component.translatable("text.cloth-config.error.too_small", minimum));
         } catch (NumberFormatException ex) {
-            return Optional.of(new TranslatableComponent("text.cloth-config.error.not_valid_number_int"));
+            return Optional.of(Component.translatable("text.cloth-config.error.not_valid_number_int"));
         }
         return super.getError();
     }

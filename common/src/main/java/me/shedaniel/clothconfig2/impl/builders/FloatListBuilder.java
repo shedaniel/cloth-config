@@ -23,8 +23,6 @@ import me.shedaniel.clothconfig2.gui.entries.FloatListListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -43,7 +41,7 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
     private boolean expanded = false;
     private Float min = null, max = null;
     private Function<FloatListListEntry, FloatListListEntry.FloatListCell> createNewInstance;
-    private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
+    private Component addTooltip = Component.translatable("text.cloth-config.list.add"), removeTooltip = Component.translatable("text.cloth-config.list.remove");
     private boolean deleteButtonEnabled = true, insertInFront = false;
     
     public FloatListBuilder(Component resetButtonKey, Component fieldNameKey, List<Float> value) {

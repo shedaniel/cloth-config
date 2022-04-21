@@ -30,7 +30,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.lang.reflect.Field;
@@ -93,7 +92,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         
         String i18n = i18nFunction.apply(manager);
         
-        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(new TranslatableComponent(String.format("%s.title", i18n))).setSavingRunnable(manager::save);
+        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(Component.translatable(String.format("%s.title", i18n))).setSavingRunnable(manager::save);
         
         Class<T> configClass = manager.getConfigClass();
         
@@ -147,7 +146,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         if (field.isAnnotationPresent(ConfigEntry.Category.class))
             categoryName = field.getAnnotation(ConfigEntry.Category.class).value();
         
-        Component categoryKey = new TranslatableComponent(categoryFunction.apply(baseI13n, categoryName));
+        Component categoryKey = Component.translatable(categoryFunction.apply(baseI13n, categoryName));
         
         if (!screenBuilder.hasCategory(categoryKey)) {
             ConfigCategory category = screenBuilder.getOrCreateCategory(categoryKey);

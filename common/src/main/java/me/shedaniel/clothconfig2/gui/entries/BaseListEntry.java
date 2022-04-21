@@ -20,7 +20,6 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.Expandable;
@@ -33,10 +32,8 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.ApiStatus;
@@ -73,7 +70,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     @NotNull protected Function<SELF, C> createNewInstance;
     @NotNull protected Supplier<List<T>> defaultValue;
     @Nullable
-    protected Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
+    protected Component addTooltip = Component.translatable("text.cloth-config.list.add"), removeTooltip = Component.translatable("text.cloth-config.list.remove");
     
     @ApiStatus.Internal
     public BaseListEntry(@NotNull Component fieldName, @Nullable Supplier<Optional<Component[]>> tooltipSupplier, @Nullable Supplier<List<T>> defaultValue, @NotNull Function<SELF, C> createNewInstance, @Nullable Consumer<List<T>> saveConsumer, Component resetButtonKey) {
@@ -226,7 +223,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         List<Component> errors = cells.stream().map(C::getConfigError).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
         
         if (errors.size() > 1)
-            return Optional.of(new TranslatableComponent("text.cloth-config.multi_error"));
+            return Optional.of(Component.translatable("text.cloth-config.multi_error"));
         else
             return errors.stream().findFirst();
     }

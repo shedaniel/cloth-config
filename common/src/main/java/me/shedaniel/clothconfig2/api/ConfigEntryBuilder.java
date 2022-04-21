@@ -33,7 +33,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.network.chat.TextComponent;
 
 import java.util.List;
 import java.util.function.Function;
@@ -142,7 +141,7 @@ public interface ConfigEntryBuilder {
     }
     
     default DropdownMenuBuilder<String> startStringDropdownMenu(Component fieldNameKey, String value, SelectionCellCreator<String> cellCreator) {
-        return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, s -> s, TextComponent::new), cellCreator);
+        return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, s -> s, Component::literal), cellCreator);
     }
     
     default DropdownMenuBuilder<String> startStringDropdownMenu(Component fieldNameKey, String value, Function<String, Component> toTextFunction, SelectionCellCreator<String> cellCreator) {
@@ -150,7 +149,7 @@ public interface ConfigEntryBuilder {
     }
     
     default DropdownMenuBuilder<String> startStringDropdownMenu(Component fieldNameKey, String value) {
-        return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, s -> s, TextComponent::new), new DefaultSelectionCellCreator<>());
+        return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, s -> s, Component::literal), new DefaultSelectionCellCreator<>());
     }
     
     default DropdownMenuBuilder<String> startStringDropdownMenu(Component fieldNameKey, String value, Function<String, Component> toTextFunction) {

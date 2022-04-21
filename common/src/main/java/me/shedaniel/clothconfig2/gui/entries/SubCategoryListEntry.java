@@ -20,7 +20,6 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
@@ -36,7 +35,6 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
@@ -211,7 +209,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
             Optional<Component> configError = entry.getConfigError();
             if (configError.isPresent()) {
                 if (error != null)
-                    return Optional.ofNullable(new TranslatableComponent("text.cloth-config.multi_error"));
+                    return Optional.ofNullable(Component.translatable("text.cloth-config.multi_error"));
                 return configError;
             }
         }

@@ -31,7 +31,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -174,7 +173,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         private static final ItemStack BARRIER = new ItemStack(Items.BARRIER);
         
         public static <T> SelectionTopCellElement<T> of(T value, Function<String, T> toObjectFunction) {
-            return of(value, toObjectFunction, t -> new TextComponent(t.toString()));
+            return of(value, toObjectFunction, t -> Component.literal(t.toString()));
         }
         
         public static <T> SelectionTopCellElement<T> of(T value, Function<String, T> toObjectFunction, Function<T, Component> toTextFunction) {
@@ -182,7 +181,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         }
         
         public static SelectionTopCellElement<ResourceLocation> ofItemIdentifier(Item item) {
-            return new DefaultSelectionTopCellElement<ResourceLocation>(Registry.ITEM.getKey(item), ITEM_IDENTIFIER_FUNCTION, identifier -> new TextComponent(identifier.toString())) {
+            return new DefaultSelectionTopCellElement<ResourceLocation>(Registry.ITEM.getKey(item), ITEM_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
                     textFieldWidget.x = x + 4;
@@ -199,7 +198,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         }
         
         public static SelectionTopCellElement<ResourceLocation> ofBlockIdentifier(Block block) {
-            return new DefaultSelectionTopCellElement<ResourceLocation>(Registry.BLOCK.getKey(block), BLOCK_IDENTIFIER_FUNCTION, identifier -> new TextComponent(identifier.toString())) {
+            return new DefaultSelectionTopCellElement<ResourceLocation>(Registry.BLOCK.getKey(block), BLOCK_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
                     textFieldWidget.x = x + 4;
@@ -216,7 +215,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         }
         
         public static SelectionTopCellElement<Item> ofItemObject(Item item) {
-            return new DefaultSelectionTopCellElement<Item>(item, ITEM_FUNCTION, i -> new TextComponent(Registry.ITEM.getKey(i).toString())) {
+            return new DefaultSelectionTopCellElement<Item>(item, ITEM_FUNCTION, i -> Component.literal(Registry.ITEM.getKey(i).toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
                     textFieldWidget.x = x + 4;
@@ -233,7 +232,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         }
         
         public static SelectionTopCellElement<Block> ofBlockObject(Block block) {
-            return new DefaultSelectionTopCellElement<Block>(block, BLOCK_FUNCTION, i -> new TextComponent(Registry.BLOCK.getKey(i).toString())) {
+            return new DefaultSelectionTopCellElement<Block>(block, BLOCK_FUNCTION, i -> Component.literal(Registry.BLOCK.getKey(i).toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
                     textFieldWidget.x = x + 4;
@@ -467,7 +466,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         }
         
         public static SelectionCellCreator<Item> ofItemObject(int cellHeight, int cellWidth, int maxItems) {
-            return new DefaultSelectionCellCreator<Item>(i -> new TextComponent(Registry.ITEM.getKey(i).toString())) {
+            return new DefaultSelectionCellCreator<Item>(i -> Component.literal(Registry.ITEM.getKey(i).toString())) {
                 @Override
                 public DropdownBoxEntry.SelectionCellElement<Item> create(Item selection) {
                     ItemStack s = new ItemStack(selection);
@@ -515,7 +514,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>>
         }
         
         public static SelectionCellCreator<Block> ofBlockObject(int cellHeight, int cellWidth, int maxItems) {
-            return new DefaultSelectionCellCreator<Block>(i -> new TextComponent(Registry.BLOCK.getKey(i).toString())) {
+            return new DefaultSelectionCellCreator<Block>(i -> Component.literal(Registry.BLOCK.getKey(i).toString())) {
                 @Override
                 public DropdownBoxEntry.SelectionCellElement<Block> create(Block selection) {
                     ItemStack s = new ItemStack(selection);
