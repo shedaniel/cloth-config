@@ -28,22 +28,22 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.Map;
 
 public abstract class AbstractTabbedConfigScreen extends AbstractConfigScreen implements TabbedConfigScreen {
-    private final Map<Component, ResourceLocation> categoryBackgroundLocation = Maps.newHashMap();
+    private final Map<String, ResourceLocation> categoryBackgroundLocation = Maps.newHashMap();
     
     protected AbstractTabbedConfigScreen(Screen parent, Component title, ResourceLocation backgroundLocation) {
         super(parent, title, backgroundLocation);
     }
     
     @Override
-    public final void registerCategoryBackground(Component text, ResourceLocation identifier) {
+    public final void registerCategoryBackground(String text, ResourceLocation identifier) {
         this.categoryBackgroundLocation.put(text, identifier);
     }
     
     @Override
     public ResourceLocation getBackgroundLocation() {
         Component selectedCategory = getSelectedCategory();
-        if (categoryBackgroundLocation.containsKey(selectedCategory))
-            return categoryBackgroundLocation.get(selectedCategory);
+        if (categoryBackgroundLocation.containsKey(selectedCategory.getString()))
+            return categoryBackgroundLocation.get(selectedCategory.getString());
         return super.getBackgroundLocation();
     }
 }

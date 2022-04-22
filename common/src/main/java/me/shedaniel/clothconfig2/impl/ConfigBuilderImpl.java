@@ -53,8 +53,8 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean transparentBackground = false;
     private ResourceLocation defaultBackground = GuiComponent.BACKGROUND_LOCATION;
     private Consumer<Screen> afterInitConsumer = screen -> {};
-    private final Map<Component, ConfigCategory> categoryMap = Maps.newLinkedHashMap();
-    private Component fallbackCategory = null;
+    private final Map<String, ConfigCategory> categoryMap = Maps.newLinkedHashMap();
+    private String fallbackCategory = null;
     private boolean alwaysShowTabs = false;
     
     @ApiStatus.Internal
@@ -102,7 +102,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     
     @Override
     public ConfigBuilder setFallbackCategory(ConfigCategory fallbackCategory) {
-        this.fallbackCategory = Objects.requireNonNull(fallbackCategory).getCategoryKey();
+        this.fallbackCategory = Objects.requireNonNull(fallbackCategory).getCategoryKey().getString();
         return this;
     }
     
@@ -141,34 +141,34 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     
     @Override
     public ConfigCategory getOrCreateCategory(Component categoryKey) {
-        if (categoryMap.containsKey(categoryKey))
-            return categoryMap.get(categoryKey);
+        if (categoryMap.containsKey(categoryKey.getString()))
+            return categoryMap.get(categoryKey.getString());
         if (fallbackCategory == null)
-            fallbackCategory = categoryKey;
-        return categoryMap.computeIfAbsent(categoryKey, key -> new ConfigCategoryImpl(this, categoryKey));
+            fallbackCategory = categoryKey.getString();
+        return categoryMap.computeIfAbsent(categoryKey.getString(), key -> new ConfigCategoryImpl(this, categoryKey));
     }
     
     @Override
     public ConfigBuilder removeCategory(Component category) {
-        if (categoryMap.containsKey(category) && fallbackCategory.equals(category))
+        if (categoryMap.containsKey(category.getString()) && Objects.equals(fallbackCategory, category.getString()))
             fallbackCategory = null;
-        if (!categoryMap.containsKey(category))
+        if (!categoryMap.containsKey(category.getString()))
             throw new NullPointerException("Category doesn't exist!");
-        categoryMap.remove(category);
+        categoryMap.remove(category.getString());
         return this;
     }
     
     @Override
     public ConfigBuilder removeCategoryIfExists(Component category) {
-        if (categoryMap.containsKey(category) && fallbackCategory.equals(category))
+        if (categoryMap.containsKey(category.getString()) && Objects.equals(fallbackCategory, category.getString()))
             fallbackCategory = null;
-        categoryMap.remove(category);
+        categoryMap.remove(category.getString());
         return this;
     }
     
     @Override
     public boolean hasCategory(Component category) {
-        return categoryMap.containsKey(category);
+        return categoryMap.containsKey(category.getString());
     }
     
     @Override
@@ -238,7 +238,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
         }
         screen.setSavingRunnable(savingRunnable);
         screen.setEditable(editable);
-        screen.setFallbackCategory(fallbackCategory);
+        screen.setFallbackCategory(fallbackCategory == null ? null : Component.literal(fallbackCategory));
         screen.setTransparentBackground(transparentBackground);
         screen.setAlwaysShowTabs(alwaysShowTabs);
         screen.setConfirmSave(doesConfirmSave);

@@ -50,7 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"deprecation", "rawtypes", "DuplicatedCode"})
+@SuppressWarnings({"deprecation", "rawtypes", "DuplicatedCode", "NullableProblems"})
 @Environment(EnvType.CLIENT)
 public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     private final ScrollingContainer tabsScroller = new ScrollingContainer() {
@@ -77,10 +77,10 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     private Rectangle tabsBounds, tabsLeftBounds, tabsRightBounds;
     private double tabsMaximumScrolled = -1d;
     private final List<ClothConfigTabButton> tabButtons = Lists.newArrayList();
-    private final Map<Component, ConfigCategory> categoryMap;
+    private final Map<String, ConfigCategory> categoryMap;
     
     @ApiStatus.Internal
-    public ClothConfigScreen(Screen parent, Component title, Map<Component, ConfigCategory> categoryMap, ResourceLocation backgroundLocation) {
+    public ClothConfigScreen(Screen parent, Component title, Map<String, ConfigCategory> categoryMap, ResourceLocation backgroundLocation) {
         super(parent, title, backgroundLocation);
         categoryMap.forEach((categoryName, category) -> {
             List<AbstractConfigEntry<?>> entries = Lists.newArrayList();
@@ -94,9 +94,9 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 entry.setScreen(this);
                 entries.add(entry);
             }
-            categorizedEntries.put(categoryName, entries);
+            categorizedEntries.put(category.getCategoryKey(), entries);
             if (category.getBackground() != null) {
-                registerCategoryBackground(categoryName, category.getBackground());
+                registerCategoryBackground(category.getCategoryKey().getString(), category.getBackground());
             }
         });
         
@@ -163,7 +163,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             });
             int j = 0;
             for (Tuple<Component, Integer> tab : tabs) {
-                tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getB(), 20, tab.getA(), this.categoryMap.get(tab.getA()).getDescription()));
+                tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getB(), 20, tab.getA(), this.categoryMap.get(tab.getA().getString()).getDescription()));
                 j++;
             }
             childrenL().addAll(tabButtons);

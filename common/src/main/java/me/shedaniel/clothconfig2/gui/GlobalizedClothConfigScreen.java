@@ -98,7 +98,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     private boolean requestingReferenceRebuilding = false;
     
     @ApiStatus.Internal
-    public GlobalizedClothConfigScreen(Screen parent, Component title, Map<Component, ConfigCategory> categoryMap, ResourceLocation backgroundLocation) {
+    public GlobalizedClothConfigScreen(Screen parent, Component title, Map<String, ConfigCategory> categoryMap, ResourceLocation backgroundLocation) {
         super(parent, title, backgroundLocation);
         categoryMap.forEach((categoryName, category) -> {
             List<AbstractConfigEntry<?>> entries = Lists.newArrayList();
@@ -112,7 +112,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
                 entry.setScreen(this);
                 entries.add(entry);
             }
-            categorizedEntries.put(categoryName, entries);
+            categorizedEntries.put(category.getCategoryKey(), entries);
         });
         this.sideSlider.scrollTo(0, false);
     }

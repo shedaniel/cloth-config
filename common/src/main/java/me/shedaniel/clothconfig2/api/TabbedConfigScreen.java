@@ -23,7 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public interface TabbedConfigScreen extends ConfigScreen {
-    void registerCategoryBackground(Component text, ResourceLocation identifier);
+    void registerCategoryBackground(String text, ResourceLocation identifier);
     
     Component getSelectedCategory();
 }
