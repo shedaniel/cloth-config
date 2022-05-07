@@ -33,8 +33,8 @@ dependencies {
     modApi "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
-    modApi("me.shedaniel.cloth:basic-math:0.6.0")
-    include("me.shedaniel.cloth:basic-math:0.6.0")
+    modApi("me.shedaniel.cloth:basic-math:0.6.1")
+    include("me.shedaniel.cloth:basic-math:0.6.1")
 
     implementation("blue.endless:jankson:${rootProject.jankson_version}")
     implementation("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
@@ -116,8 +116,9 @@ curseforge {
         apiKey = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
         project {
             id = project.curseforge_id_fabric
-            releaseType = "beta"
+            releaseType = "release"
             addGameVersion "1.17"
+            addGameVersion "1.17.1"
             addGameVersion "Java 8"
             addGameVersion "Fabric"
             // may be needed in the future, but not right now
