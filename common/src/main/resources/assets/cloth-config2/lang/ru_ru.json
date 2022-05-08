@@ -36,7 +36,7 @@
   "modifier.cloth-config.alt": "Alt + %s",
   "modifier.cloth-config.ctrl": "Ctrl + %s",
   "modifier.cloth-config.shift": "Shift + %s",
-  "title.cloth-config.config": "Настройки Cloth Mod Config",
+  "title.cloth-config.config": "Настройки модификации Cloth",
   "category.cloth-config.scrolling": "Прокрутка",
   "category.cloth-config.testing": "Демонстрация настроек",
   "option.cloth-config.scrollDuration": "Длительность прокрутки",
@@ -44,4 +44,7 @@
   "option.cloth-config.bounceBackMultiplier": "Множитель отскока",
   "option.cloth-config.setDefaultSmoothScroll": "Установить плавную прокрутку по умолчанию",
   "option.cloth-config.disableSmoothScroll": "Отключить плавную прокрутку"
+  "text.cloth-config.testing.1": "Вы разработчик модов и хотите использовать %1$s? Чтобы начать, перейдите на %2$s. Вы также можете %3$s.",
+  "text.cloth-config.testing.2": "Cloth настройки Вики",
+  "text.cloth-config.testing.3": "щёлкните здесь, чтобы открыть файл параметров Minecraft без какой-либо конкретной причины"
 }
