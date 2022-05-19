@@ -32,8 +32,8 @@ dependencies {
 
     forge "net.minecraftforge:forge:${rootProject.architectury.minecraft}-${rootProject.forge_version}"
 
-    modRuntimeOnly("me.shedaniel.cloth:basic-math:0.6.0")
-    forgeDependencies(shadowCommon("me.shedaniel.cloth:basic-math:0.6.0"))
+    modRuntimeOnly("me.shedaniel.cloth:basic-math:0.6.1")
+    forgeDependencies(shadowCommon("me.shedaniel.cloth:basic-math:0.6.1"))
 
     forgeDependencies("cpw.mods:securejarhandler:0.9.48")
     implementation("blue.endless:jankson:${rootProject.jankson_version}")
@@ -106,6 +106,8 @@ curseforge {
             id = project.curseforge_id_forge
             releaseType = "release"
             addGameVersion "1.18"
+            addGameVersion "1.18.1"
+            addGameVersion "1.18.2"
             addGameVersion "Java 17"
             addGameVersion "Forge"
             mainArtifact(remapJar.archivePath) {
