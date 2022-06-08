@@ -52,7 +52,7 @@ dependencies {
     modCompileOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
-    modRuntimeOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
+    modLocalRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
 
