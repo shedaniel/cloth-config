@@ -105,9 +105,7 @@ curseforge {
         project {
             id = project.curseforge_id_forge
             releaseType = "release"
-            addGameVersion "1.18"
-            addGameVersion "1.18.1"
-            addGameVersion "1.18.2"
+            addGameVersion "1.19"
             addGameVersion "Java 17"
             addGameVersion "Forge"
             mainArtifact(remapJar.archivePath) {
