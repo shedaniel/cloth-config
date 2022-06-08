@@ -76,6 +76,10 @@ shadowJar {
     classifier "shadow"
 }
 
+prepareRemapJar {
+    dependsOn(shadowJar)
+}
+
 remapJar {
     dependsOn(shadowJar)
     input.set(shadowJar.archiveFile)
