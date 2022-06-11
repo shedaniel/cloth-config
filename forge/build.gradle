@@ -67,13 +67,9 @@ shadowJar {
     classifier "shadow"
 }
 
-prepareRemapJar {
-    dependsOn(shadowJar)
-}
-
 remapJar {
+    input.set(shadowJar.archiveFile)
     dependsOn(shadowJar)
-    input.set(shadowJar.archivePath)
     archiveClassifier = "forge"
 
     from rootProject.file("LICENSE.md")
