@@ -1,6 +1,6 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "7.0.0"
-    id "com.matthewprenger.cursegradle"
+    id "me.shedaniel.unified-publishing"
     id "maven-publish"
 }
 
@@ -103,27 +103,31 @@ publishing {
     }
 }
 
-curseforge {
-    if (project.hasProperty("curse_api_key") || System.getenv("curse_api_key") != null) {
-        apiKey = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
-        project {
-            id = project.curseforge_id_forge
-            releaseType = "release"
-            addGameVersion "1.19"
-            addGameVersion "Java 17"
-            addGameVersion "Forge"
-            mainArtifact(remapJar.archivePath) {
-                displayName = "[Forge $rootProject.supported_version] v$project.version"
+unifiedPublishing {
+    project {
+        displayName = "[Forge $rootProject.supported_version] v$project.version"
+        releaseType = "release"
+        gameVersions = ["1.19"]
+        gameLoaders = ["forge"]
+
+        mainPublication remapJar
+
+        if (project.hasProperty("curse_api_key") || System.getenv("curse_api_key") != null) {
+            curseforge {
+                token = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
+                id = project.curseforge_id
+                gameVersions += ["Java 17"]
             }
-            afterEvaluate {
-                uploadTask.dependsOn("build")
+        }
+
+        if (project.hasProperty("modrinth_key") || System.getenv("modrinth_key") != null) {
+            modrinth {
+                token = project.hasProperty("modrinth_key") ? project.property("modrinth_key") : System.getenv("modrinth_key")
+                id = project.modrinth_id
+                version = "$project.version+$project.name"
             }
         }
     }
-    options {
-        forgeGradleIntegration = false
-        javaVersionAutoDetect = false
-    }
 }
 
-rootProject.tasks.getByName("curseforgePublish").dependsOn tasks.getByName("curseforge")
+rootProject.tasks.getByName("modPublish").dependsOn tasks.getByName("publishUnified")

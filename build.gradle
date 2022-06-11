@@ -1,7 +1,7 @@
 plugins {
     id "architectury-plugin" version "3.4-SNAPSHOT"
     id "dev.architectury.loom" version "0.12.0-SNAPSHOT" apply false
-    id "com.matthewprenger.cursegradle" version "1.4.0" apply false
+    id "me.shedaniel.unified-publishing" version "0.1.+" apply false
     id "maven-publish"
     id "org.cadixdev.licenser" version "0.6.1" apply false
 }
@@ -57,4 +57,4 @@ allprojects {
 task licenseFormatAll
 subprojects { licenseFormatAll.dependsOn("${path}:licenseFormat") }
 
-task curseforgePublish
+task modPublish
