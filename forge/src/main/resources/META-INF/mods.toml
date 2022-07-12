@@ -13,3 +13,10 @@ displayName = "Cloth Config v4 API"
 description = '''
 An API for config screens.
 '''
+
+[[dependencies.cloth_config]]
+modId = "forge"
+mandatory = true
+versionRange = "[41.0.94,)"
+ordering = "NONE"
+side = "BOTH"
