@@ -8,7 +8,7 @@
   "text.cloth-config.config": "設置",
   "text.cloth-config.multi_error": "多個問題！",
   "text.cloth-config.not_editable": "不可編輯！",
-  "text.cloth-config.error.not_valid_number_int": "不是一個有效的數字！（整數）,
+  "text.cloth-config.error.not_valid_number_int": "不是一個有效的數字！（整數）",
   "text.cloth-config.error.not_valid_number_long": "不是一個有效的數字！（長整數）",
   "text.cloth-config.error.not_valid_number_float": "不是一個有效的數字！（浮點數）",
   "text.cloth-config.error.not_valid_number_double": "不是一個有效的數字！（双精度浮点数）",
