@@ -27,7 +27,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -59,7 +58,7 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
         this.defaultValue = defaultValue;
         this.value = value.copy();
         this.original = value.copy();
-        this.buttonWidget = new Button(0, 0, 150, 20, NarratorChatListener.NO_TITLE, widget -> {
+        this.buttonWidget = new Button(0, 0, 150, 20, Component.empty(), widget -> {
             getConfigScreen().setFocusedBinding(this);
         });
         this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {

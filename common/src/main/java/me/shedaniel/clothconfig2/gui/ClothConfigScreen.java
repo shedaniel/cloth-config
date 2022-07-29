@@ -32,7 +32,6 @@ import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -125,7 +124,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
         addRenderableWidget(quitButton = new Button(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()));
-        addRenderableWidget(saveButton = new Button(width / 2 + 3, height - 26, buttonWidths, 20, NarratorChatListener.NO_TITLE, button -> saveAll(true)) {
+        addRenderableWidget(saveButton = new Button(width / 2 + 3, height - 26, buttonWidths, 20, Component.empty(), button -> saveAll(true)) {
             @Override
             public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
@@ -148,7 +147,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             tabsBounds = new Rectangle(0, 41, width, 24);
             tabsLeftBounds = new Rectangle(0, 41, 18, 24);
             tabsRightBounds = new Rectangle(width - 18, 41, 18, 24);
-            childrenL().add(buttonLeftTab = new Button(4, 44, 12, 18, NarratorChatListener.NO_TITLE, button -> tabsScroller.scrollTo(0, true)) {
+            childrenL().add(buttonLeftTab = new Button(4, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(0, true)) {
                 @Override
                 public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -167,7 +166,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 j++;
             }
             childrenL().addAll(tabButtons);
-            childrenL().add(buttonRightTab = new Button(width - 16, 44, 12, 18, NarratorChatListener.NO_TITLE, button -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true)) {
+            childrenL().add(buttonRightTab = new Button(width - 16, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true)) {
                 @Override
                 public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);

@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "cloth-config",
-    "name": "Cloth Config v6",
+    "name": "Cloth Config v8",
     "description": "An API for config screens.",
     "version": "${version}",
     "authors": [

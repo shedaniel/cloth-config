@@ -25,7 +25,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -168,7 +167,7 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     
     private class Slider extends AbstractSliderButton {
         protected Slider(int int_1, int int_2, int int_3, int int_4, double double_1) {
-            super(int_1, int_2, int_3, int_4, NarratorChatListener.NO_TITLE, double_1);
+            super(int_1, int_2, int_3, int_4, Component.empty(), double_1);
         }
         
         @Override

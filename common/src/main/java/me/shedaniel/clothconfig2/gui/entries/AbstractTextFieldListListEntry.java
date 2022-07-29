@@ -23,7 +23,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -74,7 +73,7 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             
             final T finalValue = substituteDefault(value);
             
-            widget = new EditBox(Minecraft.getInstance().font, 0, 0, 100, 18, NarratorChatListener.NO_TITLE) {
+            widget = new EditBox(Minecraft.getInstance().font, 0, 0, 100, 18, Component.empty()) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
                     setFocused(isSelected);

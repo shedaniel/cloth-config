@@ -33,7 +33,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Widget;
@@ -288,7 +287,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         @NotNull protected ImmutableList<R> selections;
         @NotNull protected List<SelectionCellElement<R>> cells;
         @NotNull protected List<SelectionCellElement<R>> currentElements;
-        protected Component lastSearchKeyword = NarratorChatListener.NO_TITLE;
+        protected Component lastSearchKeyword = Component.empty();
         protected Rectangle lastRectangle;
         protected boolean scrolling;
         protected double scroll, target;
@@ -726,7 +725,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             this.value = Objects.requireNonNull(value);
             this.toObjectFunction = Objects.requireNonNull(toObjectFunction);
             this.toTextFunction = Objects.requireNonNull(toTextFunction);
-            textFieldWidget = new EditBox(Minecraft.getInstance().font, 0, 0, 148, 18, NarratorChatListener.NO_TITLE) {
+            textFieldWidget = new EditBox(Minecraft.getInstance().font, 0, 0, 148, 18, Component.empty()) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
                     setFocused(isSuggestionMode() && isSelected && DefaultSelectionTopCellElement.this.getParent().getFocused() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.getFocused() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.getFocused() == this);

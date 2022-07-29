@@ -25,7 +25,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -69,7 +68,7 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
         this.defaultValue = defaultValue;
         this.original = bool;
         this.bool = new AtomicBoolean(bool);
-        this.buttonWidget = new Button(0, 0, 150, 20, NarratorChatListener.NO_TITLE, widget -> {
+        this.buttonWidget = new Button(0, 0, 150, 20, Component.empty(), widget -> {
             BooleanListEntry.this.bool.set(!BooleanListEntry.this.bool.get());
         });
         this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {

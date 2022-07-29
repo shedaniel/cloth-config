@@ -20,10 +20,10 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.network.chat.Component;
 
 public class ColorDisplayWidget extends AbstractWidget {
     
@@ -32,7 +32,7 @@ public class ColorDisplayWidget extends AbstractWidget {
     protected int size;
     
     public ColorDisplayWidget(EditBox textFieldWidget, int x, int y, int size, int color) {
-        super(x, y, size, size, NarratorChatListener.NO_TITLE);
+        super(x, y, size, size, Component.empty());
         this.textFieldWidget = textFieldWidget;
         this.color = color;
         this.size = size;
