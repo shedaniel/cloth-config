@@ -19,15 +19,12 @@
 
 package me.shedaniel.clothconfig2.api.animator;
 
-import org.jetbrains.annotations.ApiStatus;
-
 /**
  * A value provider is used to provide a value for animation.
  *
  * @param <T> the type of the value
  * @see ValueAnimator
  */
-@ApiStatus.Experimental
 public interface ValueProvider<T> {
     /**
      * Returns a constant value provider, which always returns the same value.

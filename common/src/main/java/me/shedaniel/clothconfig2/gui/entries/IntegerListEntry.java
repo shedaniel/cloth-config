@@ -28,23 +28,10 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class IntegerListEntry extends TextFieldListEntry<Integer> {
-    
-    private static final Function<String, String> stripCharacters = s -> {
-        StringBuilder builder = new StringBuilder();
-        char[] var2 = s.toCharArray();
-        int var3 = var2.length;
-        
-        for (char c : var2)
-            if (Character.isDigit(c) || c == '-')
-                builder.append(c);
-        
-        return builder.toString();
-    };
+public class IntegerListEntry extends AbstractNumberListEntry<Integer> {
     private int minimum, maximum;
     private final Consumer<Integer> saveConsumer;
     
@@ -70,11 +57,6 @@ public class IntegerListEntry extends TextFieldListEntry<Integer> {
         this.minimum = -Integer.MAX_VALUE;
         this.maximum = Integer.MAX_VALUE;
         this.saveConsumer = saveConsumer;
-    }
-    
-    @Override
-    protected String stripAddText(String s) {
-        return stripCharacters.apply(s);
     }
     
     @Override

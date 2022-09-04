@@ -17,26 +17,35 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package me.shedaniel.clothconfig2.api.animator;
+package me.shedaniel.clothconfig2.impl.builders;
 
-import java.util.function.Function;
+import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import net.minecraft.network.chat.Component;
 
-public interface ProgressValueAnimator<T> extends ValueAnimator<T> {
-    double progress();
+public abstract class AbstractRangeFieldBuilder<T, A extends AbstractConfigListEntry, SELF extends FieldBuilder<T, A, SELF>> extends AbstractFieldBuilder<T, A, SELF> {
+    protected T min = null, max = null;
     
-    @Override
-    default ProgressValueAnimator<T> setAs(T value) {
-        ValueAnimator.super.setAs(value);
-        return this;
+    protected AbstractRangeFieldBuilder(Component resetButtonKey, Component fieldNameKey) {
+        super(resetButtonKey, fieldNameKey);
     }
     
-    @Override
-    ProgressValueAnimator<T> setTo(T value, long duration);
+    public SELF setMin(T min) {
+        this.min = min;
+        return (SELF) this;
+    }
     
-    @Override
-    ProgressValueAnimator<T> setTarget(T target);
+    public SELF setMax(T max) {
+        this.max = max;
+        return (SELF) this;
+    }
     
-    static <R> ProgressValueAnimator<R> mapProgress(NumberAnimator<?> parent, Function<Double, R> converter, Function<R, Double> backwardsConverter) {
-        return new MappingProgressValueAnimator<>(parent.asDouble(), converter, backwardsConverter);
+    public SELF removeMin() {
+        this.min = null;
+        return (SELF) this;
+    }
+    
+    public SELF removeMax() {
+        this.max = null;
+        return (SELF) this;
     }
 }

@@ -32,11 +32,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry> {
-    
-    @Nullable private Consumer<Boolean> saveConsumer = null;
-    @NotNull private Function<Boolean, Optional<Component[]>> tooltipSupplier = bool -> Optional.empty();
-    private final boolean value;
+public class BooleanToggleBuilder extends AbstractFieldBuilder<Boolean, BooleanListEntry, BooleanToggleBuilder> {
     @Nullable private Function<Boolean, Component> yesNoTextSupplier = null;
     
     public BooleanToggleBuilder(Component resetButtonKey, Component fieldNameKey, boolean value) {
@@ -44,24 +40,24 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
         this.value = value;
     }
     
-    public BooleanToggleBuilder setErrorSupplier(@Nullable Function<Boolean, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+    @Override
+    public BooleanToggleBuilder setErrorSupplier(Function<Boolean, Optional<Component>> errorSupplier) {
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Override
     public BooleanToggleBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requireRestart();
     }
     
+    @Override
     public BooleanToggleBuilder setSaveConsumer(Consumer<Boolean> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
+    @Override
     public BooleanToggleBuilder setDefaultValue(Supplier<Boolean> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public BooleanToggleBuilder setDefaultValue(boolean defaultValue) {
@@ -69,24 +65,24 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
         return this;
     }
     
-    public BooleanToggleBuilder setTooltipSupplier(@NotNull Function<Boolean, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+    @Override
+    public BooleanToggleBuilder setTooltipSupplier(Function<Boolean, Optional<Component[]>> tooltipSupplier) {
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
-    public BooleanToggleBuilder setTooltipSupplier(@NotNull Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = bool -> tooltipSupplier.get();
-        return this;
+    @Override
+    public BooleanToggleBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public BooleanToggleBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = bool -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
-    public BooleanToggleBuilder setTooltip(@Nullable Component... tooltip) {
-        this.tooltipSupplier = bool -> Optional.ofNullable(tooltip);
-        return this;
+    @Override
+    public BooleanToggleBuilder setTooltip(Component... tooltip) {
+        return super.setTooltip(tooltip);
     }
     
     @Nullable
@@ -102,7 +98,7 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
     @NotNull
     @Override
     public BooleanListEntry build() {
-        BooleanListEntry entry = new BooleanListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart()) {
+        BooleanListEntry entry = new BooleanListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, getSaveConsumer(), null, isRequireRestart()) {
             @Override
             public Component getYesNoText(boolean bool) {
                 if (yesNoTextSupplier == null)
@@ -110,7 +106,7 @@ public class BooleanToggleBuilder extends FieldBuilder<Boolean, BooleanListEntry
                 return yesNoTextSupplier.apply(bool);
             }
         };
-        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;

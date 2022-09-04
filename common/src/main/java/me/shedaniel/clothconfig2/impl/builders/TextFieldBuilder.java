@@ -32,68 +32,63 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class TextFieldBuilder extends FieldBuilder<String, StringListEntry> {
-    
-    private Consumer<String> saveConsumer = null;
-    private Function<String, Optional<Component[]>> tooltipSupplier = str -> Optional.empty();
-    private final String value;
-    
+public class TextFieldBuilder extends AbstractFieldBuilder<String, StringListEntry, TextFieldBuilder> {
     public TextFieldBuilder(Component resetButtonKey, Component fieldNameKey, String value) {
         super(resetButtonKey, fieldNameKey);
         Objects.requireNonNull(value);
         this.value = value;
     }
     
+    @Override
     public TextFieldBuilder setErrorSupplier(Function<String, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Override
     public TextFieldBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requireRestart();
     }
     
+    @Override
     public TextFieldBuilder setSaveConsumer(Consumer<String> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
+    @Override
     public TextFieldBuilder setDefaultValue(Supplier<String> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
+    @Override
     public TextFieldBuilder setDefaultValue(String defaultValue) {
-        this.defaultValue = () -> Objects.requireNonNull(defaultValue);
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
-    public TextFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = str -> tooltipSupplier.get();
-        return this;
-    }
-    
+    @Override
     public TextFieldBuilder setTooltipSupplier(Function<String, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
+    public TextFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
+        return super.setTooltipSupplier(tooltipSupplier);
+    }
+    
+    @Override
     public TextFieldBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = str -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
+    @Override
     public TextFieldBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @NotNull
     @Override
     public StringListEntry build() {
-        StringListEntry entry = new StringListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
-        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        StringListEntry entry = new StringListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, getSaveConsumer(), null, isRequireRestart());
+        entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;

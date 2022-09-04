@@ -31,92 +31,83 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class IntFieldBuilder extends FieldBuilder<Integer, IntegerListEntry> {
-    
-    private Consumer<Integer> saveConsumer = null;
-    private Function<Integer, Optional<Component[]>> tooltipSupplier = i -> Optional.empty();
-    private final int value;
-    private Integer min = null, max = null;
-    
+public class IntFieldBuilder extends AbstractRangeFieldBuilder<Integer, IntegerListEntry, IntFieldBuilder> {
     public IntFieldBuilder(Component resetButtonKey, Component fieldNameKey, int value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
+    @Override
     public IntFieldBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requireRestart();
     }
     
+    @Override
     public IntFieldBuilder setErrorSupplier(Function<Integer, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Override
     public IntFieldBuilder setSaveConsumer(Consumer<Integer> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
+    @Override
     public IntFieldBuilder setDefaultValue(Supplier<Integer> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public IntFieldBuilder setDefaultValue(int defaultValue) {
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
+    @Override
     public IntFieldBuilder setTooltipSupplier(Function<Integer, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public IntFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = i -> tooltipSupplier.get();
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public IntFieldBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = i -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
+    @Override
     public IntFieldBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public IntFieldBuilder setMin(int min) {
-        this.min = min;
-        return this;
+        return super.setMin(min);
     }
     
     public IntFieldBuilder setMax(int max) {
-        this.max = max;
-        return this;
+        return super.setMax(max);
     }
     
+    @Override
     public IntFieldBuilder removeMin() {
-        this.min = null;
-        return this;
+        return super.removeMin();
     }
     
+    @Override
     public IntFieldBuilder removeMax() {
-        this.max = null;
-        return this;
+        return super.removeMax();
     }
     
     @NotNull
     @Override
     public IntegerListEntry build() {
-        IntegerListEntry entry = new IntegerListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
+        IntegerListEntry entry = new IntegerListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, getSaveConsumer(), null, isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)
             entry.setMaximum(max);
-        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;

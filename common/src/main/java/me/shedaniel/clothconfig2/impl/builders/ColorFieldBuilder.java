@@ -34,13 +34,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
-    
-    private Consumer<Integer> saveConsumer = null;
-    private Function<Integer, Optional<Component>> errorSupplier;
-    private Function<Integer, Optional<Component[]>> tooltipSupplier = str -> Optional.empty();
-    private final int value;
-    private Supplier<Integer> defaultValue;
+public class ColorFieldBuilder extends AbstractFieldBuilder<Integer, ColorEntry, ColorFieldBuilder> {
     private boolean alpha = false;
     
     public ColorFieldBuilder(Component resetButtonKey, Component fieldNameKey, int value) {
@@ -48,34 +42,32 @@ public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
         this.value = value;
     }
     
+    @Override
     public ColorFieldBuilder setErrorSupplier(Function<Integer, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Override
     public ColorFieldBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requireRestart();
     }
     
+    @Override
     public ColorFieldBuilder setSaveConsumer(Consumer<Integer> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
     public ColorFieldBuilder setSaveConsumer2(Consumer<Color> saveConsumer) {
-        this.saveConsumer = integer -> saveConsumer.accept(alpha ? Color.ofTransparent(integer) : Color.ofOpaque(integer));
-        return this;
+        return super.setSaveConsumer(integer -> saveConsumer.accept(alpha ? Color.ofTransparent(integer) : Color.ofOpaque(integer)));
     }
     
     public ColorFieldBuilder setSaveConsumer3(Consumer<TextColor> saveConsumer) {
-        this.saveConsumer = integer -> saveConsumer.accept(TextColor.fromRgb(integer));
-        return this;
+        return super.setSaveConsumer(integer -> saveConsumer.accept(TextColor.fromRgb(integer)));
     }
     
+    @Override
     public ColorFieldBuilder setDefaultValue(Supplier<Integer> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public ColorFieldBuilder setDefaultValue2(Supplier<Color> defaultValue) {
@@ -103,36 +95,36 @@ public class ColorFieldBuilder extends FieldBuilder<String, ColorEntry> {
         return this;
     }
     
+    @Override
     public ColorFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = str -> tooltipSupplier.get();
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public ColorFieldBuilder setTooltipSupplier(Function<Integer, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public ColorFieldBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = str -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
+    @Override
     public ColorFieldBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = str -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @NotNull
     @Override
     public ColorEntry build() {
-        ColorEntry entry = new ColorEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
+        ColorEntry entry = new ColorEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, getSaveConsumer(), null, isRequireRestart());
         if (this.alpha) {
             entry.withAlpha();
         } else {
             entry.withoutAlpha();
         }
-        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;

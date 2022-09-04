@@ -19,11 +19,8 @@
 
 package me.shedaniel.clothconfig2.api.animator;
 
-import org.jetbrains.annotations.ApiStatus;
-
 import java.util.function.Supplier;
 
-@ApiStatus.Experimental
 public abstract class NumberAnimator<T extends Number> extends Number implements ValueAnimator<T> {
     public NumberAnimator<Double> asDouble() {
         return new NumberAnimatorWrapped<>(this, Number::doubleValue);
