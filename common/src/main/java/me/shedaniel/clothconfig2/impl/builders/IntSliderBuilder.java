@@ -31,14 +31,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> {
-    
-    private Consumer<Integer> saveConsumer = null;
-    private Function<Integer, Optional<Component[]>> tooltipSupplier = i -> Optional.empty();
-    private final int value;
-    private int max;
-    private int min;
-    private Function<Integer, Component> textGetter = null;
+public class IntSliderBuilder extends AbstractSliderFieldBuilder<Integer, IntegerSliderEntry, IntSliderBuilder> {
     
     public IntSliderBuilder(Component resetButtonKey, Component fieldNameKey, int value, int min, int max) {
         super(resetButtonKey, fieldNameKey);
@@ -47,29 +40,29 @@ public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> 
         this.min = min;
     }
     
+    @Override
     public IntSliderBuilder setErrorSupplier(Function<Integer, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Override
     public IntSliderBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requireRestart();
     }
     
+    @Override
     public IntSliderBuilder setTextGetter(Function<Integer, Component> textGetter) {
-        this.textGetter = textGetter;
-        return this;
+        return super.setTextGetter(textGetter);
     }
     
+    @Override
     public IntSliderBuilder setSaveConsumer(Consumer<Integer> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
+    @Override
     public IntSliderBuilder setDefaultValue(Supplier<Integer> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public IntSliderBuilder setDefaultValue(int defaultValue) {
@@ -77,24 +70,24 @@ public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> 
         return this;
     }
     
+    @Override
     public IntSliderBuilder setTooltipSupplier(Function<Integer, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public IntSliderBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = i -> tooltipSupplier.get();
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public IntSliderBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = i -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
+    @Override
     public IntSliderBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public IntSliderBuilder setMax(int max) {
@@ -107,13 +100,23 @@ public class IntSliderBuilder extends FieldBuilder<Integer, IntegerSliderEntry> 
         return this;
     }
     
+    @Override
+    public IntSliderBuilder removeMin() {
+        return this;
+    }
+    
+    @Override
+    public IntSliderBuilder removeMax() {
+        return this;
+    }
+    
     @NotNull
     @Override
     public IntegerSliderEntry build() {
-        IntegerSliderEntry entry = new IntegerSliderEntry(getFieldNameKey(), min, max, value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
+        IntegerSliderEntry entry = new IntegerSliderEntry(getFieldNameKey(), min, max, value, getResetButtonKey(), defaultValue, getSaveConsumer(), null, isRequireRestart());
         if (textGetter != null)
             entry.setTextGetter(textGetter);
-        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;

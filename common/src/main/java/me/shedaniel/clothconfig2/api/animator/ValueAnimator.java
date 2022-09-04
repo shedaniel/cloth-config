@@ -30,7 +30,6 @@ import java.util.function.Supplier;
  *
  * @param <T> the type of the value
  */
-@ApiStatus.Experimental
 public interface ValueAnimator<T> extends ValueProvider<T> {
     static long typicalTransitionTime() {
         return 700;
@@ -151,7 +150,13 @@ public interface ValueAnimator<T> extends ValueProvider<T> {
         return ofDimension().setAs(initialValue);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     static ValueAnimator<Point> ofDimension(Point initialValue) {
+        return ofPoint().setAs(initialValue);
+    }
+    
+    static ValueAnimator<Point> ofPoint(Point initialValue) {
         return ofPoint().setAs(initialValue);
     }
     
@@ -163,7 +168,13 @@ public interface ValueAnimator<T> extends ValueProvider<T> {
         return ofFloatingDimension().setAs(initialValue);
     }
     
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     static ValueAnimator<FloatingPoint> ofFloatingDimension(FloatingPoint initialValue) {
+        return ofFloatingPoint().setAs(initialValue);
+    }
+    
+    static ValueAnimator<FloatingPoint> ofFloatingPoint(FloatingPoint initialValue) {
         return ofFloatingPoint().setAs(initialValue);
     }
     

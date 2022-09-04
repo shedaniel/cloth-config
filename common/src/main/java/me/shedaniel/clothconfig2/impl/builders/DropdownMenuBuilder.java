@@ -46,7 +46,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>> {
+public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>, DropdownMenuBuilder<T>> {
     protected SelectionTopCellElement<T> topCellElement;
     protected SelectionCellCreator<T> cellCreator;
     protected Function<T, Optional<Component[]>> tooltipSupplier = str -> Optional.empty();

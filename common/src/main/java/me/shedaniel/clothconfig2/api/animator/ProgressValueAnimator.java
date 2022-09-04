@@ -19,11 +19,8 @@
 
 package me.shedaniel.clothconfig2.api.animator;
 
-import org.jetbrains.annotations.ApiStatus;
-
 import java.util.function.Function;
 
-@ApiStatus.Experimental
 public interface ProgressValueAnimator<T> extends ValueAnimator<T> {
     double progress();
     

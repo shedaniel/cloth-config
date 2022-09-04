@@ -45,8 +45,8 @@ import java.util.stream.Collectors;
 public class ClothConfigDemo {
     public static ConfigBuilder getConfigBuilderWithDemo() {
         class Pair<T, R> {
-            T t;
-            R r;
+            final T t;
+            final R r;
             
             public Pair(T t, R r) {
                 this.t = t;

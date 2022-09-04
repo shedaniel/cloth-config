@@ -27,23 +27,10 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class DoubleListEntry extends TextFieldListEntry<Double> {
-    
-    private static final Function<String, String> stripCharacters = s -> {
-        StringBuilder stringBuilder_1 = new StringBuilder();
-        char[] var2 = s.toCharArray();
-        int var3 = var2.length;
-        
-        for (char c : var2)
-            if (Character.isDigit(c) || c == '-' || c == '.')
-                stringBuilder_1.append(c);
-        
-        return stringBuilder_1.toString();
-    };
+public class DoubleListEntry extends AbstractNumberListEntry<Double> {
     private double minimum, maximum;
     private final Consumer<Double> saveConsumer;
     
@@ -69,11 +56,6 @@ public class DoubleListEntry extends TextFieldListEntry<Double> {
         this.minimum = -Double.MAX_VALUE;
         this.maximum = Double.MAX_VALUE;
         this.saveConsumer = saveConsumer;
-    }
-    
-    @Override
-    protected String stripAddText(String s) {
-        return stripCharacters.apply(s);
     }
     
     @Override

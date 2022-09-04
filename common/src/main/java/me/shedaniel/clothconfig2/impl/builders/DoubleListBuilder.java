@@ -32,30 +32,22 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListListEntry> {
-    
-    protected Function<Double, Optional<Component>> cellErrorSupplier;
-    private Consumer<List<Double>> saveConsumer = null;
-    private Function<List<Double>, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();
-    private final List<Double> value;
-    private boolean expanded = false;
-    private Double min = null, max = null;
+public class DoubleListBuilder extends AbstractRangeListBuilder<Double, DoubleListListEntry, DoubleListBuilder> {
     private Function<DoubleListListEntry, DoubleListListEntry.DoubleListCell> createNewInstance;
-    private Component addTooltip = Component.translatable("text.cloth-config.list.add"), removeTooltip = Component.translatable("text.cloth-config.list.remove");
-    private boolean deleteButtonEnabled = true, insertInFront = false;
     
     public DoubleListBuilder(Component resetButtonKey, Component fieldNameKey, List<Double> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
+    @Override
     public Function<Double, Optional<Component>> getCellErrorSupplier() {
-        return cellErrorSupplier;
+        return super.getCellErrorSupplier();
     }
     
+    @Override
     public DoubleListBuilder setCellErrorSupplier(Function<Double, Optional<Component>> cellErrorSupplier) {
-        this.cellErrorSupplier = cellErrorSupplier;
-        return this;
+        return super.setCellErrorSupplier(cellErrorSupplier);
     }
     
     public DoubleListBuilder setErrorSupplier(Function<List<Double>, Optional<Component>> errorSupplier) {
@@ -63,29 +55,29 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         return this;
     }
     
+    @Override
     public DoubleListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
-        this.deleteButtonEnabled = deleteButtonEnabled;
-        return this;
+        return super.setDeleteButtonEnabled(deleteButtonEnabled);
     }
     
+    @Override
     public DoubleListBuilder setInsertInFront(boolean insertInFront) {
-        this.insertInFront = insertInFront;
-        return this;
+        return super.setInsertInFront(insertInFront);
     }
     
+    @Override
     public DoubleListBuilder setAddButtonTooltip(Component addTooltip) {
-        this.addTooltip = addTooltip;
-        return this;
+        return super.setAddButtonTooltip(addTooltip);
     }
     
+    @Override
     public DoubleListBuilder setRemoveButtonTooltip(Component removeTooltip) {
-        this.removeTooltip = removeTooltip;
-        return this;
+        return super.setRemoveButtonTooltip(removeTooltip);
     }
     
+    @Override
     public DoubleListBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requireRestart();
     }
     
     public DoubleListBuilder setCreateNewInstance(Function<DoubleListListEntry, DoubleListListEntry.DoubleListCell> createNewInstance) {
@@ -93,19 +85,19 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         return this;
     }
     
+    @Override
     public DoubleListBuilder setExpanded(boolean expanded) {
-        this.expanded = expanded;
-        return this;
+        return super.setExpanded(expanded);
     }
     
+    @Override
     public DoubleListBuilder setSaveConsumer(Consumer<List<Double>> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
+    @Override
     public DoubleListBuilder setDefaultValue(Supplier<List<Double>> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public DoubleListBuilder setMin(double min) {
@@ -118,14 +110,14 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         return this;
     }
     
+    @Override
     public DoubleListBuilder removeMin() {
-        this.min = null;
-        return this;
+        return super.removeMin();
     }
     
+    @Override
     public DoubleListBuilder removeMax() {
-        this.max = null;
-        return this;
+        return super.removeMax();
     }
     
     public DoubleListBuilder setDefaultValue(List<Double> defaultValue) {
@@ -133,30 +125,30 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         return this;
     }
     
+    @Override
     public DoubleListBuilder setTooltipSupplier(Function<List<Double>, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public DoubleListBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = list -> tooltipSupplier.get();
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public DoubleListBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = list -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
+    @Override
     public DoubleListBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @NotNull
     @Override
     public DoubleListListEntry build() {
-        DoubleListListEntry entry = new DoubleListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), requireRestart, deleteButtonEnabled, insertInFront);
+        DoubleListListEntry entry = new DoubleListListEntry(getFieldNameKey(), value, isExpanded(), null, getSaveConsumer(), defaultValue, getResetButtonKey(), requireRestart, isDeleteButtonEnabled(), isInsertInFront());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)
@@ -164,9 +156,9 @@ public class DoubleListBuilder extends FieldBuilder<List<Double>, DoubleListList
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
         entry.setCellErrorSupplier(cellErrorSupplier);
-        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
-        entry.setAddTooltip(addTooltip);
-        entry.setRemoveTooltip(removeTooltip);
+        entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
+        entry.setAddTooltip(getAddTooltip());
+        entry.setRemoveTooltip(getRemoveTooltip());
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;

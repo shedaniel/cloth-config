@@ -31,36 +31,31 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
-    
-    private Consumer<Double> saveConsumer = null;
-    private Function<Double, Optional<Component[]>> tooltipSupplier = d -> Optional.empty();
-    private final double value;
-    private Double min = null, max = null;
+public class DoubleFieldBuilder extends AbstractRangeFieldBuilder<Double, DoubleListEntry, DoubleFieldBuilder> {
     
     public DoubleFieldBuilder(Component resetButtonKey, Component fieldNameKey, double value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
+    @Override
     public DoubleFieldBuilder setErrorSupplier(Function<Double, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Override
     public DoubleFieldBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requireRestart();
     }
     
+    @Override
     public DoubleFieldBuilder setSaveConsumer(Consumer<Double> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
+    @Override
     public DoubleFieldBuilder setDefaultValue(Supplier<Double> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public DoubleFieldBuilder setDefaultValue(double defaultValue) {
@@ -78,45 +73,45 @@ public class DoubleFieldBuilder extends FieldBuilder<Double, DoubleListEntry> {
         return this;
     }
     
+    @Override
     public DoubleFieldBuilder removeMin() {
-        this.min = null;
-        return this;
+        return super.removeMin();
     }
     
+    @Override
     public DoubleFieldBuilder removeMax() {
-        this.max = null;
-        return this;
+        return super.removeMax();
     }
     
+    @Override
     public DoubleFieldBuilder setTooltipSupplier(Function<Double, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public DoubleFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = d -> tooltipSupplier.get();
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public DoubleFieldBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = d -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
+    @Override
     public DoubleFieldBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = d -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @NotNull
     @Override
     public DoubleListEntry build() {
-        DoubleListEntry entry = new DoubleListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
+        DoubleListEntry entry = new DoubleListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, getSaveConsumer(), null, isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)
             entry.setMaximum(max);
-        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;

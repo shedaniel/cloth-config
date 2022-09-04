@@ -32,60 +32,52 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEntry> {
-    
-    protected Function<Float, Optional<Component>> cellErrorSupplier;
-    private Consumer<List<Float>> saveConsumer = null;
-    private Function<List<Float>, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();
-    private final List<Float> value;
-    private boolean expanded = false;
-    private Float min = null, max = null;
+public class FloatListBuilder extends AbstractRangeListBuilder<Float, FloatListListEntry, FloatListBuilder> {
     private Function<FloatListListEntry, FloatListListEntry.FloatListCell> createNewInstance;
-    private Component addTooltip = Component.translatable("text.cloth-config.list.add"), removeTooltip = Component.translatable("text.cloth-config.list.remove");
-    private boolean deleteButtonEnabled = true, insertInFront = false;
     
     public FloatListBuilder(Component resetButtonKey, Component fieldNameKey, List<Float> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
+    @Override
     public Function<Float, Optional<Component>> getCellErrorSupplier() {
-        return cellErrorSupplier;
+        return super.getCellErrorSupplier();
     }
     
+    @Override
     public FloatListBuilder setCellErrorSupplier(Function<Float, Optional<Component>> cellErrorSupplier) {
-        this.cellErrorSupplier = cellErrorSupplier;
-        return this;
+        return super.setCellErrorSupplier(cellErrorSupplier);
     }
     
+    @Override
     public FloatListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
-        this.deleteButtonEnabled = deleteButtonEnabled;
-        return this;
+        return super.setDeleteButtonEnabled(deleteButtonEnabled);
     }
     
+    @Override
     public FloatListBuilder setErrorSupplier(Function<List<Float>, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Override
     public FloatListBuilder setInsertInFront(boolean insertInFront) {
-        this.insertInFront = insertInFront;
-        return this;
+        return super.setInsertInFront(insertInFront);
     }
     
+    @Override
     public FloatListBuilder setAddButtonTooltip(Component addTooltip) {
-        this.addTooltip = addTooltip;
-        return this;
+        return super.setAddButtonTooltip(addTooltip);
     }
     
+    @Override
     public FloatListBuilder setRemoveButtonTooltip(Component removeTooltip) {
-        this.removeTooltip = removeTooltip;
-        return this;
+        return super.setRemoveButtonTooltip(removeTooltip);
     }
     
+    @Override
     public FloatListBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requireRestart();
     }
     
     public FloatListBuilder setCreateNewInstance(Function<FloatListListEntry, FloatListListEntry.FloatListCell> createNewInstance) {
@@ -93,19 +85,19 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         return this;
     }
     
+    @Override
     public FloatListBuilder setExpanded(boolean expanded) {
-        this.expanded = expanded;
-        return this;
+        return super.setExpanded(expanded);
     }
     
+    @Override
     public FloatListBuilder setSaveConsumer(Consumer<List<Float>> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
+    @Override
     public FloatListBuilder setDefaultValue(Supplier<List<Float>> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public FloatListBuilder setMin(float min) {
@@ -118,45 +110,45 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         return this;
     }
     
+    @Override
     public FloatListBuilder removeMin() {
-        this.min = null;
-        return this;
+        return super.removeMin();
     }
     
+    @Override
     public FloatListBuilder removeMax() {
-        this.max = null;
-        return this;
+        return super.removeMax();
     }
     
+    @Override
     public FloatListBuilder setDefaultValue(List<Float> defaultValue) {
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
-    public FloatListBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = list -> tooltipSupplier.get();
-        return this;
-    }
-    
+    @Override
     public FloatListBuilder setTooltipSupplier(Function<List<Float>, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
+    public FloatListBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
+        return super.setTooltipSupplier(tooltipSupplier);
+    }
+    
+    @Override
     public FloatListBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = list -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
+    @Override
     public FloatListBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @NotNull
     @Override
     public FloatListListEntry build() {
-        FloatListListEntry entry = new FloatListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart(), deleteButtonEnabled, insertInFront);
+        FloatListListEntry entry = new FloatListListEntry(getFieldNameKey(), value, isExpanded(), null, getSaveConsumer(), defaultValue, getResetButtonKey(), isRequireRestart(), isDeleteButtonEnabled(), isInsertInFront());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)
@@ -164,9 +156,9 @@ public class FloatListBuilder extends FieldBuilder<List<Float>, FloatListListEnt
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
         entry.setCellErrorSupplier(cellErrorSupplier);
-        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
-        entry.setAddTooltip(addTooltip);
-        entry.setRemoveTooltip(removeTooltip);
+        entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
+        entry.setAddTooltip(getAddTooltip());
+        entry.setRemoveTooltip(getRemoveTooltip());
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;
