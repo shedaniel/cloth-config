@@ -35,7 +35,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> {
+public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry, KeyCodeBuilder> {
     
     @Nullable private Consumer<ModifierKeyCode> saveConsumer = null;
     @NotNull private Function<ModifierKeyCode, Optional<Component[]>> tooltipSupplier = bool -> Optional.empty();
@@ -82,7 +82,7 @@ public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> 
         return this;
     }
     
-    public KeyCodeBuilder setSaveConsumer(Consumer<InputConstants.Key> saveConsumer) {
+    public KeyCodeBuilder setKeySaveConsumer(Consumer<InputConstants.Key> saveConsumer) {
         return setModifierSaveConsumer(keyCode -> saveConsumer.accept(keyCode.getKeyCode()));
     }
     
@@ -109,7 +109,7 @@ public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry> 
         return this;
     }
     
-    public KeyCodeBuilder setTooltipSupplier(@NotNull Function<InputConstants.Key, Optional<Component[]>> tooltipSupplier) {
+    public KeyCodeBuilder setKeyTooltipSupplier(@NotNull Function<InputConstants.Key, Optional<Component[]>> tooltipSupplier) {
         return setModifierTooltipSupplier(keyCode -> tooltipSupplier.apply(keyCode.getKeyCode()));
     }
     

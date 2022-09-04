@@ -19,7 +19,7 @@
 
 package me.shedaniel.autoconfig.util;
 
-import me.shedaniel.architectury.annotations.ExpectPlatform;
+import dev.architectury.injectables.annotations.ExpectPlatform;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
