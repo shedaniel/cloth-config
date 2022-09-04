@@ -68,17 +68,24 @@ shadowJar {
 remapJar {
     dependsOn(shadowJar)
     input.set(shadowJar.archivePath)
-    archiveClassifier = "forge"
-    
+    archiveClassifier = "shadow-remapped"
+}
+
+task mainJar(type: Jar) {
+    dependsOn(remapJar)
+    from zipTree(remapJar.archivePath)
     from zipTree(file("cloth-config-forge-4.1.3.jar"))
     from rootProject.file("LICENSE.md")
+    archiveClassifier = "forge"
 }
+
+remapJar.finalizedBy mainJar
 
 publishing {
     publications {
         mavenForge(MavenPublication) {
             artifactId = rootProject.archives_base_name + "-forge"
-            artifact(remapJar.archivePath) {
+            artifact(mainJar.archivePath) {
                 builtBy build
                 classifier null
             }
@@ -108,7 +115,7 @@ curseforge {
             addGameVersion "1.16.5"
             addGameVersion "Java 8"
             addGameVersion "Forge"
-            mainArtifact(remapJar.archivePath) {
+            mainArtifact(mainJar.archivePath) {
                 displayName = "[Forge $rootProject.supported_version] v$project.version"
             }
             afterEvaluate {
