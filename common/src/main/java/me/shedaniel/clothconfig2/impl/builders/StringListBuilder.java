@@ -34,59 +34,52 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class StringListBuilder extends FieldBuilder<List<String>, StringListListEntry> {
-    
-    private Function<String, Optional<Component>> cellErrorSupplier;
-    private Consumer<List<String>> saveConsumer = null;
-    private Function<List<String>, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();
-    private final List<String> value;
-    private boolean expanded = false;
+public class StringListBuilder extends AbstractListBuilder<String, StringListListEntry, StringListBuilder> {
     private Function<StringListListEntry, StringListListEntry.StringListCell> createNewInstance;
-    private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add"), removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
-    private boolean deleteButtonEnabled = true, insertInFront = false;
     
     public StringListBuilder(Component resetButtonKey, Component fieldNameKey, List<String> value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
+    @Override
     public Function<String, Optional<Component>> getCellErrorSupplier() {
-        return cellErrorSupplier;
+        return super.getCellErrorSupplier();
     }
     
+    @Override
     public StringListBuilder setCellErrorSupplier(Function<String, Optional<Component>> cellErrorSupplier) {
-        this.cellErrorSupplier = cellErrorSupplier;
-        return this;
+        return super.setCellErrorSupplier(cellErrorSupplier);
     }
     
+    @Override
     public StringListBuilder setErrorSupplier(Function<List<String>, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Override
     public StringListBuilder setDeleteButtonEnabled(boolean deleteButtonEnabled) {
-        this.deleteButtonEnabled = deleteButtonEnabled;
-        return this;
+        return super.setDeleteButtonEnabled(deleteButtonEnabled);
     }
     
+    @Override
     public StringListBuilder setInsertInFront(boolean insertInFront) {
-        this.insertInFront = insertInFront;
-        return this;
+        return super.setInsertInFront(insertInFront);
     }
     
+    @Override
     public StringListBuilder setAddButtonTooltip(Component addTooltip) {
-        this.addTooltip = addTooltip;
-        return this;
+        return super.setAddButtonTooltip(addTooltip);
     }
     
+    @Override
     public StringListBuilder setRemoveButtonTooltip(Component removeTooltip) {
-        this.removeTooltip = removeTooltip;
-        return this;
+        return super.setRemoveButtonTooltip(removeTooltip);
     }
     
+    @Override
     public StringListBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requireRestart();
     }
     
     public StringListBuilder setCreateNewInstance(Function<StringListListEntry, StringListListEntry.StringListCell> createNewInstance) {
@@ -94,56 +87,56 @@ public class StringListBuilder extends FieldBuilder<List<String>, StringListList
         return this;
     }
     
+    @Override
     public StringListBuilder setExpanded(boolean expanded) {
-        this.expanded = expanded;
-        return this;
+        return super.setExpanded(expanded);
     }
     
+    @Override
     public StringListBuilder setSaveConsumer(Consumer<List<String>> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
+    @Override
     public StringListBuilder setDefaultValue(Supplier<List<String>> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
+    @Override
     public StringListBuilder setDefaultValue(List<String> defaultValue) {
-        this.defaultValue = () -> defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
-    public StringListBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = list -> tooltipSupplier.get();
-        return this;
-    }
-    
+    @Override
     public StringListBuilder setTooltipSupplier(Function<List<String>, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
+    public StringListBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
+        return super.setTooltipSupplier(tooltipSupplier);
+    }
+    
+    @Override
     public StringListBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = list -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
+    @Override
     public StringListBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = list -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     @NotNull
     @Override
     public StringListListEntry build() {
-        StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, expanded, null, saveConsumer, defaultValue, getResetButtonKey(), isRequireRestart(), deleteButtonEnabled, insertInFront);
+        StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, isExpanded(), null, getSaveConsumer(), defaultValue, getResetButtonKey(), isRequireRestart(), isDeleteButtonEnabled(), isInsertInFront());
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
         entry.setCellErrorSupplier(cellErrorSupplier);
-        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
-        entry.setAddTooltip(addTooltip);
-        entry.setRemoveTooltip(removeTooltip);
+        entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
+        entry.setAddTooltip(getAddTooltip());
+        entry.setRemoveTooltip(getRemoveTooltip());
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;

@@ -33,7 +33,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class SubCategoryBuilder extends FieldBuilder<Object, SubCategoryListEntry> implements List<AbstractConfigListEntry> {
+public class SubCategoryBuilder extends FieldBuilder<List<AbstractConfigListEntry>, SubCategoryListEntry, SubCategoryBuilder> implements List<AbstractConfigListEntry> {
     
     private final List<AbstractConfigListEntry> entries;
     private Function<List<AbstractConfigListEntry>, Optional<Component[]>> tooltipSupplier = list -> Optional.empty();

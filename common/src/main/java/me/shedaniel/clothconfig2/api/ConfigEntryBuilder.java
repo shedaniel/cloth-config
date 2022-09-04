@@ -112,7 +112,7 @@ public interface ConfigEntryBuilder {
     }
     
     default KeyCodeBuilder fillKeybindingField(Component fieldNameKey, KeyMapping value) {
-        return startKeyCodeField(fieldNameKey, value.key).setDefaultValue(value.getDefaultKey()).setSaveConsumer(code -> {
+        return startKeyCodeField(fieldNameKey, value.key).setDefaultValue(value.getDefaultKey()).setKeySaveConsumer(code -> {
             value.setKey(code);
             KeyMapping.resetMapping();
             Minecraft.getInstance().options.save();

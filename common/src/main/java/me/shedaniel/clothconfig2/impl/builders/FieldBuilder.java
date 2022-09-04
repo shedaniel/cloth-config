@@ -32,7 +32,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public abstract class FieldBuilder<T, A extends AbstractConfigListEntry> {
+public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF extends FieldBuilder<T, A, SELF>> {
     @NotNull private final Component fieldNameKey;
     @NotNull private final Component resetButtonKey;
     protected boolean requireRestart = false;
@@ -75,5 +75,4 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry> {
     public void requireRestart(boolean requireRestart) {
         this.requireRestart = requireRestart;
     }
-    
 }

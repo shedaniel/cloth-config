@@ -31,36 +31,30 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
-    
-    private Consumer<Float> saveConsumer = null;
-    private Function<Float, Optional<Component[]>> tooltipSupplier = f -> Optional.empty();
-    private final float value;
-    private Float min = null, max = null;
-    
+public class FloatFieldBuilder extends AbstractRangeFieldBuilder<Float, FloatListEntry, FloatFieldBuilder> {
     public FloatFieldBuilder(Component resetButtonKey, Component fieldNameKey, float value) {
         super(resetButtonKey, fieldNameKey);
         this.value = value;
     }
     
+    @Override
     public FloatFieldBuilder setErrorSupplier(Function<Float, Optional<Component>> errorSupplier) {
-        this.errorSupplier = errorSupplier;
-        return this;
+        return super.setErrorSupplier(errorSupplier);
     }
     
+    @Override
     public FloatFieldBuilder requireRestart() {
-        requireRestart(true);
-        return this;
+        return super.requireRestart();
     }
     
+    @Override
     public FloatFieldBuilder setSaveConsumer(Consumer<Float> saveConsumer) {
-        this.saveConsumer = saveConsumer;
-        return this;
+        return super.setSaveConsumer(saveConsumer);
     }
     
+    @Override
     public FloatFieldBuilder setDefaultValue(Supplier<Float> defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+        return super.setDefaultValue(defaultValue);
     }
     
     public FloatFieldBuilder setDefaultValue(float defaultValue) {
@@ -68,24 +62,24 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
         return this;
     }
     
+    @Override
     public FloatFieldBuilder setTooltipSupplier(Function<Float, Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = tooltipSupplier;
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public FloatFieldBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
-        this.tooltipSupplier = f -> tooltipSupplier.get();
-        return this;
+        return super.setTooltipSupplier(tooltipSupplier);
     }
     
+    @Override
     public FloatFieldBuilder setTooltip(Optional<Component[]> tooltip) {
-        this.tooltipSupplier = f -> tooltip;
-        return this;
+        return super.setTooltip(tooltip);
     }
     
+    @Override
     public FloatFieldBuilder setTooltip(Component... tooltip) {
-        this.tooltipSupplier = f -> Optional.ofNullable(tooltip);
-        return this;
+        return super.setTooltip(tooltip);
     }
     
     public FloatFieldBuilder setMin(float min) {
@@ -98,25 +92,25 @@ public class FloatFieldBuilder extends FieldBuilder<Float, FloatListEntry> {
         return this;
     }
     
+    @Override
     public FloatFieldBuilder removeMin() {
-        this.min = null;
-        return this;
+        return super.removeMin();
     }
     
+    @Override
     public FloatFieldBuilder removeMax() {
-        this.max = null;
-        return this;
+        return super.removeMax();
     }
     
     @NotNull
     @Override
     public FloatListEntry build() {
-        FloatListEntry entry = new FloatListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, saveConsumer, null, isRequireRestart());
+        FloatListEntry entry = new FloatListEntry(getFieldNameKey(), value, getResetButtonKey(), defaultValue, getSaveConsumer(), null, isRequireRestart());
         if (min != null)
             entry.setMinimum(min);
         if (max != null)
             entry.setMaximum(max);
-        entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
+        entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
         return entry;

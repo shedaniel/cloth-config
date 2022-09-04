@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class TextDescriptionBuilder extends FieldBuilder<Component, TextListEntry> {
+public class TextDescriptionBuilder extends FieldBuilder<Component, TextListEntry, TextDescriptionBuilder> {
     
     private int color = -1;
     @Nullable private Supplier<Optional<Component[]>> tooltipSupplier = null;
