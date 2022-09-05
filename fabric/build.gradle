@@ -5,7 +5,7 @@ plugins {
 }
 
 loom {
-    accessWidener = file("src/main/resources/cloth-config.accessWidener")
+    accessWidenerPath = file("src/main/resources/cloth-config.accessWidener")
 }
 
 configurations {
@@ -48,7 +48,7 @@ dependencies {
     modCompileOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
-    modRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
+    modRuntimeOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
 
@@ -77,6 +77,10 @@ shadowJar {
     
     configurations = [project.configurations.shadowCommon]
     classifier "shadow"
+}
+
+prepareRemapJar {
+    dependsOn(shadowJar)
 }
 
 remapJar {
