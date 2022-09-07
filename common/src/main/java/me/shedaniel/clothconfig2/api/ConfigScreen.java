@@ -23,6 +23,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 public interface ConfigScreen {
@@ -39,4 +40,6 @@ public interface ConfigScreen {
     void saveAll(boolean openOtherScreens);
     
     void addTooltip(Tooltip tooltip);
+    
+    boolean matchesSearch(Iterator<String> tags);
 }

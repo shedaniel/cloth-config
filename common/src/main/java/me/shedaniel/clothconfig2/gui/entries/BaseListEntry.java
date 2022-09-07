@@ -65,9 +65,9 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     @NotNull protected final List<C> cells;
     @NotNull protected final List<Object> widgets; // GuiEventListener & NarratableEntry
     protected boolean expanded;
+    protected boolean insertButtonEnabled = true;
     protected boolean deleteButtonEnabled;
     protected boolean insertInFront;
-    @Nullable protected Consumer<List<T>> saveConsumer;
     protected ListLabelWidget labelWidget;
     protected AbstractWidget resetWidget;
     @NotNull protected Function<SELF, C> createNewInstance;
@@ -106,7 +106,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
             widgets.addAll(cells);
         });
         this.widgets.add(resetWidget);
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
         this.createNewInstance = createNewInstance;
         this.defaultValue = defaultValue;
     }
@@ -157,6 +157,18 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         return deleteButtonEnabled;
     }
     
+    public boolean isInsertButtonEnabled() {
+        return insertButtonEnabled;
+    }
+
+    public void setDeleteButtonEnabled(boolean deleteButtonEnabled) {
+        this.deleteButtonEnabled = deleteButtonEnabled;
+    }
+
+    public void setInsertButtonEnabled(boolean insertButtonEnabled) {
+        this.insertButtonEnabled = insertButtonEnabled;
+    }
+
     protected abstract C getFromValue(T value);
     
     @NotNull
@@ -238,8 +250,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                 ((ReferenceProvider<?>) cell).provideReferenceEntry().save();
         }
         
-        if (saveConsumer != null)
-            saveConsumer.accept(getValue());
+        super.save();
     }
     
     @Override
@@ -252,11 +263,11 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
     
     protected boolean isInsideCreateNew(double mouseX, double mouseY) {
-        return mouseX >= labelWidget.rectangle.x + 12 && mouseY >= labelWidget.rectangle.y + 3 && mouseX <= labelWidget.rectangle.x + 12 + 11 && mouseY <= labelWidget.rectangle.y + 3 + 11;
+        return isInsertButtonEnabled() && mouseX >= labelWidget.rectangle.x + 12 && mouseY >= labelWidget.rectangle.y + 3 && mouseX <= labelWidget.rectangle.x + 12 + 11 && mouseY <= labelWidget.rectangle.y + 3 + 11;
     }
     
     protected boolean isInsideDelete(double mouseX, double mouseY) {
-        return isDeleteButtonEnabled() && mouseX >= labelWidget.rectangle.x + 25 && mouseY >= labelWidget.rectangle.y + 3 && mouseX <= labelWidget.rectangle.x + 25 + 11 && mouseY <= labelWidget.rectangle.y + 3 + 11;
+        return isDeleteButtonEnabled() && mouseX >= labelWidget.rectangle.x + (isInsertButtonEnabled() ? 25 : 12) && mouseY >= labelWidget.rectangle.y + 3 && mouseX <= labelWidget.rectangle.x + (isInsertButtonEnabled() ? 25 : 12) + 11 && mouseY <= labelWidget.rectangle.y + 3 + 11;
     }
     
     @Override
@@ -279,9 +290,10 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);
         blit(matrices, x - 15, y + 5, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        blit(matrices, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
+        if (isInsertButtonEnabled())
+            blit(matrices, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
         if (isDeleteButtonEnabled())
-            blit(matrices, x - 15 + 26, y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
+            blit(matrices, x - 15 + (isInsertButtonEnabled() ? 26 : 13), y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
         resetWidget.x = x + entryWidth - resetWidget.getWidth();
         resetWidget.y = y;
         resetWidget.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault();

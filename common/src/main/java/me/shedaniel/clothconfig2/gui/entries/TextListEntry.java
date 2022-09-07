@@ -80,7 +80,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
             this.savedX = x;
             this.savedY = y;
         }
-        int yy = y + 4;
+        int yy = y + 7;
         for (FormattedCharSequence string : wrappedLines) {
             Minecraft.getInstance().font.drawShadow(matrices, string, x, yy, color);
             yy += Minecraft.getInstance().font.lineHeight + 3;
@@ -98,7 +98,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
     public int getItemHeight() {
         if (savedWidth == -1) return LINE_HEIGHT;
         int lineCount = this.wrappedLines.size();
-        return lineCount == 0 ? 0 : 15 + lineCount * LINE_HEIGHT;
+        return lineCount == 0 ? 0 : 14 + lineCount * LINE_HEIGHT;
     }
     
     @Override
@@ -120,7 +120,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
         
         if (lineCount > 0) {
             int textX = Mth.floor(x - this.savedX);
-            int textY = Mth.floor(y - 4 - this.savedY);
+            int textY = Mth.floor(y - 7 - this.savedY);
             if (textX >= 0 && textY >= 0 && textX <= this.savedWidth && textY < LINE_HEIGHT * lineCount + lineCount) {
                 int line = textY / LINE_HEIGHT;
                 if (line < this.wrappedLines.size()) {
@@ -130,11 +130,6 @@ public class TextListEntry extends TooltipListEntry<Object> {
             }
         }
         return null;
-    }
-    
-    @Override
-    public void save() {
-        
     }
     
     @Override

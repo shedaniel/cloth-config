@@ -19,6 +19,7 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -40,10 +41,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
@@ -84,6 +82,11 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
             }
         }
         return false;
+    }
+    
+    @Override
+    public Iterator<String> getSearchTags() {
+        return Iterators.concat(super.getSearchTags(), Iterators.concat(entries.stream().map(AbstractConfigListEntry::getSearchTags).iterator()));
     }
     
     @Override

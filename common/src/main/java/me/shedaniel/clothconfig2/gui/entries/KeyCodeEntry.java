@@ -48,7 +48,6 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     private final ModifierKeyCode original;
     private final Button buttonWidget;
     private final Button resetButton;
-    private final Consumer<ModifierKeyCode> saveConsumer;
     private final Supplier<ModifierKeyCode> defaultValue;
     private final List<AbstractWidget> widgets;
     private boolean allowMouse = true, allowKey = true, allowModifiers = true;
@@ -67,7 +66,7 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
             KeyCodeEntry.this.value = getDefaultValue().orElse(null).copy();
             getConfigScreen().setFocusedBinding(null);
         });
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
     }
     
@@ -98,12 +97,6 @@ public class KeyCodeEntry extends TooltipListEntry<ModifierKeyCode> {
     
     public void setAllowMouse(boolean allowMouse) {
         this.allowMouse = allowMouse;
-    }
-    
-    @Override
-    public void save() {
-        if (saveConsumer != null)
-            saveConsumer.accept(getValue());
     }
     
     @Override

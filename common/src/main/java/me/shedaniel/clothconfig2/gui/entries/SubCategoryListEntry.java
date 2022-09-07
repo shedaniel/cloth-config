@@ -19,10 +19,12 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.Expandable;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
@@ -40,10 +42,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Environment(EnvType.CLIENT)
 public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigListEntry>> implements Expandable {
@@ -63,6 +62,11 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         this.children = Lists.newArrayList(widget);
         this.children.addAll(entries);
         this.setReferenceProviderEntries((List) entries);
+    }
+    
+    @Override
+    public Iterator<String> getSearchTags() {
+        return Iterators.concat(super.getSearchTags(), Iterators.concat(entries.stream().<Iterator<String>>map(AbstractConfigEntry::getSearchTags).iterator()));
     }
     
     @Override
@@ -97,6 +101,27 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         return entries;
     }
     
+    public List<AbstractConfigListEntry> filteredEntries() {
+        return new AbstractList<AbstractConfigListEntry>() {
+            @Override
+            public Iterator<AbstractConfigListEntry> iterator() {
+                return Iterators.filter(entries.iterator(), entry -> {
+                    return getConfigScreen().matchesSearch(entry.getSearchTags());
+                });
+            }
+            
+            @Override
+            public AbstractConfigListEntry get(int index) {
+                return Iterators.get(iterator(), index);
+            }
+            
+            @Override
+            public int size() {
+                return Iterators.size(iterator());
+            }
+        };
+    }
+    
     @Override
     public Optional<List<AbstractConfigListEntry>> getDefaultValue() {
         return Optional.empty();
@@ -115,7 +140,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         }
         if (expanded) {
             int yy = y + 24;
-            for (AbstractConfigListEntry<?> entry : entries) {
+            for (AbstractConfigListEntry<?> entry : filteredEntries()) {
                 entry.render(matrices, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered && getFocused() == entry, delta);
                 yy += entry.getItemHeight();
             }
@@ -125,7 +150,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public void updateSelected(boolean isSelected) {
         for (AbstractConfigListEntry<?> entry : entries) {
-            entry.updateSelected(expanded && isSelected && getFocused() == entry);
+            entry.updateSelected(expanded && isSelected && getFocused() == entry && getConfigScreen().matchesSearch(entry.getSearchTags()));
         }
     }
     
@@ -142,7 +167,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public void lateRender(PoseStack matrices, int mouseX, int mouseY, float delta) {
         if (expanded) {
-            for (AbstractConfigListEntry<?> entry : entries) {
+            for (AbstractConfigListEntry<?> entry : filteredEntries()) {
                 entry.lateRender(matrices, mouseX, mouseY, delta);
             }
         }
@@ -154,7 +179,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         if (!expanded) return -1;
         List<Integer> list = new ArrayList<>();
         int i = 24;
-        for (AbstractConfigListEntry<?> entry : entries) {
+        for (AbstractConfigListEntry<?> entry : filteredEntries()) {
             i += entry.getItemHeight();
             if (entry.getMorePossibleHeight() >= 0) {
                 list.add(i + entry.getMorePossibleHeight());
@@ -177,7 +202,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     public int getItemHeight() {
         if (expanded) {
             int i = 24;
-            for (AbstractConfigListEntry<?> entry : entries)
+            for (AbstractConfigListEntry<?> entry : filteredEntries())
                 i += entry.getItemHeight();
             return i;
         }
@@ -231,12 +256,12 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
             }
             return isHovered = false;
         }
-    
+        
         @Override
         public NarrationPriority narrationPriority() {
             return isHovered ? NarrationPriority.HOVERED : NarrationPriority.NONE;
         }
-    
+        
         @Override
         public void updateNarration(NarrationElementOutput narrationElementOutput) {
             narrationElementOutput.add(NarratedElementType.TITLE, getFieldName());

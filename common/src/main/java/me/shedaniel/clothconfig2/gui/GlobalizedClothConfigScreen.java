@@ -27,6 +27,8 @@ import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.api.scroll.ScrollingContainer;
+import me.shedaniel.clothconfig2.gui.entries.EmptyEntry;
+import me.shedaniel.clothconfig2.gui.widget.SearchFieldEntry;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -74,6 +76,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         }
     };
     private Reference lastHoveredReference = null;
+    private SearchFieldEntry searchFieldEntry;
     private final ScrollingContainer sideSlider = new ScrollingContainer() {
         private final Rectangle empty = new Rectangle();
         
@@ -138,6 +141,9 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         buildReferences();
         this.childrenL().add(listWidget = new ClothConfigScreen.ListWidget<>(this, minecraft, width - 14, height, 30, height - 32, getBackgroundLocation()));
         this.listWidget.setLeftPos(14);
+        this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(5));
+        this.listWidget.children().add((AbstractConfigEntry) (searchFieldEntry = new SearchFieldEntry(this, listWidget)));
+        this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(5));
         this.categorizedEntries.forEach((category, entries) -> {
             if (!listWidget.children().isEmpty())
                 this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(5));
@@ -167,6 +173,11 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             }
         });
         Optional.ofNullable(this.afterInitConsumer).ifPresent(consumer -> consumer.accept(this));
+    }
+    
+    @Override
+    public boolean matchesSearch(Iterator<String> tags) {
+        return searchFieldEntry.matchesSearch(tags);
     }
     
     private void buildReferences() {
@@ -332,51 +343,6 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         return (int) (sideSlider.scrollAmount() * sideExpandLimit.get() + 14);
     }
     
-    private static class EmptyEntry extends AbstractConfigListEntry<Object> {
-        private final int height;
-        
-        public EmptyEntry(int height) {
-            super(new TextComponent(UUID.randomUUID().toString()), false);
-            this.height = height;
-        }
-        
-        @Override
-        public int getItemHeight() {
-            return height;
-        }
-        
-        @Override
-        public List<? extends NarratableEntry> narratables() {
-            return Collections.emptyList();
-        }
-        
-        @Override
-        public Object getValue() {
-            return null;
-        }
-        
-        @Override
-        public Optional<Object> getDefaultValue() {
-            return Optional.empty();
-        }
-        
-        @Override
-        public boolean isMouseInside(int mouseX, int mouseY, int x, int y, int entryWidth, int entryHeight) {
-            return false;
-        }
-        
-        @Override
-        public void save() {}
-        
-        @Override
-        public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {}
-        
-        @Override
-        public List<? extends GuiEventListener> children() {
-            return Collections.emptyList();
-        }
-    }
-    
     private static class CategoryTextEntry extends AbstractConfigListEntry<Object> {
         private final Component category;
         private final Component text;
@@ -404,9 +370,6 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public Optional<Object> getDefaultValue() {
             return Optional.empty();
         }
-        
-        @Override
-        public void save() {}
         
         @Override
         public boolean isMouseInside(int mouseX, int mouseY, int x, int y, int entryWidth, int entryHeight) {

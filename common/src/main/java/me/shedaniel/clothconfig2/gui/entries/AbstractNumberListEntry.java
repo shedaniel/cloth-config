@@ -22,6 +22,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -36,23 +37,38 @@ public abstract class AbstractNumberListEntry<T> extends TextFieldListEntry<T> {
         
         return builder.toString();
     };
+    protected T minimum, maximum;
  
     @ApiStatus.Internal
     @Deprecated
     protected AbstractNumberListEntry(Component fieldName, T original, Component resetButtonKey, Supplier<T> defaultValue) {
         super(fieldName, original, resetButtonKey, defaultValue);
+        applyDefaultRange();
     }
     
     @ApiStatus.Internal
     @Deprecated
     protected AbstractNumberListEntry(Component fieldName, T original, Component resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<Component[]>> tooltipSupplier) {
         super(fieldName, original, resetButtonKey, defaultValue, tooltipSupplier);
+        applyDefaultRange();
     }
     
     @ApiStatus.Internal
     @Deprecated
     protected AbstractNumberListEntry(Component fieldName, T original, Component resetButtonKey, Supplier<T> defaultValue, Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, original, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
+        applyDefaultRange();
+    }
+    
+    protected abstract Map.Entry<T, T> getDefaultRange();
+    
+    private void applyDefaultRange() {
+        Map.Entry<T, T> range = getDefaultRange();
+    
+        if (range != null) {
+            this.minimum = range.getKey();
+            this.maximum = range.getValue();
+        }
     }
     
     @Override

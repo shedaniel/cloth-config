@@ -110,7 +110,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     }
     
     protected void textFieldPreRender(EditBox widget) {
-        
+        widget.setTextColor(getConfigError().isPresent() ? 0xff5555 : 0xe0e0e0);
     }
     
     @Override
@@ -141,7 +141,10 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         textFieldWidget.render(matrices, mouseX, mouseY, delta);
     }
     
-    protected abstract boolean isMatchDefault(String text);
+    protected boolean isMatchDefault(String text) {
+        Optional<T> defaultValue = getDefaultValue();
+        return defaultValue.isPresent() && text.equals(defaultValue.get().toString());
+    }
     
     @Override
     public Optional<T> getDefaultValue() {
