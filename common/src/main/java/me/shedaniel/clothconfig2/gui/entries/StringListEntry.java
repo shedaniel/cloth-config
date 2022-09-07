@@ -30,14 +30,11 @@ import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public class StringListEntry extends TextFieldListEntry<String> {
-    
-    private final Consumer<String> saveConsumer;
-    
     @ApiStatus.Internal
     @Deprecated
     public StringListEntry(Component fieldName, String value, Component resetButtonKey, Supplier<String> defaultValue, Consumer<String> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
     }
     
     @ApiStatus.Internal
@@ -50,23 +47,11 @@ public class StringListEntry extends TextFieldListEntry<String> {
     @Deprecated
     public StringListEntry(Component fieldName, String value, Component resetButtonKey, Supplier<String> defaultValue, Consumer<String> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
     }
     
     @Override
     public String getValue() {
         return textFieldWidget.getValue();
     }
-    
-    @Override
-    public void save() {
-        if (saveConsumer != null)
-            saveConsumer.accept(getValue());
-    }
-    
-    @Override
-    protected boolean isMatchDefault(String text) {
-        return getDefaultValue().isPresent() && text.equals(getDefaultValue().get());
-    }
-    
 }

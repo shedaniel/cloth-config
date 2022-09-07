@@ -47,7 +47,6 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     private final boolean original;
     private final Button buttonWidget;
     private final Button resetButton;
-    private final Consumer<Boolean> saveConsumer;
     private final Supplier<Boolean> defaultValue;
     private final List<AbstractWidget> widgets;
     
@@ -76,19 +75,13 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
         this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             BooleanListEntry.this.bool.set(defaultValue.get());
         });
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
     }
     
     @Override
     public boolean isEdited() {
         return super.isEdited() || original != bool.get();
-    }
-    
-    @Override
-    public void save() {
-        if (saveConsumer != null)
-            saveConsumer.accept(getValue());
     }
     
     @Override

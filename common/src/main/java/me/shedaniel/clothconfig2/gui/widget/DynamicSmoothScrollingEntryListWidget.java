@@ -62,6 +62,7 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
         } else {
             scrollAnimator.setAs(clampExtension(scroll, getMaxScroll()));
         }
+        this.scroll = scrollAnimator.value();
     }
     
     @Override

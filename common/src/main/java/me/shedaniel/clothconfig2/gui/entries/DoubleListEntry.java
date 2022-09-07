@@ -21,27 +21,23 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public class DoubleListEntry extends AbstractNumberListEntry<Double> {
-    private double minimum, maximum;
-    private final Consumer<Double> saveConsumer;
-    
     @ApiStatus.Internal
     @Deprecated
     public DoubleListEntry(Component fieldName, Double value, Component resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
-        this.minimum = -Double.MAX_VALUE;
-        this.maximum = Double.MAX_VALUE;
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
     }
     
     @ApiStatus.Internal
@@ -54,33 +50,12 @@ public class DoubleListEntry extends AbstractNumberListEntry<Double> {
     @Deprecated
     public DoubleListEntry(Component fieldName, Double value, Component resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
-        this.minimum = -Double.MAX_VALUE;
-        this.maximum = Double.MAX_VALUE;
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
     }
     
     @Override
-    protected void textFieldPreRender(EditBox widget) {
-        try {
-            double i = Double.parseDouble(textFieldWidget.getValue());
-            if (i < minimum || i > maximum)
-                widget.setTextColor(16733525);
-            else
-                widget.setTextColor(14737632);
-        } catch (NumberFormatException ex) {
-            widget.setTextColor(16733525);
-        }
-    }
-    
-    @Override
-    protected boolean isMatchDefault(String text) {
-        return getDefaultValue().isPresent() && text.equals(defaultValue.get().toString());
-    }
-    
-    @Override
-    public void save() {
-        if (saveConsumer != null)
-            saveConsumer.accept(getValue());
+    protected Map.Entry<Double, Double> getDefaultRange() {
+        return new AbstractMap.SimpleEntry<>(-Double.MAX_VALUE, Double.MAX_VALUE);
     }
     
     public DoubleListEntry setMinimum(double minimum) {
