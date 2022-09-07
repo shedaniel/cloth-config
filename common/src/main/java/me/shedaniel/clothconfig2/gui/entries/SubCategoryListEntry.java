@@ -104,7 +104,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
             @Override
             public Iterator<AbstractConfigListEntry> iterator() {
                 return Iterators.filter(entries.iterator(), entry -> {
-                    return getConfigScreen().matchesSearch(entry.getSearchTags());
+                    return getConfigScreen() != null && getConfigScreen().matchesSearch(entry.getSearchTags());
                 });
             }
             
