@@ -21,39 +21,22 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class FloatListEntry extends TextFieldListEntry<Float> {
-    
-    private static final Function<String, String> stripCharacters = s -> {
-        StringBuilder stringBuilder_1 = new StringBuilder();
-        char[] var2 = s.toCharArray();
-        int var3 = var2.length;
-        
-        for (char c : var2)
-            if (Character.isDigit(c) || c == '-' || c == '.')
-                stringBuilder_1.append(c);
-        
-        return stringBuilder_1.toString();
-    };
-    private float minimum, maximum;
-    private final Consumer<Float> saveConsumer;
-    
+public class FloatListEntry extends AbstractNumberListEntry<Float> {
     @ApiStatus.Internal
     @Deprecated
     public FloatListEntry(Component fieldName, Float value, Component resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer) {
         super(fieldName, value, resetButtonKey, defaultValue);
-        this.minimum = -Float.MAX_VALUE;
-        this.maximum = Float.MAX_VALUE;
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
     }
     
     @ApiStatus.Internal
@@ -66,32 +49,12 @@ public class FloatListEntry extends TextFieldListEntry<Float> {
     @Deprecated
     public FloatListEntry(Component fieldName, Float value, Component resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, value, resetButtonKey, defaultValue, tooltipSupplier, requiresRestart);
-        this.minimum = -Float.MAX_VALUE;
-        this.maximum = Float.MAX_VALUE;
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
     }
     
     @Override
-    protected String stripAddText(String s) {
-        return stripCharacters.apply(s);
-    }
-    
-    @Override
-    protected void textFieldPreRender(EditBox widget) {
-        try {
-            double i = Float.parseFloat(textFieldWidget.getValue());
-            if (i < minimum || i > maximum)
-                widget.setTextColor(16733525);
-            else
-                widget.setTextColor(14737632);
-        } catch (NumberFormatException ex) {
-            widget.setTextColor(16733525);
-        }
-    }
-    
-    @Override
-    protected boolean isMatchDefault(String text) {
-        return getDefaultValue().isPresent() && text.equals(defaultValue.get().toString());
+    protected Map.Entry<Float, Float> getDefaultRange() {
+        return new AbstractMap.SimpleEntry<>(-Float.MAX_VALUE, Float.MAX_VALUE);
     }
     
     public FloatListEntry setMinimum(float minimum) {
@@ -102,12 +65,6 @@ public class FloatListEntry extends TextFieldListEntry<Float> {
     public FloatListEntry setMaximum(float maximum) {
         this.maximum = maximum;
         return this;
-    }
-    
-    @Override
-    public void save() {
-        if (saveConsumer != null)
-            saveConsumer.accept(getValue());
     }
     
     @Override

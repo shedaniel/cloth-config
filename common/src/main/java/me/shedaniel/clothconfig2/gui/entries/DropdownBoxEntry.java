@@ -56,11 +56,9 @@ import static me.shedaniel.clothconfig2.api.ScrollingContainer.handleScrollingPo
 @SuppressWarnings("deprecation")
 @Environment(EnvType.CLIENT)
 public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
-    
     protected Button resetButton;
     protected SelectionElement<T> selectionElement;
     @NotNull private final Supplier<T> defaultValue;
-    @Nullable private final Consumer<T> saveConsumer;
     private boolean suggestionMode = true;
     
     @ApiStatus.Internal
@@ -68,7 +66,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     public DropdownBoxEntry(Component fieldName, @NotNull Component resetButtonKey, @Nullable Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart, @Nullable Supplier<T> defaultValue, @Nullable Consumer<T> saveConsumer, @Nullable Iterable<T> selections, @NotNull SelectionTopCellElement<T> topRenderer, @NotNull SelectionCellCreator<T> cellCreator) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
         this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             selectionElement.topRenderer.setValue(defaultValue.get());
         });
@@ -135,12 +133,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     @Override
     public Optional<T> getDefaultValue() {
         return defaultValue == null ? Optional.empty() : Optional.ofNullable(defaultValue.get());
-    }
-    
-    @Override
-    public void save() {
-        if (saveConsumer != null)
-            saveConsumer.accept(getValue());
     }
     
     @Override

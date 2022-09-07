@@ -131,6 +131,7 @@ public class StringListBuilder extends AbstractListBuilder<String, StringListLis
         StringListListEntry entry = new StringListListEntry(getFieldNameKey(), value, isExpanded(), null, getSaveConsumer(), defaultValue, getResetButtonKey(), isRequireRestart(), isDeleteButtonEnabled(), isInsertInFront());
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
+        entry.setInsertButtonEnabled(isInsertButtonEnabled());
         entry.setCellErrorSupplier(cellErrorSupplier);
         entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         entry.setAddTooltip(getAddTooltip());

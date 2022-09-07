@@ -155,6 +155,7 @@ public class DoubleListBuilder extends AbstractRangeListBuilder<Double, DoubleLi
             entry.setMaximum(max);
         if (createNewInstance != null)
             entry.setCreateNewInstance(createNewInstance);
+        entry.setInsertButtonEnabled(isInsertButtonEnabled());
         entry.setCellErrorSupplier(cellErrorSupplier);
         entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         entry.setAddTooltip(getAddTooltip());

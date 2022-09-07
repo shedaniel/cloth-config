@@ -142,12 +142,12 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return (E) super.getFocused();
     }
     
-    public final List<E> children() {
+    public List<E> children() {
         return this.entries;
     }
     
     protected final void clearItems() {
-        this.entries.clear();
+        this.children().clear();
     }
     
     protected E getItem(int index) {
@@ -155,8 +155,8 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected int addItem(E item) {
-        this.entries.add(item);
-        return this.entries.size() - 1;
+        this.children().add(item);
+        return this.children().size() - 1;
     }
     
     protected int getItemCount() {
@@ -174,7 +174,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         int currentY = Mth.floor(mouseY - (double) this.top) - this.headerHeight + (int) this.getScroll() - 4;
         int itemY = 0;
         int itemIndex = -1;
-        for (int i = 0; i < entries.size(); i++) {
+        for (int i = 0; i < children().size(); i++) {
             E item = getItem(i);
             itemY += item.getItemHeight();
             if (itemY > currentY) {
@@ -202,7 +202,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected int getMaxScrollPosition() {
         List<Integer> list = new ArrayList<>();
         int i = headerHeight;
-        for (E entry : entries) {
+        for (E entry : children()) {
             i += entry.getItemHeight();
             if (entry.getMorePossibleHeight() >= 0) {
                 list.add(i + entry.getMorePossibleHeight());
@@ -409,7 +409,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     public boolean mouseScrolled(double double_1, double double_2, double double_3) {
-        for (E entry : entries) {
+        for (E entry : children()) {
             if (entry.mouseScrolled(double_1, double_2, double_3)) {
                 return true;
             }
@@ -456,8 +456,8 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         for (int renderIndex = 0; renderIndex < itemCount; ++renderIndex) {
             E item = this.getItem(renderIndex);
             int itemY = startY + headerHeight;
-            for (int i = 0; i < entries.size() && i < renderIndex; i++)
-                itemY += entries.get(i).getItemHeight();
+            for (int i = 0; i < children().size() && i < renderIndex; i++)
+                itemY += children().get(i).getItemHeight();
             int itemHeight = item.getItemHeight() - 4;
             int itemWidth = this.getItemWidth();
             int itemMinX, itemMaxX;
@@ -497,8 +497,8 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     protected int getRowTop(int index) {
         int integer = top + 4 - (int) this.getScroll() + headerHeight;
-        for (int i = 0; i < entries.size() && i < index; i++)
-            integer += entries.get(i).getItemHeight();
+        for (int i = 0; i < children().size() && i < index; i++)
+            integer += children().get(i).getItemHeight();
         return integer;
     }
     
@@ -522,12 +522,12 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected E remove(int int_1) {
-        E itemListWidget$Item_1 = this.entries.get(int_1);
-        return this.removeEntry(this.entries.get(int_1)) ? itemListWidget$Item_1 : null;
+        E itemListWidget$Item_1 = this.children().get(int_1);
+        return this.removeEntry(this.children().get(int_1)) ? itemListWidget$Item_1 : null;
     }
     
     protected boolean removeEntry(E itemListWidget$Item_1) {
-        boolean boolean_1 = this.entries.remove(itemListWidget$Item_1);
+        boolean boolean_1 = this.children().remove(itemListWidget$Item_1);
         if (boolean_1 && itemListWidget$Item_1 == this.getSelectedItem()) {
             this.selectItem(null);
         }

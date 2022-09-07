@@ -25,8 +25,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.api.*;
+import me.shedaniel.clothconfig2.api.animator.ValueAnimator;
+import me.shedaniel.clothconfig2.gui.entries.EmptyEntry;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
-import me.shedaniel.clothconfig2.impl.EasingMethod;
+import me.shedaniel.clothconfig2.gui.widget.SearchFieldEntry;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
@@ -43,10 +45,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"deprecation", "rawtypes", "DuplicatedCode", "NullableProblems"})
@@ -72,7 +72,8 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     public ListWidget<AbstractConfigEntry<AbstractConfigEntry<?>>> listWidget;
     private final LinkedHashMap<Component, List<AbstractConfigEntry<?>>> categorizedEntries = Maps.newLinkedHashMap();
     private final List<Tuple<Component, Integer>> tabs;
-    private AbstractWidget quitButton, saveButton, buttonLeftTab, buttonRightTab;
+    private SearchFieldEntry searchFieldEntry;
+    private AbstractWidget buttonLeftTab, buttonRightTab;
     private Rectangle tabsBounds, tabsLeftBounds, tabsRightBounds;
     private double tabsMaximumScrolled = -1d;
     private final List<ClothConfigTabButton> tabButtons = Lists.newArrayList();
@@ -119,12 +120,15 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         this.tabButtons.clear();
         
         childrenL().add(listWidget = new ListWidget(this, minecraft, width, height, isShowingTabs() ? 70 : 30, height - 32, getBackgroundLocation()));
+        listWidget.children().add((AbstractConfigEntry) new EmptyEntry(5));
+        listWidget.children().add((AbstractConfigEntry) (searchFieldEntry = new SearchFieldEntry(this, listWidget)));
+        listWidget.children().add((AbstractConfigEntry) new EmptyEntry(5));
         if (categorizedEntries.size() > selectedCategoryIndex) {
             listWidget.children().addAll((List) Lists.newArrayList(categorizedEntries.values()).get(selectedCategoryIndex));
         }
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addRenderableWidget(quitButton = new Button(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()));
-        addRenderableWidget(saveButton = new Button(width / 2 + 3, height - 26, buttonWidths, 20, Component.empty(), button -> saveAll(true)) {
+        addRenderableWidget(new Button(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()));
+        addRenderableWidget(new Button(width / 2 + 3, height - 26, buttonWidths, 20, Component.empty(), button -> saveAll(true)) {
             @Override
             public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
@@ -142,7 +146,6 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 super.render(matrices, mouseX, mouseY, delta);
             }
         });
-        saveButton.active = isEdited();
         if (isShowingTabs()) {
             tabsBounds = new Rectangle(0, 41, width, 24);
             tabsLeftBounds = new Rectangle(0, 41, 18, 24);
@@ -183,6 +186,11 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             tabsBounds = tabsLeftBounds = tabsRightBounds = new Rectangle();
         }
         Optional.ofNullable(this.afterInitConsumer).ifPresent(consumer -> consumer.accept(this));
+    }
+    
+    @Override
+    public boolean matchesSearch(Iterator<String> tags) {
+        return searchFieldEntry.matchesSearch(tags);
     }
     
     @Override
@@ -320,16 +328,10 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     
     public static class ListWidget<R extends DynamicElementListWidget.ElementEntry<R>> extends DynamicElementListWidget<R> {
         private final AbstractConfigScreen screen;
-        private boolean hasCurrent;
-        private double currentX;
-        private double currentY;
-        private double currentWidth;
-        private double currentHeight;
-        public Rectangle target;
+        private final ValueAnimator<Rectangle> currentBounds = ValueAnimator.ofRectangle();
+        public UnaryOperator<List<R>> entriesTransformer = UnaryOperator.identity();
         public Rectangle thisTimeTarget;
         public long lastTouch;
-        public long start;
-        public long duration;
         
         public ListWidget(AbstractConfigScreen screen, Minecraft client, int width, int height, int top, int bottom, ResourceLocation backgroundLocation) {
             super(client, width, height, top, bottom, backgroundLocation);
@@ -357,33 +359,21 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         @Override
         protected void renderList(PoseStack matrices, int startX, int startY, int int_3, int int_4, float delta) {
             thisTimeTarget = null;
-            if (hasCurrent) {
+            Rectangle hoverBounds = currentBounds.value();
+            if (!hoverBounds.isEmpty()) {
                 long timePast = System.currentTimeMillis() - lastTouch;
                 int alpha = timePast <= 200 ? 255 : Mth.ceil(255 - Math.min(timePast - 200, 500F) / 500F * 255.0);
                 alpha = (alpha * 36 / 255) << 24;
-                fillGradient(matrices, currentX, currentY, currentX + currentWidth, currentY + currentHeight, 0xFFFFFF | alpha, 0xFFFFFF | alpha);
+                fillGradient(matrices, hoverBounds.x, hoverBounds.y - scroll, hoverBounds.getMaxX(), hoverBounds.getMaxY() - scroll, 0xFFFFFF | alpha, 0xFFFFFF | alpha);
             }
             super.renderList(matrices, startX, startY, int_3, int_4, delta);
             if (thisTimeTarget != null && isMouseOver(int_3, int_4)) {
                 lastTouch = System.currentTimeMillis();
             }
-            if (thisTimeTarget != null && !thisTimeTarget.equals(target)) {
-                if (!hasCurrent) {
-                    currentX = thisTimeTarget.x;
-                    currentY = thisTimeTarget.y;
-                    currentWidth = thisTimeTarget.width;
-                    currentHeight = thisTimeTarget.height;
-                    hasCurrent = true;
-                }
-                target = thisTimeTarget.clone();
-                start = lastTouch;
-                this.duration = 40;
-            } else if (hasCurrent && target != null) {
-                long timePast = System.currentTimeMillis() - start;
-                currentX = (int) ScrollingContainer.ease(currentX, target.x, Math.min(timePast / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
-                currentY = (int) ScrollingContainer.ease(currentY, target.y, Math.min(timePast / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
-                currentWidth = (int) ScrollingContainer.ease(currentWidth, target.width, Math.min(timePast / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
-                currentHeight = (int) ScrollingContainer.ease(currentHeight, target.height, Math.min(timePast / (double) duration * delta * 3, 1), EasingMethod.EasingMethodImpl.LINEAR);
+            if (thisTimeTarget != null && !thisTimeTarget.equals(currentBounds.target())) {
+                currentBounds.setTo(thisTimeTarget, 100);
+            } else if (!currentBounds.target().isEmpty()) {
+                currentBounds.update(delta);
             }
         }
         
@@ -451,6 +441,11 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         protected void renderHoleBackground(PoseStack matrices, int y1, int y2, int alpha1, int alpha2) {
             if (!screen.isTransparentBackground())
                 super.renderHoleBackground(matrices, y1, y2, alpha1, alpha2);
+        }
+        
+        @Override
+        public List<R> children() {
+            return entriesTransformer.apply(super.children());
         }
     }
 }

@@ -22,7 +22,6 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.widget.ColorDisplayWidget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
@@ -36,7 +35,6 @@ import java.util.function.Supplier;
 public class ColorEntry extends TextFieldListEntry<Integer> {
     
     private final ColorDisplayWidget colorDisplayWidget;
-    private final Consumer<Integer> saveConsumer;
     private boolean alpha;
     
     @ApiStatus.Internal
@@ -48,7 +46,7 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
         if (colorValue.hasError())
             throw new IllegalArgumentException("Invalid Color: " + colorValue.getError().name());
         this.alpha = false;
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
         this.original = value;
         this.textFieldWidget.setValue(getHexColorString(value));
         this.colorDisplayWidget = new ColorDisplayWidget(textFieldWidget, 0, 0, 20, getColorValueColor(textFieldWidget.getValue()));
@@ -76,21 +74,6 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
             this.colorDisplayWidget.x = textFieldWidget.x - 23;
         }
         colorDisplayWidget.render(matrices, mouseX, mouseY, delta);
-    }
-    
-    @Override
-    protected void textFieldPreRender(EditBox widget) {
-        if (!getConfigError().isPresent()) {
-            widget.setTextColor(14737632);
-        } else {
-            widget.setTextColor(16733525);
-        }
-    }
-    
-    @Override
-    public void save() {
-        if (saveConsumer != null)
-            saveConsumer.accept(getValue());
     }
     
     @Override

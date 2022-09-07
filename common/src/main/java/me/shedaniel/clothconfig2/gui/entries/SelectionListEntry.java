@@ -50,7 +50,6 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     private final int original;
     private final Button buttonWidget;
     private final Button resetButton;
-    private final Consumer<T> saveConsumer;
     private final Supplier<T> defaultValue;
     private final List<AbstractWidget> widgets;
     private final Function<T, Component> nameProvider;
@@ -92,15 +91,9 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
         this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             SelectionListEntry.this.index.set(getDefaultIndex());
         });
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
         this.nameProvider = nameProvider == null ? (t -> Component.translatable(t instanceof Translatable ? ((Translatable) t).getKey() : t.toString())) : nameProvider;
-    }
-    
-    @Override
-    public void save() {
-        if (saveConsumer != null)
-            saveConsumer.accept(getValue());
     }
     
     @Override

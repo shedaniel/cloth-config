@@ -49,7 +49,6 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     protected AtomicLong value;
     protected final long orginial;
     private long minimum, maximum;
-    private final Consumer<Long> saveConsumer;
     private final Supplier<Long> defaultValue;
     private Function<Long, Component> textGetter = value -> Component.literal(String.format("Value: %d", value));
     private final List<AbstractWidget> widgets;
@@ -73,7 +72,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         this.orginial = value;
         this.defaultValue = defaultValue;
         this.value = new AtomicLong(value);
-        this.saveConsumer = saveConsumer;
+        this.saveCallback = saveConsumer;
         this.maximum = maximum;
         this.minimum = minimum;
         this.sliderWidget = new Slider(0, 0, 152, 20, ((double) LongSliderEntry.this.value.get() - minimum) / Math.abs(maximum - minimum));
@@ -82,12 +81,6 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         });
         this.sliderWidget.setMessage(textGetter.apply(LongSliderEntry.this.value.get()));
         this.widgets = Lists.newArrayList(sliderWidget, resetButton);
-    }
-    
-    @Override
-    public void save() {
-        if (saveConsumer != null)
-            saveConsumer.accept(getValue());
     }
     
     public Function<Long, Component> getTextGetter() {
