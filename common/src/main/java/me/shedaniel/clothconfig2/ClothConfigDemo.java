@@ -91,7 +91,7 @@ public class ClothConfigDemo {
         testing.addEntry(entryBuilder.startKeyCodeField(new TextComponent("Cool Key"), InputConstants.UNKNOWN).setDefaultValue(InputConstants.UNKNOWN).build());
         testing.addEntry(entryBuilder.startModifierKeyCodeField(new TextComponent("Cool Modifier Key"), ModifierKeyCode.of(InputConstants.Type.KEYSYM.getOrCreate(79), Modifier.of(false, true, false))).setDefaultValue(ModifierKeyCode.of(InputConstants.Type.KEYSYM.getOrCreate(79), Modifier.of(false, true, false))).build());
         testing.addEntry(entryBuilder.startDoubleList(new TextComponent("A list of Doubles"), Arrays.asList(1d, 2d, 3d)).setDefaultValue(Arrays.asList(1d, 2d, 3d)).build());
-        testing.addEntry(entryBuilder.startLongList(new TextComponent("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).build());
+        testing.addEntry(entryBuilder.startLongList(new TextComponent("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).setInsertButtonEnabled(false).build());
         testing.addEntry(entryBuilder.startStrList(new TextComponent("A list of Strings"), Arrays.asList("abc", "xyz")).setTooltip(new TextComponent("Yes this is some beautiful tooltip\nOh and this is the second line!")).setDefaultValue(Arrays.asList("abc", "xyz")).build());
         SubCategoryBuilder colors = entryBuilder.startSubCategory(new TextComponent("Colors")).setExpanded(true);
         colors.add(entryBuilder.startColorField(new TextComponent("A color field"), 0x00ffff).setDefaultValue(0x00ffff).build());
