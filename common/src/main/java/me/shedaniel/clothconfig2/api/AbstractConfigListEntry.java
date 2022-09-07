@@ -72,7 +72,7 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
         if (isMouseInside(mouseX, mouseY, x, y, entryWidth, entryHeight)) {
             Rectangle area = getEntryArea(x, y, entryWidth, entryHeight);
             if (getParent() instanceof ClothConfigScreen.ListWidget)
-                ((ClothConfigScreen.ListWidget<AbstractConfigEntry<T>>) getParent()).thisTimeTarget = area;
+                ((ClothConfigScreen.ListWidget<AbstractConfigEntry<T>>) getParent()).thisTimeTarget = new Rectangle(area.x, area.y + getParent().getScroll(), area.width, area.height);
         }
     }
     

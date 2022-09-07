@@ -19,6 +19,7 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
@@ -35,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -56,6 +58,11 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
             referencableEntries.add(cell.nestedEntry);
         }
         setReferenceProviderEntries(referencableEntries);
+    }
+    
+    @Override
+    public Iterator<String> getSearchTags() {
+        return Iterators.concat(super.getSearchTags(), Iterators.concat(cells.stream().map(cell -> cell.nestedEntry.getSearchTags()).iterator()));
     }
     
     @Override

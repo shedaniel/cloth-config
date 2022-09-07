@@ -20,6 +20,7 @@
 package me.shedaniel.autoconfig.gui;
 
 import blue.endless.jankson.Comment;
+import com.google.common.collect.Lists;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.gui.registry.GuiRegistry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
@@ -34,6 +35,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -105,7 +107,12 @@ public class DefaultGuiTransformers {
                 (guis, i18n, field, config, defaults, guiProvider) -> {
                     ArrayList<AbstractConfigListEntry> ret = new ArrayList<>(guis);
                     String text = String.format("%s.%s", i18n, "@PrefixText");
-                    ret.add(0, ENTRY_BUILDER.startTextDescription(new TranslatableComponent(text)).build());
+                    TextListEntry element = ENTRY_BUILDER.startTextDescription(new TranslatableComponent(text)).build();
+                    String s = new TranslatableComponent(i18n).getString().toLowerCase(Locale.ROOT);
+                    if (!s.isEmpty()) {
+                        element.appendSearchTags(Lists.newArrayList(s.split(" ")));
+                    }
+                    ret.add(0, element);
                     return Collections.unmodifiableList(ret);
                 },
                 ConfigEntry.Gui.PrefixText.class

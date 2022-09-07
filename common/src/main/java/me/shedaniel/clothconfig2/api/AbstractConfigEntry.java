@@ -19,6 +19,10 @@
 
 package me.shedaniel.clothconfig2.api;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
@@ -32,8 +36,11 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -43,6 +50,11 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     private Supplier<Optional<Component>> errorSupplier;
     @Nullable
     private List<ReferenceProvider<?>> referencableEntries = null;
+    @Nullable
+    protected Consumer<T> saveCallback;
+    private int cacheFieldNameHash = -1;
+    private List<String> cachedTags = null;
+    private Iterable<String> additionalSearchTags = null;
     
     @Deprecated
     @ApiStatus.ScheduledForRemoval
@@ -99,6 +111,28 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
         return text;
     }
     
+    public Iterator<String> getSearchTags() {
+        String s = getFieldName().getString();
+        if (s.isEmpty()) {
+            cacheFieldNameHash = -1;
+            cachedTags = null;
+            return MoreObjects.firstNonNull(additionalSearchTags, Collections.<String>emptyList()).iterator();
+        }
+        if (s.hashCode() != cacheFieldNameHash) {
+            cacheFieldNameHash = s.hashCode();
+            cachedTags = Lists.newArrayList(s.split(" "));
+        }
+        return Iterators.concat(cachedTags.iterator(), MoreObjects.firstNonNull(additionalSearchTags, Collections.<String>emptyList()).iterator());
+    }
+    
+    public void appendSearchTags(Iterable<String> tags) {
+        if (this.additionalSearchTags == null) {
+            this.additionalSearchTags = tags;
+        } else {
+            this.additionalSearchTags = Iterables.concat(this.additionalSearchTags, tags);
+        }
+    }
+    
     public abstract T getValue();
     
     public final Optional<Component> getConfigError() {
@@ -144,7 +178,11 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
         this.screen = screen;
     }
     
-    public abstract void save();
+    public void save() {
+        if (this.saveCallback != null) {
+            this.saveCallback.accept(getValue());
+        }
+    }
     
     public boolean isEdited() {
         return getConfigError().isPresent();

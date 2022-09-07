@@ -32,7 +32,7 @@ public abstract class AbstractListBuilder<T, A extends AbstractConfigListEntry, 
     private boolean expanded = false;
     private Component addTooltip = new TranslatableComponent("text.cloth-config.list.add");
     private Component removeTooltip = new TranslatableComponent("text.cloth-config.list.remove");
-    private boolean deleteButtonEnabled = true, insertInFront = false;
+    private boolean insertButtonEnabled = true, deleteButtonEnabled = true, insertInFront = false;
     
     protected AbstractListBuilder(Component resetButtonKey, Component fieldNameKey) {
         super(resetButtonKey, fieldNameKey);
@@ -49,6 +49,11 @@ public abstract class AbstractListBuilder<T, A extends AbstractConfigListEntry, 
     
     public SELF setDeleteButtonEnabled(boolean deleteButtonEnabled) {
         this.deleteButtonEnabled = deleteButtonEnabled;
+        return (SELF) this;
+    }
+
+    public SELF setInsertButtonEnabled(boolean insertButtonEnabled) {
+        this.insertButtonEnabled = insertButtonEnabled;
         return (SELF) this;
     }
     
@@ -84,6 +89,10 @@ public abstract class AbstractListBuilder<T, A extends AbstractConfigListEntry, 
         return removeTooltip;
     }
     
+    public boolean isInsertButtonEnabled() {
+        return insertButtonEnabled;
+    }
+
     public boolean isDeleteButtonEnabled() {
         return deleteButtonEnabled;
     }
