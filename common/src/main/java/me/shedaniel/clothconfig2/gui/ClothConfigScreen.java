@@ -23,7 +23,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.api.animator.ValueAnimator;
 import me.shedaniel.clothconfig2.gui.entries.EmptyEntry;
@@ -44,8 +43,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import org.jetbrains.annotations.ApiStatus;
+import org.joml.Matrix4f;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
@@ -127,8 +128,8 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             listWidget.children().addAll((List) Lists.newArrayList(categorizedEntries.values()).get(selectedCategoryIndex));
         }
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addRenderableWidget(new Button(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20, isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()));
-        addRenderableWidget(new Button(width / 2 + 3, height - 26, buttonWidths, 20, Component.empty(), button -> saveAll(true)) {
+        addRenderableWidget(Button.builder(isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()).bounds(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20).build());
+        addRenderableWidget(new Button(width / 2 + 3, height - 26, buttonWidths, 20, Component.empty(), button -> saveAll(true), Button.NO_TOOLTIP, Supplier::get) {
             @Override
             public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
@@ -150,7 +151,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             tabsBounds = new Rectangle(0, 41, width, 24);
             tabsLeftBounds = new Rectangle(0, 41, 18, 24);
             tabsRightBounds = new Rectangle(width - 18, 41, 18, 24);
-            childrenL().add(buttonLeftTab = new Button(4, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(0, true)) {
+            childrenL().add(buttonLeftTab = new Button(4, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(0, true), Button.NO_TOOLTIP, Supplier::get) {
                 @Override
                 public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -160,7 +161,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
-                    this.blit(matrices, x, y, 12, 18 * int_3, width, height);
+                    this.blit(matrices, getX(), getY(), 12, 18 * int_3, width, height);
                 }
             });
             int j = 0;
@@ -169,7 +170,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 j++;
             }
             childrenL().addAll(tabButtons);
-            childrenL().add(buttonRightTab = new Button(width - 16, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true)) {
+            childrenL().add(buttonRightTab = new Button(width - 16, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true), Button.NO_TOOLTIP, Supplier::get) {
                 @Override
                 public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -179,7 +180,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
-                    this.blit(matrices, x, y, 0, 18 * int_3, width, height);
+                    this.blit(matrices, getX(), getY(), 0, 18 * int_3, width, height);
                 }
             });
         } else {
@@ -221,7 +222,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             tabsScroller.updatePosition(delta * 3);
             int xx = 24 - (int) tabsScroller.scrollAmount;
             for (ClothConfigTabButton tabButton : tabButtons) {
-                tabButton.x = xx;
+                tabButton.setX(xx);
                 xx += tabButton.getWidth() + 2;
             }
             buttonLeftTab.active = tabsScroller.scrollAmount > 0d;

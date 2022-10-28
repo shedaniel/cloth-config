@@ -21,7 +21,6 @@ package me.shedaniel.clothconfig2.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
@@ -31,6 +30,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.joml.Matrix4f;
 
 import static me.shedaniel.clothconfig2.api.ScrollingContainer.clampExtension;
 import static me.shedaniel.clothconfig2.api.ScrollingContainer.handleScrollingPosition;

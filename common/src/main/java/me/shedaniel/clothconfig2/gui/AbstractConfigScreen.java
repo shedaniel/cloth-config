@@ -23,7 +23,6 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
@@ -44,6 +43,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 
 import java.net.URI;
 import java.net.URISyntaxException;

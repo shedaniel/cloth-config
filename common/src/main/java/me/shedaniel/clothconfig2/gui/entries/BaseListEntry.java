@@ -90,7 +90,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         this.cells = Lists.newArrayList();
         this.labelWidget = new ListLabelWidget();
         this.widgets = Lists.newArrayList(labelWidget);
-        this.resetWidget = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
+        this.resetWidget = Button.builder(resetButtonKey, widget -> {
             widgets.removeAll(cells);
             for (C cell : cells) {
                 cell.onDelete();
@@ -101,7 +101,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                 cell.onAdd();
             }
             widgets.addAll(cells);
-        });
+        }).bounds(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20).build();
         this.widgets.add(resetWidget);
         this.saveCallback = saveConsumer;
         this.createNewInstance = createNewInstance;
@@ -157,15 +157,15 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     public boolean isInsertButtonEnabled() {
         return insertButtonEnabled;
     }
-
+    
     public void setDeleteButtonEnabled(boolean deleteButtonEnabled) {
         this.deleteButtonEnabled = deleteButtonEnabled;
     }
-
+    
     public void setInsertButtonEnabled(boolean insertButtonEnabled) {
         this.insertButtonEnabled = insertButtonEnabled;
     }
-
+    
     protected abstract C getFromValue(T value);
     
     @NotNull
@@ -291,8 +291,8 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
             blit(matrices, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
         if (isDeleteButtonEnabled())
             blit(matrices, x - 15 + (isInsertButtonEnabled() ? 26 : 13), y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
-        resetWidget.x = x + entryWidth - resetWidget.getWidth();
-        resetWidget.y = y;
+        resetWidget.setX(x + entryWidth - resetWidget.getWidth());
+        resetWidget.setY(y);
         resetWidget.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault();
         resetWidget.render(matrices, mouseX, mouseY, delta);
         Minecraft.getInstance().font.drawShadow(matrices, getDisplayedFieldName().getVisualOrderText(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 6, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());

@@ -23,7 +23,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.api.scroll.ScrollingContainer;
@@ -49,8 +48,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
+import org.joml.Matrix4f;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements ReferenceBuildingConfigScreen, Expandable {
     public ClothConfigScreen.ListWidget<AbstractConfigEntry<AbstractConfigEntry<?>>> listWidget;
@@ -150,8 +151,8 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             this.listWidget.children().addAll((List) entries);
         });
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addRenderableWidget(cancelButton = new Button(0, height - 26, buttonWidths, 20, isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()));
-        addRenderableWidget(exitButton = new Button(0, height - 26, buttonWidths, 20, Component.empty(), button -> saveAll(true)) {
+        addRenderableWidget(cancelButton = Button.builder(isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()).bounds(0, height - 26, buttonWidths, 20).build());
+        addRenderableWidget(exitButton = new Button(0, height - 26, buttonWidths, 20, Component.empty(), button -> saveAll(true), Button.NO_TOOLTIP, Supplier::get) {
             @Override
             public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
@@ -220,8 +221,8 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         ScissorsHandler.INSTANCE.removeLastScissor();
         font.drawShadow(matrices, title.getVisualOrderText(), sliderPosition + (width - sliderPosition) / 2f - font.width(title) / 2f, 12, -1);
         ScissorsHandler.INSTANCE.removeLastScissor();
-        cancelButton.x = sliderPosition + (width - sliderPosition) / 2 - cancelButton.getWidth() - 3;
-        exitButton.x = sliderPosition + (width - sliderPosition) / 2 + 3;
+        cancelButton.setX(sliderPosition + (width - sliderPosition) / 2 - cancelButton.getWidth() - 3);
+        exitButton.setX(sliderPosition + (width - sliderPosition) / 2 + 3);
         super.render(matrices, mouseX, mouseY, delta);
         sideSlider.updatePosition(delta);
         sideScroller.updatePosition(delta);

@@ -35,7 +35,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -67,9 +67,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.defaultValue = defaultValue;
         this.saveCallback = saveConsumer;
-        this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
+        this.resetButton = Button.builder(resetButtonKey, widget -> {
             selectionElement.topRenderer.setValue(defaultValue.get());
-        });
+        }).bounds(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20).build();
         this.selectionElement = new SelectionElement<>(this, new Rectangle(0, 0, 150, 20), new DefaultDropdownMenuElement<>(selections == null ? ImmutableList.of() : ImmutableList.copyOf(selections)), topRenderer, cellCreator);
     }
     
@@ -78,17 +78,17 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         Window window = Minecraft.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && (!defaultValue.get().equals(getValue()) || getConfigError().isPresent());
-        this.resetButton.y = y;
+        this.resetButton.setY(y);
         this.selectionElement.active = isEditable();
         this.selectionElement.bounds.y = y;
         Component displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().font.isBidirectional()) {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, getPreferredTextColor());
-            this.resetButton.x = x;
+            this.resetButton.setX(x);
             this.selectionElement.bounds.x = x + resetButton.getWidth() + 1;
         } else {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), x, y + 6, getPreferredTextColor());
-            this.resetButton.x = x + entryWidth - resetButton.getWidth();
+            this.resetButton.setX(x + entryWidth - resetButton.getWidth());
             this.selectionElement.bounds.x = x + entryWidth - 150 + 1;
         }
         this.selectionElement.bounds.width = 150 - resetButton.getWidth() - 4;
@@ -165,7 +165,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         return selectionElement.mouseScrolled(double_1, double_2, double_3);
     }
     
-    public static class SelectionElement<R> extends AbstractContainerEventHandler implements Widget {
+    public static class SelectionElement<R> extends AbstractContainerEventHandler implements Renderable {
         protected Rectangle bounds;
         protected boolean active;
         protected SelectionTopCellElement<R> topRenderer;
@@ -750,8 +750,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         @Override
         public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
-            textFieldWidget.x = x + 4;
-            textFieldWidget.y = y + 6;
+            textFieldWidget.setX(x + 4);
+            textFieldWidget.setY(y + 6);
             textFieldWidget.setWidth(width - 8);
             textFieldWidget.setEditable(getParent().isEditable());
             textFieldWidget.setTextColor(getPreferredTextColor());

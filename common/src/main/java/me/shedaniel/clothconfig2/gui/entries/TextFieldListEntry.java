@@ -80,9 +80,9 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         };
         textFieldWidget.setMaxLength(999999);
         textFieldWidget.setValue(String.valueOf(original));
-        this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
+        this.resetButton = Button.builder(resetButtonKey, widget -> {
             TextFieldListEntry.this.textFieldWidget.setValue(String.valueOf(defaultValue.get()));
-        });
+        }).bounds(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20).build();
         this.widgets = Lists.newArrayList(textFieldWidget, resetButton);
     }
     
@@ -122,18 +122,18 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         Window window = Minecraft.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault(textFieldWidget.getValue());
-        this.resetButton.y = y;
+        this.resetButton.setY(y);
         this.textFieldWidget.setEditable(isEditable());
-        this.textFieldWidget.y = y + 1;
+        this.textFieldWidget.setY(y + 1);
         Component displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().font.isBidirectional()) {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, getPreferredTextColor());
-            this.resetButton.x = x;
-            this.textFieldWidget.x = x + resetButton.getWidth();
+            this.resetButton.setX(x);
+            this.textFieldWidget.setX(x + resetButton.getWidth());
         } else {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), x, y + 6, getPreferredTextColor());
-            this.resetButton.x = x + entryWidth - resetButton.getWidth();
-            this.textFieldWidget.x = x + entryWidth - 148;
+            this.resetButton.setX(x + entryWidth - resetButton.getWidth());
+            this.textFieldWidget.setX(x + entryWidth - 148);
         }
         setTextFieldWidth(textFieldWidget, 148 - resetButton.getWidth() - 4);
         resetButton.render(matrices, mouseX, mouseY, delta);

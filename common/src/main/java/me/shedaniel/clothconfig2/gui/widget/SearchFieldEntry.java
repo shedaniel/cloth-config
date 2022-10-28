@@ -109,8 +109,8 @@ public class SearchFieldEntry extends AbstractConfigListEntry<Object> {
     @Override
     public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         this.editBox.setWidth(Mth.clamp(entryWidth - 10, 0, 500));
-        this.editBox.x = x + entryWidth / 2 - this.editBox.getWidth() / 2;
-        this.editBox.y = y + entryHeight / 2 - 9;
+        this.editBox.setX(x + entryWidth / 2 - this.editBox.getWidth() / 2);
+        this.editBox.setY(y + entryHeight / 2 - 9);
         this.editBox.render(matrices, mouseX, mouseY, delta);
         if (this.editBox.getValue().isEmpty()) {
             this.editBox.setSuggestion("Search...");

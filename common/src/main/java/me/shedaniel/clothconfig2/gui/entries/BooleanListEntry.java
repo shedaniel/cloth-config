@@ -67,12 +67,12 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
         this.defaultValue = defaultValue;
         this.original = bool;
         this.bool = new AtomicBoolean(bool);
-        this.buttonWidget = new Button(0, 0, 150, 20, Component.empty(), widget -> {
+        this.buttonWidget = Button.builder(Component.empty(), widget -> {
             BooleanListEntry.this.bool.set(!BooleanListEntry.this.bool.get());
-        });
-        this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
+        }).bounds(0, 0, 150, 20).build();
+        this.resetButton = Button.builder(resetButtonKey, widget -> {
             BooleanListEntry.this.bool.set(defaultValue.get());
-        });
+        }).bounds(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20).build();
         this.saveCallback = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
     }
@@ -97,19 +97,19 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         Window window = Minecraft.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && defaultValue.get() != bool.get();
-        this.resetButton.y = y;
+        this.resetButton.setY(y);
         this.buttonWidget.active = isEditable();
-        this.buttonWidget.y = y;
+        this.buttonWidget.setY(y);
         this.buttonWidget.setMessage(getYesNoText(bool.get()));
         Component displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().font.isBidirectional()) {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, 16777215);
-            this.resetButton.x = x;
-            this.buttonWidget.x = x + resetButton.getWidth() + 2;
+            this.resetButton.setX(x);
+            this.buttonWidget.setX(x + resetButton.getWidth() + 2);
         } else {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), x, y + 6, getPreferredTextColor());
-            this.resetButton.x = x + entryWidth - resetButton.getWidth();
-            this.buttonWidget.x = x + entryWidth - 150;
+            this.resetButton.setX(x + entryWidth - resetButton.getWidth());
+            this.buttonWidget.setX(x + entryWidth - 150);
         }
         this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         resetButton.render(matrices, mouseX, mouseY, delta);

@@ -84,13 +84,13 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
         this.index = new AtomicInteger(this.values.indexOf(value));
         this.index.compareAndSet(-1, 0);
         this.original = this.values.indexOf(value);
-        this.buttonWidget = new Button(0, 0, 150, 20, Component.empty(), widget -> {
+        this.buttonWidget = Button.builder(Component.empty(), widget -> {
             SelectionListEntry.this.index.incrementAndGet();
             SelectionListEntry.this.index.compareAndSet(SelectionListEntry.this.values.size(), 0);
-        });
-        this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
+        }).bounds(0, 0, 150, 20).build();
+        this.resetButton = Button.builder(resetButtonKey, widget -> {
             SelectionListEntry.this.index.set(getDefaultIndex());
-        });
+        }).bounds(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20).build();
         this.saveCallback = saveConsumer;
         this.widgets = Lists.newArrayList(buttonWidget, resetButton);
         this.nameProvider = nameProvider == null ? (t -> Component.translatable(t instanceof Translatable ? ((Translatable) t).getKey() : t.toString())) : nameProvider;
@@ -116,19 +116,19 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         Window window = Minecraft.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && getDefaultIndex() != this.index.get();
-        this.resetButton.y = y;
+        this.resetButton.setY(y);
         this.buttonWidget.active = isEditable();
-        this.buttonWidget.y = y;
+        this.buttonWidget.setY(y);
         this.buttonWidget.setMessage(nameProvider.apply(getValue()));
         Component displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().font.isBidirectional()) {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, getPreferredTextColor());
-            this.resetButton.x = x;
-            this.buttonWidget.x = x + resetButton.getWidth() + 2;
+            this.resetButton.setX(x);
+            this.buttonWidget.setX(x + resetButton.getWidth() + 2);
         } else {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), x, y + 6, getPreferredTextColor());
-            this.resetButton.x = x + entryWidth - resetButton.getWidth();
-            this.buttonWidget.x = x + entryWidth - 150;
+            this.resetButton.setX(x + entryWidth - resetButton.getWidth());
+            this.buttonWidget.setX(x + entryWidth - 150);
         }
         this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
         resetButton.render(matrices, mouseX, mouseY, delta);

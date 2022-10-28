@@ -184,8 +184,8 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
             return new DefaultSelectionTopCellElement<ResourceLocation>(Registry.ITEM.getKey(item), ITEM_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
-                    textFieldWidget.x = x + 4;
-                    textFieldWidget.y = y + 6;
+                    textFieldWidget.setX(x + 4);
+                    textFieldWidget.setY(y + 6);
                     textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEditable(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());
@@ -201,8 +201,8 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
             return new DefaultSelectionTopCellElement<ResourceLocation>(Registry.BLOCK.getKey(block), BLOCK_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
-                    textFieldWidget.x = x + 4;
-                    textFieldWidget.y = y + 6;
+                    textFieldWidget.setX(x + 4);
+                    textFieldWidget.setY(y + 6);
                     textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEditable(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());
@@ -218,8 +218,8 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
             return new DefaultSelectionTopCellElement<Item>(item, ITEM_FUNCTION, i -> Component.literal(Registry.ITEM.getKey(i).toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
-                    textFieldWidget.x = x + 4;
-                    textFieldWidget.y = y + 6;
+                    textFieldWidget.setX(x + 4);
+                    textFieldWidget.setY(y + 6);
                     textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEditable(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());
@@ -235,8 +235,8 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
             return new DefaultSelectionTopCellElement<Block>(block, BLOCK_FUNCTION, i -> Component.literal(Registry.BLOCK.getKey(i).toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
-                    textFieldWidget.x = x + 4;
-                    textFieldWidget.y = y + 6;
+                    textFieldWidget.setX(x + 4);
+                    textFieldWidget.setY(y + 6);
                     textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEditable(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());

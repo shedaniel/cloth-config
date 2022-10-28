@@ -120,8 +120,8 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         @Override
         public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             widget.setWidth(entryWidth - 12);
-            widget.x = x;
-            widget.y = y + 1;
+            widget.setX(x);
+            widget.setY(y + 1);
             widget.setEditable(listListEntry.isEditable());
             widget.render(matrices, mouseX, mouseY, delta);
             isHovered = widget.isMouseOver(mouseX, mouseY);

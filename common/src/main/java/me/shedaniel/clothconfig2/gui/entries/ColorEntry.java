@@ -64,14 +64,14 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
     @Override
     public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
-        this.colorDisplayWidget.y = y;
+        this.colorDisplayWidget.setY(y);
         ColorValue value = getColorValue(textFieldWidget.getValue());
         if (!value.hasError())
             colorDisplayWidget.setColor(alpha ? value.getColor() : 0xff000000 | value.getColor());
         if (Minecraft.getInstance().font.isBidirectional()) {
-            this.colorDisplayWidget.x = x + resetButton.getWidth() + textFieldWidget.getWidth();
+            this.colorDisplayWidget.setX(x + resetButton.getWidth() + textFieldWidget.getWidth());
         } else {
-            this.colorDisplayWidget.x = textFieldWidget.x - 23;
+            this.colorDisplayWidget.setX(textFieldWidget.getX() - 23);
         }
         colorDisplayWidget.render(matrices, mouseX, mouseY, delta);
     }
