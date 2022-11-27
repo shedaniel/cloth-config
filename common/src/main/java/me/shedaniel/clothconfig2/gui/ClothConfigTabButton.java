@@ -89,7 +89,7 @@ public class ClothConfigTabButton extends AbstractButton {
     }
     
     @Override
-    public void updateNarration(NarrationElementOutput narrationElementOutput) {
+    public void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
         
     }
 }

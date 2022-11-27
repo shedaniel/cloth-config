@@ -29,7 +29,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -141,7 +141,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         public static final Function<String, ResourceLocation> ITEM_IDENTIFIER_FUNCTION = str -> {
             try {
                 ResourceLocation identifier = new ResourceLocation(str);
-                if (Registry.ITEM.getOptional(identifier).isPresent())
+                if (BuiltInRegistries.ITEM.getOptional(identifier).isPresent())
                     return identifier;
             } catch (Exception ignored) {
             }
@@ -150,7 +150,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         public static final Function<String, ResourceLocation> BLOCK_IDENTIFIER_FUNCTION = str -> {
             try {
                 ResourceLocation identifier = new ResourceLocation(str);
-                if (Registry.BLOCK.getOptional(identifier).isPresent())
+                if (BuiltInRegistries.BLOCK.getOptional(identifier).isPresent())
                     return identifier;
             } catch (Exception ignored) {
             }
@@ -158,14 +158,14 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         };
         public static final Function<String, Item> ITEM_FUNCTION = str -> {
             try {
-                return Registry.ITEM.getOptional(new ResourceLocation(str)).orElse(null);
+                return BuiltInRegistries.ITEM.getOptional(new ResourceLocation(str)).orElse(null);
             } catch (Exception ignored) {
             }
             return null;
         };
         public static final Function<String, Block> BLOCK_FUNCTION = str -> {
             try {
-                return Registry.BLOCK.getOptional(new ResourceLocation(str)).orElse(null);
+                return BuiltInRegistries.BLOCK.getOptional(new ResourceLocation(str)).orElse(null);
             } catch (Exception ignored) {
             }
             return null;
@@ -181,7 +181,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         }
         
         public static SelectionTopCellElement<ResourceLocation> ofItemIdentifier(Item item) {
-            return new DefaultSelectionTopCellElement<ResourceLocation>(Registry.ITEM.getKey(item), ITEM_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
+            return new DefaultSelectionTopCellElement<ResourceLocation>(BuiltInRegistries.ITEM.getKey(item), ITEM_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
                     textFieldWidget.setX(x + 4);
@@ -191,14 +191,14 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
                     textFieldWidget.setTextColor(getPreferredTextColor());
                     textFieldWidget.render(matrices, mouseX, mouseY, delta);
                     ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-                    ItemStack stack = hasConfigError() ? BARRIER : new ItemStack(Registry.ITEM.get(getValue()));
+                    ItemStack stack = hasConfigError() ? BARRIER : new ItemStack(BuiltInRegistries.ITEM.get(getValue()));
                     itemRenderer.renderGuiItem(stack, x + width - 18, y + 2);
                 }
             };
         }
         
         public static SelectionTopCellElement<ResourceLocation> ofBlockIdentifier(Block block) {
-            return new DefaultSelectionTopCellElement<ResourceLocation>(Registry.BLOCK.getKey(block), BLOCK_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
+            return new DefaultSelectionTopCellElement<ResourceLocation>(BuiltInRegistries.BLOCK.getKey(block), BLOCK_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
                     textFieldWidget.setX(x + 4);
@@ -208,14 +208,14 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
                     textFieldWidget.setTextColor(getPreferredTextColor());
                     textFieldWidget.render(matrices, mouseX, mouseY, delta);
                     ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-                    ItemStack stack = hasConfigError() ? BARRIER : new ItemStack(Registry.BLOCK.get(getValue()));
+                    ItemStack stack = hasConfigError() ? BARRIER : new ItemStack(BuiltInRegistries.BLOCK.get(getValue()));
                     itemRenderer.renderGuiItem(stack, x + width - 18, y + 2);
                 }
             };
         }
         
         public static SelectionTopCellElement<Item> ofItemObject(Item item) {
-            return new DefaultSelectionTopCellElement<Item>(item, ITEM_FUNCTION, i -> Component.literal(Registry.ITEM.getKey(i).toString())) {
+            return new DefaultSelectionTopCellElement<Item>(item, ITEM_FUNCTION, i -> Component.literal(BuiltInRegistries.ITEM.getKey(i).toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
                     textFieldWidget.setX(x + 4);
@@ -232,7 +232,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         }
         
         public static SelectionTopCellElement<Block> ofBlockObject(Block block) {
-            return new DefaultSelectionTopCellElement<Block>(block, BLOCK_FUNCTION, i -> Component.literal(Registry.BLOCK.getKey(i).toString())) {
+            return new DefaultSelectionTopCellElement<Block>(block, BLOCK_FUNCTION, i -> Component.literal(BuiltInRegistries.BLOCK.getKey(i).toString())) {
                 @Override
                 public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
                     textFieldWidget.setX(x + 4);
@@ -372,7 +372,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
             return new DefaultSelectionCellCreator<ResourceLocation>() {
                 @Override
                 public DropdownBoxEntry.SelectionCellElement<ResourceLocation> create(ResourceLocation selection) {
-                    ItemStack s = new ItemStack(Registry.ITEM.get(selection));
+                    ItemStack s = new ItemStack(BuiltInRegistries.ITEM.get(selection));
                     return new DropdownBoxEntry.DefaultSelectionCellElement<ResourceLocation>(selection, toTextFunction) {
                         @Override
                         public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
@@ -421,7 +421,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
             return new DefaultSelectionCellCreator<ResourceLocation>() {
                 @Override
                 public DropdownBoxEntry.SelectionCellElement<ResourceLocation> create(ResourceLocation selection) {
-                    ItemStack s = new ItemStack(Registry.BLOCK.get(selection));
+                    ItemStack s = new ItemStack(BuiltInRegistries.BLOCK.get(selection));
                     return new DropdownBoxEntry.DefaultSelectionCellElement<ResourceLocation>(selection, toTextFunction) {
                         @Override
                         public void render(PoseStack matrices, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
@@ -466,7 +466,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         }
         
         public static SelectionCellCreator<Item> ofItemObject(int cellHeight, int cellWidth, int maxItems) {
-            return new DefaultSelectionCellCreator<Item>(i -> Component.literal(Registry.ITEM.getKey(i).toString())) {
+            return new DefaultSelectionCellCreator<Item>(i -> Component.literal(BuiltInRegistries.ITEM.getKey(i).toString())) {
                 @Override
                 public DropdownBoxEntry.SelectionCellElement<Item> create(Item selection) {
                     ItemStack s = new ItemStack(selection);
@@ -514,7 +514,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         }
         
         public static SelectionCellCreator<Block> ofBlockObject(int cellHeight, int cellWidth, int maxItems) {
-            return new DefaultSelectionCellCreator<Block>(i -> Component.literal(Registry.BLOCK.getKey(i).toString())) {
+            return new DefaultSelectionCellCreator<Block>(i -> Component.literal(BuiltInRegistries.BLOCK.getKey(i).toString())) {
                 @Override
                 public DropdownBoxEntry.SelectionCellElement<Block> create(Block selection) {
                     ItemStack s = new ItemStack(selection);
