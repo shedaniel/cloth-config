@@ -17,6 +17,6 @@ An API for config screens.
 [[dependencies.cloth_config]]
 modId = "forge"
 mandatory = true
-versionRange = "[41.0.94,)"
+versionRange = "[44,)"
 ordering = "NONE"
 side = "BOTH"
