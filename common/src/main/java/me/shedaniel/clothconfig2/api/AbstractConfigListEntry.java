@@ -36,7 +36,7 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
     private boolean requiresRestart;
     
     @Nullable private BooleanListEntry dependency = null;
-    private boolean dependantValue = true;
+    private boolean dependentValue = true;
     
     public AbstractConfigListEntry(Component fieldName, boolean requiresRestart) {
         this.fieldName = fieldName;
@@ -54,7 +54,7 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
     }
     
     public boolean isEditable() {
-        return isDependencyMet() && getConfigScreen().isEditable() && editable;
+        return dependencySatisfied() && getConfigScreen().isEditable() && editable;
     }
     
     public void setEditable(boolean editable) {
@@ -67,7 +67,7 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
     
     public final void setDependency(@NotNull BooleanListEntry entry, boolean value) {
         dependency = entry;
-        dependantValue = value;
+        dependentValue = value;
     }
     
     @Nullable
@@ -75,12 +75,16 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
         return dependency;
     }
     
+    public boolean getDependentValue() {
+        return dependentValue;
+    }
+    
     public boolean hasDependency() {
         return dependency != null;
     }
     
-    public boolean isDependencyMet() {
-        return dependency == null || dependantValue == dependency.getValue(); 
+    public boolean dependencySatisfied() {
+        return dependency == null || dependentValue == dependency.getValue(); 
     }
     
     public final int getPreferredTextColor() {

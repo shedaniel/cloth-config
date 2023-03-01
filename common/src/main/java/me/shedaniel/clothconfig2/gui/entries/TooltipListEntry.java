@@ -27,7 +27,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
 public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
@@ -70,22 +68,20 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     }
     
     public Optional<Component[]> getTooltip() {
-        Optional<Component[]> tooltip = tooltipSupplier == null ?
-                Optional.empty() : tooltipSupplier.get();
-        Optional<Component> dependsOnTooltip = isDependencyMet() ?
-                Optional.empty() : Optional.of(Component.literal("Depends on XXX which is disabled"));//TODO translatable TODO formatting
+        Optional<Component[]> tooltip = tooltipSupplier == null ? Optional.empty() : tooltipSupplier.get();
+        Optional<Component> dependencyTooltip = getDependencyTooltip();
         
-        if (tooltip.isEmpty() && dependsOnTooltip.isEmpty())
+        if (tooltip.isEmpty() && dependencyTooltip.isEmpty())
             return Optional.empty();
     
         // Concatenate the two tooltips
         int len = tooltip.map(components -> components.length).orElse(0);
-        if (dependsOnTooltip.isPresent()) len++;
+        if (dependencyTooltip.isPresent()) len++;
         int finalLen = len;
         
         Component[] newArray = new Component[len];
         tooltip.ifPresent(components -> System.arraycopy(components, 0, newArray, 0, components.length));
-        dependsOnTooltip.ifPresent(component -> newArray[finalLen-1] = component);
+        dependencyTooltip.ifPresent(component -> newArray[finalLen-1] = component);
         
         return Optional.of(newArray);
         
@@ -100,6 +96,19 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     
     public Optional<Component[]> getTooltip(int mouseX, int mouseY) {
         return getTooltip();
+    }
+    
+    public Optional<Component> getDependencyTooltip() {
+        // TODO consider showing the tooltip when hasDependency() instead?
+        if (dependencySatisfied())
+            return Optional.empty();
+    
+        Component value = getDependentValue()
+                ? Component.translatable("text.cloth-config.dependencies.enabled")
+                : Component.translatable("text.cloth-config.dependencies.disabled");
+        
+        return Optional.of(Component.translatable("text.cloth-config.dependencies.warning",
+                            getDependency().getDisplayedFieldName(), value));
     }
     
     @Nullable

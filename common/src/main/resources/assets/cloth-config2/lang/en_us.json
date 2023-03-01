@@ -44,6 +44,9 @@
     "option.cloth-config.bounceBackMultiplier": "Bounce Multiplier",
     "option.cloth-config.setDefaultSmoothScroll": "Set Default Smooth Scroll",
     "option.cloth-config.disableSmoothScroll": "Disable Smooth Scroll",
+    "text.cloth-config.dependencies.warning": "Depends on %1$s being %2$s.",
+    "text.cloth-config.dependencies.enabled": "enabled",
+    "text.cloth-config.dependencies.disabled": "disabled",
     "text.cloth-config.testing.1": "You are a mod developer and you want to use %1$s? Go on the %2$s to get started. You can also %3$s.",
     "text.cloth-config.testing.2": "Cloth Config Wiki",
     "text.cloth-config.testing.3": "click here to open the Minecraft options file for no specific reason"
