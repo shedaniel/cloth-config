@@ -25,8 +25,10 @@ import me.shedaniel.clothconfig2.api.Tooltip;
 import me.shedaniel.math.Point;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -102,13 +104,10 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
         // TODO consider showing the tooltip when hasDependency() instead?
         if (dependencySatisfied())
             return Optional.empty();
-    
-        Component value = getDependentValue()
-                ? Component.translatable("text.cloth-config.dependencies.enabled")
-                : Component.translatable("text.cloth-config.dependencies.disabled");
         
-        return Optional.of(Component.translatable("text.cloth-config.dependencies.warning",
-                            getDependency().getDisplayedFieldName(), value));
+        Component dependencyName = getDependency().getFieldName();
+        Component requiredValue = getDependency().getYesNoText(getDependentValue());
+        return Optional.of(Component.translatable("text.cloth-config.dependencies.warning", dependencyName, requiredValue));
     }
     
     @Nullable
@@ -119,5 +118,4 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     public void setTooltipSupplier(@Nullable Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
     }
-    
 }

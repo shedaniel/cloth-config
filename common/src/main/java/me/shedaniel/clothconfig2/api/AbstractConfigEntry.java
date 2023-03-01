@@ -25,6 +25,8 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
+import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
+import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -53,6 +55,9 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     private int cacheFieldNameHash = -1;
     private List<String> cachedTags = null;
     private Iterable<String> additionalSearchTags = null;
+    
+    @Nullable private BooleanListEntry dependency = null;
+    private boolean dependentValue = true;
     
     public final void setReferenceProviderEntries(@Nullable List<ReferenceProvider<?>> referencableEntries) {
         this.referencableEntries = referencableEntries;
@@ -92,7 +97,35 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
             text = text.withStyle(ChatFormatting.ITALIC);
         if (!hasError && !isEdited)
             text = text.withStyle(ChatFormatting.GRAY);
+        if (!dependencySatisfied())
+            text = text.withStyle(ChatFormatting.DARK_GRAY);
         return text;
+    }
+    
+    public final void setDependency(@NotNull BooleanListEntry entry) {
+        setDependency(entry, true);
+    }
+    
+    public final void setDependency(@NotNull BooleanListEntry entry, boolean value) {
+        dependency = entry;
+        dependentValue = value;
+    }
+    
+    @Nullable
+    public BooleanListEntry getDependency() {
+        return dependency;
+    }
+    
+    public boolean getDependentValue() {
+        return dependentValue;
+    }
+    
+    public boolean hasDependency() {
+        return dependency != null;
+    }
+    
+    public boolean dependencySatisfied() {
+        return dependency == null || dependentValue == dependency.getValue();
     }
     
     public Iterator<String> getSearchTags() {

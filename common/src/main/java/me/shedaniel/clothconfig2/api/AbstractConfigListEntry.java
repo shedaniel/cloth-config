@@ -21,22 +21,16 @@ package me.shedaniel.clothconfig2.api;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
-import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
 public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> {
     private final Component fieldName;
     private boolean editable = true;
     private boolean requiresRestart;
-    
-    @Nullable private BooleanListEntry dependency = null;
-    private boolean dependentValue = true;
     
     public AbstractConfigListEntry(Component fieldName, boolean requiresRestart) {
         this.fieldName = fieldName;
@@ -59,32 +53,6 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
     
     public void setEditable(boolean editable) {
         this.editable = editable;
-    }
-    
-    public final void setDependency(@NotNull BooleanListEntry entry) {
-        setDependency(entry, true);
-    }
-    
-    public final void setDependency(@NotNull BooleanListEntry entry, boolean value) {
-        dependency = entry;
-        dependentValue = value;
-    }
-    
-    @Nullable
-    public BooleanListEntry getDependency() {
-        return dependency;
-    }
-    
-    public boolean getDependentValue() {
-        return dependentValue;
-    }
-    
-    public boolean hasDependency() {
-        return dependency != null;
-    }
-    
-    public boolean dependencySatisfied() {
-        return dependency == null || dependentValue == dependency.getValue(); 
     }
     
     public final int getPreferredTextColor() {
