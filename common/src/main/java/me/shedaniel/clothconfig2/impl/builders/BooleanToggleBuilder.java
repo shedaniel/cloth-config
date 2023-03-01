@@ -109,6 +109,8 @@ public class BooleanToggleBuilder extends AbstractFieldBuilder<Boolean, BooleanL
         entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
+        if (dependency != null)
+            entry.setDependency(dependency, dependantValue);
         return entry;
     }
     

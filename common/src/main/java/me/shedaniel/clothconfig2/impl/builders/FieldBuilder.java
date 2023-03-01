@@ -20,6 +20,7 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
@@ -38,6 +39,8 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
     protected boolean requireRestart = false;
     @Nullable protected Supplier<T> defaultValue = null;
     @Nullable protected Function<T, Optional<Component>> errorSupplier;
+    @Nullable protected BooleanListEntry dependency = null;
+    protected boolean dependantValue = false;
     
     protected FieldBuilder(Component resetButtonKey, Component fieldNameKey) {
         this.resetButtonKey = Objects.requireNonNull(resetButtonKey);
@@ -74,5 +77,15 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
     
     public void requireRestart(boolean requireRestart) {
         this.requireRestart = requireRestart;
+    }
+    
+    public final SELF withDependency(@NotNull BooleanListEntry entry) {
+        return withDependency(entry, true);
+    }
+    
+    public final SELF withDependency(@NotNull BooleanListEntry entry, boolean value) {
+        this.dependency = entry;
+        this.dependantValue = value;
+        return (SELF) this;
     }
 }
