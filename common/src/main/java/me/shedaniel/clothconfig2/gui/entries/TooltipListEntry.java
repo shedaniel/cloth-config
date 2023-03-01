@@ -105,8 +105,11 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
         if (dependencySatisfied())
             return Optional.empty();
         
-        Component dependencyName = getDependency().getFieldName();
-        Component requiredValue = getDependency().getYesNoText(getDependentValue());
+        Component dependencyName = MutableComponent.create(getDependency().getFieldName().getContents())
+                .withStyle(ChatFormatting.BOLD);
+        Component requiredValue = MutableComponent.create(getDependency().getYesNoText(getDependentValue()).getContents())
+                .withStyle(ChatFormatting.BOLD);
+
         return Optional.of(Component.translatable("text.cloth-config.dependencies.warning", dependencyName, requiredValue));
     }
     

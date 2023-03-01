@@ -22,7 +22,6 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.datafixers.types.Type;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -33,7 +32,6 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -104,7 +102,7 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
         this.resetButton.y = y;
         this.buttonWidget.active = isEditable();
         this.buttonWidget.y = y;
-        this.buttonWidget.setMessage(getYesNoText(bool.get()));
+        this.buttonWidget.setMessage(getDisplayedYesNoText(bool.get()));
         Component displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().font.isBidirectional()) {
             Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, 16777215);
@@ -122,6 +120,11 @@ public class BooleanListEntry extends TooltipListEntry<Boolean> {
     
     public Component getYesNoText(boolean bool) {
         return Component.translatable("text.cloth-config.boolean.value." + bool);
+    }
+    
+    public Component getDisplayedYesNoText(boolean bool) {
+        return MutableComponent.create(getYesNoText(bool).getContents())
+                .withStyle(bool ? ChatFormatting.GREEN : ChatFormatting.RED);
     }
     
     @Override
