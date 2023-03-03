@@ -32,6 +32,7 @@ import me.shedaniel.math.impl.PointHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -39,6 +40,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -252,6 +254,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             return entry;
         }
         
+        @Nullable
+        @Override
+        public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
+            return null;
+        }
+        
         @NotNull
         public abstract ImmutableList<R> getSelections();
         
@@ -421,7 +429,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             
             if (getMaxScrollPosition() > 6) {
                 RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-                RenderSystem.disableTexture();
                 int scrollbarPositionMinX = lastRectangle.x + getCellCreator().getCellWidth() - 6;
                 int scrollbarPositionMaxX = scrollbarPositionMinX + 6;
                 int height = (int) (((last10Height) * (last10Height)) / this.getMaxScrollPosition());
@@ -449,7 +456,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).color(topc, topc, topc, 255).endVertex();
                 buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(topc, topc, topc, 255).endVertex();
                 tesselator.end();
-                RenderSystem.enableTexture();
             }
             matrices.popPose();
         }

@@ -239,6 +239,16 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         }
         
         @Override
+        public void setFocused(boolean bl) {
+        
+        }
+    
+        @Override
+        public boolean isFocused() {
+            return false;
+        }
+        
+        @Override
         public NarrationPriority narrationPriority() {
             return isHovered ? NarrationPriority.HOVERED : NarrationPriority.NONE;
         }

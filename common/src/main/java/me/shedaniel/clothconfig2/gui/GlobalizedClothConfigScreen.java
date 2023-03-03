@@ -31,10 +31,13 @@ import me.shedaniel.clothconfig2.gui.widget.SearchFieldEntry;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -48,6 +51,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.*;
@@ -137,7 +141,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         this.sideExpandLimit.reset();
         this.references.clear();
         buildReferences();
-        this.childrenL().add(listWidget = new ClothConfigScreen.ListWidget<>(this, minecraft, width - 14, height, 30, height - 32, getBackgroundLocation()));
+        this.addWidget(listWidget = new ClothConfigScreen.ListWidget<>(this, minecraft, width - 14, height, 30, height - 32, getBackgroundLocation()));
         this.listWidget.setLeftPos(14);
         this.listWidget.children().add((AbstractConfigEntry) new EmptyEntry(5));
         this.listWidget.children().add((AbstractConfigEntry) (searchFieldEntry = new SearchFieldEntry(this, listWidget)));
@@ -209,7 +213,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         if (isTransparentBackground()) {
             fillGradient(matrices, 14, 0, width, height, -1072689136, -804253680);
         } else {
-            renderDirtBackground(0);
+            renderDirtBackground(matrices);
             overlayBackground(matrices, new Rectangle(14, 0, width, height), 64, 64, 64, 255, 255);
         }
         listWidget.width = width - sliderPosition;
@@ -250,7 +254,6 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         }
         {
             Matrix4f matrix = matrices.last().pose();
-            RenderSystem.disableTexture();
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
@@ -271,13 +274,12 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             buffer.vertex(matrix, sliderPosition - 14, height, 100.0F).color(0, 0, 0, shadeColor).endVertex();
             tesselator.end();
             RenderSystem.disableBlend();
-            RenderSystem.enableTexture();
         }
         Rectangle slideArrowBounds = new Rectangle(sliderPosition - 14, 0, 14, height);
         {
             MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-            font.renderText(">", sliderPosition - 7 - font.width(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil((1 - sideSlider.scrollAmount()) * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, false, 0, 15728880);
-            font.renderText("<", sliderPosition - 7 - font.width("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil(sideSlider.scrollAmount() * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, false, 0, 15728880);
+            font.renderText(">", sliderPosition - 7 - font.width(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil((1 - sideSlider.scrollAmount()) * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
+            font.renderText("<", sliderPosition - 7 - font.width("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil(sideSlider.scrollAmount() * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
             immediate.endBatch();
             
             Rectangle scrollerBounds = sideScroller.getBounds();
@@ -359,6 +361,10 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             return 4 + strings.size() * 10;
         }
         
+        @Nullable
+        public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
+            return null;
+        }
         @Override
         public Object getValue() {
             return null;

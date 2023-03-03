@@ -24,17 +24,14 @@
  */
 package me.shedaniel.clothconfig2.api;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 
 @Deprecated
@@ -150,32 +147,11 @@ public abstract class ScrollingContainer {
             float bottomC = (hovered ? .67f : .5f) * scrollBarAlphaOffset;
             float topC = (hovered ? .87f : .67f) * scrollBarAlphaOffset;
             
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            RenderSystem.disableTexture();
-            Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder buffer = tesselator.getBuilder();
-            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            {
-                float a = (background >> 24 & 255) / 255.0F;
-                float r = (background >> 16 & 255) / 255.0F;
-                float g = (background >> 8 & 255) / 255.0F;
-                float b = (background & 255) / 255.0F;
-                buffer.vertex(scrollbarPositionMinX, bounds.getMaxY(), 0.0D).color(r, g, b, a).endVertex();
-                buffer.vertex(scrollbarPositionMaxX, bounds.getMaxY(), 0.0D).color(r, g, b, a).endVertex();
-                buffer.vertex(scrollbarPositionMaxX, bounds.y, 0.0D).color(r, g, b, a).endVertex();
-                buffer.vertex(scrollbarPositionMinX, bounds.y, 0.0D).color(r, g, b, a).endVertex();
-            }
-            buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
-            buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
-            buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
-            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(bottomC, bottomC, bottomC, alpha).endVertex();
-            buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).color(topC, topC, topC, alpha).endVertex();
-            buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).color(topC, topC, topC, alpha).endVertex();
-            buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).color(topC, topC, topC, alpha).endVertex();
-            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(topC, topC, topC, alpha).endVertex();
-            tesselator.end();
-            RenderSystem.disableBlend();
-            RenderSystem.enableTexture();
+            GuiComponent.fill(new PoseStack(), scrollbarPositionMinX, bounds.y, scrollbarPositionMaxX, bounds.getMaxY(), background);
+            GuiComponent.fill(new PoseStack(), scrollbarPositionMinX, minY, scrollbarPositionMaxX, minY + height,
+                    FastColor.ARGB32.color(Math.round(alpha * 255.0F), Math.round(bottomC * 255.0F), Math.round(bottomC * 255.0F), Math.round(bottomC * 255.0F)));
+            GuiComponent.fill(new PoseStack(), scrollbarPositionMinX, minY, scrollbarPositionMaxX - 1, minY + height - 1,
+                    FastColor.ARGB32.color(Math.round(alpha * 255.0F), Math.round(topC * 255.0F), Math.round(topC * 255.0F), Math.round(topC * 255.0F)));
         }
     }
     

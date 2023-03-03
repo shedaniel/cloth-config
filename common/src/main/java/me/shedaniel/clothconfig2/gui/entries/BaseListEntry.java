@@ -60,7 +60,8 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     
     protected static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
     @NotNull protected final List<C> cells;
-    @NotNull protected final List<Object> widgets; // GuiEventListener & NarratableEntry
+    @NotNull protected final List<GuiEventListener> widgets;
+    @NotNull protected final List<NarratableEntry> narratables;
     protected boolean expanded;
     protected boolean insertButtonEnabled = true;
     protected boolean deleteButtonEnabled;
@@ -90,8 +91,10 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         this.cells = Lists.newArrayList();
         this.labelWidget = new ListLabelWidget();
         this.widgets = Lists.newArrayList(labelWidget);
+        this.narratables = Lists.newArrayList();
         this.resetWidget = Button.builder(resetButtonKey, widget -> {
             widgets.removeAll(cells);
+            narratables.removeAll(cells);
             for (C cell : cells) {
                 cell.onDelete();
             }
@@ -101,8 +104,10 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                 cell.onAdd();
             }
             widgets.addAll(cells);
+            narratables.addAll(cells);
         }).bounds(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20).build();
         this.widgets.add(resetWidget);
+        this.narratables.add(resetWidget);
         this.saveCallback = saveConsumer;
         this.createNewInstance = createNewInstance;
         this.defaultValue = defaultValue;
@@ -218,16 +223,16 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     @Override
     public List<? extends GuiEventListener> children() {
         if (!expanded) {
-            List<GuiEventListener> elements = new ArrayList<>((List<GuiEventListener>) (List<?>) widgets);
+            List<GuiEventListener> elements = new ArrayList<>(widgets);
             elements.removeAll(cells);
             return elements;
         }
-        return (List<GuiEventListener>) (List<?>) widgets;
+        return widgets;
     }
     
     @Override
     public List<? extends NarratableEntry> narratables() {
-        return (List<NarratableEntry>) (List<?>) widgets;
+        return narratables;
     }
     
     @Override
@@ -356,6 +361,15 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             }
+            return false;
+        }
+        
+        @Override
+        public void setFocused(boolean bl) {
+        }
+        
+        @Override
+        public boolean isFocused() {
             return false;
         }
     }

@@ -39,7 +39,7 @@ public class ColorDisplayWidget extends AbstractWidget {
     }
     
     @Override
-    public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
+    public void renderWidget(PoseStack matrices, int mouseX, int mouseY, float delta) {
         fillGradient(matrices, this.getX(), this.getY(), this.getX() + size, this.getY() + size, textFieldWidget.isFocused() ? -1 : -6250336, textFieldWidget.isFocused() ? -1 : -6250336);
         fillGradient(matrices, this.getX() + 1, this.getY() + 1, this.getX() + size - 1, this.getY() + size - 1, 0xffffffff, 0xffffffff);
         fillGradient(matrices, this.getX() + 1, this.getY() + 1, this.getX() + size - 1, this.getY() + size - 1, color, color);

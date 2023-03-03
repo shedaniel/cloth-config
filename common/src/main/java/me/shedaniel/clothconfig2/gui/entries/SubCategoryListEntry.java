@@ -23,6 +23,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Pair;
 import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.Expandable;
@@ -39,6 +40,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -153,6 +155,44 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     }
     
     @Override
+    public void setFocused(@Nullable GuiEventListener guiEventListener) {
+        super.setFocused(guiEventListener);
+//        if (guiEventListener != null && children().contains(guiEventListener) && guiEventListener instanceof AbstractConfigListEntry) {
+//            // traverse up to find the row start
+//            Stack<Pair<AbstractConfigEntry<?>, Iterator<? extends GuiEventListener>>> stack = new Stack<>();
+//            Set<GuiEventListener> visited = new HashSet<>();
+//            for (AbstractConfigEntry<List<AbstractConfigListEntry>> entry : getParent().children()) {
+//                stack.push(Pair.of(entry, entry.children().iterator()));
+//            }
+//            List<AbstractConfigEntry<?>> parents = null;
+//            
+//            while (!stack.isEmpty()) {
+//                Iterator<? extends GuiEventListener> iterator = stack.peek().getSecond();
+//                if (iterator.hasNext()) {
+//                    GuiEventListener child = iterator.next();
+//                    if (visited.add(child)) {
+//                        if (child == this) {
+//                            parents = Lists.newArrayList(stack.stream().map(Pair::getFirst).iterator());
+//                            break;
+//                        } else if (child instanceof AbstractConfigEntry<?> childEntry) {
+//                            stack.push(Pair.of(childEntry, childEntry.children().iterator()));
+//                        }
+//                    }
+//                } else {
+//                    stack.pop();
+//                }
+//            }
+//            
+//            if (parents != null) {
+//                int rowStart = getParent().getRowTop(getParent().children().indexOf(parents.get(0))) + (int) getParent().getScroll() - getParent().top - 4;
+//                if (Minecraft.getInstance().getLastInputType().isKeyboard()) {
+//                    getParent().ensureVisible(rowStart, ((AbstractConfigListEntry<?>) guiEventListener).getItemHeight());
+//                }
+//            }
+//        }
+    }
+    
+    @Override
     public boolean isEdited() {
         for (AbstractConfigListEntry<?> entry : entries) {
             if (entry.isEdited()) {
@@ -253,6 +293,15 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
                 return isHovered = true;
             }
             return isHovered = false;
+        }
+        
+        @Override
+        public void setFocused(boolean bl) {
+        }
+        
+        @Override
+        public boolean isFocused() {
+            return false;
         }
         
         @Override

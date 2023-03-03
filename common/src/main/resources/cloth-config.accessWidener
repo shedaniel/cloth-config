@@ -1,5 +1,5 @@
 accessWidener   v1  named
-accessible method net/minecraft/client/gui/Font renderText (Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;ZII)F
+accessible method net/minecraft/client/gui/Font renderText (Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;II)F
 accessible field net/minecraft/client/gui/components/Button onPress Lnet/minecraft/client/gui/components/Button$OnPress;
 mutable field net/minecraft/client/gui/components/Button onPress Lnet/minecraft/client/gui/components/Button$OnPress;
 accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;

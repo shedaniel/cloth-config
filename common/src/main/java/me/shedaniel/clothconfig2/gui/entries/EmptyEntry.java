@@ -21,9 +21,12 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -38,6 +41,11 @@ public class EmptyEntry extends AbstractConfigListEntry<Object> {
     @Override
     public int getItemHeight() {
         return height;
+    }
+    
+    @Nullable
+    public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
+        return null;
     }
     
     @Override

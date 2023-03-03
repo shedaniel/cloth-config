@@ -33,6 +33,7 @@ import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -153,15 +154,14 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             tabsRightBounds = new Rectangle(width - 18, 41, 18, 24);
             childrenL().add(buttonLeftTab = new Button(4, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(0, true), Supplier::get) {
                 @Override
-                public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
+                public void renderWidget(PoseStack matrices, int mouseX, int mouseY, float delta) {
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);
                     RenderSystem.setShaderTexture(0, CONFIG_TEX);
                     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
-                    int int_3 = this.getYImage(this.isHovered);
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
-                    this.blit(matrices, getX(), getY(), 12, 18 * int_3, width, height);
+                    this.blit(matrices, getX(), getY(), 12, 18 * (!this.isActive() ? 0 : this.isHoveredOrFocused() ? 2 : 1), width, height);
                 }
             });
             int j = 0;
@@ -172,15 +172,14 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             childrenL().addAll(tabButtons);
             childrenL().add(buttonRightTab = new Button(width - 16, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true), Supplier::get) {
                 @Override
-                public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
+                public void renderWidget(PoseStack matrices, int mouseX, int mouseY, float delta) {
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);
                     RenderSystem.setShaderTexture(0, CONFIG_TEX);
                     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
-                    int int_3 = this.getYImage(this.isHovered);
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
-                    this.blit(matrices, getX(), getY(), 0, 18 * int_3, width, height);
+                    this.blit(matrices, getX(), getY(), 0, 18 * (!this.isActive() ? 0 : this.isHoveredOrFocused() ? 2 : 1), width, height);
                 }
             });
         } else {
@@ -231,7 +230,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         if (isTransparentBackground()) {
             fillGradient(matrices, 0, 0, this.width, this.height, -1072689136, -804253680);
         } else {
-            renderDirtBackground(0);
+            renderDirtBackground(matrices);
         }
         listWidget.render(matrices, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
@@ -299,7 +298,6 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     private void drawTabsShades(Matrix4f matrix, int lightColor, int darkColor) {
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 0, 1);
-        RenderSystem.disableTexture();
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.getBuilder();
@@ -313,7 +311,6 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0F).uv(1f, 0).color(0, 0, 0, lightColor).endVertex();
         buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY() - 4, 0.0F).uv(0, 0).color(0, 0, 0, lightColor).endVertex();
         tesselator.end();
-        RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
     
@@ -365,7 +362,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 long timePast = System.currentTimeMillis() - lastTouch;
                 int alpha = timePast <= 200 ? 255 : Mth.ceil(255 - Math.min(timePast - 200, 500F) / 500F * 255.0);
                 alpha = (alpha * 36 / 255) << 24;
-                fillGradient(matrices, hoverBounds.x, hoverBounds.y - scroll, hoverBounds.getMaxX(), hoverBounds.getMaxY() - scroll, 0xFFFFFF | alpha, 0xFFFFFF | alpha);
+                GuiComponent.fillGradient(matrices, hoverBounds.x, hoverBounds.y - (int) scroll, hoverBounds.getMaxX(), hoverBounds.getMaxY() - (int) scroll, 0xFFFFFF | alpha, 0xFFFFFF | alpha);
             }
             super.renderList(matrices, startX, startY, int_3, int_4, delta);
             if (thisTimeTarget != null && isMouseOver(int_3, int_4)) {
@@ -376,20 +373,6 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             } else if (!currentBounds.target().isEmpty()) {
                 currentBounds.update(delta);
             }
-        }
-        
-        protected void fillGradient(PoseStack matrices, double xStart, double yStart, double xEnd, double yEnd, int colorStart, int colorEnd) {
-            RenderSystem.disableTexture();
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder bufferBuilder = tesselator.getBuilder();
-            bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            fillGradient(matrices.last().pose(), bufferBuilder, xStart, yStart, xEnd, yEnd, this.getBlitOffset(), colorStart, colorEnd);
-            tesselator.end();
-            RenderSystem.disableBlend();
-            RenderSystem.enableTexture();
         }
         
         protected static void fillGradient(Matrix4f matrix4f, BufferBuilder bufferBuilder, double xStart, double yStart, double xEnd, double yEnd, int i, int j, int k) {

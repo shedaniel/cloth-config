@@ -19,8 +19,9 @@
 
 package me.shedaniel.clothconfig2.gui.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.animator.NumberAnimator;
 import me.shedaniel.clothconfig2.api.animator.ValueAnimator;
@@ -29,10 +30,9 @@ import me.shedaniel.math.impl.PointHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
-import org.joml.Matrix4f;
 
 import static me.shedaniel.clothconfig2.api.scroll.ScrollingContainer.clampExtension;
 import static me.shedaniel.clothconfig2.api.scroll.ScrollingContainer.handleBounceBack;
@@ -142,30 +142,11 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
             int bottomc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 168 : 128;
             int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 222 : 172;
             
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            RenderSystem.disableTexture();
-            Matrix4f matrix = matrices.last().pose();
-            // Black Bar
-            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            buffer.vertex(matrix, scrollbarPositionMinX, this.bottom, 0.0F).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, this.bottom, 0.0F).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, this.top, 0.0F).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMinX, this.top, 0.0F).color(0, 0, 0, 255).endVertex();
-            
-            // Bottom
-            buffer.vertex(matrix, scrollbarPositionMinX, minY + height, 0.0F).color(bottomc, bottomc, bottomc, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, minY + height, 0.0F).color(bottomc, bottomc, bottomc, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, minY, 0.0F).color(bottomc, bottomc, bottomc, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMinX, minY, 0.0F).color(bottomc, bottomc, bottomc, 255).endVertex();
-            
-            // Top
-            buffer.vertex(matrix, scrollbarPositionMinX, (minY + height - 1), 0.0F).color(topc, topc, topc, 255).endVertex();
-            buffer.vertex(matrix, (scrollbarPositionMaxX - 1), (minY + height - 1), 0.0F).color(topc, topc, topc, 255).endVertex();
-            buffer.vertex(matrix, (scrollbarPositionMaxX - 1), minY, 0.0F).color(topc, topc, topc, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMinX, minY, 0.0F).color(topc, topc, topc, 255).endVertex();
-            tessellator.end();
-            RenderSystem.disableBlend();
-            RenderSystem.enableTexture();
+            fill(matrices, scrollbarPositionMinX, this.top, scrollbarPositionMaxX, this.bottom, 0xff000000);
+            fill(matrices, scrollbarPositionMinX, minY, scrollbarPositionMaxX, minY + height,
+                    FastColor.ARGB32.color(255, bottomc, bottomc, bottomc));
+            fill(matrices, scrollbarPositionMinX, minY, scrollbarPositionMaxX - 1, minY + height - 1,
+                    FastColor.ARGB32.color(255, topc, topc, topc));
         }
     }
     

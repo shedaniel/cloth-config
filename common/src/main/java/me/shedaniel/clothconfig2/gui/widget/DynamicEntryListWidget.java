@@ -28,17 +28,21 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.navigation.ScreenDirection;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -46,6 +50,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 @Environment(EnvType.CLIENT)
 public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends AbstractContainerEventHandler implements Renderable, NarratableEntry {
@@ -257,26 +262,14 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         RenderSystem.disableDepthTest();
         this.renderHoleBackground(matrices, 0, this.top, 255, 255);
         this.renderHoleBackground(matrices, this.bottom, this.height, 255, 255);
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(770, 771, 0, 1);
-        RenderSystem.disableTexture();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        Matrix4f matrix = matrices.last().pose();
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        buffer.vertex(matrix, this.left, this.top + 4, 0.0F).uv(0, 1).color(0, 0, 0, 0).endVertex();
-        buffer.vertex(matrix, this.right, this.top + 4, 0.0F).uv(1, 1).color(0, 0, 0, 0).endVertex();
-        buffer.vertex(matrix, this.right, this.top, 0.0F).uv(1, 0).color(0, 0, 0, 255).endVertex();
-        buffer.vertex(matrix, this.left, this.top, 0.0F).uv(0, 0).color(0, 0, 0, 255).endVertex();
-        buffer.vertex(matrix, this.left, this.bottom, 0.0F).uv(0, 1).color(0, 0, 0, 255).endVertex();
-        buffer.vertex(matrix, this.right, this.bottom, 0.0F).uv(1, 1).color(0, 0, 0, 255).endVertex();
-        buffer.vertex(matrix, this.right, this.bottom - 4, 0.0F).uv(1, 0).color(0, 0, 0, 0).endVertex();
-        buffer.vertex(matrix, this.left, this.bottom - 4, 0.0F).uv(0, 0).color(0, 0, 0, 0).endVertex();
-        tesselator.end();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        fillGradient(matrices, this.left, this.top, this.right, this.top + 4, 0xff000000, 0);
+        fillGradient(matrices, this.left, this.bottom - 4, this.right, this.bottom, 0, 0xff000000);
+        
         int maxScroll = this.getMaxScroll();
         renderScrollBar(matrices, tesselator, buffer, maxScroll, scrollbarPosition, int_4);
         
         this.renderDecorations(matrices, mouseX, mouseY);
-        RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
     
@@ -289,25 +282,9 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                 int_10 = this.top;
             }
             
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            RenderSystem.disableTexture();
-            Matrix4f matrix = matrices.last().pose();
-            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            buffer.vertex(matrix, scrollbarPositionMinX, this.bottom, 0.0F).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, this.bottom, 0.0F).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, this.top, 0.0F).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMinX, this.top, 0.0F).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMinX, int_10 + int_9, 0.0F).color(128, 128, 128, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, int_10 + int_9, 0.0F).color(128, 128, 128, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMaxX, int_10, 0.0F).color(128, 128, 128, 255).endVertex();
-            buffer.vertex(matrix, scrollbarPositionMinX, int_10, 0.0F).color(128, 128, 128, 255).endVertex();
-            buffer.vertex(scrollbarPositionMinX, (int_10 + int_9 - 1), 0.0F).color(192, 192, 192, 255).endVertex();
-            buffer.vertex((scrollbarPositionMaxX - 1), (int_10 + int_9 - 1), 0.0F).color(192, 192, 192, 255).endVertex();
-            buffer.vertex((scrollbarPositionMaxX - 1), int_10, 0.0F).color(192, 192, 192, 255).endVertex();
-            buffer.vertex(scrollbarPositionMinX, int_10, 0.0F).color(192, 192, 192, 255).endVertex();
-            tessellator.end();
-            RenderSystem.disableBlend();
-            RenderSystem.enableTexture();
+            fill(matrices, scrollbarPositionMinX, this.top, scrollbarPositionMaxX, this.bottom, 0xff000000);
+            fill(matrices, scrollbarPositionMinX, int_10, scrollbarPositionMaxX, int_10 + int_9, 0xff808080);
+            fill(matrices, scrollbarPositionMinX, int_10, scrollbarPositionMaxX - 1, int_10 + int_9 - 1, 0xffc0c0c0);
         }
     }
     
@@ -319,13 +296,18 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected void ensureVisible(E item) {
-        int rowTop = this.getRowTop(this.children().indexOf(item));
-        int int_2 = rowTop - this.top - 4 - item.getItemHeight();
-        if (int_2 < 0)
-            this.scroll(int_2);
-        int int_3 = this.bottom - rowTop - item.getItemHeight() * 2;
-        if (int_3 < 0)
-            this.scroll(-int_3);
+        ensureVisible((int) this.getScroll() - top - headerHeight - 4 + this.getRowTop(this.children().indexOf(item)), item.getItemHeight());
+    }
+    
+    public void ensureVisible(int rowTop, int itemHeight) {
+        int rowBottom = rowTop + itemHeight;
+        double scroll = getScroll();
+        // ensure visible with scroll(..)
+        if (rowTop < scroll) {
+            this.capYPosition(rowTop);
+        } else if (rowBottom > scroll + this.height) {
+            this.capYPosition(rowBottom);
+        }
     }
     
     protected void scroll(int int_1) {
@@ -376,6 +358,61 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             
             return this.scrolling;
         }
+    }
+    
+    public ScreenRectangle getRectangle() {
+        return new ScreenRectangle(this.left, this.top, this.right - this.left, this.bottom - this.top);
+    }
+    
+    public void setFocused(@Nullable GuiEventListener guiEventListener) {
+        super.setFocused(guiEventListener);
+        int i = this.entries.indexOf(guiEventListener);
+        if (i >= 0) {
+            E entry = this.entries.get(i);
+            this.selectItem(entry);
+            if (this.client.getLastInputType().isKeyboard()) {
+                this.ensureVisible(entry);
+            }
+        }
+    }
+    
+    @Nullable
+    protected E nextEntry(ScreenDirection screenDirection) {
+        return this.nextEntry(screenDirection, (entry) -> {
+            return true;
+        });
+    }
+    
+    @Nullable
+    protected E nextEntry(ScreenDirection screenDirection, Predicate<E> predicate) {
+        return this.nextEntry(screenDirection, predicate, this.getSelectedItem());
+    }
+    
+    @Nullable
+    protected E nextEntry(ScreenDirection screenDirection, Predicate<E> predicate, @Nullable E entry) {
+        int var10000 = switch (screenDirection) {
+            case RIGHT, LEFT -> 0;
+            case UP -> -1;
+            case DOWN -> 1;
+        };
+    
+        if (!this.children().isEmpty() && var10000 != 0) {
+            int j;
+            if (entry == null) {
+                j = var10000 > 0 ? 0 : this.children().size() - 1;
+            } else {
+                j = this.children().indexOf(entry) + var10000;
+            }
+            
+            for(int k = j; k >= 0 && k < this.entries.size(); k += var10000) {
+                E entry2 = this.entries.get(k);
+                if (predicate.test(entry2)) {
+                    return entry2;
+                }
+            }
+        }
+        
+        return null;
     }
     
     public boolean mouseReleased(double double_1, double double_2, int int_1) {
@@ -460,25 +497,11 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                 itemY += children().get(i).getItemHeight();
             int itemHeight = item.getItemHeight() - 4;
             int itemWidth = this.getItemWidth();
-            int itemMinX, itemMaxX;
             if (this.selectionVisible && this.isSelected(renderIndex)) {
-                itemMinX = this.left + this.width / 2 - itemWidth / 2;
-                itemMaxX = itemMinX + itemWidth;
-                RenderSystem.disableTexture();
-                RenderSystem.setShader(GameRenderer::getPositionColorShader);
-                float float_2 = this.isFocused() ? 1.0F : 0.5F;
-                Matrix4f matrix = matrices.last().pose();
-                buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-                buffer.vertex(matrix, itemMinX, itemY + itemHeight + 2, 0.0F).color(float_2, float_2, float_2, 1.0F).endVertex();
-                buffer.vertex(matrix, itemMaxX, itemY + itemHeight + 2, 0.0F).color(float_2, float_2, float_2, 1.0F).endVertex();
-                buffer.vertex(matrix, itemMaxX, itemY - 2, 0.0F).color(float_2, float_2, float_2, 1.0F).endVertex();
-                buffer.vertex(matrix, itemMinX, itemY - 2, 0.0F).color(float_2, float_2, float_2, 1.0F).endVertex();
-                buffer.vertex(matrix, itemMinX + 1, itemY + itemHeight + 1, 0.0F).color(0.0F, 0.0F, 0.0F, 1.0F).endVertex();
-                buffer.vertex(matrix, itemMaxX - 1, itemY + itemHeight + 1, 0.0F).color(0.0F, 0.0F, 0.0F, 1.0F).endVertex();
-                buffer.vertex(matrix, itemMaxX - 1, itemY - 1, 0.0F).color(0.0F, 0.0F, 0.0F, 1.0F).endVertex();
-                buffer.vertex(matrix, itemMinX + 1, itemY - 1, 0.0F).color(0.0F, 0.0F, 0.0F, 1.0F).endVertex();
-                tesselator.end();
-                RenderSystem.enableTexture();
+                int itemMinX = this.left + (this.width - itemWidth) / 2;
+                int itemMaxX = this.left + (this.width + itemWidth) / 2;
+                fill(matrices, itemMinX, itemY - 2, itemMaxX, itemY + itemHeight + 2, this.isFocused() ? 0xffffffff : 0xff808080);
+                fill(matrices, itemMinX + 1, itemY - 1, itemMaxX - 1, itemY + itemHeight + 1, 0xff000000);
             }
             
             int y = this.getRowTop(renderIndex);
@@ -495,14 +518,15 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return this.left + this.width / 2 - this.getItemWidth() / 2 + 2;
     }
     
-    protected int getRowTop(int index) {
+    public int getRowTop(int index) {
         int integer = top + 4 - (int) this.getScroll() + headerHeight;
         for (int i = 0; i < children().size() && i < index; i++)
             integer += children().get(i).getItemHeight();
         return integer;
     }
     
-    protected boolean isFocused() {
+    @Override
+    public boolean isFocused() {
         return false;
     }
     
