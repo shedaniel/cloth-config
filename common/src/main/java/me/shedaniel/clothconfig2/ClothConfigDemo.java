@@ -158,6 +158,7 @@ public class ClothConfigDemo {
         BooleanListEntry dependency = entryBuilder.startBooleanToggle(Component.literal("A cool toggle"), false).build();
         testing.addEntry(dependency);
         testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true).withDependency(dependency).build());
+        testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I only appear when cool is toggled..."), true).withDependency(dependency).hiddenWhenDisabled(true).build());
         testing.addEntry(entryBuilder.startTextDescription(
                 Component.translatable("text.cloth-config.testing.1",
                         Component.literal("ClothConfig").withStyle(s -> s.withBold(true).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(Util.make(new ItemStack(Items.PINK_WOOL), stack -> stack.setHoverName(Component.literal("(\u30FB\u2200\u30FB)")).enchant(Enchantments.BLOCK_EFFICIENCY, 10)))))),

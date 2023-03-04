@@ -126,8 +126,10 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
-        if (dependency != null)
+        if (dependency != null) {
             entry.setDependency(dependency, dependantValue);
+            entry.shouldHideWhenDisabled(hiddenWhenDisabled);
+        }
         entry.setSuggestionMode(suggestionMode);
         return entry;
     }

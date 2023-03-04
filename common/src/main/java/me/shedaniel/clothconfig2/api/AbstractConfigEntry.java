@@ -26,7 +26,6 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
-import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -58,6 +57,7 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     
     @Nullable private BooleanListEntry dependency = null;
     private boolean dependentValue = true;
+    private boolean hideWhenDisabled = false;
     
     public final void setReferenceProviderEntries(@Nullable List<ReferenceProvider<?>> referencableEntries) {
         this.referencableEntries = referencableEntries;
@@ -140,6 +140,14 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
             cachedTags = Lists.newArrayList(s.split(" "));
         }
         return Iterators.concat(cachedTags.iterator(), MoreObjects.firstNonNull(additionalSearchTags, Collections.<String>emptyList()).iterator());
+    }
+    
+    public boolean hidden() {
+        return hideWhenDisabled && !dependencySatisfied();
+    }
+    
+    public void shouldHideWhenDisabled(boolean hide) {
+        this.hideWhenDisabled = hide;
     }
     
     public void appendSearchTags(Iterable<String> tags) {

@@ -114,8 +114,10 @@ public class DoubleFieldBuilder extends AbstractRangeFieldBuilder<Double, Double
         entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
-        if (dependency != null)
+        if (dependency != null) {
             entry.setDependency(dependency, dependantValue);
+            entry.shouldHideWhenDisabled(hiddenWhenDisabled);
+        }
         return entry;
     }
     

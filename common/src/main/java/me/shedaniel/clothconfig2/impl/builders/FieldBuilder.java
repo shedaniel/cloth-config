@@ -41,6 +41,7 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
     @Nullable protected Function<T, Optional<Component>> errorSupplier;
     @Nullable protected BooleanListEntry dependency = null;
     protected boolean dependantValue = false;
+    protected boolean hiddenWhenDisabled = false;
     
     protected FieldBuilder(Component resetButtonKey, Component fieldNameKey) {
         this.resetButtonKey = Objects.requireNonNull(resetButtonKey);
@@ -83,9 +84,16 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
         return withDependency(entry, true);
     }
     
+    @SuppressWarnings("unchecked")
     public final SELF withDependency(@NotNull BooleanListEntry entry, boolean value) {
         this.dependency = entry;
         this.dependantValue = value;
+        return (SELF) this;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public final SELF hiddenWhenDisabled(boolean hidden) {
+        this.hiddenWhenDisabled = hidden;
         return (SELF) this;
     }
 }

@@ -162,8 +162,10 @@ public class DoubleListBuilder extends AbstractRangeListBuilder<Double, DoubleLi
         entry.setRemoveTooltip(getRemoveTooltip());
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
-        if (dependency != null)
+        if (dependency != null) {
             entry.setDependency(dependency, dependantValue);
+            entry.shouldHideWhenDisabled(hiddenWhenDisabled);
+        }
         return entry;
     }
     
