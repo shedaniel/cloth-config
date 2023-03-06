@@ -19,10 +19,12 @@
 
 package me.shedaniel.clothconfig2.gui.widget;
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
+import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
@@ -42,10 +44,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.UnaryOperator;
 
 @Environment(EnvType.CLIENT)
 public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends AbstractContainerEventHandler implements Widget, NarratableEntry {
@@ -69,6 +69,49 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected E hoveredItem;
     protected E selectedItem;
     protected ResourceLocation backgroundLocation;
+
+    private final UnaryOperator<List<E>> hiddenElementFilter = entries -> new AbstractList<>() {
+        @Override
+        public Iterator<E> iterator() {
+            return Iterators.filter(entries.iterator(), entry -> {
+                if (entry instanceof AbstractConfigEntry configEntry) {
+                    return !configEntry.hidden();
+                }
+                return true;
+            });
+        }
+        
+        @Override
+        public E get(int index) {
+            return Iterators.get(iterator(), index);
+        }
+        
+        @Override
+        public void add(int index, E element) {
+            entries.add(index, element);
+        }
+        
+        @Override
+        public E remove(int index) {
+            E entry = get(index);
+            return entries.remove(entry) ? entry : null;
+        }
+        
+        @Override
+        public boolean remove(Object o) {
+            return entries.remove(o);
+        }
+        
+        @Override
+        public void clear() {
+            entries.clear();
+        }
+        
+        @Override
+        public int size() {
+            return Iterators.size(iterator());
+        }
+    };
     
     public DynamicEntryListWidget(Minecraft client, int width, int height, int top, int bottom, ResourceLocation backgroundLocation) {
         this.client = client;
@@ -79,6 +122,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         this.left = 0;
         this.right = width;
         this.backgroundLocation = backgroundLocation;
+    }
+    
+    public List<E> visibleChildren() {
+        return hiddenElementFilter.apply(this.children());
     }
     
     public void setRenderSelection(boolean boolean_1) {
@@ -117,7 +164,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected void narrateListElementPosition(NarrationElementOutput narrationElementOutput, E entry) {
-        List<E> list = this.children();
+        List<E> list = this.visibleChildren();
         if (list.size() > 1) {
             int i = list.indexOf(entry);
             if (i != -1) {
@@ -151,7 +198,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected E getItem(int index) {
-        return this.children().get(index);
+        return this.visibleChildren().get(index);
     }
     
     protected int addItem(E item) {
@@ -160,11 +207,11 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected int getItemCount() {
-        return this.children().size();
+        return this.visibleChildren().size();
     }
     
     protected boolean isSelected(int index) {
-        return Objects.equals(this.getSelectedItem(), this.children().get(index));
+        return Objects.equals(this.getSelectedItem(), this.getItem(index));
     }
     
     protected final E getItemAtPosition(double mouseX, double mouseY) {
@@ -174,7 +221,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         int currentY = Mth.floor(mouseY - (double) this.top) - this.headerHeight + (int) this.getScroll() - 4;
         int itemY = 0;
         int itemIndex = -1;
-        for (int i = 0; i < children().size(); i++) {
+        for (int i = 0; i < getItemCount(); i++) {
             E item = getItem(i);
             itemY += item.getItemHeight();
             if (itemY > currentY) {
@@ -202,7 +249,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected int getMaxScrollPosition() {
         List<Integer> list = new ArrayList<>();
         int i = headerHeight;
-        for (E entry : children()) {
+        for (E entry : visibleChildren()) {
             i += entry.getItemHeight();
             if (entry.getMorePossibleHeight() >= 0) {
                 list.add(i + entry.getMorePossibleHeight());
@@ -313,13 +360,13 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     protected void centerScrollOn(E item) {
         double d = (this.bottom - this.top) / -2d;
-        for (int i = 0; i < this.children().indexOf(item) && i < this.getItemCount(); i++)
+        for (int i = 0; i < this.visibleChildren().indexOf(item) && i < this.getItemCount(); i++)
             d += getItem(i).getItemHeight();
         this.capYPosition(d);
     }
     
     protected void ensureVisible(E item) {
-        int rowTop = this.getRowTop(this.children().indexOf(item));
+        int rowTop = this.getRowTop(this.visibleChildren().indexOf(item));
         int int_2 = rowTop - this.top - 4 - item.getItemHeight();
         if (int_2 < 0)
             this.scroll(int_2);
@@ -409,7 +456,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     public boolean mouseScrolled(double double_1, double double_2, double double_3) {
-        for (E entry : children()) {
+        for (E entry : visibleChildren()) {
             if (entry.mouseScrolled(double_1, double_2, double_3)) {
                 return true;
             }
@@ -433,10 +480,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected void moveSelection(int int_1) {
-        if (!this.children().isEmpty()) {
-            int int_2 = this.children().indexOf(this.getSelectedItem());
+        if (!this.visibleChildren().isEmpty()) {
+            int int_2 = this.visibleChildren().indexOf(this.getSelectedItem());
             int int_3 = Mth.clamp(int_2 + int_1, 0, this.getItemCount() - 1);
-            E itemListWidget$Item_1 = this.children().get(int_3);
+            E itemListWidget$Item_1 = this.getItem(int_3);
             this.selectItem(itemListWidget$Item_1);
             this.ensureVisible(itemListWidget$Item_1);
         }
@@ -456,8 +503,8 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         for (int renderIndex = 0; renderIndex < itemCount; ++renderIndex) {
             E item = this.getItem(renderIndex);
             int itemY = startY + headerHeight;
-            for (int i = 0; i < children().size() && i < renderIndex; i++)
-                itemY += children().get(i).getItemHeight();
+            for (int i = 0; i < getItemCount() && i < renderIndex; i++)
+                itemY += getItem(i).getItemHeight();
             int itemHeight = item.getItemHeight() - 4;
             int itemWidth = this.getItemWidth();
             int itemMinX, itemMaxX;
@@ -497,8 +544,8 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     protected int getRowTop(int index) {
         int integer = top + 4 - (int) this.getScroll() + headerHeight;
-        for (int i = 0; i < children().size() && i < index; i++)
-            integer += children().get(i).getItemHeight();
+        for (int i = 0; i < getItemCount() && i < index; i++)
+            integer += getItem(i).getItemHeight();
         return integer;
     }
     
@@ -521,18 +568,18 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         tesselator.end();
     }
     
-    protected E remove(int int_1) {
-        E itemListWidget$Item_1 = this.children().get(int_1);
-        return this.removeEntry(this.children().get(int_1)) ? itemListWidget$Item_1 : null;
+    protected E remove(int index) {
+        E item = this.getItem(index);
+        return this.removeEntry(item) ? item : null;
     }
     
-    protected boolean removeEntry(E itemListWidget$Item_1) {
-        boolean boolean_1 = this.children().remove(itemListWidget$Item_1);
-        if (boolean_1 && itemListWidget$Item_1 == this.getSelectedItem()) {
+    protected boolean removeEntry(E entry) {
+        boolean removed = this.children().remove(entry);
+        if (removed && entry == this.getSelectedItem()) {
             this.selectItem(null);
         }
         
-        return boolean_1;
+        return removed;
     }
     
     public static final class SmoothScrollingSettings {

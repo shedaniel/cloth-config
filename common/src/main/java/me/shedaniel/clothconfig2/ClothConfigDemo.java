@@ -155,10 +155,19 @@ public class ClothConfigDemo {
                     }
                 }
         ));
-        BooleanListEntry dependency = entryBuilder.startBooleanToggle(Component.literal("A cool toggle"), false).build();
-        testing.addEntry(dependency);
-        testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true).withDependency(dependency).build());
-        testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I only appear when cool is toggled..."), true).withDependency(dependency).hiddenWhenDisabled(true).build());
+        SubCategoryBuilder depends = entryBuilder.startSubCategory(Component.literal("Dependencies")).setExpanded(true);
+        BooleanListEntry dependency = entryBuilder.startBooleanToggle(Component.literal("A cool toggle"), false).setTooltip(Component.literal("Toggle me...")).build();
+        depends.add(dependency);
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true).withDependency(dependency).build());
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only appear when cool is toggled..."), true).withDependency(dependency).hiddenWhenDisabled(true).build());
+        SubCategoryBuilder dependantSub = entryBuilder.startSubCategory(Component.literal("How do deps work with sub-categories?")).withDependency(dependency);
+        dependantSub.add(entryBuilder.startTextDescription(Component.literal("This sub category depends on Cool being toggled")).build());
+        dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Example entry"), true).build());
+        dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Another example..."), true).build());
+        depends.add(dependantSub.build());
+        testing.addEntry(depends.build());
+        testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I appear when cool is toggled..."), true).withDependency(dependency).hiddenWhenDisabled(true).setTooltip(Component.literal("Hopefully I keep my index")).build());
+        
         testing.addEntry(entryBuilder.startTextDescription(
                 Component.translatable("text.cloth-config.testing.1",
                         Component.literal("ClothConfig").withStyle(s -> s.withBold(true).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(Util.make(new ItemStack(Items.PINK_WOOL), stack -> stack.setHoverName(Component.literal("(\u30FB\u2200\u30FB)")).enchant(Enchantments.BLOCK_EFFICIENCY, 10)))))),

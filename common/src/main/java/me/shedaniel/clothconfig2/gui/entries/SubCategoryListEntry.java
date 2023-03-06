@@ -104,7 +104,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
             @Override
             public Iterator<AbstractConfigListEntry> iterator() {
                 return Iterators.filter(entries.iterator(), entry -> {
-                    return getConfigScreen() != null && getConfigScreen().matchesSearch(entry.getSearchTags());
+                    return !entry.hidden() && getConfigScreen() != null && getConfigScreen().matchesSearch(entry.getSearchTags());
                 });
             }
             
@@ -148,7 +148,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public void updateSelected(boolean isSelected) {
         for (AbstractConfigListEntry<?> entry : entries) {
-            entry.updateSelected(expanded && isSelected && getFocused() == entry && getConfigScreen().matchesSearch(entry.getSearchTags()));
+            entry.updateSelected(expanded && isSelected && getFocused() == entry && !entry.hidden() && getConfigScreen().matchesSearch(entry.getSearchTags()));
         }
     }
     
