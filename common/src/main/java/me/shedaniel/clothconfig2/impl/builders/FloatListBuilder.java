@@ -162,7 +162,10 @@ public class FloatListBuilder extends AbstractRangeListBuilder<Float, FloatListL
         entry.setRemoveTooltip(getRemoveTooltip());
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
-        
+        if (dependency != null) {
+            entry.setDependency(dependency, dependantValue);
+            entry.shouldHideWhenDisabled(hiddenWhenDisabled);
+        }
         return entry;
     }
     
