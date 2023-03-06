@@ -165,6 +165,8 @@ public class ClothConfigDemo {
         dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Example entry"), true).build());
         dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Another example..."), true).build());
         depends.add(dependantSub.build());
+        depends.add(entryBuilder.startLongList(Component.literal("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).withDependency(dependency).build());
+    
         testing.addEntry(depends.build());
         testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I appear when cool is toggled..."), true).withDependency(dependency).hiddenWhenDisabled(true).setTooltip(Component.literal("Hopefully I keep my index")).build());
         

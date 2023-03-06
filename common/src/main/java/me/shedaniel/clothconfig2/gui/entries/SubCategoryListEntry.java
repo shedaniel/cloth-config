@@ -30,6 +30,7 @@ import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -69,7 +70,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     
     @Override
     public boolean isExpanded() {
-        return expanded;
+        return dependencySatisfied() && expanded;
     }
     
     @Override
@@ -130,13 +131,14 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         RenderSystem.setShaderTexture(0, CONFIG_TEX);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        blit(matrices, x - 15, y + 5, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        Minecraft.getInstance().font.drawShadow(matrices, getDisplayedFieldName().getVisualOrderText(), x, y + 6, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        boolean hovered = widget.rectangle.contains(mouseX, mouseY);
+        blit(matrices, x - 15, y + 5, 24, (dependencySatisfied() ? (hovered ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9);
+        Minecraft.getInstance().font.drawShadow(matrices, getDisplayedFieldName().getVisualOrderText(), x, y + 6, hovered ? 0xffe6fe16 : 0xffffffff);
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent((DynamicEntryListWidget) getParent());
             entry.setScreen(getConfigScreen());
         }
-        if (expanded) {
+        if (isExpanded()) {
             int yy = y + 24;
             for (AbstractConfigListEntry<?> entry : filteredEntries()) {
                 entry.render(matrices, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered && getFocused() == entry, delta);
@@ -148,7 +150,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public void updateSelected(boolean isSelected) {
         for (AbstractConfigListEntry<?> entry : entries) {
-            entry.updateSelected(expanded && isSelected && getFocused() == entry && !entry.hidden() && getConfigScreen().matchesSearch(entry.getSearchTags()));
+            entry.updateSelected(isExpanded() && isSelected && getFocused() == entry && !entry.hidden() && getConfigScreen().matchesSearch(entry.getSearchTags()));
         }
     }
     
@@ -164,7 +166,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     
     @Override
     public void lateRender(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        if (expanded) {
+        if (isExpanded()) {
             for (AbstractConfigListEntry<?> entry : filteredEntries()) {
                 entry.lateRender(matrices, mouseX, mouseY, delta);
             }
@@ -174,7 +176,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @SuppressWarnings("deprecation")
     @Override
     public int getMorePossibleHeight() {
-        if (!expanded) return -1;
+        if (!isExpanded()) return -1;
         List<Integer> list = new ArrayList<>();
         int i = 24;
         for (AbstractConfigListEntry<?> entry : filteredEntries()) {
@@ -198,7 +200,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     
     @Override
     public int getItemHeight() {
-        if (expanded) {
+        if (isExpanded()) {
             int i = 24;
             for (AbstractConfigListEntry<?> entry : filteredEntries())
                 i += entry.getItemHeight();
@@ -214,12 +216,12 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     
     @Override
     public List<? extends GuiEventListener> children() {
-        return expanded ? (List) children : Collections.singletonList(widget);
+        return isExpanded() ? (List) children : Collections.singletonList(widget);
     }
     
     @Override
     public List<? extends NarratableEntry> narratables() {
-        return expanded ? (List) children : Collections.singletonList(widget);
+        return isExpanded() ? (List) children : Collections.singletonList(widget);
     }
     
     @Override
@@ -246,9 +248,9 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         private boolean isHovered;
         
         @Override
-        public boolean mouseClicked(double double_1, double double_2, int int_1) {
-            if (rectangle.contains(double_1, double_2)) {
-                expanded = !expanded;
+        public boolean mouseClicked(double mouseX, double mouseY, int int_1) {
+            if (rectangle.contains(mouseX, mouseY) && dependencySatisfied()) {
+                setExpanded(!expanded);
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return isHovered = true;
             }
