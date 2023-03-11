@@ -22,6 +22,8 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
     
     public boolean check() {
         T value = getEntry().getValue();
+        
+        // Dependency is satisfied if any condition is met
         return getValues().stream().anyMatch(value::equals);
     }
     
@@ -50,6 +52,12 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
         this.shouldHide = shouldHide;
     }
     
+    /**
+     * Gets the localised human-readable text for a dependency's value
+     * 
+     * @param value the value to get text for
+     * @return the localised human-readable text
+     */
     protected abstract Component getValueText(T value);
     
     public <TooltipType> Optional<Component[]> getTooltipFor(TooltipListEntry<TooltipType> tooltipEntry) {

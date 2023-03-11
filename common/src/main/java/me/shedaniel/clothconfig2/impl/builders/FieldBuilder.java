@@ -22,7 +22,6 @@ package me.shedaniel.clothconfig2.impl.builders;
 import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.Dependency;
-import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
@@ -41,12 +40,10 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
     @NotNull private final Component fieldNameKey;
     @NotNull private final Component resetButtonKey;
     @NotNull protected final Collection<Dependency<?,?>> dependencies = new ArrayList<>();
+
     protected boolean requireRestart = false;
     @Nullable protected Supplier<T> defaultValue = null;
     @Nullable protected Function<T, Optional<Component>> errorSupplier;
-    @Nullable protected BooleanListEntry dependency = null;
-    protected boolean dependantValue = false;
-    protected boolean hiddenWhenDisabled = false;
     
     protected FieldBuilder(Component resetButtonKey, Component fieldNameKey) {
         this.resetButtonKey = Objects.requireNonNull(resetButtonKey);
@@ -86,7 +83,7 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
     }
     
     @SuppressWarnings("unchecked")
-    public final <DepT, DepE extends AbstractConfigEntry<DepT>> SELF addDependency(Dependency<DepT, DepE> dependency) {
+    public final <DepType, DepEntry extends AbstractConfigEntry<DepType>> SELF addDependency(Dependency<DepType, DepEntry> dependency) {
         dependencies.add(dependency);
         return (SELF) this;
     }
