@@ -21,21 +21,23 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import me.shedaniel.clothconfig2.api.Dependency;
 import me.shedaniel.clothconfig2.api.Tooltip;
 import me.shedaniel.math.Point;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
 public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
@@ -69,48 +71,35 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
                 .toArray(FormattedCharSequence[]::new);
     }
     
+    private Optional<Component[]> getDependencyTooltips() {
+        Collection<Dependency<?, ?>> dependencies = getDependencies();
+        if (dependencies.isEmpty())
+            return Optional.empty();
+        
+        // Map to dependency tooltips then concatenate
+        Component[] lines = dependencies.stream()
+                .map(dependency -> dependency.getTooltipFor(this))
+                .flatMap(Optional::stream)
+                .flatMap(Arrays::stream)
+                .toArray(Component[]::new);
+        
+        return lines.length > 0 ? Optional.of(lines) : Optional.empty();
+    }
+    
     public Optional<Component[]> getTooltip() {
         Optional<Component[]> tooltip = tooltipSupplier == null ? Optional.empty() : tooltipSupplier.get();
-        Optional<Component> dependencyTooltip = getDependencyTooltip();
-        
-        if (tooltip.isEmpty() && dependencyTooltip.isEmpty())
-            return Optional.empty();
+        Optional<Component[]> dependencyTooltip = getDependencyTooltips();
     
-        // Concatenate the two tooltips
-        int len = tooltip.map(components -> components.length).orElse(0);
-        if (dependencyTooltip.isPresent()) len++;
-        int finalLen = len;
+        // Concatenate the two optional tooltips
+        Component[] lines = Stream.concat(tooltip.stream(), dependencyTooltip.stream())
+                .flatMap(Arrays::stream)
+                .toArray(Component[]::new);
         
-        Component[] newArray = new Component[len];
-        tooltip.ifPresent(components -> System.arraycopy(components, 0, newArray, 0, components.length));
-        dependencyTooltip.ifPresent(component -> newArray[finalLen-1] = component);
-        
-        return Optional.of(newArray);
-        
-        // FIXME: streams would be cleaner if I could figure out how to replace the above
-//        Object[] array = Stream.concat(
-//                tooltip.stream().map(Arrays::stream),
-//                dependsOnTooltip.stream()
-//        ).toArray();
-//        
-//        return array.length == 0 ? Optional.empty() : Optional.of((Component[]) array);
+        return lines.length > 0 ? Optional.of(lines) : Optional.empty();
     }
     
     public Optional<Component[]> getTooltip(int mouseX, int mouseY) {
         return getTooltip();
-    }
-    
-    public Optional<Component> getDependencyTooltip() {
-        // TODO consider showing the tooltip when hasDependency() instead?
-        if (dependencySatisfied())
-            return Optional.empty();
-        
-        Component dependencyName = MutableComponent.create(getDependency().getFieldName().getContents())
-                .withStyle(ChatFormatting.BOLD);
-        Component requiredValue = MutableComponent.create(getDependency().getYesNoText(getDependentValue()).getContents())
-                .withStyle(ChatFormatting.BOLD);
-
-        return Optional.of(Component.translatable("text.cloth-config.dependencies.warning", dependencyName, requiredValue));
     }
     
     @Nullable

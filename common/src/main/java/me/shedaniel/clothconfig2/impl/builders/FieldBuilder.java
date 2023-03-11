@@ -19,7 +19,9 @@
 
 package me.shedaniel.clothconfig2.impl.builders;
 
+import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import me.shedaniel.clothconfig2.api.Dependency;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -27,6 +29,8 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -36,6 +40,7 @@ import java.util.function.Supplier;
 public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF extends FieldBuilder<T, A, SELF>> {
     @NotNull private final Component fieldNameKey;
     @NotNull private final Component resetButtonKey;
+    @NotNull protected final Collection<Dependency<?,?>> dependencies = new ArrayList<>();
     protected boolean requireRestart = false;
     @Nullable protected Supplier<T> defaultValue = null;
     @Nullable protected Function<T, Optional<Component>> errorSupplier;
@@ -80,20 +85,9 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
         this.requireRestart = requireRestart;
     }
     
-    public final SELF withDependency(@NotNull BooleanListEntry entry) {
-        return withDependency(entry, true);
-    }
-    
     @SuppressWarnings("unchecked")
-    public final SELF withDependency(@NotNull BooleanListEntry entry, boolean value) {
-        this.dependency = entry;
-        this.dependantValue = value;
-        return (SELF) this;
-    }
-    
-    @SuppressWarnings("unchecked")
-    public final SELF hiddenWhenDisabled(boolean hidden) {
-        this.hiddenWhenDisabled = hidden;
+    public final <DepT, DepE extends AbstractConfigEntry<DepT>> SELF addDependency(Dependency<DepT, DepE> dependency) {
+        dependencies.add(dependency);
         return (SELF) this;
     }
 }

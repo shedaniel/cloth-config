@@ -113,10 +113,8 @@ public class LongFieldBuilder extends AbstractRangeFieldBuilder<Long, LongListEn
         entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
-        if (dependency != null) {
-            entry.setDependency(dependency, dependantValue);
-            entry.shouldHideWhenDisabled(hiddenWhenDisabled);
-        }
+        if (!dependencies.isEmpty())
+            entry.addDependencies(dependencies);
         return entry;
     }
     

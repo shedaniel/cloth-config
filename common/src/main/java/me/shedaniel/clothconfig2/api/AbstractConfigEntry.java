@@ -36,10 +36,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -55,9 +52,8 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     private List<String> cachedTags = null;
     private Iterable<String> additionalSearchTags = null;
     
-    @Nullable private BooleanListEntry dependency = null;
-    private boolean dependentValue = true;
-    private boolean hideWhenDisabled = false;
+    @NotNull
+    private final Collection<Dependency<?,?>> dependencies = new ArrayList<>();
     
     public final void setReferenceProviderEntries(@Nullable List<ReferenceProvider<?>> referencableEntries) {
         this.referencableEntries = referencableEntries;
@@ -102,30 +98,20 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
         return text;
     }
     
-    public final void setDependency(@NotNull BooleanListEntry entry) {
-        setDependency(entry, true);
-    }
-    
-    public final void setDependency(@NotNull BooleanListEntry entry, boolean value) {
-        dependency = entry;
-        dependentValue = value;
-    }
-    
-    @Nullable
-    public BooleanListEntry getDependency() {
-        return dependency;
-    }
-    
-    public boolean getDependentValue() {
-        return dependentValue;
-    }
-    
-    public boolean hasDependency() {
-        return dependency != null;
-    }
-    
     public boolean dependencySatisfied() {
-        return dependency == null || dependentValue == dependency.getValue();
+        if (dependencies.isEmpty())
+            return true;
+        return dependencies.stream().allMatch(Dependency::check);
+    }
+    
+    public boolean hidden() {
+        if (dependencySatisfied())
+            return false;
+        
+        // If disabled, check if one of the "hide when disabled" dependencies is unmet
+        return dependencies.stream()
+                .filter(Dependency::isHiddenWhenDisabled)
+                .anyMatch(dependency -> !dependency.check());
     }
     
     public Iterator<String> getSearchTags() {
@@ -140,14 +126,6 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
             cachedTags = Lists.newArrayList(s.split(" "));
         }
         return Iterators.concat(cachedTags.iterator(), MoreObjects.firstNonNull(additionalSearchTags, Collections.<String>emptyList()).iterator());
-    }
-    
-    public boolean hidden() {
-        return hideWhenDisabled && !dependencySatisfied();
-    }
-    
-    public void shouldHideWhenDisabled(boolean hide) {
-        this.hideWhenDisabled = hide;
     }
     
     public void appendSearchTags(Iterable<String> tags) {
@@ -211,5 +189,13 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     
     public int getInitialReferenceOffset() {
         return 0;
+    }
+    
+    public void addDependencies(Collection<Dependency<?, ?>> dependencies) {
+        this.dependencies.addAll(dependencies);
+    }
+    
+    public Collection<Dependency<?, ?>> getDependencies() {
+        return dependencies;
     }
 }
