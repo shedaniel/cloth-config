@@ -47,8 +47,8 @@
     "text.cloth-config.testing.1": "You are a mod developer and you want to use %1$s? Go on the %2$s to get started. You can also %3$s.",
     "text.cloth-config.testing.2": "Cloth Config Wiki",
     "text.cloth-config.testing.3": "click here to open the Minecraft options file for no specific reason",
-    "text.cloth-config.dependencies.one": "Depends on \"%1$s\" being set to \"%2$s\".",
-    "text.cloth-config.dependencies.two": "Depends on \"%1$s\" being set to \"%2$s\" or \"%3$s\".",
-    "text.cloth-config.dependencies.many": "Depends on \"%1$s\" being set to one of the following:",
-    "text.cloth-config.dependencies.listEntry": "- %1$s"
+    "text.cloth-config.dependencies.one_condition": "Depends on \"%1$s\" being set to \"%2$s\".",
+    "text.cloth-config.dependencies.two_condition": "Depends on \"%1$s\" being set to \"%2$s\" or \"%3$s\".",
+    "text.cloth-config.dependencies.many_conditions": "Depends on \"%1$s\" being set to one of the following:",
+    "text.cloth-config.dependencies.list_entry": "- %1$s"
 }

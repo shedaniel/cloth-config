@@ -159,9 +159,8 @@ public class ClothConfigDemo {
         
         SubCategoryBuilder depends = entryBuilder.startSubCategory(Component.literal("Dependencies")).setExpanded(true);
         BooleanListEntry dependency = entryBuilder.startBooleanToggle(Component.literal("A cool toggle"), false).setTooltip(Component.literal("Toggle me...")).build();
-        BooleanDependency disableUnless = new BooleanDependency(dependency);
-        BooleanDependency hideUnless = new BooleanDependency(dependency);
-        hideUnless.setHiddenWhenDisabled(true);
+        BooleanDependency disableUnless = BooleanDependency.disabledWhenNotSatisfied(dependency);
+        BooleanDependency hideUnless = BooleanDependency.hiddenWhenNotSatisfied(dependency);
         
         depends.add(dependency);
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true).addDependency(disableUnless).build());

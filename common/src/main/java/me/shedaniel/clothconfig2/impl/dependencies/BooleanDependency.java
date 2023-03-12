@@ -6,16 +6,31 @@ import net.minecraft.network.chat.Component;
 
 public class BooleanDependency extends Dependency<Boolean, BooleanListEntry> {
     
-    public BooleanDependency(BooleanListEntry entry, Boolean value) {
-        super(entry, value);
+    private BooleanDependency(BooleanListEntry entry, Boolean condition) {
+        super(entry);
+        this.setCondition(condition);
     }
     
-    public BooleanDependency(BooleanListEntry entry) {
-        super(entry, true);
+    public static BooleanDependency hiddenWhenNotSatisfied(BooleanListEntry entry) {
+        return hiddenWhenNotSatisfied(entry, true);
+    }
+    
+    public static BooleanDependency hiddenWhenNotSatisfied(BooleanListEntry entry, boolean condition) {
+        BooleanDependency dependency = new BooleanDependency(entry, condition);
+        dependency.setHiddenWhenDisabled(true);
+        return dependency;
+    }
+    
+    public static BooleanDependency disabledWhenNotSatisfied(BooleanListEntry entry) {
+        return disabledWhenNotSatisfied(entry, true);
+    }
+    
+    public static BooleanDependency disabledWhenNotSatisfied(BooleanListEntry entry, boolean condition) {
+        return new BooleanDependency(entry, condition);
     }
     
     @Override
-    protected Component getValueText(Boolean value) {
-        return getEntry().getYesNoText(value);
+    protected Component getConditionText(Boolean condition) {
+        return getEntry().getYesNoText(condition);
     }
 }

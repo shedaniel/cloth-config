@@ -34,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -67,7 +66,8 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     }
     
     private FormattedCharSequence[] postProcessTooltip(Component[] tooltip) {
-        return Arrays.stream(tooltip).flatMap(component -> Minecraft.getInstance().font.split(component, getConfigScreen().width).stream())
+        return Arrays.stream(tooltip)
+                .flatMap(component -> Minecraft.getInstance().font.split(component, getConfigScreen().width).stream())
                 .toArray(FormattedCharSequence[]::new);
     }
     
@@ -76,9 +76,9 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
         if (dependencies.isEmpty())
             return Optional.empty();
         
-        // Map to dependency tooltips then concatenate
+        // Get all the dependencies' tooltips and combine them into one array
         Component[] lines = dependencies.stream()
-                .map(dependency -> dependency.getTooltipFor(this))
+                .map(Dependency::getTooltip)
                 .flatMap(Optional::stream)
                 .flatMap(Arrays::stream)
                 .toArray(Component[]::new);
