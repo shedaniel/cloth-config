@@ -23,6 +23,8 @@ import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.ConfigManager;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependOnEach;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOn;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
@@ -145,21 +147,30 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         // This time, look for fields that have defined dependencies and generate them.
         // Apply the generated dependencies to the config entries referenced by the i18n map.
         categoryMap.forEach((category, fields) -> fields.stream()
-                .filter(field -> field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
+                .filter(field -> field.isAnnotationPresent(DependsOn.class) || field.isAnnotationPresent(DependOnEach.class))
                 .forEach(field -> {
-                    // FIXME how to handle multiple dependencies on one field?
-                    ConfigEntry.Gui.DependsOn annotation = field.getAnnotation(ConfigEntry.Gui.DependsOn.class);
-                    String optionI18n = optionFunction.apply(i18n, field);
-                    String dependencyI18n = annotation.value();
-                    AbstractConfigListEntry<?> entry = i18nMap.get(optionI18n);
-                    AbstractConfigListEntry<?> dependency = i18nMap.get(dependencyI18n);
-    
-                    if (entry == null)
-                        throw new IllegalStateException("Specified entry not found: \"%s\"".formatted(optionI18n));
-                    if (dependency == null)
-                        throw new RuntimeException("Specified dependency not found: \"%s\"".formatted(dependencyI18n));
+                    // Get all the DependsOn annotations in a list, so we can iterate over them
+                    List<DependsOn> annotations = new ArrayList<>();
+                    if (field.isAnnotationPresent(DependOnEach.class))
+                        Collections.addAll(annotations, field.getAnnotation(DependOnEach.class).value());
+                    else if (field.isAnnotationPresent(DependsOn.class))
+                        annotations.add(field.getAnnotation(DependsOn.class));
+                    else
+                        throw new RuntimeException("Neither DependsOn nor DependsOnAll annotation is present. This shouldn't be possible!");
                     
-                    entry.addDependency(buildDependency(annotation, dependency));
+                    annotations.forEach(annotation -> {
+                        String optionI18n = optionFunction.apply(i18n, field);
+                        String dependencyI18n = annotation.value();
+                        AbstractConfigListEntry<?> entry = i18nMap.get(optionI18n);
+                        AbstractConfigListEntry<?> dependency = i18nMap.get(dependencyI18n);
+    
+                        if (entry == null)
+                            throw new IllegalStateException("Specified entry not found: \"%s\"".formatted(optionI18n));
+                        if (dependency == null)
+                            throw new RuntimeException("Specified dependency not found: \"%s\"".formatted(dependencyI18n));
+    
+                        entry.addDependency(buildDependency(annotation, dependency));
+                    });
                 }));
 
         return buildFunction.apply(builder);
@@ -195,12 +206,12 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
      * Currently, supports {@link BooleanListEntry} and {@link SelectionListEntry} dependencies.
      * If a different config entry type is used, an {@link IllegalStateException} will be thrown.
      * 
-     * @param annotation The {@link ConfigEntry.Gui.DependsOn} annotation defining the dependency
+     * @param annotation The {@link DependsOn} annotation defining the dependency
      * @param dependency The depended-on {@link AbstractConfigListEntry}
      * @return The built {@link Dependency}
      * @throws IllegalStateException when an unsupported dependency type is used, or the annotation is somehow invalid
      */
-    private static Dependency<?,?> buildDependency(ConfigEntry.Gui.DependsOn annotation, AbstractConfigListEntry<?> dependency) throws IllegalStateException {
+    private static Dependency<?,?> buildDependency(DependsOn annotation, AbstractConfigListEntry<?> dependency) throws IllegalStateException {
         if (dependency instanceof BooleanListEntry booleanListEntry) {
             return buildDependency(annotation, booleanListEntry);
         } else if (dependency instanceof SelectionListEntry<?> selectionListEntry) {
@@ -210,7 +221,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         }
     }
     
-    private static BooleanDependency buildDependency(ConfigEntry.Gui.DependsOn annotation, BooleanListEntry dependency) {
+    private static BooleanDependency buildDependency(DependsOn annotation, BooleanListEntry dependency) {
         List<Boolean> conditions = Arrays.stream(annotation.conditions())
                 // Functionally equivalent to Boolean::parseBoolean, but allows us to throw a RuntimeException
                 .map(condition -> switch (condition.toLowerCase()) {
@@ -230,7 +241,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         return booleanDependency;
     }
     
-    private static <T> SelectionDependency<T> buildDependency(ConfigEntry.Gui.DependsOn annotation, SelectionListEntry<T> dependency) {
+    private static <T> SelectionDependency<T> buildDependency(DependsOn annotation, SelectionListEntry<T> dependency) {
         // List of valid values for the depended-on SelectionListEntry
         List<T> possibleValues = dependency.getValues();
 

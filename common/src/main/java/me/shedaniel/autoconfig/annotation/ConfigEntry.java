@@ -157,6 +157,21 @@ public class ConfigEntry {
             }
         }
     
+    
+        /**
+         * Define multiple dependencies.
+         * <br><br>
+         * All dependencies must be met for the annotated field to be enabled.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface DependOnEach {
+            /**
+             * An array of dependencies to depend on
+             */
+            DependsOn[] value();
+        }
+    
         /**
          * Depends on the referenced field
          */
