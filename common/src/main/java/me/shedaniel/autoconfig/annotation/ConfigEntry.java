@@ -19,6 +19,9 @@
 
 package me.shedaniel.autoconfig.annotation;
 
+import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
+import me.shedaniel.clothconfig2.api.dependencies.SelectionDependency;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -152,6 +155,43 @@ public class ConfigEntry {
                 DROPDOWN,
                 BUTTON
             }
+        }
+    
+        /**
+         * Depends on the referenced field
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface DependsOn {
+            /**
+             * The i18n key of the field to depend on
+             */
+            String value();
+    
+            /**
+             * One or more conditions to be checked against the dependency's value.
+             * If any condition is matched, the annotated field is enabled.
+             * <br><br>
+             * Some dependency types may be stricter about the number of conditions defined.
+             * For example:
+             * <ul>
+             *     <li>{@link BooleanDependency} requires exactly one condition be defined</li>
+             *     <li>{@link SelectionDependency} requires one or more conditions be defined</li>
+             * </ul>
+             * The value must be parsable into the appropriate type for the dependency, for example:
+             * <ul>
+             *     <li>{@code "true"} or {@code "false"} for a boolean dependency</li>
+             *     <li>The {@code toString()} value for an Enum dependency</li>
+             *     <li>Etc</li>
+             * </ul>
+             */
+            String[] conditions();
+    
+            /**
+             * If set to true, the annotated field will be hidden (instead of
+             * simply being disabled) when the dependency is unmet.
+             */
+            boolean hiddenWhenNotMet() default false;
         }
     }
 }

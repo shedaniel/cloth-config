@@ -130,12 +130,24 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
      * then the dependency is met.
      * <br>
      * Unlike {@code setCondition()}, existing conditions are not removed.
-     * 
+     *
      * @param conditions the conditions to be added
      */
     @SafeVarargs //FIXME is this actually safe from heap pollution? T... aka Object[] seems okay-ish?
     public final void addCondition(T... conditions) {
-        this.conditions.addAll(Arrays.asList(conditions));
+        addConditions(Arrays.asList(conditions));
+    }
+    
+    /**
+     * Adds one or more conditions to the dependency. If any condition matches the entry's value,
+     * then the dependency is met.
+     * <br>
+     * Unlike {@code setCondition()}, existing conditions are not removed.
+     *
+     * @param conditions a {@link Collection} of conditions to be added
+     */
+    public final void addConditions(Collection<T> conditions) {
+        this.conditions.addAll(conditions);
     }
     
     /**

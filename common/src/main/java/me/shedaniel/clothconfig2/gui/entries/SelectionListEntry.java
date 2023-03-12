@@ -106,6 +106,10 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
         return this.values.get(this.index.get());
     }
     
+    public @NotNull List<T> getValues() {
+        return this.values;
+    }
+    
     @Override
     public Optional<T> getDefaultValue() {
         return defaultValue == null ? Optional.empty() : Optional.ofNullable(defaultValue.get());
