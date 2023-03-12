@@ -48,7 +48,7 @@
     "text.cloth-config.testing.2": "Cloth Config Wiki",
     "text.cloth-config.testing.3": "click here to open the Minecraft options file for no specific reason",
     "text.cloth-config.dependencies.one_condition": "Depends on \"%1$s\" being set to \"%2$s\".",
-    "text.cloth-config.dependencies.two_condition": "Depends on \"%1$s\" being set to \"%2$s\" or \"%3$s\".",
+    "text.cloth-config.dependencies.two_conditions": "Depends on \"%1$s\" being set to \"%2$s\" or \"%3$s\".",
     "text.cloth-config.dependencies.many_conditions": "Depends on \"%1$s\" being set to one of the following:",
     "text.cloth-config.dependencies.list_entry": "- %1$s"
 }

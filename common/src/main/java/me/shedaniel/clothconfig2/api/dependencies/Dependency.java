@@ -211,7 +211,7 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(switch (conditionTexts.size()) {
             case 1 -> Component.translatable("text.cloth-config.dependencies.one_condition", dependencyName, conditionTexts.get(0));
-            case 2 -> Component.translatable("text.cloth-config.dependencies.two_condition", dependencyName, conditionTexts.get(0), conditionTexts.get(1));
+            case 2 -> Component.translatable("text.cloth-config.dependencies.two_conditions", dependencyName, conditionTexts.get(0), conditionTexts.get(1));
             default -> Component.translatable("text.cloth-config.dependencies.many_conditions", dependencyName);
         });
         
