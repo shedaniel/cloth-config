@@ -56,14 +56,20 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         if (isMouseInside(mouseX, mouseY, x, y, entryWidth, entryHeight)) {
-            Optional<Component[]> tooltip = getTooltip(mouseX, mouseY);
-            if (tooltip.isPresent() && tooltip.get().length > 0)
-                addTooltip(Tooltip.of(new Point(mouseX, mouseY), postProcessTooltip(tooltip.get())));
+            getTooltip(mouseX, mouseY).ifPresent(tooltip -> {
+                if (tooltip.length > 0) {
+                    FormattedCharSequence[] processedTooltip = postProcessTooltip(tooltip);
+                    int height = processedTooltip.length * Minecraft.getInstance().font.lineHeight;
+                    addTooltip(Tooltip.of(new Point(mouseX, mouseY - height), processedTooltip));
+                }
+            });
         }
     }
     
     private FormattedCharSequence[] postProcessTooltip(Component[] tooltip) {
-        return Arrays.stream(tooltip).flatMap(component -> Minecraft.getInstance().font.split(component, getConfigScreen().width).stream())
+        int maxWidth = getConfigScreen().width / 2 - 4;
+        return Arrays.stream(tooltip)
+                .flatMap(component -> Minecraft.getInstance().font.split(component, maxWidth).stream())
                 .toArray(FormattedCharSequence[]::new);
     }
     
