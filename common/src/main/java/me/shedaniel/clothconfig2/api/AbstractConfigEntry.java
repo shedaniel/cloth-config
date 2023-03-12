@@ -93,37 +93,57 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
             text = text.withStyle(ChatFormatting.ITALIC);
         if (!hasError && !isEdited)
             text = text.withStyle(ChatFormatting.GRAY);
-        if (!dependencySatisfied())
+        if (!dependenciesMet())
             text = text.withStyle(ChatFormatting.DARK_GRAY);
         return text;
     }
     
-    public boolean dependencySatisfied() {
-        if (dependencies.isEmpty())
-            return true;
-        
-        // Entry is only enabled if all dependencies are satisfied
+    /**
+     * True if no dependencies exist, otherwise all dependencies must be met.
+     * 
+     * @return whether all dependencies are met. 
+     */
+    public boolean dependenciesMet() {
+        // allMatch() returns true if there are no dependencies
         return dependencies.stream().allMatch(Dependency::check);
     }
     
+    /**
+     * If an unmet dependency has {@code hiddenWhenNotMet} set to true, then the config entry
+     * should be hidden from menus.
+     * 
+     * @return whether the config entry should be hidden.
+     */
     public boolean hidden() {
-        if (dependencySatisfied())
-            return false;
-        
-        // If disabled, check if one of the "hide when disabled" dependencies is unmet
+        // anyMatch() returns false if there are no dependencies
         return dependencies.stream()
-                .filter(Dependency::hiddenWhenUnsatisfied)
+                .filter(Dependency::hiddenWhenNotMet)
                 .anyMatch(dependency -> !dependency.check());
     }
     
+    /**
+     * Add dependencies to the entry. If any dependency is unmet, the entry will be disabled.
+     * 
+     * @param dependencies one or more dependencies to be added. 
+     */
     public void addDependency(Dependency<?, ?>... dependencies) {
-        this.dependencies.addAll(Arrays.asList(dependencies));
+        addDependencies(Arrays.asList(dependencies));
     }
     
+    /**
+     * Add dependencies to the entry. If any dependency is unmet, the entry will be disabled.
+     * 
+     * @param dependencies a {@link Collection} of dependencies to be added.
+     */
     public void addDependencies(Collection<Dependency<?, ?>> dependencies) {
         this.dependencies.addAll(dependencies);
     }
     
+    /**
+     * Get the entry's dependencies.
+     * 
+     * @return a {@link Collection} of {@link Dependency}s
+     */
     public @NotNull Collection<Dependency<?, ?>> getDependencies() {
         return dependencies;
     }

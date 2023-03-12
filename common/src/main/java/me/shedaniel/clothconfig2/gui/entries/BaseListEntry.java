@@ -110,7 +110,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     
     @Override
     public boolean isExpanded() {
-        return expanded && dependencySatisfied();
+        return expanded && dependenciesMet();
     }
     
     @Override
@@ -151,11 +151,11 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     public abstract SELF self();
     
     public boolean isDeleteButtonEnabled() {
-        return deleteButtonEnabled && dependencySatisfied();
+        return deleteButtonEnabled && dependenciesMet();
     }
     
     public boolean isInsertButtonEnabled() {
-        return insertButtonEnabled && dependencySatisfied();
+        return insertButtonEnabled && dependenciesMet();
     }
 
     public void setDeleteButtonEnabled(boolean deleteButtonEnabled) {
@@ -287,7 +287,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         boolean insideLabel = labelWidget.rectangle.contains(mouseX, mouseY);
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);
-        blit(matrices, x - 15, y + 5, 24 + 9, (dependencySatisfied() ? (insideLabel && !insideCreateNew && !insideDelete ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9);
+        blit(matrices, x - 15, y + 5, 24 + 9, (dependenciesMet() ? (insideLabel && !insideCreateNew && !insideDelete ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9);
         if (isInsertButtonEnabled())
             blit(matrices, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
         if (isDeleteButtonEnabled())
@@ -328,7 +328,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int int_1) {
-            if (!dependencySatisfied())
+            if (!dependenciesMet())
                 return false;
             if (resetWidget.isMouseOver(mouseX, mouseY)) {
                 return false;

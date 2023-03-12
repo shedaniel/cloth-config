@@ -117,7 +117,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         boolean hovered = widget.rectangle.contains(mouseX, mouseY);
         RenderSystem.setShaderTexture(0, CONFIG_TEX);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        blit(matrices, x - 15, y + 5, 24, (dependencySatisfied() ? (hovered ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9);
+        blit(matrices, x - 15, y + 5, 24, (dependenciesMet() ? (hovered ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9);
         Minecraft.getInstance().font.drawShadow(matrices, getDisplayedFieldName().getVisualOrderText(), x, y + 6, hovered ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry entry : entries) {
             entry.setParent(getParent());
@@ -217,7 +217,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     
     @Override
     public boolean isExpanded() {
-        return this.expanded && dependencySatisfied();
+        return this.expanded && dependenciesMet();
     }
     
     @Override
@@ -231,7 +231,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int int_1) {
-            if (rectangle.contains(mouseX, mouseY) && dependencySatisfied()) {
+            if (dependenciesMet() && rectangle.contains(mouseX, mouseY)) {
                 setExpanded(!expanded);
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return isHovered = true;

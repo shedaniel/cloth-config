@@ -29,8 +29,8 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
      * @param entry the {@link BooleanListEntry} that is depended on.
      * @return the generated {@link BooleanDependency}.
      */
-    public static @NotNull BooleanDependency hiddenWhenNotSatisfied(BooleanListEntry entry) {
-        return hiddenWhenNotSatisfied(entry, true);
+    public static @NotNull BooleanDependency hiddenWhenNotMet(BooleanListEntry entry) {
+        return hiddenWhenNotMet(entry, true);
     }
     
     /**
@@ -42,9 +42,9 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
      * @param condition the expected value for {@code entry}
      * @return the generated {@link BooleanDependency}.
      */
-    public static @NotNull BooleanDependency hiddenWhenNotSatisfied(BooleanListEntry entry, boolean condition) {
+    public static @NotNull BooleanDependency hiddenWhenNotMet(BooleanListEntry entry, boolean condition) {
         BooleanDependency dependency = new BooleanDependency(entry, condition);
-        dependency.hiddenWhenUnsatisfied(true);
+        dependency.hiddenWhenNotMet(true);
         return dependency;
     }
     
@@ -56,8 +56,8 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
      * @param entry the {@link BooleanListEntry} that is depended on.
      * @return the generated {@link BooleanDependency}.
      */
-    public static @NotNull BooleanDependency disabledWhenNotSatisfied(BooleanListEntry entry) {
-        return disabledWhenNotSatisfied(entry, true);
+    public static @NotNull BooleanDependency disabledWhenNotMet(BooleanListEntry entry) {
+        return disabledWhenNotMet(entry, true);
     }
     
     /**
@@ -69,7 +69,7 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
      * @param condition the expected value for {@code entry}
      * @return the generated {@link BooleanDependency}.
      */
-    public static @NotNull BooleanDependency disabledWhenNotSatisfied(BooleanListEntry entry, boolean condition) {
+    public static @NotNull BooleanDependency disabledWhenNotMet(BooleanListEntry entry, boolean condition) {
         return new BooleanDependency(entry, condition);
     }
     
@@ -84,9 +84,9 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
      * @return the generated {@link SelectionDependency}.
      */
     @SafeVarargs //FIXME is generic vargs (T...) _actually_ safe or are we lying?
-    public static @NotNull <T> SelectionDependency<T> hiddenWhenNotSatisfied(SelectionListEntry<T> entry, T condition, T... conditions) {
+    public static @NotNull <T> SelectionDependency<T> hiddenWhenNotMet(SelectionListEntry<T> entry, T condition, T... conditions) {
         SelectionDependency<T> dependency = new SelectionDependency<>(entry, condition, conditions);
-        dependency.hiddenWhenUnsatisfied(true);
+        dependency.hiddenWhenNotMet(true);
         return dependency;
     }
     
@@ -101,7 +101,7 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
      * @return the generated {@link SelectionDependency}.
      */
     @SafeVarargs //FIXME is generic vargs (T...) _actually_ safe or are we lying?
-    public static @NotNull <T> SelectionDependency<T> disabledWhenNotSatisfied(SelectionListEntry<T> entry, T condition, T... conditions) {
+    public static @NotNull <T> SelectionDependency<T> disabledWhenNotMet(SelectionListEntry<T> entry, T condition, T... conditions) {
         return new SelectionDependency<>(entry, condition, conditions);
     }
     
@@ -127,7 +127,7 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
     
     /**
      * Adds one or more conditions to the dependency. If any condition matches the entry's value,
-     * then the dependency is satisfied.
+     * then the dependency is met.
      * <br>
      * Unlike {@code setCondition()}, existing conditions are not removed.
      * 
@@ -146,16 +146,18 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
     }
     
     /**
-     * @return a shallow copy of the dependency's condition list
+     * Get the dependency's conditions.
+     * 
+     * @return a {@link Collection} containing the dependency's conditions
      */
     public final Collection<T> getConditions() {
-        return conditions.stream().toList();
+        return conditions;
     }
     
     /**
      * @return whether entries with this dependency should hide when this dependency is unmet, instead of simply being disabled.
      */
-    public final boolean hiddenWhenUnsatisfied() {
+    public final boolean hiddenWhenNotMet() {
         return shouldHide;
     }
     
@@ -164,7 +166,7 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
      * 
      * @param shouldHide whether dependant entries should hide
      */
-    public final void hiddenWhenUnsatisfied(boolean shouldHide) {
+    public final void hiddenWhenNotMet(boolean shouldHide) {
         this.shouldHide = shouldHide;
     }
     
@@ -179,13 +181,13 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
     /**
      * Generates a tooltip for this dependency, if the dependency is currently not met.
      * <br>
-     * For example {@code "Depends on "Some Config Entry" being set to "YES"."}
+     * For example <em>Depends on "Some Config Entry" being set to "YES".</em>
      * 
-     * @return {@code Optional.empty()} or an {@link Optional} containing the tooltip.
+     * @return an {@link Optional} containing the tooltip, otherwise {@code Optional.empty()}.
      */
     public Optional<Component[]> getTooltip() {
         // Only generate a tooltip if the dependency is unmet
-        // TODO consider always showing the tooltip, even when the dependency is satisfied?
+        // TODO consider always showing the tooltip, even when the dependency is met?
         if (check())
             return Optional.empty();
         
@@ -195,7 +197,7 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
             // Probably best to keep this assertion here anyway, just in case anything ever gets broken.
             throw new IllegalStateException("Expected at least one condition to be defined");
         
-        // Get the name of the depended on entry, and style it bold.
+        // Get the name of the depended-on entry, and style it bold.
         Component dependencyName = MutableComponent.create(getEntry().getFieldName().getContents())
                 .withStyle(ChatFormatting.BOLD);
         
