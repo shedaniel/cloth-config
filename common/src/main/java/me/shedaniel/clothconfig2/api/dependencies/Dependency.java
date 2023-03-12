@@ -2,6 +2,7 @@ package me.shedaniel.clothconfig2.api.dependencies;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
+import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -59,7 +60,6 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
         return disabledWhenNotSatisfied(entry, true);
     }
     
-    
     /**
      * Generates a {@link BooleanDependency}, dependent on {@code entry}'s value matching {@code condition}.
      * <br>
@@ -71,6 +71,38 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
      */
     public static @NotNull BooleanDependency disabledWhenNotSatisfied(BooleanListEntry entry, boolean condition) {
         return new BooleanDependency(entry, condition);
+    }
+    
+    /**
+     * Generates a {@link SelectionDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * <br>
+     * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
+     *
+     * @param entry the {@link SelectionListEntry} that is depended on.
+     * @param condition the expected value for {@code entry}
+     * @param conditions optional additional values
+     * @return the generated {@link SelectionDependency}.
+     */
+    @SafeVarargs //FIXME is generic vargs (T...) _actually_ safe or are we lying?
+    public static @NotNull <T> SelectionDependency<T> hiddenWhenNotSatisfied(SelectionListEntry<T> entry, T condition, T... conditions) {
+        SelectionDependency<T> dependency = new SelectionDependency<>(entry, condition, conditions);
+        dependency.hiddenWhenUnsatisfied(true);
+        return dependency;
+    }
+    
+    /**
+     * Generates a {@link SelectionDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * <br>
+     * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
+     *
+     * @param entry the {@link SelectionListEntry} that is depended on.
+     * @param condition the expected value for {@code entry}
+     * @param conditions optional additional values
+     * @return the generated {@link SelectionDependency}.
+     */
+    @SafeVarargs //FIXME is generic vargs (T...) _actually_ safe or are we lying?
+    public static @NotNull <T> SelectionDependency<T> disabledWhenNotSatisfied(SelectionListEntry<T> entry, T condition, T... conditions) {
+        return new SelectionDependency<>(entry, condition, conditions);
     }
     
     /**
@@ -101,6 +133,7 @@ public abstract class Dependency<T, E extends AbstractConfigEntry<T>> {
      * 
      * @param conditions the conditions to be added
      */
+    @SafeVarargs //FIXME is this actually safe from heap pollution? T... aka Object[] seems okay-ish?
     public final void addCondition(T... conditions) {
         this.conditions.addAll(Arrays.asList(conditions));
     }

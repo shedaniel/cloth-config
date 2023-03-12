@@ -149,6 +149,16 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
         return widgets;
     }
     
+    /**
+     * Gets the text used to represent the given {@code value}.
+     * 
+     * @param value the value to get the text for.
+     * @return the text representing the {@code value}.
+     */
+    public Component getTextFor(T value) {
+        return nameProvider.apply(value);
+    }
+    
     public interface Translatable {
         @NotNull String getKey();
     }

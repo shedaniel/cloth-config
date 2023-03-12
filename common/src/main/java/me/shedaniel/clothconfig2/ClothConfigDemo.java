@@ -25,6 +25,7 @@ import me.shedaniel.autoconfig.util.Utils;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
+import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.gui.entries.MultiElementListEntry;
 import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
@@ -168,9 +169,12 @@ public class ClothConfigDemo {
         dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Another example..."), true).build());
         depends.add(dependantSub.build());
         depends.add(entryBuilder.startLongList(Component.literal("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).addDependency(Dependency.disabledWhenNotSatisfied(dependency)).build());
+        EnumListEntry<DependencyDemoEnum> enumDependency = entryBuilder.startEnumSelector(Component.literal("Select a good or bad option"), DependencyDemoEnum.class, DependencyDemoEnum.OKAY).build();
+        depends.add(enumDependency);
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when a good option is chosen..."), true).setTooltip(Component.literal("Select good or better above")).addDependency(Dependency.disabledWhenNotSatisfied(enumDependency, DependencyDemoEnum.EXCELLENT, DependencyDemoEnum.GOOD)).build());
     
         testing.addEntry(depends.build());
-        testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I appear when cool is toggled..."), true).addDependency(Dependency.hiddenWhenNotSatisfied(dependency)).setTooltip(Component.literal("Hopefully I keep my index")).build());
+        testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I appear when bad option is chosen..."), true).addDependency(Dependency.hiddenWhenNotSatisfied(enumDependency, DependencyDemoEnum.HORRIBLE, DependencyDemoEnum.BAD)).setTooltip(Component.literal("Hopefully I keep my index")).build());
         
         testing.addEntry(entryBuilder.startTextDescription(
                 Component.translatable("text.cloth-config.testing.1",
@@ -181,5 +185,9 @@ public class ClothConfigDemo {
         ).build());
         builder.transparentBackground();
         return builder;
+    }
+    
+    public enum DependencyDemoEnum {
+        EXCELLENT, GOOD, OKAY, BAD, HORRIBLE
     }
 }
