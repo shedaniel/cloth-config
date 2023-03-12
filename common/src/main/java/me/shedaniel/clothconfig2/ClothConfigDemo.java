@@ -82,6 +82,10 @@ public class ClothConfigDemo {
                 return result;
             }
         }
+    
+        enum DependencyDemoEnum {
+            EXCELLENT, GOOD, OKAY, BAD, HORRIBLE
+        }
         
         ConfigBuilder builder = ConfigBuilder.create().setTitle(Component.translatable("title.cloth-config.config"));
         builder.setDefaultBackgroundTexture(new ResourceLocation("minecraft:textures/block/oak_planks.png"));
@@ -185,9 +189,5 @@ public class ClothConfigDemo {
         ).build());
         builder.transparentBackground();
         return builder;
-    }
-    
-    public enum DependencyDemoEnum {
-        EXCELLENT, GOOD, OKAY, BAD, HORRIBLE
     }
 }
