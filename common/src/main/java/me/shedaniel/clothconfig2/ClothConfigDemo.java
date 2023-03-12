@@ -23,12 +23,12 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.autoconfig.util.Utils;
 import me.shedaniel.clothconfig2.api.*;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.MultiElementListEntry;
 import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
-import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependency;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
@@ -159,21 +159,18 @@ public class ClothConfigDemo {
         
         SubCategoryBuilder depends = entryBuilder.startSubCategory(Component.literal("Dependencies")).setExpanded(true);
         BooleanListEntry dependency = entryBuilder.startBooleanToggle(Component.literal("A cool toggle"), false).setTooltip(Component.literal("Toggle me...")).build();
-        BooleanDependency disableUnless = BooleanDependency.disabledWhenNotSatisfied(dependency);
-        BooleanDependency hideUnless = BooleanDependency.hiddenWhenNotSatisfied(dependency);
-        
         depends.add(dependency);
-        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true).addDependency(disableUnless).build());
-        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only appear when cool is toggled..."), true).addDependency(hideUnless).build());
-        SubCategoryBuilder dependantSub = entryBuilder.startSubCategory(Component.literal("How do deps work with sub-categories?")).addDependency(disableUnless);
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true).addDependency(Dependency.disabledWhenNotSatisfied(dependency)).build());
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only appear when cool is toggled..."), true).addDependency(Dependency.hiddenWhenNotSatisfied(dependency)).build());
+        SubCategoryBuilder dependantSub = entryBuilder.startSubCategory(Component.literal("How do deps work with sub-categories?")).addDependency(Dependency.disabledWhenNotSatisfied(dependency));
         dependantSub.add(entryBuilder.startTextDescription(Component.literal("This sub category depends on Cool being toggled")).build());
         dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Example entry"), true).build());
         dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Another example..."), true).build());
         depends.add(dependantSub.build());
-        depends.add(entryBuilder.startLongList(Component.literal("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).addDependency(disableUnless).build());
+        depends.add(entryBuilder.startLongList(Component.literal("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).addDependency(Dependency.disabledWhenNotSatisfied(dependency)).build());
     
         testing.addEntry(depends.build());
-        testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I appear when cool is toggled..."), true).addDependency(hideUnless).setTooltip(Component.literal("Hopefully I keep my index")).build());
+        testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I appear when cool is toggled..."), true).addDependency(Dependency.hiddenWhenNotSatisfied(dependency)).setTooltip(Component.literal("Hopefully I keep my index")).build());
         
         testing.addEntry(entryBuilder.startTextDescription(
                 Component.translatable("text.cloth-config.testing.1",

@@ -24,6 +24,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import net.fabricmc.api.EnvType;
@@ -111,7 +112,7 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
         
         // If disabled, check if one of the "hide when disabled" dependencies is unmet
         return dependencies.stream()
-                .filter(Dependency::isHiddenWhenDisabled)
+                .filter(Dependency::hiddenWhenUnsatisfied)
                 .anyMatch(dependency -> !dependency.check());
     }
     

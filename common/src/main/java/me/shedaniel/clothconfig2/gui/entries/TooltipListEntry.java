@@ -21,8 +21,8 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
-import me.shedaniel.clothconfig2.api.Dependency;
 import me.shedaniel.clothconfig2.api.Tooltip;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.math.Point;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
