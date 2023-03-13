@@ -53,7 +53,7 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     private Iterable<String> additionalSearchTags = null;
     
     @NotNull
-    private final Collection<Dependency<?,?>> dependencies = new ArrayList<>();
+    private final Collection<Dependency> dependencies = new ArrayList<>();
     
     public final void setReferenceProviderEntries(@Nullable List<ReferenceProvider<?>> referencableEntries) {
         this.referencableEntries = referencableEntries;
@@ -126,7 +126,7 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
      * 
      * @param dependencies one or more dependencies to be added. 
      */
-    public void addDependency(Dependency<?, ?>... dependencies) {
+    public void addDependency(Dependency... dependencies) {
         addDependencies(Arrays.asList(dependencies));
     }
     
@@ -135,7 +135,7 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
      * 
      * @param dependencies a {@link Collection} of dependencies to be added.
      */
-    public void addDependencies(Collection<Dependency<?, ?>> dependencies) {
+    public void addDependencies(Collection<Dependency> dependencies) {
         this.dependencies.addAll(dependencies);
     }
     
@@ -144,7 +144,7 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
      * 
      * @return a {@link Collection} of {@link Dependency}s
      */
-    public @NotNull Collection<Dependency<?, ?>> getDependencies() {
+    public @NotNull Collection<Dependency> getDependencies() {
         return dependencies;
     }
     

@@ -19,7 +19,6 @@
 
 package me.shedaniel.clothconfig2.impl.builders;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import net.fabricmc.api.EnvType;
@@ -39,7 +38,7 @@ import java.util.function.Supplier;
 public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF extends FieldBuilder<T, A, SELF>> {
     @NotNull private final Component fieldNameKey;
     @NotNull private final Component resetButtonKey;
-    @NotNull protected final Collection<Dependency<?,?>> dependencies = new ArrayList<>();
+    @NotNull protected final Collection<Dependency> dependencies = new ArrayList<>();
 
     protected boolean requireRestart = false;
     @Nullable protected Supplier<T> defaultValue = null;
@@ -83,7 +82,7 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
     }
     
     @SuppressWarnings("unchecked")
-    public final <DepType, DepEntry extends AbstractConfigEntry<DepType>> SELF addDependency(Dependency<DepType, DepEntry> dependency) {
+    public final SELF addDependency(Dependency dependency) {
         dependencies.add(dependency);
         return (SELF) this;
     }

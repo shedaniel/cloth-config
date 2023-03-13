@@ -211,7 +211,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
      * @return The built {@link Dependency}
      * @throws IllegalStateException when an unsupported dependency type is used, or the annotation is somehow invalid
      */
-    private static Dependency<?,?> buildDependency(DependsOn annotation, AbstractConfigListEntry<?> dependency) throws IllegalStateException {
+    private static Dependency buildDependency(DependsOn annotation, AbstractConfigListEntry<?> dependency) throws IllegalStateException {
         if (dependency instanceof BooleanListEntry booleanListEntry) {
             return buildDependency(annotation, booleanListEntry);
         } else if (dependency instanceof SelectionListEntry<?> selectionListEntry) {

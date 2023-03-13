@@ -72,12 +72,13 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     }
     
     private Optional<Component[]> getDependencyTooltips() {
-        Collection<Dependency<?, ?>> dependencies = getDependencies();
+        Collection<Dependency> dependencies = getDependencies();
         if (dependencies.isEmpty())
             return Optional.empty();
         
         // Get all the dependencies' tooltips and combine them into one array
         Component[] lines = dependencies.stream()
+                .filter(dependency -> !dependency.check()) // TODO consider showing all tooltips, not just for unmet
                 .map(Dependency::getTooltip)
                 .flatMap(Optional::stream)
                 .flatMap(Arrays::stream)
