@@ -91,8 +91,8 @@ public class TextFieldBuilder extends AbstractFieldBuilder<String, StringListEnt
         entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
-        if (!dependencies.isEmpty())
-            entry.addDependencies(dependencies);
+        if (dependency != null)
+            entry.setDependency(dependency);
         return entry;
     }
     

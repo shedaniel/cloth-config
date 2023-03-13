@@ -20,6 +20,7 @@
 package me.shedaniel.autoconfig.annotation;
 
 import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
+import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
 import me.shedaniel.clothconfig2.api.dependencies.SelectionDependency;
 
 import java.lang.annotation.ElementType;
@@ -157,21 +158,6 @@ public class ConfigEntry {
             }
         }
     
-    
-        /**
-         * Define multiple dependencies.
-         * <br><br>
-         * All dependencies must be met for the annotated field to be enabled.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
-        public @interface DependOnEach {
-            /**
-             * An array of dependencies to depend on
-             */
-            DependsOn[] value();
-        }
-    
         /**
          * Depends on the referenced field
          */
@@ -207,6 +193,26 @@ public class ConfigEntry {
              * simply being disabled) when the dependency is unmet.
              */
             boolean hiddenWhenNotMet() default false;
+        }
+    
+        /**
+         * Defines a group of dependencies, with a {@link DependencyGroup.Condition} to be met.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface DependsOnGroup {
+    
+            /**
+             * The condition for this group to be met.
+             * 
+             * @see DependencyGroup.Condition
+             */
+            DependencyGroup.Condition value();
+        
+            /**
+             * The dependencies to be included in the group.
+             */
+            DependsOn[] dependencies();
         }
     }
 }

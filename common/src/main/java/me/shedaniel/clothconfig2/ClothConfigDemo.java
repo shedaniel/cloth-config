@@ -165,20 +165,31 @@ public class ClothConfigDemo {
         SubCategoryBuilder depends = entryBuilder.startSubCategory(Component.literal("Dependencies")).setExpanded(true);
         BooleanListEntry dependency = entryBuilder.startBooleanToggle(Component.literal("A cool toggle"), false).setTooltip(Component.literal("Toggle me...")).build();
         depends.add(dependency);
-        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true).addDependency(Dependency.disabledWhenNotMet(dependency)).build());
-        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only appear when cool is toggled..."), true).addDependency(Dependency.hiddenWhenNotMet(dependency)).build());
-        SubCategoryBuilder dependantSub = entryBuilder.startSubCategory(Component.literal("How do deps work with sub-categories?")).addDependency(Dependency.disabledWhenNotMet(dependency));
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true)
+                .withDependency(Dependency.disabledWhenNotMet(dependency)).build());
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only appear when cool is toggled..."), true)
+                .withDependency(Dependency.hiddenWhenNotMet(dependency)).build());
+        SubCategoryBuilder dependantSub = entryBuilder.startSubCategory(Component.literal("How do deps work with sub-categories?"))
+                .withDependency(Dependency.disabledWhenNotMet(dependency));
         dependantSub.add(entryBuilder.startTextDescription(Component.literal("This sub category depends on Cool being toggled")).build());
         dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Example entry"), true).build());
         dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Another example..."), true).build());
         depends.add(dependantSub.build());
-        depends.add(entryBuilder.startLongList(Component.literal("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).addDependency(Dependency.disabledWhenNotMet(dependency)).build());
+        depends.add(entryBuilder.startLongList(Component.literal("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L))
+                .withDependency(Dependency.disabledWhenNotMet(dependency)).build());
         EnumListEntry<DependencyDemoEnum> enumDependency = entryBuilder.startEnumSelector(Component.literal("Select a good or bad option"), DependencyDemoEnum.class, DependencyDemoEnum.OKAY).build();
         depends.add(enumDependency);
-        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when a good option is chosen..."), true).setTooltip(Component.literal("Select good or better above")).addDependency(Dependency.disabledWhenNotMet(enumDependency, DependencyDemoEnum.EXCELLENT, DependencyDemoEnum.GOOD)).build());
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when a good option is chosen..."), true).setTooltip(Component.literal("Select good or better above"))
+                .withDependency(Dependency.disabledWhenNotMet(enumDependency, DependencyDemoEnum.EXCELLENT, DependencyDemoEnum.GOOD)).build());
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I need a good option AND a cool toggle!"), true).setTooltip(Component.literal("Select good or better and also toggle cool"))
+                .withDependency(Dependency.all(
+                        Dependency.disabledWhenNotMet(dependency),
+                        Dependency.disabledWhenNotMet(enumDependency, DependencyDemoEnum.EXCELLENT, DependencyDemoEnum.GOOD)))
+                .build());
     
         testing.addEntry(depends.build());
-        testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I appear when bad option is chosen..."), true).addDependency(Dependency.hiddenWhenNotMet(enumDependency, DependencyDemoEnum.HORRIBLE, DependencyDemoEnum.BAD)).setTooltip(Component.literal("Hopefully I keep my index")).build());
+        testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I appear when bad option is chosen..."), true)
+                .withDependency(Dependency.hiddenWhenNotMet(enumDependency, DependencyDemoEnum.HORRIBLE, DependencyDemoEnum.BAD)).setTooltip(Component.literal("Hopefully I keep my index")).build());
         
         testing.addEntry(entryBuilder.startTextDescription(
                 Component.translatable("text.cloth-config.testing.1",

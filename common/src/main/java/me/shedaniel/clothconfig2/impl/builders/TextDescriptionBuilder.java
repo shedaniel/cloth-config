@@ -70,8 +70,8 @@ public class TextDescriptionBuilder extends FieldBuilder<Component, TextListEntr
     @Override
     public TextListEntry build() {
         TextListEntry entry = new TextListEntry(getFieldNameKey(), value, color, tooltipSupplier);
-        if (!dependencies.isEmpty())
-            entry.addDependencies(dependencies);
+        if (dependency != null)
+            entry.setDependency(dependency);
         return entry;
     }
     

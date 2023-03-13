@@ -27,8 +27,6 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -38,11 +36,11 @@ import java.util.function.Supplier;
 public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF extends FieldBuilder<T, A, SELF>> {
     @NotNull private final Component fieldNameKey;
     @NotNull private final Component resetButtonKey;
-    @NotNull protected final Collection<Dependency> dependencies = new ArrayList<>();
 
     protected boolean requireRestart = false;
     @Nullable protected Supplier<T> defaultValue = null;
     @Nullable protected Function<T, Optional<Component>> errorSupplier;
+    @Nullable protected Dependency dependency = null;
     
     protected FieldBuilder(Component resetButtonKey, Component fieldNameKey) {
         this.resetButtonKey = Objects.requireNonNull(resetButtonKey);
@@ -82,8 +80,8 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
     }
     
     @SuppressWarnings("unchecked")
-    public final SELF addDependency(Dependency dependency) {
-        dependencies.add(dependency);
+    public final SELF withDependency(Dependency dependency) {
+        this.dependency = dependency;
         return (SELF) this;
     }
 }

@@ -132,12 +132,14 @@ public abstract class ConfigEntryDependency<T, E extends AbstractConfigEntry<T>>
         
         // If many conditions, print them as a list
         if (conditionTexts.size() > 2) {
-            conditionTexts.forEach(text -> tooltip.add(Component.translatable("text.cloth-config.dependencies.list_entry", text)));
+            tooltip.addAll(conditionTexts.stream()
+                    .map(text -> Component.translatable("text.cloth-config.dependencies.list_entry", text))
+                    .toList());
         }
         
         if (tooltip.isEmpty())
             return Optional.empty();
         
-        return Optional.of(tooltip.toArray(new Component[0]));
+        return Optional.of(tooltip.toArray(Component[]::new));
     }
 }

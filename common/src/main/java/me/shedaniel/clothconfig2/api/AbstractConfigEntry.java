@@ -36,7 +36,10 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -52,8 +55,8 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     private List<String> cachedTags = null;
     private Iterable<String> additionalSearchTags = null;
     
-    @NotNull
-    private final Collection<Dependency> dependencies = new ArrayList<>();
+    @Nullable
+    private Dependency dependency = null;
     
     public final void setReferenceProviderEntries(@Nullable List<ReferenceProvider<?>> referencableEntries) {
         this.referencableEntries = referencableEntries;
@@ -99,13 +102,12 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     }
     
     /**
-     * True if no dependencies exist, otherwise all dependencies must be met.
+     * True if no dependency exists, otherwise true if the dependency conditions are currently met.
      * 
-     * @return whether all dependencies are met. 
+     * @return whether dependency conditions are met. 
      */
     public boolean dependenciesMet() {
-        // allMatch() returns true if there are no dependencies
-        return dependencies.stream().allMatch(Dependency::check);
+        return dependency == null || dependency.check();
     }
     
     /**
@@ -115,37 +117,27 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
      * @return whether the config entry should be hidden.
      */
     public boolean hidden() {
-        // anyMatch() returns false if there are no dependencies
-        return dependencies.stream()
-                .filter(Dependency::hiddenWhenNotMet)
-                .anyMatch(dependency -> !dependency.check());
+        return dependency != null && dependency.hidden();
     }
     
     /**
-     * Add dependencies to the entry. If any dependency is unmet, the entry will be disabled.
+     * Sets the entry's dependency. Whenever the dependency is unmet, the entry will be disabled.
+     * <br>
+     * Passing in a {@code null} value will remove the entry's dependency.
      * 
-     * @param dependencies one or more dependencies to be added. 
+     * @param dependency the new dependency. 
      */
-    public void addDependency(Dependency... dependencies) {
-        addDependencies(Arrays.asList(dependencies));
+    public void setDependency(@Nullable Dependency dependency) {
+        this.dependency = dependency;
     }
     
     /**
-     * Add dependencies to the entry. If any dependency is unmet, the entry will be disabled.
+     * Get the entry's dependency.
      * 
-     * @param dependencies a {@link Collection} of dependencies to be added.
+     * @return the {@link Dependency}
      */
-    public void addDependencies(Collection<Dependency> dependencies) {
-        this.dependencies.addAll(dependencies);
-    }
-    
-    /**
-     * Get the entry's dependencies.
-     * 
-     * @return a {@link Collection} of {@link Dependency}s
-     */
-    public @NotNull Collection<Dependency> getDependencies() {
-        return dependencies;
+    public @Nullable Dependency getDependency() {
+        return dependency;
     }
     
     public Iterator<String> getSearchTags() {

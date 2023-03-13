@@ -14,4 +14,12 @@ public class BooleanDependency extends ConfigEntryDependency<Boolean, BooleanLis
     protected Component getConditionText(Boolean condition) {
         return getEntry().getYesNoText(condition);
     }
+    
+    @Override
+    public Component getShortDescription() {
+        Component condition = getConditionText(this.getConditions().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("BooleanDependency requires exactly one condition")));
+        return Component.translatable("text.cloth-config.boolean_dependency.short_description", getEntry().getFieldName(), condition);
+    }
 }

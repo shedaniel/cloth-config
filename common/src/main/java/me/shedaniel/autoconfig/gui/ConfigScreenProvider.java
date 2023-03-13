@@ -23,8 +23,8 @@ import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.ConfigManager;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
-import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependOnEach;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOn;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOnGroup;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
@@ -97,6 +97,36 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         T defaults = manager.getSerializer().createDefault();
         
         String i18n = i18nFunction.apply(manager);
+    
+        // Keep references to all GUI entries in this map.
+        // So that we can access them later when adding dependencies
+        Map<String, AbstractConfigListEntry<?>> i18nMap = new HashMap<>();
+        
+        // Function to build a Dependency from a DependsOn annotation, using i18nMao
+        Function<DependsOn, Dependency> buildDependsOn = (annotation) -> {
+            String dependencyI18n = annotation.value();
+            AbstractConfigListEntry<?> dependency = i18nMap.get(dependencyI18n);
+            if (dependency == null)
+                throw new RuntimeException("Specified dependency not found: \"%s\"".formatted(dependencyI18n));
+        
+            return buildDependency(annotation, dependency);
+        };
+    
+        // Function to build a DependencyGroup from a DependsOnGroup annotation
+        Function<DependsOnGroup, Dependency> buildDependsOnGroup = (annotation) -> {
+            // Build each dependency as defined in DependsOn annotations
+            Dependency[] dependencies = Arrays.stream(annotation.dependencies())
+                    .map(buildDependsOn)
+                    .toArray(Dependency[]::new);
+        
+            // Return the appropriate DependencyGroup variant
+            return switch (annotation.value()) {
+                case ALL -> Dependency.all(dependencies);
+                case NONE -> Dependency.none(dependencies);
+                case ANY -> Dependency.any(dependencies);
+                case ONE -> Dependency.one(dependencies);
+            };
+        };
         
         ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(Component.translatable(String.format("%s.title", i18n))).setSavingRunnable(manager::save);
         
@@ -113,18 +143,10 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         
         Map<String, ResourceLocation> categoryBackgrounds =
                 Arrays.stream(configClass.getAnnotationsByType(Config.Gui.CategoryBackground.class))
-                        .collect(
-                                toMap(
-                                        Config.Gui.CategoryBackground::category,
-                                        ann -> new ResourceLocation(ann.background())
-                                )
-                        );
-        
-        // Keep references to all GUI entries in this map.
-        // So that we can access them later when adding dependencies
-        Map<String, AbstractConfigListEntry<?>> i18nMap = new HashMap<>();
+                        .collect(toMap(Config.Gui.CategoryBackground::category,
+                                       ann -> new ResourceLocation(ann.background())));
     
-        LinkedHashMap<ConfigCategory, List<Field>> categoryMap = Arrays.stream(configClass.getDeclaredFields())
+        Map<ConfigCategory, List<Field>> categoryMap = Arrays.stream(configClass.getDeclaredFields())
                 .collect(groupingBy(
                         field -> getOrCreateCategoryForField(field, builder, categoryBackgrounds, i18n),
                         LinkedHashMap::new,
@@ -147,30 +169,23 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         // This time, look for fields that have defined dependencies and generate them.
         // Apply the generated dependencies to the config entries referenced by the i18n map.
         categoryMap.forEach((category, fields) -> fields.stream()
-                .filter(field -> field.isAnnotationPresent(DependsOn.class) || field.isAnnotationPresent(DependOnEach.class))
+                .filter(field -> field.isAnnotationPresent(DependsOn.class) || field.isAnnotationPresent(DependsOnGroup.class))
                 .forEach(field -> {
-                    // Get all the DependsOn annotations in a list, so we can iterate over them
-                    List<DependsOn> annotations = new ArrayList<>();
-                    if (field.isAnnotationPresent(DependOnEach.class))
-                        Collections.addAll(annotations, field.getAnnotation(DependOnEach.class).value());
-                    else if (field.isAnnotationPresent(DependsOn.class))
-                        annotations.add(field.getAnnotation(DependsOn.class));
-                    else
-                        throw new RuntimeException("Neither DependsOn nor DependsOnAll annotation is present. This shouldn't be possible!");
-                    
-                    annotations.forEach(annotation -> {
-                        String optionI18n = optionFunction.apply(i18n, field);
-                        String dependencyI18n = annotation.value();
-                        AbstractConfigListEntry<?> entry = i18nMap.get(optionI18n);
-                        AbstractConfigListEntry<?> dependency = i18nMap.get(dependencyI18n);
+                    String optionI18n = optionFunction.apply(i18n, field);
+                    AbstractConfigListEntry<?> entry = i18nMap.get(optionI18n);
+                    if (entry == null)
+                        throw new IllegalStateException("Specified entry not found: \"%s\"".formatted(optionI18n));
     
-                        if (entry == null)
-                            throw new IllegalStateException("Specified entry not found: \"%s\"".formatted(optionI18n));
-                        if (dependency == null)
-                            throw new RuntimeException("Specified dependency not found: \"%s\"".formatted(dependencyI18n));
-    
-                        entry.addDependency(buildDependency(annotation, dependency));
-                    });
+                    Dependency dependency;
+                    if (field.isAnnotationPresent(DependsOnGroup.class)) {
+                        dependency = buildDependsOnGroup.apply(field.getAnnotation(DependsOnGroup.class));
+                    } else if (field.isAnnotationPresent(DependsOn.class)) {
+                        dependency = buildDependsOn.apply(field.getAnnotation(DependsOn.class));
+                    } else {
+                        throw new RuntimeException("Neither DependsOn nor DependsOnGroup annotation is present.");
+                    }
+
+                    entry.setDependency(dependency);
                 }));
 
         return buildFunction.apply(builder);

@@ -103,8 +103,8 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends AbstractFieldBuilder
         entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
-        if (!dependencies.isEmpty())
-            entry.addDependencies(dependencies);
+        if (dependency != null)
+            entry.setDependency(dependency);
         return entry;
     }
     

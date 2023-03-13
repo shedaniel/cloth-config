@@ -17,4 +17,18 @@ public class SelectionDependency<T> extends ConfigEntryDependency<T, SelectionLi
     protected Component getConditionText(T condition) {
         return getEntry().getTextFor(condition);
     }
+    
+    @Override
+    public Component getShortDescription() {
+        int conditions = getConditions().size();
+        
+        if (conditions == 1) {
+            Component condition = getConditionText(this.getConditions().stream()
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Expected exactly one condition")));
+            return Component.translatable("text.cloth-config.selection_dependency.short_description.one", getEntry().getFieldName(), condition);
+        }
+        
+        return Component.translatable("text.cloth-config.selection_dependency.short_description.many", getEntry().getFieldName(), conditions);
+    }
 }

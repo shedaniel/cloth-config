@@ -33,7 +33,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -71,25 +70,22 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
                 .toArray(FormattedCharSequence[]::new);
     }
     
-    private Optional<Component[]> getDependencyTooltips() {
-        Collection<Dependency> dependencies = getDependencies();
-        if (dependencies.isEmpty())
+    private Optional<Component[]> getDependencyTooltip() {
+        @Nullable Dependency dependency = getDependency();
+        if (dependency == null)
             return Optional.empty();
-        
-        // Get all the dependencies' tooltips and combine them into one array
-        Component[] lines = dependencies.stream()
-                .filter(dependency -> !dependency.check()) // TODO consider showing all tooltips, not just for unmet
-                .map(Dependency::getTooltip)
-                .flatMap(Optional::stream)
-                .flatMap(Arrays::stream)
-                .toArray(Component[]::new);
-        
-        return lines.length > 0 ? Optional.of(lines) : Optional.empty();
+    
+        // TODO consider showing all tooltips, not just for unmet
+        if (dependency.check())
+            return Optional.empty();
+
+        return dependency.getTooltip();
+    
     }
     
     public Optional<Component[]> getTooltip() {
         Optional<Component[]> tooltip = tooltipSupplier == null ? Optional.empty() : tooltipSupplier.get();
-        Optional<Component[]> dependencyTooltip = getDependencyTooltips();
+        Optional<Component[]> dependencyTooltip = getDependencyTooltip();
     
         // Concatenate the two optional tooltips
         Component[] lines = Stream.concat(tooltip.stream(), dependencyTooltip.stream())
