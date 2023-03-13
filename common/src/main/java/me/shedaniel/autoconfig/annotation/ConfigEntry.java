@@ -170,6 +170,12 @@ public class ConfigEntry {
             String value();
     
             /**
+             * If set to true, the annotated field will be hidden (instead of
+             * simply being disabled) when the dependency is unmet.
+             */
+            boolean hiddenWhenNotMet() default false;
+    
+            /**
              * One or more conditions to be checked against the dependency's value.
              * If any condition is matched, the annotated field is enabled.
              * <br><br>
@@ -187,12 +193,6 @@ public class ConfigEntry {
              * </ul>
              */
             String[] conditions();
-    
-            /**
-             * If set to true, the annotated field will be hidden (instead of
-             * simply being disabled) when the dependency is unmet.
-             */
-            boolean hiddenWhenNotMet() default false;
         }
     
         /**
