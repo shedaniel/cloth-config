@@ -23,10 +23,7 @@ import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
 import me.shedaniel.clothconfig2.api.dependencies.SelectionDependency;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 public class ConfigEntry {
     
@@ -163,6 +160,7 @@ public class ConfigEntry {
          */
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.FIELD)
+        @Repeatable(DependsOnGroup.class)
         public @interface DependsOn {
             /**
              * The i18n key of the field to depend on
@@ -201,18 +199,18 @@ public class ConfigEntry {
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.FIELD)
         public @interface DependsOnGroup {
-    
-            /**
-             * The condition for this group to be met.
-             * 
-             * @see DependencyGroup.Condition
-             */
-            DependencyGroup.Condition value();
         
             /**
              * The dependencies to be included in the group.
              */
-            DependsOn[] dependencies();
+            DependsOn[] value();
+        
+            /**
+             * The condition for this group to be met.
+             *
+             * @see DependencyGroup.Condition
+             */
+            DependencyGroup.Condition condition() default DependencyGroup.Condition.ALL;
         }
     }
 }

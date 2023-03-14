@@ -19,6 +19,7 @@
 
 package me.shedaniel.autoconfig.gui.registry;
 
+import me.shedaniel.autoconfig.dependencies.DependencyManager;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import net.fabricmc.api.EnvType;
@@ -32,10 +33,12 @@ import java.util.Objects;
 @Environment(EnvType.CLIENT)
 public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
     
-    private List<GuiRegistryAccess> children;
+    private DependencyManager dependencyManager;
+    private final List<GuiRegistryAccess> children;
     
     public ComposedGuiRegistryAccess(GuiRegistryAccess... children) {
         this.children = Arrays.asList(children);
+        setDependencyManager(new DependencyManager());
     }
     
     @Override
@@ -65,5 +68,16 @@ public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
             guis = child.transform(guis, i18n, field, config, defaults, registry);
         }
         return guis;
+    }
+    
+    @Override
+    public DependencyManager getDependencyManager() {
+        return dependencyManager;
+    }
+    
+    @Override
+    public void setDependencyManager(DependencyManager manager) {
+        dependencyManager = manager;
+        children.forEach(child -> child.setDependencyManager(manager));
     }
 }

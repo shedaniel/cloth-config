@@ -535,7 +535,17 @@ public class DefaultGuiProviders {
                 .map(
                         iField -> {
                             String iI13n = String.format("%s.%s", i18n, iField.getName());
-                            return guiProvider.getAndTransform(iI13n, iField, iConfig, iDefaults, guiProvider);
+                            List<AbstractConfigListEntry> entries = guiProvider.getAndTransform(iI13n, iField, iConfig, iDefaults, guiProvider);
+                            
+                            // Fixme could add to dependency map here?
+                            // Fixme need to check if this entry has dependencies too
+                            if (entries != null)
+                                System.err.printf("getChildren() found %d entries: %s%n", entries.size(), Arrays.toString(entries.stream()
+                                        .map(AbstractConfigListEntry::getClass)
+                                        .map(Class::getSimpleName)
+                                        .toArray()));
+                            
+                            return entries;
                         }
                 )
                 .filter(Objects::nonNull)

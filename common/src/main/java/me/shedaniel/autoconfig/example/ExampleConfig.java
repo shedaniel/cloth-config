@@ -47,6 +47,10 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     @ConfigEntry.Gui.TransitiveObject
     public ModuleB moduleB = new ModuleB();
     
+    @ConfigEntry.Category("c")
+    @ConfigEntry.Gui.TransitiveObject
+    public ModuleC moduleC = new ModuleC();
+    
     enum ExampleEnum {
         FOO,
         BAR,
@@ -96,6 +100,11 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
         
         @ConfigEntry.ColorPicker
         public int color = 0xFFFFFF;
+    }
+    
+    @Config(name = "module_c")
+    public static class ModuleC implements ConfigData {
+        
     }
     
     @Config(name = "empty")

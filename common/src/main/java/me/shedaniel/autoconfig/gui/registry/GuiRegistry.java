@@ -19,6 +19,7 @@
 
 package me.shedaniel.autoconfig.gui.registry;
 
+import me.shedaniel.autoconfig.dependencies.DependencyManager;
 import me.shedaniel.autoconfig.gui.registry.api.GuiProvider;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.autoconfig.gui.registry.api.GuiTransformer;
@@ -39,6 +40,7 @@ public final class GuiRegistry implements GuiRegistryAccess {
     
     private Map<Priority, List<ProviderEntry>> providers = new HashMap<>();
     private List<TransformerEntry> transformers = new ArrayList<>();
+    private DependencyManager dependencyManager = new DependencyManager();
     
     public GuiRegistry() {
         for (Priority priority : Priority.values()) {
@@ -62,7 +64,7 @@ public final class GuiRegistry implements GuiRegistryAccess {
             Object defaults,
             GuiRegistryAccess registry
     ) {
-        return firstPresent(
+        List<AbstractConfigListEntry> guis = firstPresent(
                 Arrays.stream(Priority.values())
                         .map(priority ->
                                 (Supplier<Optional<ProviderEntry>>) () ->
@@ -73,6 +75,12 @@ public final class GuiRegistry implements GuiRegistryAccess {
         )
                 .map(entry -> entry.provider.get(i18n, field, config, defaults, registry))
                 .orElse(null);
+        
+        // FIXME handle when one i18n maps to multiple entries
+        if (guis != null)
+            registry.getDependencyManager().register(i18n, field, guis.stream().findFirst().orElse(null));
+        
+        return guis;
     }
     
     @Override
@@ -92,6 +100,10 @@ public final class GuiRegistry implements GuiRegistryAccess {
         for (GuiTransformer transformer : matchedTransformers) {
             guis = transformer.transform(guis, i18n, field, config, defaults, registry);
         }
+    
+        // FIXME handle when one i18n maps to multiple entries
+        if (guis != null)
+            registry.getDependencyManager().register(i18n, field, guis.stream().findFirst().orElse(null));
         
         return guis;
     }
@@ -144,6 +156,16 @@ public final class GuiRegistry implements GuiRegistryAccess {
         for (Class<? extends Annotation> type : types) {
             registerPredicateTransformer(transformer, field -> predicate.test(field) && field.isAnnotationPresent(type));
         }
+    }
+    
+    @Override
+    public DependencyManager getDependencyManager() {
+        return dependencyManager;
+    }
+    
+    @Override
+    public void setDependencyManager(DependencyManager manager) {
+        dependencyManager = manager;
     }
     
     private enum Priority {
