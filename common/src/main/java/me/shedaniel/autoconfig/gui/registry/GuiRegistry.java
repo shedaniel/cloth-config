@@ -19,7 +19,6 @@
 
 package me.shedaniel.autoconfig.gui.registry;
 
-import me.shedaniel.autoconfig.dependencies.DependencyManager;
 import me.shedaniel.autoconfig.gui.registry.api.GuiProvider;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.autoconfig.gui.registry.api.GuiTransformer;
@@ -36,11 +35,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
-public final class GuiRegistry implements GuiRegistryAccess {
+public final class GuiRegistry extends AbstractGuiRegistry {
     
     private Map<Priority, List<ProviderEntry>> providers = new HashMap<>();
     private List<TransformerEntry> transformers = new ArrayList<>();
-    private DependencyManager dependencyManager = new DependencyManager();
     
     public GuiRegistry() {
         for (Priority priority : Priority.values()) {
@@ -156,16 +154,6 @@ public final class GuiRegistry implements GuiRegistryAccess {
         for (Class<? extends Annotation> type : types) {
             registerPredicateTransformer(transformer, field -> predicate.test(field) && field.isAnnotationPresent(type));
         }
-    }
-    
-    @Override
-    public DependencyManager getDependencyManager() {
-        return dependencyManager;
-    }
-    
-    @Override
-    public void setDependencyManager(DependencyManager manager) {
-        dependencyManager = manager;
     }
     
     private enum Priority {

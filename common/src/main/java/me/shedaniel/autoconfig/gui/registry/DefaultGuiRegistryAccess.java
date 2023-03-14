@@ -19,7 +19,6 @@
 
 package me.shedaniel.autoconfig.gui.registry;
 
-import me.shedaniel.autoconfig.dependencies.DependencyManager;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import org.apache.logging.log4j.LogManager;
@@ -28,9 +27,8 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 
-public class DefaultGuiRegistryAccess implements GuiRegistryAccess {
+public class DefaultGuiRegistryAccess extends AbstractGuiRegistry {
     
-    private DependencyManager dependencyManager = new DependencyManager();
     @Override
     public List<AbstractConfigListEntry> get(
             String i18n,
@@ -53,15 +51,5 @@ public class DefaultGuiRegistryAccess implements GuiRegistryAccess {
             GuiRegistryAccess registry
     ) {
         return guis;
-    }
-    
-    @Override
-    public DependencyManager getDependencyManager() {
-        return dependencyManager;
-    }
-    
-    @Override
-    public void setDependencyManager(DependencyManager manager) {
-        dependencyManager = manager;
     }
 }

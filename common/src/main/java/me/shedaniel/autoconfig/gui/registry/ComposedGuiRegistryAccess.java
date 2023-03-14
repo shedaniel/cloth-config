@@ -31,9 +31,8 @@ import java.util.List;
 import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
-public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
+public class ComposedGuiRegistryAccess extends AbstractGuiRegistry {
     
-    private DependencyManager dependencyManager;
     private final List<GuiRegistryAccess> children;
     
     public ComposedGuiRegistryAccess(GuiRegistryAccess... children) {
@@ -71,13 +70,8 @@ public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
     }
     
     @Override
-    public DependencyManager getDependencyManager() {
-        return dependencyManager;
-    }
-    
-    @Override
     public void setDependencyManager(DependencyManager manager) {
-        dependencyManager = manager;
+        super.setDependencyManager(manager);
         children.forEach(child -> child.setDependencyManager(manager));
     }
 }
