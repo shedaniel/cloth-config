@@ -156,7 +156,15 @@ public class ConfigEntry {
         }
     
         /**
-         * Depends on the referenced field
+         * Depends on the referenced field.
+         * <br>
+         * A field can be annotated multiple times.
+         * All defined dependencies must be met for the config entry to be enabled.
+         * <br>
+         * Alternatively, {@link DependsOnGroup} can also be used to define multiple dependencies,
+         * optionally using alternative group-matching conditions such as {@code any}, {@code none}, or exactly {@code one}. 
+         * 
+         * @see DependsOnGroup
          */
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.FIELD)
@@ -194,7 +202,9 @@ public class ConfigEntry {
         }
     
         /**
-         * Defines a group of dependencies, with a {@link DependencyGroup.Condition} to be met.
+         * Defines a group of dependencies, with a "group-matching" {@link DependencyGroup.Condition} to be met.
+         * 
+         * @see DependencyGroup.Condition
          */
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.FIELD)
@@ -206,7 +216,7 @@ public class ConfigEntry {
             DependsOn[] value();
         
             /**
-             * The condition for this group to be met.
+             * The condition for this group to be met. By defaults, require all dependencies to be met.
              *
              * @see DependencyGroup.Condition
              */
