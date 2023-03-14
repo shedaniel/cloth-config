@@ -4,6 +4,7 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
+import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
 import me.shedaniel.clothconfig2.api.dependencies.SelectionDependency;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
@@ -53,7 +54,16 @@ public class DependencyManager {
                 });
     }
     
-    public Dependency buildDependency(ConfigEntry.Gui.DependsOnGroup annotation) {
+    /**
+     * Build a {@link DependencyGroup} as defined in the annotation.
+     * <br><br>
+     * If there is an issue building any child dependency, a {@link RuntimeException} will be thrown.
+     *
+     * @param annotation The {@link ConfigEntry.Gui.DependsOnGroup} annotation defining the group
+     * @return The built {@link DependencyGroup}
+     * @throws RuntimeException when there is an issue building one of the group's dependencies
+     */
+    public DependencyGroup buildDependency(ConfigEntry.Gui.DependsOnGroup annotation) {
         // Build each dependency as defined in DependsOn annotations
         Dependency[] dependencies = Arrays.stream(annotation.value())
                 .map(this::buildDependency)
@@ -68,33 +78,29 @@ public class DependencyManager {
         };
     }
     
+    /**
+     * Build a {@link Dependency} as defined in the annotation.
+     * <br><br>
+     * Currently, supports {@link BooleanListEntry} and {@link SelectionListEntry} dependencies.
+     * If a different config entry type is used, a {@link RuntimeException} will be thrown.
+     *
+     * @param annotation The {@link ConfigEntry.Gui.DependsOn} annotation defining the dependency
+     * @return The built {@link Dependency}
+     * @throws RuntimeException when an unsupported dependency type is used, or the annotation is somehow invalid
+     */
     public Dependency buildDependency(ConfigEntry.Gui.DependsOn annotation) {
         String i18n = annotation.value();
         AbstractConfigListEntry<?> dependency = getEntry(i18n);
         if (dependency == null)
             throw new RuntimeException("Specified dependency not found: \"%s\"".formatted(i18n));
     
-        return buildDependency(annotation, dependency);
-    }
     
-    /**
-     * Build a {@link Dependency} on the config entry, as defined in the annotation.
-     * <br><br>
-     * Currently, supports {@link BooleanListEntry} and {@link SelectionListEntry} dependencies.
-     * If a different config entry type is used, an {@link IllegalStateException} will be thrown.
-     *
-     * @param annotation The {@link ConfigEntry.Gui.DependsOn} annotation defining the dependency
-     * @param dependency The depended-on {@link AbstractConfigListEntry}
-     * @return The built {@link Dependency}
-     * @throws IllegalStateException when an unsupported dependency type is used, or the annotation is somehow invalid
-     */
-    public static Dependency buildDependency(ConfigEntry.Gui.DependsOn annotation, AbstractConfigListEntry<?> dependency) throws IllegalStateException {
         if (dependency instanceof BooleanListEntry booleanListEntry) {
             return buildDependency(annotation, booleanListEntry);
         } else if (dependency instanceof SelectionListEntry<?> selectionListEntry) {
             return buildDependency(annotation, selectionListEntry);
         } else {
-            throw new IllegalStateException("Unsupported dependency type: %s".formatted(dependency.getClass().getSimpleName()));
+            throw new RuntimeException("Unsupported dependency type: %s".formatted(dependency.getClass().getSimpleName()));
         }
     }
     
