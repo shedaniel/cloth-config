@@ -112,7 +112,7 @@ unifiedPublishing {
     project {
         displayName = "[Fabric $rootProject.supported_version] v$project.version"
         releaseType = "release"
-        gameVersions = []
+        gameVersions = ["1.19.4"]
         gameLoaders = ["fabric"]
         
         mainPublication remapJar
@@ -130,7 +130,6 @@ unifiedPublishing {
                 token = project.hasProperty("modrinth_key") ? project.property("modrinth_key") : System.getenv("modrinth_key")
                 id = project.modrinth_id
                 version = "$project.version+$project.name"
-                gameVersions.addAll project.minecraft_version
             }
         }
     }
