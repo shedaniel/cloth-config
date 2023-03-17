@@ -46,40 +46,42 @@ public class SearchFieldEntry extends AbstractConfigListEntry<Object> {
             lowerCases = s.isEmpty() ? new String[0] : s.toLowerCase(Locale.ROOT).split(" ");
         });
         listWidget.entriesTransformer = entries -> {
-            return new AbstractList<>() {
+            return new AbstractList<AbstractConfigEntry<AbstractConfigEntry<?>>>() {
                 @Override
                 public Iterator<AbstractConfigEntry<AbstractConfigEntry<?>>> iterator() {
                     if (editBox.getValue().isEmpty())
                         return entries.iterator();
-                    return Iterators.filter(entries.iterator(), entry -> !entry.hidden() && screen.matchesSearch(entry.getSearchTags()));
+                    return Iterators.filter(entries.iterator(), entry -> {
+                        return !entry.hidden() && screen.matchesSearch(entry.getSearchTags());
+                    });
                 }
-    
+                
                 @Override
                 public AbstractConfigEntry<AbstractConfigEntry<?>> get(int index) {
                     return Iterators.get(iterator(), index);
                 }
-    
+                
                 @Override
                 public void add(int index, AbstractConfigEntry<AbstractConfigEntry<?>> element) {
                     entries.add(index, element);
                 }
-    
+                
                 @Override
                 public AbstractConfigEntry<AbstractConfigEntry<?>> remove(int index) {
                     AbstractConfigEntry<AbstractConfigEntry<?>> entry = get(index);
                     return entries.remove(entry) ? entry : null;
                 }
-    
+                
                 @Override
                 public boolean remove(Object o) {
                     return entries.remove(o);
                 }
-    
+                
                 @Override
                 public void clear() {
                     entries.clear();
                 }
-    
+                
                 @Override
                 public int size() {
                     return Iterators.size(iterator());

@@ -107,22 +107,33 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         
         Map<String, ResourceLocation> categoryBackgrounds =
                 Arrays.stream(configClass.getAnnotationsByType(Config.Gui.CategoryBackground.class))
-                        .collect(toMap(Config.Gui.CategoryBackground::category,
-                                       ann -> new ResourceLocation(ann.background())));
-
+                        .collect(
+                                toMap(
+                                        Config.Gui.CategoryBackground::category,
+                                        ann -> new ResourceLocation(ann.background())
+                                )
+                        );
+        
         Arrays.stream(configClass.getDeclaredFields())
-                .collect(groupingBy(
-                        field -> getOrCreateCategoryForField(field, builder, categoryBackgrounds, i18n),
-                        LinkedHashMap::new,
-                        toList()))
-                .forEach((category, fields) -> fields.forEach(field -> {
-            String optionI18n = optionFunction.apply(i18n, field);
-            registry.getAndTransform(optionI18n, field, config, defaults, registry)
-                    .forEach(category::addEntry);
-        }));
+                .collect(
+                        groupingBy(
+                                field -> getOrCreateCategoryForField(field, builder, categoryBackgrounds, i18n),
+                                LinkedHashMap::new,
+                                toList()
+                        )
+                )
+                .forEach(
+                        (key, value) -> value.forEach(
+                                field -> {
+                                    String optionI13n = optionFunction.apply(i18n, field);
+                                    registry.getAndTransform(optionI13n, field, config, defaults, registry)
+                                            .forEach(key::addEntry);
+                                }
+                        )
+                );
     
         registry.getDependencyManager().buildDependencies();
-
+        
         return buildFunction.apply(builder);
     }
     

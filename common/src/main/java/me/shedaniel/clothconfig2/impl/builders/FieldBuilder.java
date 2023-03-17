@@ -36,7 +36,6 @@ import java.util.function.Supplier;
 public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF extends FieldBuilder<T, A, SELF>> {
     @NotNull private final Component fieldNameKey;
     @NotNull private final Component resetButtonKey;
-
     protected boolean requireRestart = false;
     @Nullable protected Supplier<T> defaultValue = null;
     @Nullable protected Function<T, Optional<Component>> errorSupplier;
