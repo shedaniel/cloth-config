@@ -23,6 +23,7 @@ import blue.endless.jankson.Comment;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnumHandler.EnumDisplayOption;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -66,7 +67,7 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
         public ExampleEnum anEnum = ExampleEnum.FOO;
         
         @ConfigEntry.Gui.Tooltip(count = 2)
-        @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+        @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
         public ExampleEnum anEnumWithButton = ExampleEnum.FOO;
         
         @Comment("This tooltip was automatically applied from a Jankson @Comment")
@@ -105,6 +106,49 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     @Config(name = "module_c")
     public static class ModuleC implements ConfigData {
         
+        @ConfigEntry.Gui.PrefixText
+        @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+        public DependencySubCategory dependencySubCategory = new DependencySubCategory();
+        public static class DependencySubCategory {
+            
+            @ConfigEntry.Gui.Tooltip
+            public boolean coolToggle = false;
+            
+            @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
+            public DependencyDemoEnum coolEnum = DependencyDemoEnum.OKAY;
+    
+            @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
+            public boolean dependsOnCoolToggle1 = false;
+    
+            @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"}, hiddenWhenNotMet = true)
+            public boolean dependsOnCoolToggle2 = false;
+    
+            @ConfigEntry.Gui.TransitiveObject
+            @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
+            public DependantObject dependantObject = new DependantObject();
+            public static class DependantObject {
+                @ConfigEntry.Gui.PrefixText
+                public boolean toggle1 = false;
+                public boolean toggle2 = true;
+            }
+    
+            @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+            @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
+            @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolEnum", conditions = {"good", "excellent"})
+            public DependantCollapsible dependantCollapsible = new DependantCollapsible();
+            public static class DependantCollapsible {
+                public boolean toggle1 = false;
+                public boolean toggle2 = true;
+            }
+    
+            @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
+            public List<Integer> list = Arrays.asList(1, 2, 3);
+    
+        }
+    
+        @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
+        public boolean dependsOnCoolToggleOutside = false;
+        
     }
     
     @Config(name = "empty")
@@ -141,5 +185,9 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
             this.first = first;
             this.second = second;
         }
+    }
+    
+    enum DependencyDemoEnum {
+        EXCELLENT, GOOD, OKAY, BAD, HORRIBLE
     }
 }
