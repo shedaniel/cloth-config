@@ -10,47 +10,73 @@ import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * {@code DependencyManager} is used by {@link me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess GuiRegistryAccess} implementations
+ * to handle generating dependencies defined in {@link ConfigEntry.Gui.DependsOn @DependsOn} and {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}
+ * annotations.
+ * <br><br>
+ * It is necessary to register <strong>all</strong> config entry GUIs with the {@code DependencyManager} instance before building any dependencies. 
+ */
 public class DependencyManager {
     
-    private final Map<String, GeneratedConfigEntry> generatedEntries = new HashMap<>();
+    private record EntryRecord(String i18n, Field field, AbstractConfigListEntry<?> gui) {}
+    private final Map<String, EntryRecord> registry = new LinkedHashMap<>();
     
-    public DependencyManager() {
-        // TODO params?
-        System.err.println("new DependencyManager created");
+    public DependencyManager() {}
+    
+    /**
+     * Register a new or transformed config entry for later use by {@code buildDependencies}.
+     * 
+     * @param i18n the i18n key 
+     * @param field the field where the config entry was defined
+     * @param entry the config entry GUI
+     */
+    public void register(String i18n, Field field, AbstractConfigListEntry<?> entry) {
+        registry.put(i18n, new EntryRecord(i18n, field, entry));
     }
     
-    public void register(String i18n, Field field, AbstractConfigListEntry entry) {
-        generatedEntries.put(i18n, new GeneratedConfigEntry(i18n, field, entry));
+    /**
+     * Get the config entry GUI associated with the given i18n key.
+     * 
+     * @param i18n the i18n key 
+     * @return An {@link Optional} containing config entry or {@code Optional.empty()}
+     */
+    public Optional<AbstractConfigListEntry<?>> getEntry(String i18n) {
+        return Optional.ofNullable(registry.get(i18n)).map(EntryRecord::gui);
     }
     
-    public AbstractConfigListEntry getEntry(String i18n) {
-        return generatedEntries.get(i18n).entry;
+    /**
+     * Get the field associated with the given i18n key.
+     *
+     * @param i18n the i18n key 
+     * @return An {@link Optional} containing defining field or {@code Optional.empty()}
+     */
+    public Optional<Field> getField(String i18n) {
+        return Optional.ofNullable(registry.get(i18n)).map(EntryRecord::field);
     }
     
-    public Field getField(String i18n) {
-        return generatedEntries.get(i18n).field;
-    }
-    
+    /**
+     * Builds the dependencies for all registered config entries.
+     * <br><br>
+     * Both the dependent and depended-on entry for each dependency must be registered before running this method.
+     */
     public void buildDependencies() {
-        generatedEntries.values().stream()
-                .filter(entry -> entry.getField().isAnnotationPresent(ConfigEntry.Gui.DependsOn.class) || entry.getField().isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
+        registry.values().stream()
+                .filter(entry -> entry.field().isAnnotationPresent(ConfigEntry.Gui.DependsOn.class) || entry.field().isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
                 .forEach(entry -> {
-                    Field field = entry.getField();
+                    Field field = entry.field();
                     Dependency dependency;
-                    if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class)) {
+
+                    if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
                         dependency = buildDependency(field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class));
-                    } else if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class)) {
+                    else if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
                         dependency = buildDependency(field.getAnnotation(ConfigEntry.Gui.DependsOn.class));
-                    } else {
+                    else
                         throw new RuntimeException("Neither DependsOn nor DependsOnGroup annotation is present.");
-                    }
-                    
-                    entry.getEntry().setDependency(dependency);
+
+                    entry.gui().setDependency(dependency);
                 });
     }
     
@@ -59,7 +85,7 @@ public class DependencyManager {
      * <br><br>
      * If there is an issue building any child dependency, a {@link RuntimeException} will be thrown.
      *
-     * @param annotation The {@link ConfigEntry.Gui.DependsOnGroup} annotation defining the group
+     * @param annotation The {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup} annotation defining the group
      * @return The built {@link DependencyGroup}
      * @throws RuntimeException when there is an issue building one of the group's dependencies
      */
@@ -84,16 +110,15 @@ public class DependencyManager {
      * Currently, supports {@link BooleanListEntry} and {@link SelectionListEntry} dependencies.
      * If a different config entry type is used, a {@link RuntimeException} will be thrown.
      *
-     * @param annotation The {@link ConfigEntry.Gui.DependsOn} annotation defining the dependency
+     * @param annotation The {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation defining the dependency
      * @return The built {@link Dependency}
      * @throws RuntimeException when an unsupported dependency type is used, or the annotation is somehow invalid
      */
     public Dependency buildDependency(ConfigEntry.Gui.DependsOn annotation) {
         String i18n = annotation.value();
-        AbstractConfigListEntry<?> dependency = getEntry(i18n);
-        if (dependency == null)
-            throw new RuntimeException("Specified dependency not found: \"%s\"".formatted(i18n));
     
+        AbstractConfigListEntry<?> dependency = getEntry(i18n)
+                .orElseThrow(() -> new RuntimeException("Specified dependency not found: \"%s\"".formatted(i18n)));
     
         if (dependency instanceof BooleanListEntry booleanListEntry) {
             return buildDependency(annotation, booleanListEntry);
@@ -104,6 +129,13 @@ public class DependencyManager {
         }
     }
     
+    /**
+     * Builds a {@link BooleanDependency} defined in the {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation, depending on the given {@link BooleanListEntry}.
+     * 
+     * @param annotation the {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation that defines the dependency
+     * @param dependency the {@link BooleanListEntry} to be depended on
+     * @return the generated dependency
+     */
     public static BooleanDependency buildDependency(ConfigEntry.Gui.DependsOn annotation, BooleanListEntry dependency) {
         List<Boolean> conditions = Arrays.stream(annotation.conditions())
                 // Functionally equivalent to Boolean::parseBoolean, but allows us to throw a RuntimeException
@@ -124,10 +156,18 @@ public class DependencyManager {
         return booleanDependency;
     }
     
+    
+    /**
+     * Builds a {@link SelectionDependency} defined in the {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation, depending on the given {@link SelectionListEntry}.
+     *
+     * @param annotation the {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation that defines the dependency
+     * @param dependency the {@link SelectionListEntry} to be depended on
+     * @return the generated dependency
+     */
     public static <T> SelectionDependency<T> buildDependency(ConfigEntry.Gui.DependsOn annotation, SelectionListEntry<T> dependency) {
         // List of valid values for the depended-on SelectionListEntry
         List<T> possibleValues = dependency.getValues();
-        
+    
         // Convert each condition to the appropriate type, by
         // mapping the dependency conditions to matched possible values
         List<T> conditions = Arrays.stream(annotation.conditions())
@@ -136,42 +176,17 @@ public class DependencyManager {
                         .findAny()
                         .orElseThrow(() -> new IllegalStateException("Invalid SelectionDependency condition was defined: \"%s\"\nValid options: %s".formatted(condition, possibleValues))))
                 .toList();
-        
+    
         // Check enough conditions were parsed
         if (conditions.isEmpty())
             throw new IllegalStateException("SelectionList dependency requires at least one condition");
-        
+    
         // Finally, build the dependency and return it
         SelectionDependency<T> selectionDependency = Dependency.disabledWhenNotMet(dependency, conditions.get(0));
         if (conditions.size() > 1)
             selectionDependency.addConditions(conditions.subList(1, conditions.size()));
         selectionDependency.hiddenWhenNotMet(annotation.hiddenWhenNotMet());
-        
-        return selectionDependency;
-    }
     
-    public static class GeneratedConfigEntry {
-        
-        private final String i18n;
-        private final Field field;
-        private final AbstractConfigListEntry entry;
-        
-        private GeneratedConfigEntry(String i18n, Field field, AbstractConfigListEntry entry) {
-            this.i18n = i18n;
-            this.field = field;
-            this.entry = entry;
-        }
-        
-        public String getI18n() {
-            return i18n;
-        }
-        
-        public Field getField() {
-            return field;
-        }
-        
-        public AbstractConfigListEntry getEntry() {
-            return entry;
-        }
+        return selectionDependency;
     }
 }

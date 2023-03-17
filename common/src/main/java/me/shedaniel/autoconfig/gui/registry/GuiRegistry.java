@@ -74,9 +74,9 @@ public final class GuiRegistry extends AbstractGuiRegistry {
                 .map(entry -> entry.provider.get(i18n, field, config, defaults, registry))
                 .orElse(null);
         
-        // FIXME handle when one i18n maps to multiple entries
         if (guis != null)
-            registry.getDependencyManager().register(i18n, field, guis.stream().findFirst().orElse(null));
+            // FIXME handle when one i18n maps to multiple guis
+            guis.stream().findFirst().ifPresent(gui -> registry.getDependencyManager().register(i18n, field, gui));
         
         return guis;
     }
@@ -99,9 +99,9 @@ public final class GuiRegistry extends AbstractGuiRegistry {
             guis = transformer.transform(guis, i18n, field, config, defaults, registry);
         }
     
-        // FIXME handle when one i18n maps to multiple entries
         if (guis != null)
-            registry.getDependencyManager().register(i18n, field, guis.stream().findFirst().orElse(null));
+            // FIXME handle when one i18n maps to multiple guis
+            guis.stream().findFirst().ifPresent(gui -> registry.getDependencyManager().register(i18n, field, gui));
         
         return guis;
     }
