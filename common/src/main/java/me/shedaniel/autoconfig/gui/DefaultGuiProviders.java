@@ -21,6 +21,7 @@ package me.shedaniel.autoconfig.gui;
 
 import com.google.common.collect.Lists;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.dependencies.DependencyManager;
 import me.shedaniel.autoconfig.gui.registry.GuiRegistry;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.autoconfig.util.Utils;
@@ -35,12 +36,15 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.Nullable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -129,7 +133,17 @@ public class DefaultGuiProviders {
         );
         
         registry.registerAnnotationProvider(
-                DefaultGuiProviders::getChildren,
+                (i18n, field, config, defaults, guiProvider) -> {
+                    Annotation annotation;
+                    if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
+                        annotation = field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class);
+                    else if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
+                        annotation = field.getAnnotation(ConfigEntry.Gui.DependsOn.class);
+                    else
+                        annotation = null;
+                    
+                    return getChildrenWithOverrideAnnotation(i18n, field.getType(), getUnsafely(field, config), getUnsafely(field, defaults), guiProvider, annotation);
+                },
                 field -> !field.getType().isPrimitive(),
                 ConfigEntry.Gui.TransitiveObject.class
         );
@@ -531,11 +545,27 @@ public class DefaultGuiProviders {
     }
     
     private static List<AbstractConfigListEntry> getChildren(String i18n, Class<?> fieldType, Object iConfig, Object iDefaults, GuiRegistryAccess guiProvider) {
+        return getChildrenWithOverrideAnnotation(i18n, fieldType, iConfig, iDefaults, guiProvider, null);
+    }
+    
+    private static List<AbstractConfigListEntry> getChildrenWithOverrideAnnotation(String i18n, Class<?> fieldType, Object iConfig, Object iDefaults, GuiRegistryAccess guiProvider, @Nullable Annotation override) {
         return Arrays.stream(fieldType.getDeclaredFields())
                 .map(
                         iField -> {
                             String iI13n = String.format("%s.%s", i18n, iField.getName());
-                            return guiProvider.getAndTransform(iI13n, iField, iConfig, iDefaults, guiProvider);
+                            List<AbstractConfigListEntry> guis = guiProvider.getAndTransform(iI13n, iField, iConfig, iDefaults, guiProvider);
+                            
+                            // Add register each child with the dependency manager
+                            if (guis != null) {
+                                AtomicInteger index = new AtomicInteger();
+                                DependencyManager dependencies = guiProvider.getDependencyManager();
+                                guis.forEach(gui -> {
+                                    String key = "%s.%d".formatted(i18n, index.incrementAndGet());
+                                    dependencies.register(key, iField, gui, override);
+                                });
+                            }
+                                
+                            return guis;
                         }
                 )
                 .filter(Objects::nonNull)

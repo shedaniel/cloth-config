@@ -8,7 +8,9 @@ import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
 import me.shedaniel.clothconfig2.api.dependencies.SelectionDependency;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
+import org.jetbrains.annotations.Nullable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -21,20 +23,43 @@ import java.util.*;
  */
 public class DependencyManager {
     
-    private record EntryRecord(String i18n, Field field, AbstractConfigListEntry<?> gui) {}
+    private record EntryRecord(String i18n, Field field, AbstractConfigListEntry<?> gui, Annotation overrideDependency) {}
     private final Map<String, EntryRecord> registry = new LinkedHashMap<>();
     
     public DependencyManager() {}
     
     /**
      * Register a new or transformed config entry for later use by {@code buildDependencies}.
-     * 
+     *
      * @param i18n the i18n key 
      * @param field the field where the config entry was defined
      * @param entry the config entry GUI
      */
     public void register(String i18n, Field field, AbstractConfigListEntry<?> entry) {
-        registry.put(i18n, new EntryRecord(i18n, field, entry));
+        register(i18n, field, entry, null);
+    }
+    
+    /**
+     * Register a new or transformed config entry for later use by {@code buildDependencies}.
+     * Additionally define an "override" annotation which takes president over any dependency present on the field.
+     *
+     * @param i18n the i18n key 
+     * @param field the field where the config entry was defined
+     * @param entry the config entry GUI
+     * @param override a {@link ConfigEntry.Gui.DependsOn @DependsOn} or {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}
+     *                           annotation that should take president over the field's actual annotation
+     */
+    public void register(String i18n, Field field, AbstractConfigListEntry<?> entry, @Nullable Annotation override) {
+        if (override != null && !(override instanceof ConfigEntry.Gui.DependsOn || override instanceof ConfigEntry.Gui.DependsOnGroup))
+            throw new IllegalArgumentException("DependencyManager.register() requires a @DependsOn or @DependsOnGroup annotation, found %s".formatted(override.annotationType().getSimpleName()));
+        
+        // If override is null, then retain the existing record's override.
+        if (override == null)
+            override = Optional.ofNullable(registry.get(i18n))
+                .map(EntryRecord::overrideDependency)
+                .orElse(null);
+    
+        registry.put(i18n, new EntryRecord(i18n, field, entry, override));
     }
     
     /**
@@ -64,19 +89,32 @@ public class DependencyManager {
      */
     public void buildDependencies() {
         registry.values().stream()
-                .filter(entry -> entry.field().isAnnotationPresent(ConfigEntry.Gui.DependsOn.class) || entry.field().isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
-                .forEach(entry -> {
-                    Field field = entry.field();
-                    Dependency dependency;
-
-                    if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
-                        dependency = buildDependency(field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class));
+                .filter(record ->
+                           record.overrideDependency() != null
+                        || record.field().isAnnotationPresent(ConfigEntry.Gui.DependsOn.class)
+                        || record.field().isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
+                .forEach(record -> {
+                    Field field = record.field();
+                    
+                    Annotation annotation;
+                    if (record.overrideDependency() != null)
+                        annotation = record.overrideDependency();
+                    else if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
+                        annotation = field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class);
                     else if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
-                        dependency = buildDependency(field.getAnnotation(ConfigEntry.Gui.DependsOn.class));
+                        annotation = field.getAnnotation(ConfigEntry.Gui.DependsOn.class);
                     else
                         throw new RuntimeException("Neither DependsOn nor DependsOnGroup annotation is present.");
+                    
+                    Dependency dependency;
+                    if (annotation instanceof ConfigEntry.Gui.DependsOn dependsOn)
+                        dependency = buildDependency(dependsOn);
+                    else if (annotation instanceof ConfigEntry.Gui.DependsOnGroup dependsOnGroup)
+                        dependency = buildDependency(dependsOnGroup);
+                    else
+                        throw new IllegalStateException("Annotation must be either @DependsOn or @DependsOnGroup");
 
-                    entry.gui().setDependency(dependency);
+                    record.gui().setDependency(dependency);
                 });
     }
     
