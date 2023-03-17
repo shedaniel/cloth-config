@@ -81,8 +81,9 @@ public class TextListEntry extends TooltipListEntry<Object> {
             this.savedY = y;
         }
         int yy = y + 7;
+        int textColor = dependenciesMet() ? color : 0x555555;
         for (FormattedCharSequence string : wrappedLines) {
-            Minecraft.getInstance().font.drawShadow(matrices, string, x, yy, color);
+            Minecraft.getInstance().font.drawShadow(matrices, string, x, yy, textColor);
             yy += Minecraft.getInstance().font.lineHeight + 3;
         }
         
