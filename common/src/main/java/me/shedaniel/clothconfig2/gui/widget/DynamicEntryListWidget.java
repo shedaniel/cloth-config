@@ -19,7 +19,6 @@
 
 package me.shedaniel.clothconfig2.gui.widget;
 
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -44,8 +43,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.UnaryOperator;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
 public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends AbstractContainerEventHandler implements Widget, NarratableEntry {
@@ -69,49 +70,6 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected E hoveredItem;
     protected E selectedItem;
     protected ResourceLocation backgroundLocation;
-
-    private final UnaryOperator<List<E>> hiddenElementFilter = entries -> new AbstractList<>() {
-        @Override
-        public Iterator<E> iterator() {
-            return Iterators.filter(entries.iterator(), entry -> {
-                if (entry instanceof AbstractConfigEntry configEntry) {
-                    return !configEntry.hidden();
-                }
-                return true;
-            });
-        }
-        
-        @Override
-        public E get(int index) {
-            return Iterators.get(iterator(), index);
-        }
-        
-        @Override
-        public void add(int index, E element) {
-            entries.add(index, element);
-        }
-        
-        @Override
-        public E remove(int index) {
-            E entry = get(index);
-            return entries.remove(entry) ? entry : null;
-        }
-        
-        @Override
-        public boolean remove(Object o) {
-            return entries.remove(o);
-        }
-        
-        @Override
-        public void clear() {
-            entries.clear();
-        }
-        
-        @Override
-        public int size() {
-            return Iterators.size(iterator());
-        }
-    };
     
     public DynamicEntryListWidget(Minecraft client, int width, int height, int top, int bottom, ResourceLocation backgroundLocation) {
         this.client = client;
@@ -124,8 +82,19 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         this.backgroundLocation = backgroundLocation;
     }
     
+    /**
+     * Get all visible children. I.e. any hidden config entries are filtered out.
+     * 
+     * @return an unmodifiable {@link List} of visible entries
+     */
     public List<E> visibleChildren() {
-        return hiddenElementFilter.apply(this.children());
+        return this.children().stream()
+                .filter(entry -> {
+                    if (entry instanceof AbstractConfigEntry<?> configEntry)
+                        return !configEntry.hidden();
+                    return true;
+                })
+                .toList();
     }
     
     public void setRenderSelection(boolean boolean_1) {
