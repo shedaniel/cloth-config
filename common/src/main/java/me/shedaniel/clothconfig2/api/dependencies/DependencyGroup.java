@@ -37,10 +37,9 @@ public class DependencyGroup implements Dependency {
         if (check())
             return false;
 
-        // If shouldHide isn't explicitly defined, we should check if any of the groups (met) members have shouldHide set
+        // If shouldHide isn't explicitly defined, we should check if any of the groups (unmet) members have shouldHide set
         if (shouldHide == null) {
-            // If condition is NONE then it doesn't really make sense to use child-dependencies' hidden value
-            // Likewise, if the group condition is met, there's no point checking. 
+            // If condition is NONE, it doesn't make sense to use child-dependencies' hidden value
             if (this.condition == Condition.NONE)
                 return false;
         
@@ -85,21 +84,18 @@ public class DependencyGroup implements Dependency {
                 // FIXME this tooltip will be wrong when this.condition is NONE
                 return children.get(0).getTooltip();
             }
-            case 2 -> {
-                lines.add(Component.translatable("text.cloth-config.dependency_groups.two_dependencies", conditionText,
+            case 2 ->
+                    lines.add(Component.translatable("text.cloth-config.dependency_groups.two_dependencies", conditionText,
                         MutableComponent.create(descriptions.get(0).getContents()).withStyle(ChatFormatting.ITALIC),
                         MutableComponent.create(descriptions.get(1).getContents()).withStyle(ChatFormatting.ITALIC)));
-            }
-            default -> {
-                lines.add(Component.translatable("text.cloth-config.dependency_groups.many_dependencies", conditionText));
-            }
+            default ->
+                    lines.add(Component.translatable("text.cloth-config.dependency_groups.many_dependencies", conditionText));
         }
         
-        if (children.size() > 2) {
+        if (children.size() > 2)
             lines.addAll(descriptions.stream()
-                    .map(description -> Component.translatable("text.cloth-config.dependencies.list_entry", description))
-                    .toList());
-        }
+                .map(description -> Component.translatable("text.cloth-config.dependencies.list_entry", description))
+                .toList());
         
         return Optional.of(lines.toArray(Component[]::new));
     }

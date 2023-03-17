@@ -23,24 +23,25 @@ import java.util.*;
  */
 public class DependencyManager {
     
-    private record EntryRecord(String i18n, Field field, AbstractConfigListEntry<?> gui, Annotation overrideDependency) {}
+    private record EntryRecord(String i18n, Field field, AbstractConfigListEntry<?> gui, @Nullable Annotation overrideDependency) {}
     private final Map<String, EntryRecord> registry = new LinkedHashMap<>();
     
     public DependencyManager() {}
     
     /**
-     * Register a new or transformed config entry for later use by {@code buildDependencies}.
+     * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
      *
      * @param i18n the i18n key 
      * @param field the field where the config entry was defined
      * @param entry the config entry GUI
+     * @see #buildDependencies()
      */
     public void register(String i18n, Field field, AbstractConfigListEntry<?> entry) {
         register(i18n, field, entry, null);
     }
     
     /**
-     * Register a new or transformed config entry for later use by {@code buildDependencies}.
+     * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
      * Additionally define an "override" annotation which takes president over any dependency present on the field.
      *
      * @param i18n the i18n key 
@@ -48,16 +49,17 @@ public class DependencyManager {
      * @param entry the config entry GUI
      * @param override a {@link ConfigEntry.Gui.DependsOn @DependsOn} or {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}
      *                           annotation that should take president over the field's actual annotation
+     * @see #buildDependencies()          
      */
     public void register(String i18n, Field field, AbstractConfigListEntry<?> entry, @Nullable Annotation override) {
-        if (override != null && !(override instanceof ConfigEntry.Gui.DependsOn || override instanceof ConfigEntry.Gui.DependsOnGroup))
-            throw new IllegalArgumentException("DependencyManager.register() requires a @DependsOn or @DependsOnGroup annotation, found %s".formatted(override.annotationType().getSimpleName()));
-        
         // If override is null, then retain the existing record's override.
         if (override == null)
             override = Optional.ofNullable(registry.get(i18n))
                 .map(EntryRecord::overrideDependency)
                 .orElse(null);
+        // If non-null, ensure the annotation type is supported
+        else if (!(override instanceof ConfigEntry.Gui.DependsOn || override instanceof ConfigEntry.Gui.DependsOnGroup))
+            throw new IllegalArgumentException("DependencyManager.register() requires a @DependsOn or @DependsOnGroup annotation, found %s".formatted(override.annotationType().getSimpleName()));
     
         registry.put(i18n, new EntryRecord(i18n, field, entry, override));
     }
@@ -104,7 +106,7 @@ public class DependencyManager {
                     else if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
                         annotation = field.getAnnotation(ConfigEntry.Gui.DependsOn.class);
                     else
-                        throw new RuntimeException("Neither DependsOn nor DependsOnGroup annotation is present.");
+                        throw new IllegalStateException("Dependency annotation not present.");
                     
                     Dependency dependency;
                     if (annotation instanceof ConfigEntry.Gui.DependsOn dependsOn)
@@ -135,10 +137,10 @@ public class DependencyManager {
         
         // Return the appropriate DependencyGroup variant
         return switch (annotation.condition()) {
-            case ALL -> Dependency.all(dependencies);
+            case ALL  -> Dependency.all(dependencies);
             case NONE -> Dependency.none(dependencies);
-            case ANY -> Dependency.any(dependencies);
-            case ONE -> Dependency.one(dependencies);
+            case ANY  -> Dependency.any(dependencies);
+            case ONE  -> Dependency.one(dependencies);
         };
     }
     
@@ -158,13 +160,12 @@ public class DependencyManager {
         AbstractConfigListEntry<?> dependency = getEntry(i18n)
                 .orElseThrow(() -> new RuntimeException("Specified dependency not found: \"%s\"".formatted(i18n)));
     
-        if (dependency instanceof BooleanListEntry booleanListEntry) {
+        if (dependency instanceof BooleanListEntry booleanListEntry)
             return buildDependency(annotation, booleanListEntry);
-        } else if (dependency instanceof SelectionListEntry<?> selectionListEntry) {
+        else if (dependency instanceof SelectionListEntry<?> selectionListEntry)
             return buildDependency(annotation, selectionListEntry);
-        } else {
+        else
             throw new RuntimeException("Unsupported dependency type: %s".formatted(dependency.getClass().getSimpleName()));
-        }
     }
     
     /**

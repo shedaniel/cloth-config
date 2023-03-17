@@ -83,7 +83,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     /**
-     * Get all visible children. I.e. any hidden config entries are filtered out.
+     * Get all visible children. I.e. hidden config entries are filtered out.
      * 
      * @return an unmodifiable {@link List} of visible entries
      */

@@ -111,7 +111,7 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     }
     
     /**
-     * If an unmet dependency has {@code hiddenWhenNotMet} set to true, then the config entry
+     * If an unmet dependency has {@link Dependency#hiddenWhenNotMet() hiddenWhenNotMet()} set to true, then the config entry
      * should be hidden from menus.
      * 
      * @return whether the config entry should be hidden.
