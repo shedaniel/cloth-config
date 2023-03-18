@@ -5,6 +5,7 @@ import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface Dependency {
@@ -19,6 +20,16 @@ public interface Dependency {
     static @NotNull DependencyGroup all(Dependency... dependencies) {
         return new DependencyGroup(DependencyGroup.Condition.ALL, dependencies);
     }
+    /**
+     * Generates a {@link DependencyGroup} that depends on all of its dependencies being met.
+     * <br>
+     * 
+     * @param dependencies a {@link Collection} of dependencies to be included in the group 
+     * @return the generated group
+     */
+    static @NotNull DependencyGroup all(Collection<Dependency> dependencies) {
+        return all(dependencies.toArray(Dependency[]::new));
+    }
     
     /**
      * Generates a {@link DependencyGroup} that depends on none of its dependencies being met.
@@ -30,6 +41,17 @@ public interface Dependency {
      */
     static @NotNull DependencyGroup none(Dependency... dependencies) {
         return new DependencyGroup(DependencyGroup.Condition.NONE, dependencies);
+    }
+    /**
+     * Generates a {@link DependencyGroup} that depends on none of its dependencies being met.
+     * <br>
+     * I.e. the group is unmet if any of its dependencies are met.
+     *
+     * @param dependencies a {@link Collection} of dependencies to be included in the group 
+     * @return the generated group
+     */
+    static @NotNull DependencyGroup none(Collection<Dependency> dependencies) {
+        return none(dependencies.toArray(Dependency[]::new));
     }
     
     /**
@@ -43,6 +65,17 @@ public interface Dependency {
     static @NotNull DependencyGroup any(Dependency... dependencies) {
         return new DependencyGroup(DependencyGroup.Condition.ANY, dependencies);
     }
+    /**
+     * Generates a {@link DependencyGroup} that depends on any of its dependencies being met.
+     * <br>
+     * I.e. the group is met if one or more of its dependencies are met. 
+     *
+     * @param dependencies a {@link Collection} of dependencies to be included in the group 
+     * @return the generated group
+     */
+    static @NotNull DependencyGroup any(Collection<Dependency> dependencies) {
+        return any(dependencies.toArray(Dependency[]::new));
+    }
     
     /**
      * Generates a {@link DependencyGroup} that depends on exactly one of its dependencies being met.
@@ -55,6 +88,18 @@ public interface Dependency {
      */
     static @NotNull DependencyGroup one(Dependency... dependencies) {
         return new DependencyGroup(DependencyGroup.Condition.ONE, dependencies);
+    }
+    /**
+     * Generates a {@link DependencyGroup} that depends on exactly one of its dependencies being met.
+     * <br>
+     * I.e. the group is met if precisely one dependency is met, however the group is unmet if more than one
+     * (or less than one) are met.
+     *
+     * @param dependencies a {@link Collection} of dependencies to be included in the group 
+     * @return the generated group
+     */
+    static @NotNull DependencyGroup one(Collection<Dependency> dependencies) {
+        return one(dependencies.toArray(Dependency[]::new));
     }
     
     /**

@@ -91,6 +91,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         T defaults = manager.getSerializer().createDefault();
         
         String i18n = i18nFunction.apply(manager);
+        registry.getDependencyManager().setPrefix(i18n);
         
         ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(Component.translatable(String.format("%s.title", i18n))).setSavingRunnable(manager::save);
         

@@ -8,6 +8,7 @@ import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
 import me.shedaniel.clothconfig2.api.dependencies.SelectionDependency;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
@@ -23,45 +24,45 @@ import java.util.*;
  */
 public class DependencyManager {
     
-    private record EntryRecord(String i18n, Field field, AbstractConfigListEntry<?> gui, @Nullable Annotation overrideDependency) {}
+    private @Nullable String prefix;
+    
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+    
+    private record EntryRecord(String i18n, Field field, AbstractConfigListEntry<?> gui) {}
     private final Map<String, EntryRecord> registry = new LinkedHashMap<>();
+    private final Map<String, List<Annotation>> additionalDependencies = new LinkedHashMap<>();
     
     public DependencyManager() {}
     
     /**
      * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
      *
-     * @param i18n the i18n key 
-     * @param field the field where the config entry was defined
      * @param entry the config entry GUI
+     * @param field the field where the config entry was defined
      * @see #buildDependencies()
      */
-    public void register(String i18n, Field field, AbstractConfigListEntry<?> entry) {
-        register(i18n, field, entry, null);
+    public void register(AbstractConfigListEntry<?> entry, Field field) {
+        String key = entry.getFieldKey();
+        registry.put(key, new EntryRecord(key, field, entry));
     }
     
     /**
-     * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
-     * Additionally define an "override" annotation which takes president over any dependency present on the field.
+     * Register an additional dependency annotation which will be required in addition to any existing dependencies
+     * associated with the config entry.
      *
-     * @param i18n the i18n key 
-     * @param field the field where the config entry was defined
-     * @param entry the config entry GUI
-     * @param override a {@link ConfigEntry.Gui.DependsOn @DependsOn} or {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}
-     *                           annotation that should take president over the field's actual annotation
-     * @see #buildDependencies()          
+     * @param i18n the i18n key
+     * @param dependency a {@link ConfigEntry.Gui.DependsOn @DependsOn} or
+     *                           {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup} annotation.
      */
-    public void register(String i18n, Field field, AbstractConfigListEntry<?> entry, @Nullable Annotation override) {
-        // If override is null, then retain the existing record's override.
-        if (override == null)
-            override = Optional.ofNullable(registry.get(i18n))
-                .map(EntryRecord::overrideDependency)
-                .orElse(null);
-        // If non-null, ensure the annotation type is supported
-        else if (!(override instanceof ConfigEntry.Gui.DependsOn || override instanceof ConfigEntry.Gui.DependsOnGroup))
-            throw new IllegalArgumentException("DependencyManager.register() requires a @DependsOn or @DependsOnGroup annotation, found %s".formatted(override.annotationType().getSimpleName()));
+    public void registerAdditionalDependency(String i18n, Annotation dependency) {
+        if(!(dependency instanceof ConfigEntry.Gui.DependsOn || dependency instanceof ConfigEntry.Gui.DependsOnGroup))
+            throw new IllegalArgumentException("DependencyManager.register() requires a @DependsOn or @DependsOnGroup annotation, found %s".formatted(dependency.annotationType().getSimpleName()));
     
-        registry.put(i18n, new EntryRecord(i18n, field, entry, override));
+        List<Annotation> dependencies = additionalDependencies.getOrDefault(i18n, new ArrayList<>());
+        dependencies.add(dependency);
+        additionalDependencies.put(i18n, dependencies);
     }
     
     /**
@@ -92,32 +93,88 @@ public class DependencyManager {
     public void buildDependencies() {
         registry.values().stream()
                 .filter(record ->
-                           record.overrideDependency() != null
+                           additionalDependencies.get(record.i18n()) != null
                         || record.field().isAnnotationPresent(ConfigEntry.Gui.DependsOn.class)
                         || record.field().isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
                 .forEach(record -> {
+                    String i18n = record.i18n();
                     Field field = record.field();
+                    AbstractConfigListEntry<?> gui = record.gui();
                     
-                    Annotation annotation;
-                    if (record.overrideDependency() != null)
-                        annotation = record.overrideDependency();
-                    else if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
-                        annotation = field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class);
-                    else if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
-                        annotation = field.getAnnotation(ConfigEntry.Gui.DependsOn.class);
-                    else
-                        throw new IllegalStateException("Dependency annotation not present.");
-                    
-                    Dependency dependency;
-                    if (annotation instanceof ConfigEntry.Gui.DependsOn dependsOn)
-                        dependency = buildDependency(dependsOn);
-                    else if (annotation instanceof ConfigEntry.Gui.DependsOnGroup dependsOnGroup)
-                        dependency = buildDependency(dependsOnGroup);
-                    else
-                        throw new IllegalStateException("Annotation must be either @DependsOn or @DependsOnGroup");
-
-                    record.gui().setDependency(dependency);
+                    Optional.ofNullable(combineDependencies(
+                                    additionalDependencies.get(i18n), 
+                                    field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class),
+                                    field.getAnnotation(ConfigEntry.Gui.DependsOn.class)))
+                            .ifPresent(gui::setDependency);
                 });
+    }
+    
+    /**
+     * If only one dependency annotation is provided, that dependency is built and returned.
+     * If multiple dependencies are provided, they are combined into a {@link DependencyGroup} using {@link Dependency#all Dependency.all()}.
+     * <br><br>
+     * Note: a {@link List} containing only one valid dependency annotation is treated as providing only one dependency,
+     * provided no other dependencies are passed in explicitly.
+     * 
+     * @param additionalDependencies a list of {@link ConfigEntry.Gui.DependsOn @DependsOn} and {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}
+     *                               annotations, or optionally {@code null}
+     * @param dependsOnGroup a {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup} annotation, or optionally {@code null}
+     * @param dependsOn a {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation, or optionally {@code null}
+     * @return a single {@link Dependency} or {@link DependencyGroup} representing all dependencies provided
+     */
+    @Contract("null, null, null -> null")
+    private @Nullable Dependency combineDependencies(
+            @Nullable List<Annotation> additionalDependencies,
+            @Nullable ConfigEntry.Gui.DependsOnGroup dependsOnGroup,
+            @Nullable ConfigEntry.Gui.DependsOn dependsOn) {
+        // TODO simplify this method by only taking a List,
+        //      simply add any field annotations before calling
+        
+        // Early check for having only one dependency
+        // Redundant code, but allows us to exit early if possible
+        if (additionalDependencies == null || additionalDependencies.isEmpty()) {
+            if (dependsOnGroup == null)
+                return dependsOn == null ? null : buildDependency(dependsOn);
+            else if (dependsOn == null)
+                return buildDependency(dependsOnGroup);
+        }
+        
+        // Form a list of defined groups and single dependencies
+        List<Dependency> groups = new ArrayList<>();
+        List<Dependency> singles = new ArrayList<>();
+        
+        if (dependsOnGroup != null)
+            groups.add(buildDependency(dependsOnGroup));
+        
+        if (dependsOn != null)
+            singles.add(buildDependency(dependsOn));
+        
+        if (additionalDependencies != null) {
+            additionalDependencies.forEach(annotation -> {
+                if (annotation instanceof ConfigEntry.Gui.DependsOnGroup group)
+                    groups.add(buildDependency(group));
+                if (annotation instanceof ConfigEntry.Gui.DependsOn single)
+                    singles.add(buildDependency(single));
+            });
+        }
+        
+        // Check again if we only have one dependency
+        if (groups.isEmpty() && singles.size() == 1)
+            return singles.get(0);
+    
+        // Combine multiple dependencies if necessary,
+        // add the result to the groups list
+        if (!singles.isEmpty()) {
+            groups.add(singles.size() == 1 ?
+                    singles.get(0) : Dependency.all(singles));
+        }
+        
+        // Its possible we still don't have any dependencies
+        if (groups.isEmpty())
+            return null;
+        
+        // Return a group that depends on all dependencies & groups
+        return Dependency.all(groups);
     }
     
     /**
@@ -155,7 +212,8 @@ public class DependencyManager {
      * @throws RuntimeException when an unsupported dependency type is used, or the annotation is somehow invalid
      */
     public Dependency buildDependency(ConfigEntry.Gui.DependsOn annotation) {
-        String i18n = annotation.value();
+        String i18n = prefix != null && annotation.value().startsWith(prefix) ?
+                annotation.value() : "%s.%s".formatted(prefix, annotation.value());
     
         AbstractConfigListEntry<?> dependency = getEntry(i18n)
                 .orElseThrow(() -> new RuntimeException("Specified dependency not found: \"%s\"".formatted(i18n)));

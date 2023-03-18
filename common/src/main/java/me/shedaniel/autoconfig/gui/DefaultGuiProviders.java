@@ -36,7 +36,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -44,7 +43,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -134,15 +132,28 @@ public class DefaultGuiProviders {
         
         registry.registerAnnotationProvider(
                 (i18n, field, config, defaults, guiProvider) -> {
-                    Annotation annotation;
-                    if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
-                        annotation = field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class);
-                    else if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
-                        annotation = field.getAnnotation(ConfigEntry.Gui.DependsOn.class);
-                    else
-                        annotation = null;
+                    List<AbstractConfigListEntry> children = getChildren(i18n, field, config, defaults, guiProvider);
+    
+                    if (!children.isEmpty()) {
+                        // Check if the transitive field has a dependency declared
+                        Annotation dependency;
+                        if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
+                            dependency = field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class);
+                        else if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
+                            dependency = field.getAnnotation(ConfigEntry.Gui.DependsOn.class);
+                        else
+                            dependency = null;
+    
+                        // Apply the field's dependency to its children
+                        if (dependency != null) {
+                            DependencyManager dependencies = guiProvider.getDependencyManager();
+                            children.stream()
+                                    .map(AbstractConfigListEntry::getFieldKey)
+                                    .forEach(key -> dependencies.registerAdditionalDependency(key, dependency));
+                        }
+                    }
                     
-                    return getChildrenWithOverrideAnnotation(i18n, field.getType(), getUnsafely(field, config), getUnsafely(field, defaults), guiProvider, annotation);
+                    return children;
                 },
                 field -> !field.getType().isPrimitive(),
                 ConfigEntry.Gui.TransitiveObject.class
@@ -545,27 +556,11 @@ public class DefaultGuiProviders {
     }
     
     private static List<AbstractConfigListEntry> getChildren(String i18n, Class<?> fieldType, Object iConfig, Object iDefaults, GuiRegistryAccess guiProvider) {
-        return getChildrenWithOverrideAnnotation(i18n, fieldType, iConfig, iDefaults, guiProvider, null);
-    }
-    
-    private static List<AbstractConfigListEntry> getChildrenWithOverrideAnnotation(String i18n, Class<?> fieldType, Object iConfig, Object iDefaults, GuiRegistryAccess guiProvider, @Nullable Annotation override) {
         return Arrays.stream(fieldType.getDeclaredFields())
                 .map(
                         iField -> {
                             String iI13n = String.format("%s.%s", i18n, iField.getName());
-                            List<AbstractConfigListEntry> guis = guiProvider.getAndTransform(iI13n, iField, iConfig, iDefaults, guiProvider);
-                            
-                            // Add register each child with the dependency manager
-                            if (guis != null) {
-                                AtomicInteger index = new AtomicInteger();
-                                DependencyManager dependencies = guiProvider.getDependencyManager();
-                                guis.forEach(gui -> {
-                                    String key = "%s.%d".formatted(i18n, index.incrementAndGet());
-                                    dependencies.register(key, iField, gui, override);
-                                });
-                            }
-                                
-                            return guis;
+                            return guiProvider.getAndTransform(iI13n, iField, iConfig, iDefaults, guiProvider);
                         }
                 )
                 .filter(Objects::nonNull)

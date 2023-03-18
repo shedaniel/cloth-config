@@ -19,6 +19,7 @@
 
 package me.shedaniel.autoconfig.gui.registry;
 
+import me.shedaniel.autoconfig.dependencies.DependencyManager;
 import me.shedaniel.autoconfig.gui.registry.api.GuiProvider;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.autoconfig.gui.registry.api.GuiTransformer;
@@ -74,9 +75,10 @@ public final class GuiRegistry extends AbstractGuiRegistry {
                 .map(entry -> entry.provider.get(i18n, field, config, defaults, registry))
                 .orElse(null);
         
-        if (guis != null)
-            // FIXME handle when one i18n maps to multiple guis
-            guis.stream().findFirst().ifPresent(gui -> registry.getDependencyManager().register(i18n, field, gui));
+        if (guis != null) {
+            DependencyManager dependencies = registry.getDependencyManager();
+            guis.forEach(gui -> dependencies.register(gui, field));
+        }
         
         return guis;
     }
@@ -99,9 +101,10 @@ public final class GuiRegistry extends AbstractGuiRegistry {
             guis = transformer.transform(guis, i18n, field, config, defaults, registry);
         }
     
-        if (guis != null)
-            // FIXME handle when one i18n maps to multiple guis
-            guis.stream().findFirst().ifPresent(gui -> registry.getDependencyManager().register(i18n, field, gui));
+        if (guis != null) {
+            DependencyManager dependencies = registry.getDependencyManager();
+            guis.forEach(gui -> dependencies.register(gui, field));
+        }
         
         return guis;
     }

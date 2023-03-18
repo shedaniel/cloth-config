@@ -25,6 +25,7 @@ import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 
 @Environment(EnvType.CLIENT)
 public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> {
@@ -79,5 +80,11 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
     @Override
     public Component getFieldName() {
         return fieldName;
+    }
+    
+    public String getFieldKey() {
+        Component component = getFieldName();
+        return component.getContents() instanceof TranslatableContents translatable ?
+                translatable.getKey() : component.getString();
     }
 }
