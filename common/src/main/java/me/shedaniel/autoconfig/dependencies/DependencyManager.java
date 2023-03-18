@@ -8,12 +8,12 @@ import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
 import me.shedaniel.clothconfig2.api.dependencies.SelectionDependency;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * {@code DependencyManager} is used by {@link me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess GuiRegistryAccess} implementations
@@ -57,15 +57,15 @@ public class DependencyManager {
      *                   {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup} annotations.
      */
     public void registerAdditionalDependency(AbstractConfigListEntry<?> entry, Annotation... dependencies) {
-        List<String> invalidAnnotations = Arrays.stream(dependencies)
+        List<String> invalid = Arrays.stream(dependencies)
                 .filter(annotation -> !(annotation instanceof ConfigEntry.Gui.DependsOn || annotation instanceof ConfigEntry.Gui.DependsOnGroup))
                 .map(Annotation::annotationType)
                 .map(Class::getSimpleName)
                 .toList();
-        if (!invalidAnnotations.isEmpty())
-            throw new IllegalArgumentException(invalidAnnotations.size() == 1 ?
-                    "Invalid annotation type \"%s\" passed to registerAdditionalDependency()".formatted(invalidAnnotations.get(0))
-                    : "%d invalid annotations passed to registerAdditionalDependency(): %s".formatted(invalidAnnotations.size(), invalidAnnotations));
+        if (!invalid.isEmpty())
+            throw new IllegalArgumentException(invalid.size() == 1 ?
+                    "Invalid annotation type \"%s\" passed to registerAdditionalDependency()".formatted(invalid.get(0))
+                    : "%d invalid annotations passed to registerAdditionalDependency(): %s".formatted(invalid.size(), invalid));
         
         String key = entry.getFieldKey();
         List<Annotation> registry = additionalDependencies.getOrDefault(key, new ArrayList<>());
@@ -100,6 +100,9 @@ public class DependencyManager {
      */
     public void buildDependencies() {
         registry.values().stream()
+                // FIXME is this filter really needed?
+                //  The forEach handler already checks whether any dependencies are present,
+                //  so this is only helpful if it actually speeds things up...
                 .filter(record ->
                            additionalDependencies.get(record.i18n()) != null
                         || record.field().isAnnotationPresent(ConfigEntry.Gui.DependsOn.class)
@@ -109,10 +112,23 @@ public class DependencyManager {
                     Field field = record.field();
                     AbstractConfigListEntry<?> gui = record.gui();
                     
-                    Optional.ofNullable(combineDependencies(
-                                    additionalDependencies.get(i18n), 
-                                    field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class),
-                                    field.getAnnotation(ConfigEntry.Gui.DependsOn.class)))
+                    // Build a dependency annotation list,
+                    // populated with any dependencies declared on the field
+                    // or registered in the additionalDependencies map
+                    List<Annotation> dependencies = new ArrayList<>();
+                    if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
+                        dependencies.add(field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class));
+                    if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
+                        dependencies.add(field.getAnnotation(ConfigEntry.Gui.DependsOn.class));
+                    Optional.ofNullable(additionalDependencies.get(i18n))
+                            .ifPresent(dependencies::addAll);
+                    
+                    if (dependencies.isEmpty())
+                        return;
+                    
+                    // Combine the dependencies,
+                    // then add the result to the config entry
+                    Optional.ofNullable(combineDependencies(dependencies))
                             .ifPresent(gui::setDependency);
                 });
     }
@@ -123,52 +139,49 @@ public class DependencyManager {
      * <br><br>
      * Note: a {@link List} containing only one valid dependency annotation is treated as providing only one dependency,
      * provided no other dependencies are passed in explicitly.
-     * 
-     * @param additionalDependencies a list of {@link ConfigEntry.Gui.DependsOn @DependsOn} and {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}
-     *                               annotations, or optionally {@code null}
-     * @param dependsOnGroup a {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup} annotation, or optionally {@code null}
-     * @param dependsOn a {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation, or optionally {@code null}
-     * @return a single {@link Dependency} or {@link DependencyGroup} representing all dependencies provided
+     *
+     * @param dependencies a {@link Collection} containing {@link ConfigEntry.Gui.DependsOn @DependsOn} and {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}
+     *                     annotations
+     * @return a single {@link Dependency} or {@link DependencyGroup} representing all dependencies provided,
+     *                     or {@code null} if {@code dependencies} is empty
+     * @throws IllegalArgumentException if {@code dependencies} contains an Annotation that isn't either 
+     *                     {@link ConfigEntry.Gui.DependsOn @DependsOn} or {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}.
      */
-    @Contract("null, null, null -> null")
-    private @Nullable Dependency combineDependencies(
-            @Nullable List<Annotation> additionalDependencies,
-            @Nullable ConfigEntry.Gui.DependsOnGroup dependsOnGroup,
-            @Nullable ConfigEntry.Gui.DependsOn dependsOn) {
-        // TODO simplify this method by only taking a List,
-        //      simply add any field annotations before calling
+    private @Nullable Dependency combineDependencies(Collection<Annotation> dependencies) {
+        // Check for invalid arguments
+        List<String> invalid = dependencies.stream()
+                .filter(annotation -> !(annotation instanceof ConfigEntry.Gui.DependsOn || annotation instanceof ConfigEntry.Gui.DependsOnGroup))
+                .map(Annotation::annotationType)
+                .map(Class::getSimpleName)
+                .toList();
+        if (!invalid.isEmpty())
+            throw new IllegalArgumentException(invalid.size() == 1 ?
+                    "Invalid annotation type \"%s\" passed to combineDependencies()".formatted(invalid.get(0))
+                    : "%d invalid annotations passed to combineDependencies(): %s".formatted(invalid.size(), invalid));
         
-        // Early check for having only one dependency
-        // Redundant code, but allows us to exit early if possible
-        if (additionalDependencies == null || additionalDependencies.isEmpty()) {
-            if (dependsOnGroup == null)
-                return dependsOn == null ? null : buildDependency(dependsOn);
-            else if (dependsOn == null)
-                return buildDependency(dependsOnGroup);
-        }
-        
-        // Form a list of defined groups and single dependencies
-        List<Dependency> groups = new ArrayList<>();
-        List<Dependency> singles = new ArrayList<>();
-        
-        if (dependsOnGroup != null)
-            groups.add(buildDependency(dependsOnGroup));
-        
-        if (dependsOn != null)
-            singles.add(buildDependency(dependsOn));
-        
-        if (additionalDependencies != null) {
-            additionalDependencies.forEach(annotation -> {
-                if (annotation instanceof ConfigEntry.Gui.DependsOnGroup group)
-                    groups.add(buildDependency(group));
-                if (annotation instanceof ConfigEntry.Gui.DependsOn single)
-                    singles.add(buildDependency(single));
-            });
-        }
-        
-        // Check again if we only have one dependency
-        if (groups.isEmpty() && singles.size() == 1)
+        // FIXME remove duplicate dependencies
+    
+        // Build all single Dependencies
+        List<Dependency> singles = dependencies.stream()
+                .filter(ConfigEntry.Gui.DependsOn.class::isInstance)
+                .map(ConfigEntry.Gui.DependsOn.class::cast)
+                .map(this::buildDependency)
+                .toList();
+
+        // Build all DependencyGroups
+        List<Dependency> groups = dependencies.stream()
+                .filter(ConfigEntry.Gui.DependsOnGroup.class::isInstance)
+                .map(ConfigEntry.Gui.DependsOnGroup.class::cast)
+                .map(this::buildDependency)
+                .collect(Collectors.toCollection(ArrayList::new));
+    
+        // If we only have one dependency, return it now
+        if (singles.isEmpty() && groups.isEmpty())
+            return null;
+        else if (groups.isEmpty() && singles.size() == 1)
             return singles.get(0);
+        else if (singles.isEmpty() && groups.size() == 1)
+            return groups.get(0);
     
         // Combine multiple dependencies if necessary,
         // add the result to the groups list
@@ -176,10 +189,6 @@ public class DependencyManager {
             groups.add(singles.size() == 1 ?
                     singles.get(0) : Dependency.all(singles));
         }
-        
-        // Its possible we still don't have any dependencies
-        if (groups.isEmpty())
-            return null;
         
         // Return a group that depends on all dependencies & groups
         return Dependency.all(groups);
