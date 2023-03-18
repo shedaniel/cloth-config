@@ -52,17 +52,25 @@ public class DependencyManager {
      * Register an additional dependency annotation which will be required in addition to any existing dependencies
      * associated with the config entry.
      *
-     * @param i18n the i18n key
-     * @param dependency a {@link ConfigEntry.Gui.DependsOn @DependsOn} or
-     *                           {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup} annotation.
+     * @param entry        the entry to add dependencies to
+     * @param dependencies one or more {@link ConfigEntry.Gui.DependsOn @DependsOn} or
+     *                   {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup} annotations.
      */
-    public void registerAdditionalDependency(String i18n, Annotation dependency) {
-        if(!(dependency instanceof ConfigEntry.Gui.DependsOn || dependency instanceof ConfigEntry.Gui.DependsOnGroup))
-            throw new IllegalArgumentException("DependencyManager.register() requires a @DependsOn or @DependsOnGroup annotation, found %s".formatted(dependency.annotationType().getSimpleName()));
-    
-        List<Annotation> dependencies = additionalDependencies.getOrDefault(i18n, new ArrayList<>());
-        dependencies.add(dependency);
-        additionalDependencies.put(i18n, dependencies);
+    public void registerAdditionalDependency(AbstractConfigListEntry<?> entry, Annotation... dependencies) {
+        List<String> invalidAnnotations = Arrays.stream(dependencies)
+                .filter(annotation -> !(annotation instanceof ConfigEntry.Gui.DependsOn || annotation instanceof ConfigEntry.Gui.DependsOnGroup))
+                .map(Annotation::annotationType)
+                .map(Class::getSimpleName)
+                .toList();
+        if (!invalidAnnotations.isEmpty())
+            throw new IllegalArgumentException(invalidAnnotations.size() == 1 ?
+                    "Invalid annotation type \"%s\" passed to registerAdditionalDependency()".formatted(invalidAnnotations.get(0))
+                    : "%d invalid annotations passed to registerAdditionalDependency(): %s".formatted(invalidAnnotations.size(), invalidAnnotations));
+        
+        String key = entry.getFieldKey();
+        List<Annotation> registry = additionalDependencies.getOrDefault(key, new ArrayList<>());
+        Collections.addAll(registry, dependencies);
+        additionalDependencies.put(key, registry);
     }
     
     /**

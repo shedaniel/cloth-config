@@ -147,9 +147,7 @@ public class DefaultGuiProviders {
                         // Apply the field's dependency to its children
                         if (dependency != null) {
                             DependencyManager dependencies = guiProvider.getDependencyManager();
-                            children.stream()
-                                    .map(AbstractConfigListEntry::getFieldKey)
-                                    .forEach(key -> dependencies.registerAdditionalDependency(key, dependency));
+                            children.forEach(gui -> dependencies.registerAdditionalDependency(gui, dependency));
                         }
                     }
                     
