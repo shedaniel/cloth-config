@@ -24,17 +24,23 @@ import java.util.stream.Collectors;
  */
 public class DependencyManager {
     
-    private @Nullable String prefix;
-    
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
-    
     private record EntryRecord(String i18n, Field field, AbstractConfigListEntry<?> gui) {}
     private final Map<String, EntryRecord> registry = new LinkedHashMap<>();
     private final Map<String, List<Annotation>> additionalDependencies = new LinkedHashMap<>();
     
+    private @Nullable String prefix;
+    
     public DependencyManager() {}
+    
+    /**
+     * Define a prefix which {@link #buildDependency(ConfigEntry.Gui.DependsOn) buildDependency(@DependsOn)} will add
+     * to i18n keys if the key doesn't already start with it.
+     * 
+     * @param prefix the i18n prefix 
+     */
+    public void setPrefix(@Nullable String prefix) {
+        this.prefix = prefix;
+    }
     
     /**
      * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
