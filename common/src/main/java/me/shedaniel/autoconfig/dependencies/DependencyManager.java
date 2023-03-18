@@ -32,13 +32,27 @@ public class DependencyManager {
     public DependencyManager() {}
     
     /**
-     * Define a prefix which {@link #buildDependency(ConfigEntry.Gui.DependsOn) buildDependency(@DependsOn)} will add
-     * to i18n keys if the key doesn't already start with it.
+     * Define a prefix which {@link #getEntry(String i18n)} will add
+     * to i18n keys if they don't already start with it.
      * 
      * @param prefix the i18n prefix 
      */
     public void setPrefix(@Nullable String prefix) {
         this.prefix = prefix;
+    }
+    
+    /**
+     * Get the config entry GUI associated with the given i18n key.
+     * If a prefix has been defined on this instance, it can optionally be ommitted
+     * from the i18n key.
+     *
+     * @param i18n the i18n key 
+     * @return An {@link Optional} containing config entry or {@code Optional.empty()}
+     */
+    public Optional<AbstractConfigListEntry<?>> getEntry(String i18n) {
+        String key = prefix != null && i18n.startsWith(prefix) ?
+                i18n : "%s.%s".formatted(prefix, i18n);
+        return Optional.ofNullable(registry.get(key)).map(EntryRecord::gui);
     }
     
     /**
@@ -96,16 +110,6 @@ public class DependencyManager {
         Collections.addAll(dependenciesList, dependencies);
         
         registry.put(key, new EntryRecord(entry, dependenciesList));
-    }
-    
-    /**
-     * Get the config entry GUI associated with the given i18n key.
-     * 
-     * @param i18n the i18n key 
-     * @return An {@link Optional} containing config entry or {@code Optional.empty()}
-     */
-    public Optional<AbstractConfigListEntry<?>> getEntry(String i18n) {
-        return Optional.ofNullable(registry.get(i18n)).map(EntryRecord::gui);
     }
     
     /**
@@ -223,11 +227,9 @@ public class DependencyManager {
      * @throws RuntimeException when an unsupported dependency type is used, or the annotation is somehow invalid
      */
     public Dependency buildDependency(ConfigEntry.Gui.DependsOn annotation) {
-        String i18n = prefix != null && annotation.value().startsWith(prefix) ?
-                annotation.value() : "%s.%s".formatted(prefix, annotation.value());
-    
-        AbstractConfigListEntry<?> dependency = getEntry(i18n)
-                .orElseThrow(() -> new RuntimeException("Specified dependency not found: \"%s\"".formatted(i18n)));
+        String key = annotation.value();
+        AbstractConfigListEntry<?> dependency = getEntry(key)
+                .orElseThrow(() -> new RuntimeException("Specified dependency not found: \"%s\"".formatted(key)));
     
         if (dependency instanceof BooleanListEntry booleanListEntry)
             return buildDependency(annotation, booleanListEntry);
