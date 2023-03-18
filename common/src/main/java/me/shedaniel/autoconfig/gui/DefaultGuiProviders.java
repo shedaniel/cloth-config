@@ -147,7 +147,7 @@ public class DefaultGuiProviders {
                         // Apply the field's dependency to its children
                         if (dependency != null) {
                             DependencyManager dependencies = guiProvider.getDependencyManager();
-                            children.forEach(gui -> dependencies.registerAdditionalDependency(gui, dependency));
+                            children.forEach(gui -> dependencies.register(gui, dependency));
                         }
                     }
                     

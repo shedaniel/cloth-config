@@ -24,9 +24,8 @@ import java.util.stream.Collectors;
  */
 public class DependencyManager {
     
-    private record EntryRecord(String i18n, Field field, AbstractConfigListEntry<?> gui) {}
+    private record EntryRecord(AbstractConfigListEntry<?> gui, List<Annotation> dependencies) {}
     private final Map<String, EntryRecord> registry = new LinkedHashMap<>();
-    private final Map<String, List<Annotation>> additionalDependencies = new LinkedHashMap<>();
     
     private @Nullable String prefix;
     
@@ -51,18 +50,33 @@ public class DependencyManager {
      */
     public void register(AbstractConfigListEntry<?> entry, Field field) {
         String key = entry.getFieldKey();
-        registry.put(key, new EntryRecord(key, field, entry));
+    
+        // Merge already registered dependencies with any declared on the field
+        List<Annotation> dependencies = Optional.ofNullable(registry.get(key))
+                .map(EntryRecord::dependencies)
+                .orElseGet(ArrayList::new);
+        if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
+            dependencies.add(field.getAnnotation(ConfigEntry.Gui.DependsOn.class));
+        if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
+            dependencies.add(field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class));
+
+        registry.put(key, new EntryRecord(entry, dependencies));
     }
     
     /**
-     * Register an additional dependency annotation which will be required in addition to any existing dependencies
-     * associated with the config entry.
+     * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
+     * <br><br>
+     * Explicitly provide one or more {@link ConfigEntry.Gui.DependsOn @DependsOn} or {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}
+     * annotations to be later applied to this entry.
      *
-     * @param entry        the entry to add dependencies to
+     * @param entry        the config entry GUI
      * @param dependencies one or more {@link ConfigEntry.Gui.DependsOn @DependsOn} or
      *                   {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup} annotations.
+     * @throws IllegalArgumentException if {@code dependencies} contains an Annotation that isn't either 
+     *                     {@link ConfigEntry.Gui.DependsOn @DependsOn} or {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}.
+     * @see #buildDependencies()
      */
-    public void registerAdditionalDependency(AbstractConfigListEntry<?> entry, Annotation... dependencies) {
+    public void register(AbstractConfigListEntry<?> entry, Annotation... dependencies) {
         List<String> invalid = Arrays.stream(dependencies)
                 .filter(annotation -> !(annotation instanceof ConfigEntry.Gui.DependsOn || annotation instanceof ConfigEntry.Gui.DependsOnGroup))
                 .map(Annotation::annotationType)
@@ -72,11 +86,16 @@ public class DependencyManager {
             throw new IllegalArgumentException(invalid.size() == 1 ?
                     "Invalid annotation type \"%s\" passed to registerAdditionalDependency()".formatted(invalid.get(0))
                     : "%d invalid annotations passed to registerAdditionalDependency(): %s".formatted(invalid.size(), invalid));
-        
+    
         String key = entry.getFieldKey();
-        List<Annotation> registry = additionalDependencies.getOrDefault(key, new ArrayList<>());
-        Collections.addAll(registry, dependencies);
-        additionalDependencies.put(key, registry);
+    
+        // Merge new & existing dependencies
+        List<Annotation> dependenciesList = Optional.ofNullable(registry.get(key))
+                .map(EntryRecord::dependencies)
+                .orElseGet(ArrayList::new);
+        Collections.addAll(dependenciesList, dependencies);
+        
+        registry.put(key, new EntryRecord(entry, dependenciesList));
     }
     
     /**
@@ -90,52 +109,18 @@ public class DependencyManager {
     }
     
     /**
-     * Get the field associated with the given i18n key.
-     *
-     * @param i18n the i18n key 
-     * @return An {@link Optional} containing defining field or {@code Optional.empty()}
-     */
-    public Optional<Field> getField(String i18n) {
-        return Optional.ofNullable(registry.get(i18n)).map(EntryRecord::field);
-    }
-    
-    /**
      * Builds the dependencies for all registered config entries.
      * <br><br>
      * Both the dependent and depended-on entry for each dependency must be registered before running this method.
      */
     public void buildDependencies() {
         registry.values().stream()
-                // FIXME is this filter really needed?
-                //  The forEach handler already checks whether any dependencies are present,
-                //  so this is only helpful if it actually speeds things up...
-                .filter(record ->
-                           additionalDependencies.get(record.i18n()) != null
-                        || record.field().isAnnotationPresent(ConfigEntry.Gui.DependsOn.class)
-                        || record.field().isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
+                .filter(record -> !record.dependencies().isEmpty())
                 .forEach(record -> {
-                    String i18n = record.i18n();
-                    Field field = record.field();
-                    AbstractConfigListEntry<?> gui = record.gui();
-                    
-                    // Build a dependency annotation list,
-                    // populated with any dependencies declared on the field
-                    // or registered in the additionalDependencies map
-                    List<Annotation> dependencies = new ArrayList<>();
-                    if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
-                        dependencies.add(field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class));
-                    if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
-                        dependencies.add(field.getAnnotation(ConfigEntry.Gui.DependsOn.class));
-                    Optional.ofNullable(additionalDependencies.get(i18n))
-                            .ifPresent(dependencies::addAll);
-                    
-                    if (dependencies.isEmpty())
-                        return;
-                    
                     // Combine the dependencies,
                     // then add the result to the config entry
-                    Optional.ofNullable(combineDependencies(dependencies))
-                            .ifPresent(gui::setDependency);
+                    Optional.ofNullable(combineDependencies(record.dependencies()))
+                            .ifPresent(record.gui()::setDependency);
                 });
     }
     

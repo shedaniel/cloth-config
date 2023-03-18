@@ -146,7 +146,7 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     
         }
     
-        @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
+        @ConfigEntry.Gui.DependsOn(value = "option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
         public boolean dependsOnCoolToggleOutside = false;
         
     }
