@@ -142,4 +142,27 @@ public abstract class ConfigEntryDependency<T, E extends AbstractConfigEntry<T>>
         
         return Optional.of(tooltip.toArray(Component[]::new));
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (super.equals(obj))
+            return true;
+        if (obj instanceof ConfigEntryDependency<?,?> dependency) {
+            if (this.shouldHide != dependency.shouldHide)
+                return false;
+            if (!this.entry.equals(dependency.entry))
+                return false;
+            if (this.conditions.size() != dependency.conditions.size())
+                return false;
+            // True if all conditions have an equivalent
+            return this.conditions.stream().allMatch(condition ->
+                    dependency.conditions.stream().anyMatch(condition::equals));
+        }
+        return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        return Boolean.hashCode(this.shouldHide) + 8*this.entry.hashCode() + 16*this.conditions.hashCode();
+    }
 }

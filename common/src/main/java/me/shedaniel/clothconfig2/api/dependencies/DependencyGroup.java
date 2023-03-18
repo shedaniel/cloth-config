@@ -100,6 +100,36 @@ public class DependencyGroup implements Dependency {
         return Optional.of(lines.toArray(Component[]::new));
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (super.equals(obj))
+            return true;
+        if (obj instanceof DependencyGroup group) {
+            if (this.condition != group.condition)
+                return false;
+            if (this.shouldHide == null) {
+                if (group.shouldHide != null)
+                    return false;
+            } else {
+                if (group.shouldHide == null)
+                    return false;
+                if (this.shouldHide.booleanValue() != group.shouldHide.booleanValue())
+                    return false;
+            }
+            if (this.children.size() != group.children.size())
+                return false;
+            // True if every child has an equivalent
+            return children.stream().allMatch(child ->
+                    group.children.stream().anyMatch(child::equals));
+        }
+        return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        return (shouldHide == null ? 0 : shouldHide.hashCode()) + 8*condition.hashCode() + 16*children.hashCode();
+    }
+    
     /**
      * Defines a condition for a {@link DependencyGroup} to be met.
      */

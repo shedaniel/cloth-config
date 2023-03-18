@@ -159,12 +159,11 @@ public class DependencyManager {
                     "Invalid annotation type \"%s\" passed to combineDependencies()".formatted(invalid.get(0))
                     : "%d invalid annotations passed to combineDependencies(): %s".formatted(invalid.size(), invalid));
         
-        // FIXME remove duplicate dependencies
-    
         // Build all single Dependencies
         List<Dependency> singles = dependencies.stream()
                 .filter(ConfigEntry.Gui.DependsOn.class::isInstance)
                 .map(ConfigEntry.Gui.DependsOn.class::cast)
+                .distinct()
                 .map(this::buildDependency)
                 .toList();
 
@@ -172,6 +171,7 @@ public class DependencyManager {
         List<Dependency> groups = dependencies.stream()
                 .filter(ConfigEntry.Gui.DependsOnGroup.class::isInstance)
                 .map(ConfigEntry.Gui.DependsOnGroup.class::cast)
+                .distinct()
                 .map(this::buildDependency)
                 .collect(Collectors.toCollection(ArrayList::new));
     
@@ -186,8 +186,11 @@ public class DependencyManager {
         // Combine multiple dependencies if necessary,
         // add the result to the groups list
         if (!singles.isEmpty()) {
-            groups.add(singles.size() == 1 ?
-                    singles.get(0) : Dependency.all(singles));
+            Dependency dependency = singles.size() == 1 ?
+                    singles.get(0) : Dependency.all(singles);
+            // Ensure we don't introduce any duplicates
+            if (groups.stream().noneMatch(dependency::equals))
+                groups.add(dependency);
         }
         
         // Return a group that depends on all dependencies & groups
