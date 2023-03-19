@@ -5,13 +5,12 @@ import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
-import me.shedaniel.clothconfig2.api.dependencies.SelectionDependency;
+import me.shedaniel.clothconfig2.api.dependencies.EnumDependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
-import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
@@ -285,17 +284,16 @@ public class DependencyManager {
     
     
     /**
-     * Builds a {@link SelectionDependency} defined in the {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation, depending on the given {@link SelectionListEntry}.
+     * Builds a {@link EnumDependency} defined in the {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation, depending on the given {@link EnumListEntry}.
      *
      * @param annotation the {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation that defines the dependency
-     * @param dependency the {@link SelectionListEntry} to be depended on
+     * @param dependency the {@link EnumListEntry} to be depended on
      * @return the generated dependency
      */
-    public static <T extends Enum<?>> SelectionDependency<T> buildDependency(ConfigEntry.Gui.DependsOn annotation, EnumListEntry<T> dependency) {
+    public static <T extends Enum<?>> EnumDependency<T> buildDependency(ConfigEntry.Gui.DependsOn annotation, EnumListEntry<T> dependency) {
         // List of valid values for the depended-on SelectionListEntry
         List<T> possibleValues = dependency.getValues();
-    
-    
+
         // Convert each condition to the appropriate type, by
         // mapping the dependency conditions to matched possible values
         List<EnumCondition<T>> conditions = Arrays.stream(annotation.conditions())
@@ -316,12 +314,12 @@ public class DependencyManager {
             throw new IllegalStateException("SelectionList dependency requires at least one condition");
     
         // Finally, build the dependency and return it
-        SelectionDependency<T> selectionDependency = Dependency.disabledWhenNotMet(dependency, conditions.get(0));
+        EnumDependency<T> enumDependency = Dependency.disabledWhenNotMet(dependency, conditions.get(0));
         if (conditions.size() > 1)
-            selectionDependency.addConditions(conditions.subList(1, conditions.size()));
-        selectionDependency.hiddenWhenNotMet(annotation.hiddenWhenNotMet());
+            enumDependency.addConditions(conditions.subList(1, conditions.size()));
+        enumDependency.hiddenWhenNotMet(annotation.hiddenWhenNotMet());
     
-        return selectionDependency;
+        return enumDependency;
     }
     
     private static FlaggedCondition parseFlags(String condition) throws IllegalArgumentException {

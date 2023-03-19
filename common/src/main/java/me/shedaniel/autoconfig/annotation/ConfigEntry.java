@@ -21,7 +21,7 @@ package me.shedaniel.autoconfig.annotation;
 
 import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
-import me.shedaniel.clothconfig2.api.dependencies.SelectionDependency;
+import me.shedaniel.clothconfig2.api.dependencies.EnumDependency;
 
 import java.lang.annotation.*;
 
@@ -189,7 +189,7 @@ public class ConfigEntry {
              * For example:
              * <ul>
              *     <li>{@link BooleanDependency} requires exactly one condition be defined</li>
-             *     <li>{@link SelectionDependency} requires one or more conditions be defined</li>
+             *     <li>{@link EnumDependency} requires one or more conditions be defined</li>
              * </ul>
              * The value must be parsable into the appropriate type for the dependency, for example:
              * <ul>

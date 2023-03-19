@@ -159,68 +159,68 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link SelectionDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * Generates a {@link EnumDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
      * <br>
      * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
      *
      * @param entry the {@link EnumListEntry} that is depended on.
      * @param condition the expected value for {@code entry}
      * @param conditions optional additional values
-     * @return the generated {@link SelectionDependency}.
+     * @return the generated {@link EnumDependency}.
      */
     @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
-    static @NotNull <T extends Enum<?>> SelectionDependency<T> hiddenWhenNotMet(EnumListEntry<T> entry, T condition, T... conditions) {
-        SelectionDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
+    static @NotNull <T extends Enum<?>> EnumDependency<T> hiddenWhenNotMet(EnumListEntry<T> entry, T condition, T... conditions) {
+        EnumDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
         dependency.hiddenWhenNotMet(true);
         return dependency;
     }
     
     /**
-     * Generates a {@link SelectionDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * Generates a {@link EnumDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
      * <br>
      * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
      *
      * @param entry the {@link EnumListEntry} that is depended on.
      * @param condition a {@link EnumCondition} to check against {@code entry}
      * @param conditions optional additional {@code condition}s
-     * @return the generated {@link SelectionDependency}.
+     * @return the generated {@link EnumDependency}.
      */
     @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
-    static @NotNull <T extends Enum<?>> SelectionDependency<T> hiddenWhenNotMet(EnumListEntry<T> entry, EnumCondition<T> condition, EnumCondition<T>... conditions) {
-        SelectionDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
+    static @NotNull <T extends Enum<?>> EnumDependency<T> hiddenWhenNotMet(EnumListEntry<T> entry, EnumCondition<T> condition, EnumCondition<T>... conditions) {
+        EnumDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
         dependency.hiddenWhenNotMet(true);
         return dependency;
     }
     
     /**
-     * Generates a {@link SelectionDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * Generates a {@link EnumDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
      * <br>
      * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
      *
      * @param entry the {@link EnumListEntry} that is depended on.
      * @param condition the expected value for {@code entry}
      * @param conditions optional additional values
-     * @return the generated {@link SelectionDependency}.
+     * @return the generated {@link EnumDependency}.
      */
     @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
-    static @NotNull <T extends Enum<?>> SelectionDependency<T> disabledWhenNotMet(EnumListEntry<T> entry, T condition, T... conditions) {
+    static @NotNull <T extends Enum<?>> EnumDependency<T> disabledWhenNotMet(EnumListEntry<T> entry, T condition, T... conditions) {
         return disabledWhenNotMet(entry, new EnumCondition<>(condition))
                 .withConditions(Arrays.stream(conditions).map(EnumCondition::new).toList());
     }
     
     /**
-     * Generates a {@link SelectionDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * Generates a {@link EnumDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
      * <br>
      * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
      *
      * @param entry the {@link EnumListEntry} that is depended on.
      * @param condition the expected value for {@code entry}
      * @param conditions optional additional values
-     * @return the generated {@link SelectionDependency}.
+     * @return the generated {@link EnumDependency}.
      */
     @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
-    static @NotNull <T extends Enum<?>> SelectionDependency<T> disabledWhenNotMet(EnumListEntry<T> entry, EnumCondition<T> condition, EnumCondition<T>... conditions) {
-        SelectionDependency<T> dependency = new SelectionDependency<>(entry, condition);
+    static @NotNull <T extends Enum<?>> EnumDependency<T> disabledWhenNotMet(EnumListEntry<T> entry, EnumCondition<T> condition, EnumCondition<T>... conditions) {
+        EnumDependency<T> dependency = new EnumDependency<>(entry, condition);
         dependency.addConditions(List.of(conditions));
         return dependency;
     }

@@ -5,9 +5,9 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import net.minecraft.network.chat.Component;
 
-public class SelectionDependency<T extends Enum<?>> extends ComplexDependency<T, EnumCondition<T>, EnumListEntry<T>, SelectionDependency<T>> {
+public class EnumDependency<T extends Enum<?>> extends ComplexDependency<T, EnumCondition<T>, EnumListEntry<T>, EnumDependency<T>> {
     
-    SelectionDependency(EnumListEntry<T> entry, EnumCondition<T> condition) {
+    EnumDependency(EnumListEntry<T> entry, EnumCondition<T> condition) {
         super(entry);
         setCondition(condition);
     }
@@ -29,7 +29,7 @@ public class SelectionDependency<T extends Enum<?>> extends ComplexDependency<T,
     }
     
     @Override
-    public SelectionDependency<T> withSimpleCondition(T value) {
+    public EnumDependency<T> withSimpleCondition(T value) {
         addCondition(new EnumCondition<>(value));
         return this;
     }
