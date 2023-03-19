@@ -13,17 +13,17 @@ public class BooleanDependency extends ComplexDependency<Boolean, BooleanConditi
     }
     
     @Override
+    public BooleanDependency withSimpleCondition(Boolean value) {
+        setCondition(new BooleanCondition(value));
+        return this;
+    }
+    
+    @Override
     public Component getShortDescription() {
         Component condition = this.getConditions().stream()
                 .map(Condition::getText)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("BooleanDependency requires exactly one condition"));
         return Component.translatable("text.cloth-config.boolean_dependency.short_description", getEntry().getFieldName(), condition);
-    }
-    
-    @Override
-    public BooleanDependency withSimpleCondition(Boolean value) {
-        setCondition(new BooleanCondition(value));
-        return this;
     }
 }

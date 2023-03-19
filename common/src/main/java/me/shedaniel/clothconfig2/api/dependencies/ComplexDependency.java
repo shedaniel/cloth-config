@@ -47,6 +47,10 @@ public abstract class ComplexDependency<T, C extends Condition<T>, E extends Abs
      */
     public abstract SELF withSimpleCondition(T value);
     
+    protected Component getConditionText(C condition) {
+        return condition.getText();
+    }
+    
     /**
      * {@inheritDoc} For example <em>Depends on "Some Config Entry" being set to "YES".</em>
      */
@@ -61,11 +65,9 @@ public abstract class ComplexDependency<T, C extends Condition<T>, E extends Abs
                 .withStyle(ChatFormatting.BOLD);
         
         // Get the text for each condition, again styled bold.
-        List<MutableComponent> conditionTexts = conditions.stream()
+        List<Component> conditionTexts = conditions.stream()
                 .distinct()
-                .map(Condition::getText)
-                .map(text -> MutableComponent.create(text.getContents()))
-                .map(text -> text.withStyle(ChatFormatting.BOLD))
+                .map(this::getConditionText)
                 .toList();
         
         // Generate a slightly different tooltip depending on how many conditions are defined
