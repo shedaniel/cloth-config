@@ -6,7 +6,11 @@ import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
 import me.shedaniel.clothconfig2.api.dependencies.SelectionDependency;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
+import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +28,12 @@ import java.util.stream.Collectors;
  */
 public class DependencyManager {
     
+    private record FlaggedCondition(EnumSet<Condition.Flag> flags, String condition) {}
     private record EntryRecord(AbstractConfigListEntry<?> gui, List<Annotation> dependencies) {}
+    
+    private static final Character FLAG_PREFIX = '{';
+    private static final Character FLAG_SUFFIX = '}';
+    
     private final Map<String, EntryRecord> registry = new LinkedHashMap<>();
     
     private @Nullable String prefix;
@@ -219,7 +228,7 @@ public class DependencyManager {
     /**
      * Build a {@link Dependency} as defined in the annotation.
      * <br><br>
-     * Currently, supports {@link BooleanListEntry} and {@link SelectionListEntry} dependencies.
+     * Currently, supports {@link BooleanListEntry} and {@link EnumListEntry} dependencies.
      * If a different config entry type is used, a {@link RuntimeException} will be thrown.
      *
      * @param annotation The {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation defining the dependency
@@ -233,7 +242,7 @@ public class DependencyManager {
     
         if (dependency instanceof BooleanListEntry booleanListEntry)
             return buildDependency(annotation, booleanListEntry);
-        else if (dependency instanceof SelectionListEntry<?> selectionListEntry)
+        else if (dependency instanceof EnumListEntry<?> selectionListEntry)
             return buildDependency(annotation, selectionListEntry);
         else
             throw new RuntimeException("Unsupported dependency type: %s".formatted(dependency.getClass().getSimpleName()));
@@ -247,12 +256,20 @@ public class DependencyManager {
      * @return the generated dependency
      */
     public static BooleanDependency buildDependency(ConfigEntry.Gui.DependsOn annotation, BooleanListEntry dependency) {
-        List<Boolean> conditions = Arrays.stream(annotation.conditions())
-                // Functionally equivalent to Boolean::parseBoolean, but allows us to throw a RuntimeException
-                .map(condition -> switch (condition.toLowerCase()) {
-                    case "true" -> true;
-                    case "false" -> false;
-                    default -> throw new IllegalStateException("Unexpected condition \"%s\" for Boolean dependency (expected \"true\" or \"false\").".formatted(condition));
+        List<BooleanCondition> conditions = Arrays.stream(annotation.conditions())
+                .map(DependencyManager::parseFlags)
+                .map(record -> {
+                    // The switch expression is functionally equivalent to Boolean::parseBoolean,
+                    // but allows us to throw a RuntimeException
+                    String string = record.condition().strip().toLowerCase();
+                    BooleanCondition condition = new BooleanCondition(switch (string) {
+                        case "true" -> true;
+                        case "false" -> false;
+                        default ->
+                                throw new IllegalStateException("Unexpected condition \"%s\" for Boolean dependency (expected \"true\" or \"false\").".formatted(string));
+                    });
+                    condition.setFlags(record.flags());
+                    return condition;
                 })
                 .toList();
         
@@ -274,17 +291,24 @@ public class DependencyManager {
      * @param dependency the {@link SelectionListEntry} to be depended on
      * @return the generated dependency
      */
-    public static <T> SelectionDependency<T> buildDependency(ConfigEntry.Gui.DependsOn annotation, SelectionListEntry<T> dependency) {
+    public static <T extends Enum<?>> SelectionDependency<T> buildDependency(ConfigEntry.Gui.DependsOn annotation, EnumListEntry<T> dependency) {
         // List of valid values for the depended-on SelectionListEntry
         List<T> possibleValues = dependency.getValues();
     
+    
         // Convert each condition to the appropriate type, by
         // mapping the dependency conditions to matched possible values
-        List<T> conditions = Arrays.stream(annotation.conditions())
-                .map(condition -> possibleValues.stream()
-                        .filter(value -> value.toString().equalsIgnoreCase(condition))
-                        .findAny()
-                        .orElseThrow(() -> new IllegalStateException("Invalid SelectionDependency condition was defined: \"%s\"\nValid options: %s".formatted(condition, possibleValues))))
+        List<EnumCondition<T>> conditions = Arrays.stream(annotation.conditions())
+                .map(DependencyManager::parseFlags)
+                .map(record -> {
+                    String string = record.condition().strip().toLowerCase();
+                    EnumCondition<T> condition = new EnumCondition<>(possibleValues.stream()
+                            .filter(val -> val.toString().equalsIgnoreCase(string))
+                            .findAny()
+                            .orElseThrow(() -> new IllegalStateException("Invalid SelectionDependency condition was defined: \"%s\"\nValid options: %s".formatted(record.condition(), possibleValues))));
+                    condition.setFlags(record.flags());
+                    return condition;
+                })
                 .toList();
     
         // Check enough conditions were parsed
@@ -298,5 +322,20 @@ public class DependencyManager {
         selectionDependency.hiddenWhenNotMet(annotation.hiddenWhenNotMet());
     
         return selectionDependency;
+    }
+    
+    private static FlaggedCondition parseFlags(String condition) throws IllegalArgumentException {
+        if (FLAG_PREFIX == condition.charAt(0)) {
+            int flagEnd = condition.indexOf(FLAG_SUFFIX);
+            if (flagEnd < 0)
+                throw new IllegalArgumentException("Condition \"%s\" starts with the flag prefix '%s', but the flag suffix '%s' was not found. Suggestion: \"%s%s%s\"?"
+                        .formatted(condition, FLAG_PREFIX, FLAG_SUFFIX, FLAG_PREFIX, FLAG_SUFFIX, condition));
+            
+            String flagString = condition.substring(1, flagEnd);
+            String conditionString = condition.substring(flagEnd + 1);
+            
+            return new FlaggedCondition(Condition.Flag.fromString(flagString), conditionString);
+        }
+        return new FlaggedCondition(Condition.Flag.NONE, condition);
     }
 }

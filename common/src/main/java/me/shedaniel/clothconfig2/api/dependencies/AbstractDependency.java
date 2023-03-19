@@ -1,27 +1,27 @@
 package me.shedaniel.clothconfig2.api.dependencies;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Represents a dependency on a {@link AbstractConfigEntry}
  * 
- * @param <T> The type this dependency deals with
  * @param <C> The type used for the condition
- * @param <E> the config entry type
+ * @param <E> the depended on type
+ * @param <SELF> the type to return from chainable methods, i.e. the lowest sub-class
  */
-public abstract class ConfigEntryDependency<T, C, E extends AbstractConfigEntry<T>> implements Dependency {
+public abstract class AbstractDependency<C, E, SELF extends AbstractDependency<C, E, SELF>> implements Dependency {
     private final E entry;
     
     private final Collection<C> conditions = new ArrayList<>();
     
     private boolean shouldHide = false;
     
-    protected ConfigEntryDependency(E entry) {this.entry = entry;}
+    protected AbstractDependency(E entry) {this.entry = entry;}
     
     /**
      * @return the Config Entry that is depended on
@@ -87,60 +87,36 @@ public abstract class ConfigEntryDependency<T, C, E extends AbstractConfigEntry<
     }
     
     /**
-     * Gets the localised human-readable text for a dependency's condition
+     * Add multiple condition to the dependency.
      *
-     * @param condition the condition to get text for
-     * @return the localised human-readable text
+     * @param conditions a {@link Collection} of {@link Condition}s to be checked against the config entry 
+     * @return this dependency instance
+     * @see #withCondition(Object)
      */
-    protected abstract Component getConditionText(C condition);
+    @SuppressWarnings("unchecked")
+    public SELF withConditions(Collection<C> conditions) {
+        addConditions(conditions);
+        return (SELF) this;
+    }
     
     /**
-     * {@inheritDoc} For example <em>Depends on "Some Config Entry" being set to "YES".</em>
+     * Add a condition to the dependency.
+     *
+     * @param condition the {@link Condition} to be checked against the config entry 
+     * @return this dependency instance
+     * @see #withConditions(Collection) 
      */
-    @Override
-    public Optional<Component[]> getTooltip() {
-        Collection<C> conditions = getConditions();
-        if (conditions.isEmpty())
-            throw new IllegalStateException("Expected at least one condition to be defined");
-        
-        // Get the name of the depended-on entry, and style it bold.
-        Component dependencyName = MutableComponent.create(getEntry().getFieldName().getContents())
-                .withStyle(ChatFormatting.BOLD);
-        
-        // Get the text for each condition, again styled bold.
-        List<MutableComponent> conditionTexts = conditions.stream()
-                .distinct()
-                .map(this::getConditionText)
-                .map(text -> MutableComponent.create(text.getContents()))
-                .map(text -> text.withStyle(ChatFormatting.BOLD))
-                .toList();
-        
-        // Generate a slightly different tooltip depending on how many conditions are defined
-        List<Component> tooltip = new ArrayList<>();
-        tooltip.add(switch (conditionTexts.size()) {
-            case 1 -> Component.translatable("text.cloth-config.dependencies.one_condition", dependencyName, conditionTexts.get(0));
-            case 2 -> Component.translatable("text.cloth-config.dependencies.two_conditions", dependencyName, conditionTexts.get(0), conditionTexts.get(1));
-            default -> Component.translatable("text.cloth-config.dependencies.many_conditions", dependencyName);
-        });
-        
-        // If many conditions, print them as a list
-        if (conditionTexts.size() > 2) {
-            tooltip.addAll(conditionTexts.stream()
-                    .map(text -> Component.translatable("text.cloth-config.dependencies.list_entry", text))
-                    .toList());
-        }
-        
-        if (tooltip.isEmpty())
-            return Optional.empty();
-        
-        return Optional.of(tooltip.toArray(Component[]::new));
+    @SuppressWarnings("unchecked")
+    public SELF withCondition(C condition) {
+        addCondition(condition);
+        return (SELF) this;
     }
     
     @Override
     public boolean equals(Object obj) {
         if (super.equals(obj))
             return true;
-        if (obj instanceof ConfigEntryDependency<?,?,?> dependency) {
+        if (obj instanceof AbstractDependency<?,?,?> dependency) {
             if (this.shouldHide != dependency.shouldHide)
                 return false;
             if (!this.entry.equals(dependency.entry))

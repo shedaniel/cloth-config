@@ -1,11 +1,15 @@
 package me.shedaniel.clothconfig2.api.dependencies;
 
+import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
-import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
+import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface Dependency {
@@ -111,7 +115,7 @@ public interface Dependency {
      * @return the generated {@link BooleanDependency}.
      */
     static @NotNull BooleanDependency hiddenWhenNotMet(BooleanListEntry entry) {
-        return hiddenWhenNotMet(entry, true);
+        return hiddenWhenNotMet(entry, new BooleanCondition(true));
     }
     
     /**
@@ -120,10 +124,10 @@ public interface Dependency {
      * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
      *
      * @param entry the {@link BooleanListEntry} that is depended on.
-     * @param condition the expected value for {@code entry}
+     * @param condition a {@link BooleanCondition} to check against {@code entry}
      * @return the generated {@link BooleanDependency}.
      */
-    static @NotNull BooleanDependency hiddenWhenNotMet(BooleanListEntry entry, boolean condition) {
+    static @NotNull BooleanDependency hiddenWhenNotMet(BooleanListEntry entry, BooleanCondition condition) {
         BooleanDependency dependency = new BooleanDependency(entry, condition);
         dependency.hiddenWhenNotMet(true);
         return dependency;
@@ -138,7 +142,7 @@ public interface Dependency {
      * @return the generated {@link BooleanDependency}.
      */
     static @NotNull BooleanDependency disabledWhenNotMet(BooleanListEntry entry) {
-        return disabledWhenNotMet(entry, true);
+        return disabledWhenNotMet(entry, new BooleanCondition(true));
     }
     
     /**
@@ -147,10 +151,10 @@ public interface Dependency {
      * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
      *
      * @param entry the {@link BooleanListEntry} that is depended on.
-     * @param condition the expected value for {@code entry}
+     * @param condition a {@link BooleanCondition} to check against {@code entry}
      * @return the generated {@link BooleanDependency}.
      */
-    static @NotNull BooleanDependency disabledWhenNotMet(BooleanListEntry entry, boolean condition) {
+    static @NotNull BooleanDependency disabledWhenNotMet(BooleanListEntry entry, BooleanCondition condition) {
         return new BooleanDependency(entry, condition);
     }
     
@@ -159,14 +163,31 @@ public interface Dependency {
      * <br>
      * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
      *
-     * @param entry the {@link SelectionListEntry} that is depended on.
+     * @param entry the {@link EnumListEntry} that is depended on.
      * @param condition the expected value for {@code entry}
      * @param conditions optional additional values
      * @return the generated {@link SelectionDependency}.
      */
     @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
-    static @NotNull <T> SelectionDependency<T> hiddenWhenNotMet(SelectionListEntry<T> entry, T condition, T... conditions) {
-        SelectionDependency<T> dependency = new SelectionDependency<>(entry, condition, conditions);
+    static @NotNull <T extends Enum<?>> SelectionDependency<T> hiddenWhenNotMet(EnumListEntry<T> entry, T condition, T... conditions) {
+        SelectionDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
+        dependency.hiddenWhenNotMet(true);
+        return dependency;
+    }
+    
+    /**
+     * Generates a {@link SelectionDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * <br>
+     * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
+     *
+     * @param entry the {@link EnumListEntry} that is depended on.
+     * @param condition a {@link EnumCondition} to check against {@code entry}
+     * @param conditions optional additional {@code condition}s
+     * @return the generated {@link SelectionDependency}.
+     */
+    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    static @NotNull <T extends Enum<?>> SelectionDependency<T> hiddenWhenNotMet(EnumListEntry<T> entry, EnumCondition<T> condition, EnumCondition<T>... conditions) {
+        SelectionDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
         dependency.hiddenWhenNotMet(true);
         return dependency;
     }
@@ -176,14 +197,32 @@ public interface Dependency {
      * <br>
      * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
      *
-     * @param entry the {@link SelectionListEntry} that is depended on.
+     * @param entry the {@link EnumListEntry} that is depended on.
      * @param condition the expected value for {@code entry}
      * @param conditions optional additional values
      * @return the generated {@link SelectionDependency}.
      */
     @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
-    static @NotNull <T> SelectionDependency<T> disabledWhenNotMet(SelectionListEntry<T> entry, T condition, T... conditions) {
-        return new SelectionDependency<>(entry, condition, conditions);
+    static @NotNull <T extends Enum<?>> SelectionDependency<T> disabledWhenNotMet(EnumListEntry<T> entry, T condition, T... conditions) {
+        return disabledWhenNotMet(entry, new EnumCondition<>(condition))
+                .withConditions(Arrays.stream(conditions).map(EnumCondition::new).toList());
+    }
+    
+    /**
+     * Generates a {@link SelectionDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * <br>
+     * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
+     *
+     * @param entry the {@link EnumListEntry} that is depended on.
+     * @param condition the expected value for {@code entry}
+     * @param conditions optional additional values
+     * @return the generated {@link SelectionDependency}.
+     */
+    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    static @NotNull <T extends Enum<?>> SelectionDependency<T> disabledWhenNotMet(EnumListEntry<T> entry, EnumCondition<T> condition, EnumCondition<T>... conditions) {
+        SelectionDependency<T> dependency = new SelectionDependency<>(entry, condition);
+        dependency.addConditions(List.of(conditions));
+        return dependency;
     }
     
     /**

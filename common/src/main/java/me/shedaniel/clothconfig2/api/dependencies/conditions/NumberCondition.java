@@ -51,7 +51,7 @@ public class NumberCondition extends Condition<Number> {
     public boolean check(Number value) {
         double value1 = this.value.doubleValue();
         double value2 = value.doubleValue();
-        return switch (this.operator) {
+        boolean check = switch (this.operator) {
             case EQUALS -> value1 == value1;
             case NOT -> value1 != value2;
             case GREATER -> value1 > value2;
@@ -63,6 +63,7 @@ public class NumberCondition extends Condition<Number> {
                            || Math.ceil(value1) == Math.floor(value2)
                            || Math.ceil(value1) == Math.ceil(value2);
         };
+        return inverted() != check;
     }
     
     @Override

@@ -1,17 +1,20 @@
 package me.shedaniel.clothconfig2.api.dependencies;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
+import net.minecraft.network.chat.Component;
+
+import java.util.Optional;
 
 /**
  * {@inheritDoc}
  *
  * Represents a dependency on a {@link AbstractConfigEntry}
  * <br><br>
- * In this implementation, the condition is also of type {@code T}.
+ * In this implementation, the condition type and {@code T} are the same.
  */
-public abstract class SimpleDependency<T, E extends AbstractConfigEntry<T>> extends ConfigEntryDependency<T, T, E> {
+public abstract class PlainDependency<T, E extends AbstractConfigEntry<T>> extends AbstractDependency<T, E, PlainDependency<T, E>> {
     
-    protected SimpleDependency(E entry) {
+    protected PlainDependency(E entry) {
         super(entry);
     }
     
@@ -25,5 +28,11 @@ public abstract class SimpleDependency<T, E extends AbstractConfigEntry<T>> exte
     public boolean check() {
         T value = getEntry().getValue();
         return getConditions().stream().anyMatch(value::equals);
+    }
+    
+    @Override
+    public Optional<Component[]> getTooltip() {
+        //TODO
+        return Optional.empty();
     }
 }
