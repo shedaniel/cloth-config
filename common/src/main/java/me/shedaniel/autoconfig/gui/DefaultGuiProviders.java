@@ -169,25 +169,18 @@ public class DefaultGuiProviders {
                 field -> !field.getType().isPrimitive(),
                 ConfigEntry.Gui.CollapsibleObject.class
         );
-        
+    
+        //noinspection unchecked
         registry.registerPredicateProvider(
-                (i18n, field, config, defaults, guiProvider) -> {
-                    Object[] enumConstants = field.getType().getEnumConstants();
-                    Enum[] enums = new Enum[enumConstants.length];
-                    for (int i = 0; i < enumConstants.length; i++) {
-                        enums[i] = (Enum) enumConstants[i];
-                    }
-                    return Collections.singletonList(
-                            ENTRY_BUILDER.startSelector(
-                                            Component.translatable(i18n),
-                                            enums,
-                                            getUnsafely(field, config, getUnsafely(field, defaults))
-                                    )
-                                    .setDefaultValue(() -> getUnsafely(field, defaults))
-                                    .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
-                                    .build()
-                    );
-                },
+                (i18n, field, config, defaults, guiProvider) -> Collections.singletonList(
+                    ENTRY_BUILDER.startEnumSelector(
+                                    Component.translatable(i18n),
+                                    (Class<? extends Enum<?>>) field.getType(),
+                                    getUnsafely(field, config, getUnsafely(field, defaults)))
+                            .setDefaultValue(() -> getUnsafely(field, defaults))
+                            .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                            .build()
+                ),
                 field -> field.getType().isEnum() && field.isAnnotationPresent(ConfigEntry.Gui.EnumHandler.class) && field.getAnnotation(ConfigEntry.Gui.EnumHandler.class).option() == ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON
         );
         
