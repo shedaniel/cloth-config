@@ -12,6 +12,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static me.shedaniel.clothconfig2.api.dependencies.DependencyGroup.Condition.*;
+
 public interface Dependency {
     
     /**
@@ -22,7 +24,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup all(Dependency... dependencies) {
-        return new DependencyGroup(DependencyGroup.Condition.ALL, dependencies);
+        return new DependencyGroup(ALL, dependencies);
     }
     /**
      * Generates a {@link DependencyGroup} that depends on all of its dependencies being met.
@@ -44,7 +46,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup none(Dependency... dependencies) {
-        return new DependencyGroup(DependencyGroup.Condition.NONE, dependencies);
+        return new DependencyGroup(NONE, dependencies);
     }
     /**
      * Generates a {@link DependencyGroup} that depends on none of its dependencies being met.
@@ -67,7 +69,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup any(Dependency... dependencies) {
-        return new DependencyGroup(DependencyGroup.Condition.ANY, dependencies);
+        return new DependencyGroup(ANY, dependencies);
     }
     /**
      * Generates a {@link DependencyGroup} that depends on any of its dependencies being met.
@@ -91,7 +93,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup one(Dependency... dependencies) {
-        return new DependencyGroup(DependencyGroup.Condition.ONE, dependencies);
+        return new DependencyGroup(ONE, dependencies);
     }
     /**
      * Generates a {@link DependencyGroup} that depends on exactly one of its dependencies being met.
