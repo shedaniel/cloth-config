@@ -7,80 +7,27 @@ import net.minecraft.network.chat.MutableComponent;
 
 import java.util.*;
 
-public abstract class ConfigEntryDependency<T, E extends AbstractConfigEntry<T>> implements Dependency {
-    
+/**
+ * Represents a dependency on a {@link AbstractConfigEntry}
+ * 
+ * @param <T> The type this dependency deals with
+ * @param <C> The type used for the condition
+ * @param <E> the config entry type
+ */
+public abstract class ConfigEntryDependency<T, C, E extends AbstractConfigEntry<T>> implements Dependency {
     private final E entry;
-    private final Collection<T> conditions = new ArrayList<>();
+    
+    private final Collection<C> conditions = new ArrayList<>();
     
     private boolean shouldHide = false;
     
-    protected ConfigEntryDependency(E entry) {
-        this.entry = entry;
-    }
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * <br><br>
-     * This implementation checks if any condition matches the depended-on config entry's value.
-     */
-    @Override
-    public boolean check() {
-        T value = getEntry().getValue();
-        return getConditions().stream().anyMatch(value::equals);
-    }
-    
-    /**
-     * Clears any conditions already defined and adds the condition provided
-     * <br>
-     * You can use {@code addCondition()} to add condition(s) without removing existing conditions.
-     * 
-     * @param condition the new condition to be set
-     */
-    public final void setCondition(T condition) {
-        conditions.clear();
-        conditions.add(condition);
-    }
-    
-    /**
-     * Adds one or more conditions to the dependency. If any condition matches the entry's value,
-     * then the dependency is met.
-     * <br>
-     * Unlike {@code setCondition()}, existing conditions are not removed.
-     *
-     * @param conditions the conditions to be added
-     */
-    @SafeVarargs //FIXME is this actually safe from heap pollution? T... aka Object[] seems okay-ish?
-    public final void addCondition(T... conditions) {
-        addConditions(Arrays.asList(conditions));
-    }
-    
-    /**
-     * Adds one or more conditions to the dependency. If any condition matches the entry's value,
-     * then the dependency is met.
-     * <br>
-     * Unlike {@code setCondition()}, existing conditions are not removed.
-     *
-     * @param conditions a {@link Collection} of conditions to be added
-     */
-    public final void addConditions(Collection<T> conditions) {
-        this.conditions.addAll(conditions);
-    }
+    protected ConfigEntryDependency(E entry) {this.entry = entry;}
     
     /**
      * @return the Config Entry that is depended on
      */
     public final E getEntry() {
         return entry;
-    }
-    
-    /**
-     * Get the dependency's conditions.
-     * 
-     * @return a {@link Collection} containing the dependency's conditions
-     */
-    public final Collection<T> getConditions() {
-        return conditions;
     }
     
     @Override
@@ -94,19 +41,65 @@ public abstract class ConfigEntryDependency<T, E extends AbstractConfigEntry<T>>
     }
     
     /**
+     * Get the dependency's conditions.
+     *
+     * @return a {@link Collection} containing the dependency's conditions
+     */
+    public final Collection<C> getConditions() {
+        return conditions;
+    }
+    
+    /**
+     * Clears any conditions already defined and adds the condition provided
+     * <br>
+     * You can use {@code addCondition()} to add condition(s) without removing existing conditions.
+     *
+     * @param condition the new condition to be set
+     */
+    public final void setCondition(C condition) {
+        conditions.clear();
+        conditions.add(condition);
+    }
+    
+    /**
+     * Adds one or more conditions to the dependency. If any condition matches the entry's value,
+     * then the dependency is met.
+     * <br>
+     * Unlike {@code setCondition()}, existing conditions are not removed.
+     *
+     * @param conditions the conditions to be added
+     */
+    @SafeVarargs //FIXME is this actually safe from heap pollution? T... aka Object[] seems okay-ish?
+    public final void addCondition(C... conditions) {
+        addConditions(Arrays.asList(conditions));
+    }
+    
+    /**
+     * Adds one or more conditions to the dependency. If any condition matches the entry's value,
+     * then the dependency is met.
+     * <br>
+     * Unlike {@code setCondition()}, existing conditions are not removed.
+     *
+     * @param conditions a {@link Collection} of conditions to be added
+     */
+    public final void addConditions(Collection<C> conditions) {
+        this.conditions.addAll(conditions);
+    }
+    
+    /**
      * Gets the localised human-readable text for a dependency's condition
-     * 
+     *
      * @param condition the condition to get text for
      * @return the localised human-readable text
      */
-    protected abstract Component getConditionText(T condition);
+    protected abstract Component getConditionText(C condition);
     
     /**
      * {@inheritDoc} For example <em>Depends on "Some Config Entry" being set to "YES".</em>
      */
     @Override
     public Optional<Component[]> getTooltip() {
-        Collection<T> conditions = getConditions();
+        Collection<C> conditions = getConditions();
         if (conditions.isEmpty())
             throw new IllegalStateException("Expected at least one condition to be defined");
         
@@ -121,7 +114,7 @@ public abstract class ConfigEntryDependency<T, E extends AbstractConfigEntry<T>>
                 .map(text -> MutableComponent.create(text.getContents()))
                 .map(text -> text.withStyle(ChatFormatting.BOLD))
                 .toList();
-
+        
         // Generate a slightly different tooltip depending on how many conditions are defined
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(switch (conditionTexts.size()) {
@@ -147,7 +140,7 @@ public abstract class ConfigEntryDependency<T, E extends AbstractConfigEntry<T>>
     public boolean equals(Object obj) {
         if (super.equals(obj))
             return true;
-        if (obj instanceof ConfigEntryDependency<?,?> dependency) {
+        if (obj instanceof ConfigEntryDependency<?,?,?> dependency) {
             if (this.shouldHide != dependency.shouldHide)
                 return false;
             if (!this.entry.equals(dependency.entry))

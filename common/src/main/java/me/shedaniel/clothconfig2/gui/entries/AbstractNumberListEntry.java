@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class AbstractNumberListEntry<T> extends TextFieldListEntry<T> {
+public abstract class AbstractNumberListEntry<T extends Number> extends TextFieldListEntry<T> {
     private static final Function<String, String> stripCharacters = s -> {
         StringBuilder builder = new StringBuilder();
         char[] chars = s.toCharArray();
