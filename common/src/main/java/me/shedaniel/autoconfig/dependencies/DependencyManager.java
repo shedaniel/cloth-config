@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class DependencyManager {
     
     private record FlaggedCondition(EnumSet<Condition.Flag> flags, String condition) {}
-    private record EntryRecord(AbstractConfigListEntry<?> gui, List<Annotation> dependencies) {}
+    private record EntryRecord(AbstractConfigListEntry<?> gui, Set<Annotation> dependencies) {}
     
     private static final Character FLAG_PREFIX = '{';
     private static final Character FLAG_SUFFIX = '}';
@@ -74,9 +74,9 @@ public class DependencyManager {
         String key = entry.getFieldKey();
     
         // Merge already registered dependencies with any declared on the field
-        List<Annotation> dependencies = Optional.ofNullable(registry.get(key))
+        Set<Annotation> dependencies = Optional.ofNullable(registry.get(key))
                 .map(EntryRecord::dependencies)
-                .orElseGet(ArrayList::new);
+                .orElseGet(LinkedHashSet::new);
         if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
             dependencies.add(field.getAnnotation(ConfigEntry.Gui.DependsOn.class));
         if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
@@ -112,9 +112,9 @@ public class DependencyManager {
         String key = entry.getFieldKey();
     
         // Merge new & existing dependencies
-        List<Annotation> dependenciesList = Optional.ofNullable(registry.get(key))
+        Set<Annotation> dependenciesList = Optional.ofNullable(registry.get(key))
                 .map(EntryRecord::dependencies)
-                .orElseGet(ArrayList::new);
+                .orElseGet(LinkedHashSet::new);
         Collections.addAll(dependenciesList, dependencies);
         
         registry.put(key, new EntryRecord(entry, dependenciesList));
@@ -166,7 +166,6 @@ public class DependencyManager {
         List<Dependency> singles = dependencies.stream()
                 .filter(ConfigEntry.Gui.DependsOn.class::isInstance)
                 .map(ConfigEntry.Gui.DependsOn.class::cast)
-                .distinct()
                 .map(this::buildDependency)
                 .toList();
 
@@ -174,7 +173,6 @@ public class DependencyManager {
         List<Dependency> groups = dependencies.stream()
                 .filter(ConfigEntry.Gui.DependsOnGroup.class::isInstance)
                 .map(ConfigEntry.Gui.DependsOnGroup.class::cast)
-                .distinct()
                 .map(this::buildDependency)
                 .collect(Collectors.toCollection(ArrayList::new));
     
