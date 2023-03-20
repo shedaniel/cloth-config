@@ -185,17 +185,39 @@ public class ConfigEntry {
              * One or more conditions to be checked against the dependency's value.
              * If any condition is matched, the annotated field is enabled.
              * <br><br>
-             * Some dependency types may be stricter about the number of conditions defined.
+             * 
+             * <h2>Parsing
+             * <p>The value must be parsable into the appropriate type for the dependency, for example:
+             * <ul>
+             *     <li>{@code "true"} or {@code "false"} for a boolean dependency</li>
+             *     <li>The {@code toString()} value for an Enum dependency</li>
+             *     <li>Etc</li>
+             * </ul>
+             * 
+             * <h2>Quantity
+             * <p>Some dependency types may be stricter about the number of conditions defined.
              * For example:
              * <ul>
              *     <li>{@link BooleanDependency} requires exactly one condition be defined</li>
              *     <li>{@link EnumDependency} requires one or more conditions be defined</li>
              * </ul>
-             * The value must be parsable into the appropriate type for the dependency, for example:
+             * 
+             * <h2>Flags
+             * <p>The value can optionally be prefixed with "{@link me.shedaniel.clothconfig2.api.dependencies.conditions.Condition.Flag flags}"
+             * that affect how the condition is applied.
+             * <p>If the value starts with '<code>{</code>' then a corresponding '<code>}</code>' must be present.
+             * Any characters within the <code>{</code> and <code>}</code> will be interpreted as flags.
+             * <p>Unrecognised characters (including whitespace) within the flags section will cause an {@link IllegalArgumentException}
+             * to be thrown at runtime.
+             * <p>If you wish for your condition to literally start with a '<code>{</code>', you can start your value
+             * with '<code>{}{</code>' instead.
+             * <br><br>For example, the condition "<code>{!}Hello, world</code>" will be met when the depended-on entry's
+             * value <strong>does not</strong> equal "<em>Hello, world</em>".
+             * 
+             * <br><br><p><strong>Valid flags include:</strong>
              * <ul>
-             *     <li>{@code "true"} or {@code "false"} for a boolean dependency</li>
-             *     <li>The {@code toString()} value for an Enum dependency</li>
-             *     <li>Etc</li>
+             *     <li>'{@code !}' <em>not</em>: the condition will be inverted.</li>
+             *     <li>'{@code i}' <em>insensitive</em>: a text-based condition will ignore capitalization.</li>
              * </ul>
              */
             String[] conditions();
