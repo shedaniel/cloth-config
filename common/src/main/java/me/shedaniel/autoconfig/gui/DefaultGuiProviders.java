@@ -37,7 +37,6 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -134,21 +133,10 @@ public class DefaultGuiProviders {
                 (i18n, field, config, defaults, guiProvider) -> {
                     List<AbstractConfigListEntry> children = getChildren(i18n, field, config, defaults, guiProvider);
     
-                    if (!children.isEmpty()) {
-                        // Check if the transitive field has a dependency declared
-                        Annotation dependency;
-                        if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
-                            dependency = field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class);
-                        else if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
-                            dependency = field.getAnnotation(ConfigEntry.Gui.DependsOn.class);
-                        else
-                            dependency = null;
-    
-                        // Apply the field's dependency to its children
-                        if (dependency != null) {
-                            DependencyManager dependencies = guiProvider.getDependencyManager();
-                            children.forEach(gui -> dependencies.register(gui, dependency));
-                        }
+                    // Apply the field's dependency to its children
+                    if (!children.isEmpty() && (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class) || field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))) {
+                        DependencyManager dependencies = guiProvider.getDependencyManager();
+                        children.forEach(gui -> dependencies.register(gui, field));
                     }
                     
                     return children;

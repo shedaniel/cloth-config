@@ -1,6 +1,7 @@
 package me.shedaniel.autoconfig.dependencies;
 
-import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOn;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOnGroup;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
@@ -11,16 +12,16 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * {@code DependencyManager} is used by {@link me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess GuiRegistryAccess} implementations
- * to handle generating dependencies defined in {@link ConfigEntry.Gui.DependsOn @DependsOn} and {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}
+ * to handle generating dependencies defined in {@link DependsOn @DependsOn} and {@link DependsOnGroup @DependsOnGroup}
  * annotations.
  * <br><br>
  * It is necessary to register <strong>all</strong> config entry GUIs with the {@code DependencyManager} instance before building any dependencies. 
@@ -28,7 +29,11 @@ import java.util.stream.Collectors;
 public class DependencyManager {
     
     private record FlaggedCondition(EnumSet<Condition.Flag> flags, String condition) {}
-    private record EntryRecord(AbstractConfigListEntry<?> gui, Set<Annotation> dependencies) {}
+    private record EntryRecord(AbstractConfigListEntry<?> gui, Set<DependsOn> dependencies, Set<DependsOnGroup> groupDependencies) {
+        boolean hasDependencies() {
+            return !(dependencies().isEmpty() && groupDependencies().isEmpty());
+        }
+    }
     
     private static final Character FLAG_PREFIX = '{';
     private static final Character FLAG_SUFFIX = '}';
@@ -67,57 +72,53 @@ public class DependencyManager {
      * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
      *
      * @param entry the config entry GUI
-     * @param field the field where the config entry was defined
+     * @param field a {@link Field} with dependency annotations present
      * @see #buildDependencies()
      */
-    public void register(AbstractConfigListEntry<?> entry, Field field) {
-        String key = entry.getFieldKey();
-    
-        // Merge already registered dependencies with any declared on the field
-        Set<Annotation> dependencies = Optional.ofNullable(registry.get(key))
-                .map(EntryRecord::dependencies)
-                .orElseGet(LinkedHashSet::new);
-        if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))
-            dependencies.add(field.getAnnotation(ConfigEntry.Gui.DependsOn.class));
-        if (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class))
-            dependencies.add(field.getAnnotation(ConfigEntry.Gui.DependsOnGroup.class));
+    public void register(AbstractConfigListEntry<?> entry, @Nullable Field field) {
+        Collection<DependsOn> singles = null;
+        Collection<DependsOnGroup> groups = null;
+        
+        if (field != null) {
+            if (field.isAnnotationPresent(DependsOn.class))
+                singles = Collections.singleton(field.getAnnotation(DependsOn.class));
+            if (field.isAnnotationPresent(DependsOnGroup.class))
+                groups = Collections.singleton(field.getAnnotation(DependsOnGroup.class));
+        }
 
-        registry.put(key, new EntryRecord(entry, dependencies));
+        register(entry, singles, groups);
     }
     
     /**
      * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
      * <br><br>
-     * Explicitly provide one or more {@link ConfigEntry.Gui.DependsOn @DependsOn} or {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}
+     * Explicitly provide one or more {@link DependsOn @DependsOn} or {@link DependsOnGroup @DependsOnGroup}
      * annotations to be later applied to this entry.
      *
      * @param entry        the config entry GUI
-     * @param dependencies one or more {@link ConfigEntry.Gui.DependsOn @DependsOn} or
-     *                   {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup} annotations.
-     * @throws IllegalArgumentException if {@code dependencies} contains an Annotation that isn't either 
-     *                     {@link ConfigEntry.Gui.DependsOn @DependsOn} or {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}.
+     * @param dependencies a {@link Collection} of {@link DependsOn @DependsOn} annotations
+     * @param groupDependencies a {@link Collection} of {@link DependsOnGroup @DependsOnGroup} annotations
      * @see #buildDependencies()
      */
-    public void register(AbstractConfigListEntry<?> entry, Annotation... dependencies) {
-        List<String> invalid = Arrays.stream(dependencies)
-                .filter(annotation -> !(annotation instanceof ConfigEntry.Gui.DependsOn || annotation instanceof ConfigEntry.Gui.DependsOnGroup))
-                .map(Annotation::annotationType)
-                .map(Class::getSimpleName)
-                .toList();
-        if (!invalid.isEmpty())
-            throw new IllegalArgumentException(invalid.size() == 1 ?
-                    "Invalid annotation type \"%s\" passed to registerAdditionalDependency()".formatted(invalid.get(0))
-                    : "%d invalid annotations passed to registerAdditionalDependency(): %s".formatted(invalid.size(), invalid));
-    
+    public void register(AbstractConfigListEntry<?> entry, @Nullable Collection<DependsOn> dependencies, @Nullable Collection<DependsOnGroup> groupDependencies) {
         String key = entry.getFieldKey();
     
-        // Merge new & existing dependencies
-        Set<Annotation> dependenciesList = Optional.ofNullable(registry.get(key))
+        // Get the already defined sets if they exist
+        Optional<EntryRecord> record = Optional.ofNullable(registry.get(key));
+        Set<DependsOn> singles = record
                 .map(EntryRecord::dependencies)
                 .orElseGet(LinkedHashSet::new);
-        Collections.addAll(dependenciesList, dependencies);
+        Set<DependsOnGroup> groups = record
+                .map(EntryRecord::groupDependencies)
+                .orElseGet(LinkedHashSet::new);
+    
+        // Add any dependency annotations provided
+        if (dependencies != null && !dependencies.isEmpty())
+            singles.addAll(dependencies);
+        if (groupDependencies != null && !groupDependencies.isEmpty())
+            groups.addAll(groupDependencies);
         
-        registry.put(key, new EntryRecord(entry, dependenciesList));
+        registry.put(key, new EntryRecord(entry, singles, groups));
     }
     
     /**
@@ -127,11 +128,11 @@ public class DependencyManager {
      */
     public void buildDependencies() {
         registry.values().stream()
-                .filter(record -> !record.dependencies().isEmpty())
+                .filter(EntryRecord::hasDependencies)
                 .forEach(record -> {
                     // Combine the dependencies,
                     // then add the result to the config entry
-                    Optional.ofNullable(combineDependencies(record.dependencies()))
+                    Optional.ofNullable(combineDependencies(record.dependencies(), record.groupDependencies()))
                             .ifPresent(record.gui()::setDependency);
                 });
     }
@@ -143,40 +144,21 @@ public class DependencyManager {
      * Note: a {@link List} containing only one valid dependency annotation is treated as providing only one dependency,
      * provided no other dependencies are passed in explicitly.
      *
-     * @param dependencies a {@link Collection} containing {@link ConfigEntry.Gui.DependsOn @DependsOn} and {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}
-     *                     annotations
+     * @param dependencies a {@link Collection} of {@link DependsOn @DependsOn} annotations
+     * @param groupDependencies  a {@link Collection} of {@link DependsOnGroup @DependsOnGroup} annotations
      * @return a single {@link Dependency} or {@link DependencyGroup} representing all dependencies provided,
      *                     or {@code null} if {@code dependencies} is empty
-     * @throws IllegalArgumentException if {@code dependencies} contains an Annotation that isn't either 
-     *                     {@link ConfigEntry.Gui.DependsOn @DependsOn} or {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup}.
      */
-    private @Nullable Dependency combineDependencies(Collection<Annotation> dependencies) {
-        // Check for invalid arguments
-        List<String> invalid = dependencies.stream()
-                .filter(annotation -> !(annotation instanceof ConfigEntry.Gui.DependsOn || annotation instanceof ConfigEntry.Gui.DependsOnGroup))
-                .map(Annotation::annotationType)
-                .map(Class::getSimpleName)
-                .toList();
-        if (!invalid.isEmpty())
-            throw new IllegalArgumentException(invalid.size() == 1 ?
-                    "Invalid annotation type \"%s\" passed to combineDependencies()".formatted(invalid.get(0))
-                    : "%d invalid annotations passed to combineDependencies(): %s".formatted(invalid.size(), invalid));
-        
-        // Build all single Dependencies
+    private @Nullable Dependency combineDependencies(@NotNull Collection<DependsOn> dependencies, @NotNull Collection<DependsOnGroup> groupDependencies) {
+        // Build each annotation
         List<Dependency> singles = dependencies.stream()
-                .filter(ConfigEntry.Gui.DependsOn.class::isInstance)
-                .map(ConfigEntry.Gui.DependsOn.class::cast)
                 .map(this::buildDependency)
                 .toList();
-
-        // Build all DependencyGroups
-        List<Dependency> groups = dependencies.stream()
-                .filter(ConfigEntry.Gui.DependsOnGroup.class::isInstance)
-                .map(ConfigEntry.Gui.DependsOnGroup.class::cast)
+        List<Dependency> groups = groupDependencies.stream()
                 .map(this::buildDependency)
                 .collect(Collectors.toCollection(ArrayList::new));
     
-        // If we only have one dependency, return it now
+        // Return early if we only have one dependency
         if (singles.isEmpty() && groups.isEmpty())
             return null;
         else if (groups.isEmpty() && singles.size() == 1)
@@ -186,16 +168,12 @@ public class DependencyManager {
     
         // Combine multiple dependencies if necessary,
         // add the result to the groups list
-        if (!singles.isEmpty()) {
-            Dependency dependency = singles.size() == 1 ?
-                    singles.get(0) : Dependency.all(singles);
-            // Ensure we don't introduce any duplicates
-            if (groups.stream().noneMatch(dependency::equals))
-                groups.add(dependency);
-        }
+        if (!singles.isEmpty())
+            groups.add(singles.size() == 1 ? singles.get(0) : Dependency.all(singles));
         
         // Return a group that depends on all dependencies & groups
-        return Dependency.all(groups);
+        // Filtered to remove any duplicates
+        return Dependency.all(groups.stream().distinct().toList());
     }
     
     /**
@@ -203,11 +181,11 @@ public class DependencyManager {
      * <br><br>
      * If there is an issue building any child dependency, a {@link RuntimeException} will be thrown.
      *
-     * @param annotation The {@link ConfigEntry.Gui.DependsOnGroup @DependsOnGroup} annotation defining the group
+     * @param annotation The {@link DependsOnGroup @DependsOnGroup} annotation defining the group
      * @return The built {@link DependencyGroup}
      * @throws RuntimeException when there is an issue building one of the group's dependencies
      */
-    public DependencyGroup buildDependency(ConfigEntry.Gui.DependsOnGroup annotation) {
+    public DependencyGroup buildDependency(DependsOnGroup annotation) {
         // Build each dependency as defined in DependsOn annotations
         Dependency[] dependencies = Arrays.stream(annotation.value())
                 .map(this::buildDependency)
@@ -228,11 +206,11 @@ public class DependencyManager {
      * Currently, supports {@link BooleanListEntry} and {@link EnumListEntry} dependencies.
      * If a different config entry type is used, a {@link RuntimeException} will be thrown.
      *
-     * @param annotation The {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation defining the dependency
+     * @param annotation The {@link DependsOn @DependsOn} annotation defining the dependency
      * @return The built {@link Dependency}
      * @throws RuntimeException when an unsupported dependency type is used, or the annotation is somehow invalid
      */
-    public Dependency buildDependency(ConfigEntry.Gui.DependsOn annotation) {
+    public Dependency buildDependency(DependsOn annotation) {
         String key = annotation.value();
         AbstractConfigListEntry<?> dependency = getEntry(key)
                 .orElseThrow(() -> new RuntimeException("Specified dependency not found: \"%s\"".formatted(key)));
@@ -246,13 +224,13 @@ public class DependencyManager {
     }
     
     /**
-     * Builds a {@link BooleanDependency} defined in the {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation, depending on the given {@link BooleanListEntry}.
+     * Builds a {@link BooleanDependency} defined in the {@link DependsOn @DependsOn} annotation, depending on the given {@link BooleanListEntry}.
      * 
-     * @param annotation the {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation that defines the dependency
+     * @param annotation the {@link DependsOn @DependsOn} annotation that defines the dependency
      * @param dependency the {@link BooleanListEntry} to be depended on
      * @return the generated dependency
      */
-    public static BooleanDependency buildDependency(ConfigEntry.Gui.DependsOn annotation, BooleanListEntry dependency) {
+    public static BooleanDependency buildDependency(DependsOn annotation, BooleanListEntry dependency) {
         List<BooleanCondition> conditions = Arrays.stream(annotation.conditions())
                 .map(DependencyManager::parseFlags)
                 .map(record -> {
@@ -282,13 +260,13 @@ public class DependencyManager {
     
     
     /**
-     * Builds a {@link EnumDependency} defined in the {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation, depending on the given {@link EnumListEntry}.
+     * Builds a {@link EnumDependency} defined in the {@link DependsOn @DependsOn} annotation, depending on the given {@link EnumListEntry}.
      *
-     * @param annotation the {@link ConfigEntry.Gui.DependsOn @DependsOn} annotation that defines the dependency
+     * @param annotation the {@link DependsOn @DependsOn} annotation that defines the dependency
      * @param dependency the {@link EnumListEntry} to be depended on
      * @return the generated dependency
      */
-    public static <T extends Enum<?>> EnumDependency<T> buildDependency(ConfigEntry.Gui.DependsOn annotation, EnumListEntry<T> dependency) {
+    public static <T extends Enum<?>> EnumDependency<T> buildDependency(DependsOn annotation, EnumListEntry<T> dependency) {
         // List of valid values for the depended-on SelectionListEntry
         List<T> possibleValues = dependency.getValues();
 
