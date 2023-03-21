@@ -29,8 +29,8 @@ import java.util.stream.Stream;
 public class DependencyManager {
     
     private record FlaggedCondition(EnumSet<Condition.Flag> flags, String condition) {}
-    private record DependsOnRecord(String baseI18n, DependsOn dependency) {}
-    private record DependsOnGroupRecord(String baseI18n, DependsOnGroup dependency) {}
+    private record DependsOnRecord(String baseI18n, DependsOn annotation) {}
+    private record DependsOnGroupRecord(String baseI18n, DependsOnGroup annotation) {}
     private record EntryRecord(ConfigEntry<?> gui, Set<DependsOnRecord> dependencies, Set<DependsOnGroupRecord> dependencyGroups) {
         boolean hasDependencies() {
             return !(dependencies().isEmpty() && dependencyGroups().isEmpty());
@@ -79,7 +79,7 @@ public class DependencyManager {
      * @param i18nBase an absolute i18n key, to be used as the base reference point of the relative key
      * @param i18nKey either a relative or absolute i18n key
      * @return the absolute i18n key
-     * @see DependsOn#value()
+     * @see DependsOn#value() Public API documentation
      */
     private String parseRelativeI18n(String i18nBase, String i18nKey) {
         // Count how many "steps up" are at the start of the key string,
@@ -152,38 +152,32 @@ public class DependencyManager {
      * @param entry            the config entry GUI
      * @param dependencies     a {@link Collection} of {@link DependsOn @DependsOn} annotations
      * @param dependencyGroups a {@link Collection} of {@link DependsOnGroup @DependsOnGroup} annotations
-     * @param baseI18n         
+     * @param baseI18n         an absolute i18n key, to be used as the base reference of the dependencies
      * @see #buildDependencies()
      */
     public void register(ConfigEntry<?> entry, @Nullable Collection<DependsOn> dependencies, @Nullable Collection<DependsOnGroup> dependencyGroups, @Nullable String baseI18n) {
         String key = entry.getI18nKey();
     
         // Get the already defined sets if they exist
-        Optional<EntryRecord> record = Optional.ofNullable(registry.get(key));
-        Set<DependsOnRecord> singles = record
+        Optional<EntryRecord> optional = Optional.ofNullable(registry.get(key));
+        Set<DependsOnRecord> singles = optional
                 .map(EntryRecord::dependencies)
                 .orElseGet(LinkedHashSet::new);
-        Set<DependsOnGroupRecord> groups = record
+        Set<DependsOnGroupRecord> groups = optional
                 .map(EntryRecord::dependencyGroups)
                 .orElseGet(LinkedHashSet::new);
     
-        // Filter the provided dependency annotations and map them to the appropriate records
-        Set<DependsOnRecord> newSingles = Stream.ofNullable(dependencies)
+        // Add the new dependencies to the appropriate sets
+        singles.addAll(Stream.ofNullable(dependencies)
                 .flatMap(Collection::stream)
-                .filter(single -> singles.stream().noneMatch(depRecord -> depRecord.dependency.equals(single)))
                 .map(single -> new DependsOnRecord(baseI18n, single))
-                .collect(Collectors.toUnmodifiableSet());
-        
-        Set<DependsOnGroupRecord> newGroups = Stream.ofNullable(dependencyGroups)
-                .flatMap(Collection::stream)
-                .filter(group -> groups.stream().noneMatch(depRecord -> depRecord.dependency.equals(group)))
-                .map(group -> new DependsOnGroupRecord(baseI18n, group))
-                .collect(Collectors.toUnmodifiableSet());
-        
-        // Add the new records to the sets
-        singles.addAll(newSingles);
-        groups.addAll(newGroups);
+                .collect(Collectors.toUnmodifiableSet()));
     
+        groups.addAll(Stream.ofNullable(dependencyGroups)
+                .flatMap(Collection::stream)
+                .map(group -> new DependsOnGroupRecord(baseI18n, group))
+                .collect(Collectors.toUnmodifiableSet()));
+        
         registry.put(key, new EntryRecord(entry, singles, groups));
     }
     
@@ -217,10 +211,10 @@ public class DependencyManager {
     private @Nullable Dependency combineDependencies(@NotNull Collection<DependsOnRecord> dependencies, @NotNull Collection<DependsOnGroupRecord> dependencyGroups) {
         // Build each annotation
         List<Dependency> singles = dependencies.stream()
-                .map(single -> buildDependency(single.baseI18n(), single.dependency()))
+                .map(single -> buildDependency(single.baseI18n(), single.annotation()))
                 .toList();
         List<Dependency> groups = dependencyGroups.stream()
-                .map(group -> buildDependency(group.baseI18n(), group.dependency()))
+                .map(group -> buildDependency(group.baseI18n(), group.annotation()))
                 .collect(Collectors.toCollection(ArrayList::new));
     
         // Return early if we only have one dependency
@@ -391,12 +385,19 @@ public class DependencyManager {
         return numberDependency;
     }
     
+    /**
+     * @param condition a condition string that may or may not begin with {@link Condition.Flag flags}
+     * @return a {@link FlaggedCondition record} containing the parsed {@link Condition.Flag flags}
+     *         and the remainder of the condition string
+     * @throws IllegalArgumentException if the condition string begins a flags section without ending it
+     * @see DependsOn#conditions() Public API documentation
+     */
     private static FlaggedCondition parseFlags(String condition) throws IllegalArgumentException {
         if (FLAG_PREFIX == condition.charAt(0)) {
             int flagEnd = condition.indexOf(FLAG_SUFFIX);
             if (flagEnd < 0)
-                throw new IllegalArgumentException("Condition \"%s\" starts with the flag prefix '%s', but the flag suffix '%s' was not found. Suggestion: \"%s%s%s\"?"
-                        .formatted(condition, FLAG_PREFIX, FLAG_SUFFIX, FLAG_PREFIX, FLAG_SUFFIX, condition));
+                throw new IllegalArgumentException("Condition \"%1$s\" starts with the flag prefix '%2$s', but the flag suffix '%3$s' was not found. Did you mean \"%2$s%3$s%1$s\"?"
+                        .formatted(condition, FLAG_PREFIX, FLAG_SUFFIX));
             
             String flagString = condition.substring(1, flagEnd);
             String conditionString = condition.substring(flagEnd + 1);

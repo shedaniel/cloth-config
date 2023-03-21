@@ -188,7 +188,7 @@ public class ConfigEntry {
              * <ul>
              *     <li>Absolute: <em>"{@code text.autoconfig.example.option.module.siblingObject.otherOption}"</em></li>
              *     <li>Absolute: <em>"{@code option.module.siblingObject.otherOption}"</em></li>
-             *     <li>Relative: <em>"{@code ..siblingObject.otherOption}"</em></li> (uses multiple '{@code .}' characters)
+             *     <li>Relative: <em>"{@code ..siblingObject.otherOption}"</em> (uses multiple '{@code .}' characters)</li>
              * </ul>
              */
             String value();
