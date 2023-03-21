@@ -172,7 +172,7 @@ public interface Dependency {
      * @param conditions optional additional values
      * @return the generated {@link EnumDependency}.
      */
-    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    @SafeVarargs
     static @NotNull <T extends Enum<?>> EnumDependency<T> hiddenWhenNotMet(EnumListEntry<T> entry, T condition, T... conditions) {
         EnumDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
         dependency.hiddenWhenNotMet(true);
@@ -189,7 +189,7 @@ public interface Dependency {
      * @param conditions optional additional {@code condition}s
      * @return the generated {@link EnumDependency}.
      */
-    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    @SafeVarargs
     static @NotNull <T extends Enum<?>> EnumDependency<T> hiddenWhenNotMet(EnumListEntry<T> entry, EnumCondition<T> condition, EnumCondition<T>... conditions) {
         EnumDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
         dependency.hiddenWhenNotMet(true);
@@ -206,7 +206,7 @@ public interface Dependency {
      * @param conditions optional additional values
      * @return the generated {@link EnumDependency}.
      */
-    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    @SafeVarargs
     static @NotNull <T extends Enum<?>> EnumDependency<T> disabledWhenNotMet(EnumListEntry<T> entry, T condition, T... conditions) {
         return disabledWhenNotMet(entry, new EnumCondition<>(condition))
                 .withConditions(Arrays.stream(conditions).map(EnumCondition::new).toList());
@@ -222,7 +222,7 @@ public interface Dependency {
      * @param conditions optional additional values
      * @return the generated {@link EnumDependency}.
      */
-    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    @SafeVarargs
     static @NotNull <T extends Enum<?>> EnumDependency<T> disabledWhenNotMet(EnumListEntry<T> entry, EnumCondition<T> condition, EnumCondition<T>... conditions) {
         EnumDependency<T> dependency = new EnumDependency<>(entry, condition);
         dependency.addConditions(List.of(conditions));
@@ -239,7 +239,7 @@ public interface Dependency {
      * @param conditions optional additional values
      * @return the generated {@link NumberDependency}.
      */
-    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    @SafeVarargs
     static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> hiddenWhenNotMet(NumberConfigEntry<T> entry, T condition, T... conditions) {
         return hiddenWhenNotMet(entry, new NumberCondition<>(condition))
                 .withConditions(Arrays.stream(conditions).map(NumberCondition::new).toList());
@@ -255,7 +255,7 @@ public interface Dependency {
      * @param conditions optional additional values
      * @return the generated {@link NumberDependency}.
      */
-    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    @SafeVarargs
     static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> hiddenWhenNotMet(NumberConfigEntry<T> entry, NumberCondition<T> condition, NumberCondition<T>... conditions) {
         NumberDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
         dependency.hiddenWhenNotMet(true);
@@ -272,7 +272,7 @@ public interface Dependency {
      * @param conditions optional additional values
      * @return the generated {@link NumberDependency}.
      */
-    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    @SafeVarargs
     static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> disabledWhenNotMet(NumberConfigEntry<T> entry, T condition, T... conditions) {
         return disabledWhenNotMet(entry, new NumberCondition<>(condition))
                 .withConditions(Arrays.stream(conditions).map(NumberCondition::new).toList());
@@ -288,7 +288,7 @@ public interface Dependency {
      * @param conditions optional additional values
      * @return the generated {@link NumberDependency}.
      */
-    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    @SafeVarargs
     static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> disabledWhenNotMet(NumberConfigEntry<T> entry, NumberCondition<T> condition, NumberCondition<T>... conditions) {
         NumberDependency<T> dependency = new NumberDependency<>(entry);
         dependency.addCondition(condition);

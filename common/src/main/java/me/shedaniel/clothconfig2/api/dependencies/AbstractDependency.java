@@ -68,7 +68,7 @@ public abstract class AbstractDependency<C, E, SELF extends AbstractDependency<C
      *
      * @param conditions the conditions to be added
      */
-    @SafeVarargs //FIXME is this actually safe from heap pollution? T... aka Object[] seems okay-ish?
+    @SafeVarargs
     public final void addCondition(C... conditions) {
         addConditions(Arrays.asList(conditions));
     }
