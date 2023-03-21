@@ -1,6 +1,5 @@
 package me.shedaniel.clothconfig2.api.dependencies;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 
 import java.util.ArrayList;
@@ -8,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Represents a dependency on a {@link AbstractConfigEntry}
+ * Represents an abstract dependency.
  * 
  * @param <C> The type used for the condition
  * @param <E> the depended on type
@@ -24,7 +23,7 @@ public abstract class AbstractDependency<C, E, SELF extends AbstractDependency<C
     protected AbstractDependency(E entry) {this.entry = entry;}
     
     /**
-     * @return the Config Entry that is depended on
+     * @return the element that is depended on
      */
     public final E getEntry() {
         return entry;

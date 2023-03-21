@@ -2,6 +2,8 @@ package me.shedaniel.clothconfig2.api.dependencies;
 
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
+import me.shedaniel.clothconfig2.api.entries.NumberConfigEntry;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import net.minecraft.network.chat.Component;
@@ -223,6 +225,73 @@ public interface Dependency {
     @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
     static @NotNull <T extends Enum<?>> EnumDependency<T> disabledWhenNotMet(EnumListEntry<T> entry, EnumCondition<T> condition, EnumCondition<T>... conditions) {
         EnumDependency<T> dependency = new EnumDependency<>(entry, condition);
+        dependency.addConditions(List.of(conditions));
+        return dependency;
+    }
+    
+    /**
+     * Generates a {@link NumberDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * <br>
+     * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
+     *
+     * @param entry the numeric config entry that is depended on.
+     * @param condition the expected value for {@code entry}
+     * @param conditions optional additional values
+     * @return the generated {@link NumberDependency}.
+     */
+    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> hiddenWhenNotMet(NumberConfigEntry<T> entry, T condition, T... conditions) {
+        return hiddenWhenNotMet(entry, new NumberCondition<>(condition))
+                .withConditions(Arrays.stream(conditions).map(NumberCondition::new).toList());
+    }
+    
+    /**
+     * Generates a {@link NumberDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * <br>
+     * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
+     *
+     * @param entry the numeric config entry that is depended on.
+     * @param condition the expected value for {@code entry}
+     * @param conditions optional additional values
+     * @return the generated {@link NumberDependency}.
+     */
+    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> hiddenWhenNotMet(NumberConfigEntry<T> entry, NumberCondition<T> condition, NumberCondition<T>... conditions) {
+        NumberDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
+        dependency.hiddenWhenNotMet(true);
+        return dependency;
+    }
+    
+    /**
+     * Generates a {@link NumberDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * <br>
+     * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
+     *
+     * @param entry the numeric config entry that is depended on.
+     * @param condition the expected value for {@code entry}
+     * @param conditions optional additional values
+     * @return the generated {@link NumberDependency}.
+     */
+    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> disabledWhenNotMet(NumberConfigEntry<T> entry, T condition, T... conditions) {
+        return disabledWhenNotMet(entry, new NumberCondition<>(condition))
+                .withConditions(Arrays.stream(conditions).map(NumberCondition::new).toList());
+    }
+    
+    /**
+     * Generates a {@link NumberDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
+     * <br>
+     * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
+     *
+     * @param entry the numeric config entry that is depended on.
+     * @param condition the expected value for {@code entry}
+     * @param conditions optional additional values
+     * @return the generated {@link NumberDependency}.
+     */
+    @SafeVarargs //FIXME is generic varargs (T...) _actually_ safe or are we lying?
+    static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> disabledWhenNotMet(NumberConfigEntry<T> entry, NumberCondition<T> condition, NumberCondition<T>... conditions) {
+        NumberDependency<T> dependency = new NumberDependency<>(entry);
+        dependency.addCondition(condition);
         dependency.addConditions(List.of(conditions));
         return dependency;
     }

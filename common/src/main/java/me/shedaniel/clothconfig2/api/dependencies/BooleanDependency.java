@@ -24,6 +24,6 @@ public class BooleanDependency extends ComplexDependency<Boolean, BooleanConditi
                 .map(Condition::getText)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("BooleanDependency requires exactly one condition"));
-        return Component.translatable("text.cloth-config.boolean_dependency.short_description", getEntry().getFieldName(), condition);
+        return Component.translatable("text.cloth-config.short_description.single", getEntry().getFieldName(), condition);
     }
 }

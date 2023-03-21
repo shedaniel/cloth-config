@@ -140,7 +140,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
     }
     
     @Override
-    public String getFieldKey() {
+    public String getI18nKey() {
         return this.text.getContents() instanceof TranslatableContents translatable ?
                 translatable.getKey() : this.text.getString();
     }

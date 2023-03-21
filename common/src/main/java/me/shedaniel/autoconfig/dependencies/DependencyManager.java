@@ -2,14 +2,13 @@ package me.shedaniel.autoconfig.dependencies;
 
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOn;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOnGroup;
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
-import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
-import me.shedaniel.clothconfig2.api.dependencies.Dependency;
-import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
-import me.shedaniel.clothconfig2.api.dependencies.EnumDependency;
+import me.shedaniel.clothconfig2.api.dependencies.*;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
+import me.shedaniel.clothconfig2.api.entries.ConfigEntry;
+import me.shedaniel.clothconfig2.api.entries.NumberConfigEntry;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 public class DependencyManager {
     
     private record FlaggedCondition(EnumSet<Condition.Flag> flags, String condition) {}
-    private record EntryRecord(AbstractConfigListEntry<?> gui, Set<DependsOn> dependencies, Set<DependsOnGroup> groupDependencies) {
+    private record EntryRecord(ConfigEntry<?> gui, Set<DependsOn> dependencies, Set<DependsOnGroup> groupDependencies) {
         boolean hasDependencies() {
             return !(dependencies().isEmpty() && groupDependencies().isEmpty());
         }
@@ -62,7 +61,7 @@ public class DependencyManager {
      * @param i18n the i18n key 
      * @return An {@link Optional} containing config entry or {@code Optional.empty()}
      */
-    public Optional<AbstractConfigListEntry<?>> getEntry(String i18n) {
+    public Optional<ConfigEntry<?>> getEntry(String i18n) {
         String key = prefix != null && i18n.startsWith(prefix) ?
                 i18n : "%s.%s".formatted(prefix, i18n);
         return Optional.ofNullable(registry.get(key)).map(EntryRecord::gui);
@@ -75,7 +74,7 @@ public class DependencyManager {
      * @param field a {@link Field} with dependency annotations present
      * @see #buildDependencies()
      */
-    public void register(AbstractConfigListEntry<?> entry, @Nullable Field field) {
+    public void register(ConfigEntry<?> entry, @Nullable Field field) {
         Collection<DependsOn> singles = null;
         Collection<DependsOnGroup> groups = null;
         
@@ -100,8 +99,8 @@ public class DependencyManager {
      * @param groupDependencies a {@link Collection} of {@link DependsOnGroup @DependsOnGroup} annotations
      * @see #buildDependencies()
      */
-    public void register(AbstractConfigListEntry<?> entry, @Nullable Collection<DependsOn> dependencies, @Nullable Collection<DependsOnGroup> groupDependencies) {
-        String key = entry.getFieldKey();
+    public void register(ConfigEntry<?> entry, @Nullable Collection<DependsOn> dependencies, @Nullable Collection<DependsOnGroup> groupDependencies) {
+        String key = entry.getI18nKey();
     
         // Get the already defined sets if they exist
         Optional<EntryRecord> record = Optional.ofNullable(registry.get(key));
@@ -212,13 +211,15 @@ public class DependencyManager {
      */
     public Dependency buildDependency(DependsOn annotation) {
         String key = annotation.value();
-        AbstractConfigListEntry<?> dependency = getEntry(key)
+        ConfigEntry<?> dependency = getEntry(key)
                 .orElseThrow(() -> new RuntimeException("Specified dependency not found: \"%s\"".formatted(key)));
     
         if (dependency instanceof BooleanListEntry booleanListEntry)
             return buildDependency(annotation, booleanListEntry);
         else if (dependency instanceof EnumListEntry<?> selectionListEntry)
             return buildDependency(annotation, selectionListEntry);
+        else if (dependency instanceof NumberConfigEntry<?> numberConfigEntry)
+            return buildDependency(annotation, numberConfigEntry);
         else
             throw new RuntimeException("Unsupported dependency type: %s".formatted(dependency.getClass().getSimpleName()));
     }
@@ -296,6 +297,30 @@ public class DependencyManager {
         enumDependency.hiddenWhenNotMet(annotation.hiddenWhenNotMet());
     
         return enumDependency;
+    }
+    
+    public static <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependsOn annotation, NumberConfigEntry<T> dependency) {
+        Class<T> type = dependency.getType();
+        
+        List<NumberCondition<T>> conditions = Arrays.stream(annotation.conditions())
+                .map(DependencyManager::parseFlags)
+                .map(record -> {
+                    String string = record.condition().strip().toLowerCase();
+                    NumberCondition<T> condition = NumberCondition.fromString(type, string);
+                    condition.setFlags(record.flags());
+                    return condition;
+                })
+                .toList();
+    
+        if (conditions.isEmpty())
+            throw new IllegalStateException("Number dependencies require at least one condition.");
+    
+        NumberDependency<T> numberDependency = Dependency.disabledWhenNotMet(dependency, conditions.get(0));
+        if (conditions.size() > 1)
+            numberDependency.addConditions(conditions.subList(1, conditions.size()));
+        numberDependency.hiddenWhenNotMet(annotation.hiddenWhenNotMet());
+        
+        return numberDependency;
     }
     
     private static FlaggedCondition parseFlags(String condition) throws IllegalArgumentException {

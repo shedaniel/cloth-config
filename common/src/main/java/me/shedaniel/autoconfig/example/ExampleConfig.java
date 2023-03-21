@@ -116,12 +116,18 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
             
             @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
             public DependencyDemoEnum coolEnum = DependencyDemoEnum.OKAY;
+            
+            @ConfigEntry.BoundedDiscrete(min = -100, max = 100)
+            public int intSlider = 50;
     
             @ConfigEntry.Gui.DependsOn(value = "option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
             public boolean dependsOnCoolToggle1 = false;
     
             @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"}, hiddenWhenNotMet = true)
             public boolean dependsOnCoolToggle2 = false;
+            
+            @ConfigEntry.Gui.DependsOn(value = "option.moduleC.dependencySubCategory.intSlider", conditions = {"> 70", "< -70"})
+            public boolean dependsOnIntSlider = true;
     
             @ConfigEntry.Gui.TransitiveObject
             @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
@@ -133,8 +139,8 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
             }
     
             @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
-            @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
-            @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolEnum", conditions = {"good", "excellent"})
+            @ConfigEntry.Gui.DependsOn(value = "option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
+            @ConfigEntry.Gui.DependsOn(value = "option.moduleC.dependencySubCategory.coolEnum", conditions = {"good", "excellent"})
             public DependantCollapsible dependantCollapsible = new DependantCollapsible();
             public static class DependantCollapsible {
                 public boolean toggle1 = false;

@@ -25,6 +25,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
+import me.shedaniel.clothconfig2.api.entries.ConfigEntry;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import net.fabricmc.api.EnvType;
@@ -44,7 +45,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> implements ReferenceProvider<T> {
+public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> implements ConfigEntry<T>, ReferenceProvider<T> {
     private AbstractConfigScreen screen;
     private Supplier<Optional<Component>> errorSupplier;
     @Nullable
@@ -84,8 +85,6 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     
     public abstract void setRequiresRestart(boolean requiresRestart);
     
-    public abstract Component getFieldName();
-    
     public Component getDisplayedFieldName() {
         MutableComponent text = getFieldName().copy();
         boolean hasError = getConfigError().isPresent();
@@ -120,22 +119,10 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
         return dependency != null && dependency.hidden();
     }
     
-    /**
-     * Sets the entry's dependency. Whenever the dependency is unmet, the entry will be disabled.
-     * <br>
-     * Passing in a {@code null} value will remove the entry's dependency.
-     * 
-     * @param dependency the new dependency. 
-     */
     public void setDependency(@Nullable Dependency dependency) {
         this.dependency = dependency;
     }
     
-    /**
-     * Get the entry's dependency.
-     * 
-     * @return the {@link Dependency}
-     */
     public @Nullable Dependency getDependency() {
         return dependency;
     }

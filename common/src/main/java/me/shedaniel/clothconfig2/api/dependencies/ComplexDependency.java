@@ -1,7 +1,7 @@
 package me.shedaniel.clothconfig2.api.dependencies;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+import me.shedaniel.clothconfig2.api.entries.ConfigEntry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -14,13 +14,13 @@ import java.util.Optional;
 /**
  * {@inheritDoc}
  *
- * Represents a dependency on a {@link AbstractConfigEntry}
+ * Represents a dependency on a {@link ConfigEntry}
  * <br><br>
  * In this implementation, the condition {@code C} is represented using a {@link Condition} object.
  */
-public abstract class ComplexDependency<T, C extends Condition<T>, E extends AbstractConfigEntry<T>, SELF extends ComplexDependency<T, C, E, SELF>> extends AbstractDependency<C, E, SELF> {
+public abstract class ComplexDependency<T, C extends Condition<T>, E extends ConfigEntry<T>, SELF extends ComplexDependency<T, C, E, SELF>> extends AbstractDependency<C, E, SELF> {
     
-    public ComplexDependency(E entry) {
+    protected ComplexDependency(E entry) {
         super(entry);
     }
     
@@ -49,6 +49,24 @@ public abstract class ComplexDependency<T, C extends Condition<T>, E extends Abs
     
     protected Component getConditionText(C condition) {
         return condition.getText();
+    }
+    
+    @Override
+    public Component getShortDescription() {
+        int conditions = getConditions().size();
+        
+        if (conditions == 0)
+            throw new IllegalStateException("Required at least one condition");
+    
+        if (conditions == 1) {
+            Component condition = (this.getConditions().stream()
+                    .map(this::getConditionText)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Expected exactly one condition")));
+            return Component.translatable("text.cloth-config.short_description.single", getEntry().getFieldName(), condition);
+        }
+    
+        return Component.translatable("text.cloth-config.short_description.many", getEntry().getFieldName(), conditions);
     }
     
     /**

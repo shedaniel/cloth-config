@@ -1,6 +1,6 @@
 package me.shedaniel.clothconfig2.api.dependencies;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
+import me.shedaniel.clothconfig2.api.entries.ConfigEntry;
 import net.minecraft.network.chat.Component;
 
 import java.util.Optional;
@@ -8,11 +8,11 @@ import java.util.Optional;
 /**
  * {@inheritDoc}
  *
- * Represents a dependency on a {@link AbstractConfigEntry}
+ * Represents a dependency on a {@link ConfigEntry}
  * <br><br>
  * In this implementation, the condition type and {@code T} are the same.
  */
-public abstract class PlainDependency<T, E extends AbstractConfigEntry<T>> extends AbstractDependency<T, E, PlainDependency<T, E>> {
+public abstract class PlainDependency<T, E extends ConfigEntry<T>> extends AbstractDependency<T, E, PlainDependency<T, E>> {
     
     protected PlainDependency(E entry) {
         super(entry);

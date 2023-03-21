@@ -18,6 +18,10 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
     private final Operator operator;
     private final boolean integer;
     
+    public NumberCondition(T value) {
+        this(Operator.EQUALS, value);
+    }
+
     public NumberCondition(Operator operator, T value) {
         super(value);
         this.operator = operator;
@@ -135,7 +139,7 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
     /**
      * A mathematical comparison operator
      */
-    protected enum Operator {
+    public enum Operator {
         EQUALS("=="),
         NOT("!="),
         GREATER(">"),
