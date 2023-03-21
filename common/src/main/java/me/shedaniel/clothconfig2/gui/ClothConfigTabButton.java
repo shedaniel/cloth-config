@@ -78,8 +78,8 @@ public class ClothConfigTabButton extends AbstractButton {
     }
     
     @Override
-    public boolean isMouseOver(double double_1, double double_2) {
-        return this.visible && double_1 >= this.x && double_2 >= this.y && double_1 < this.x + this.width && double_2 < this.y + this.height && double_1 >= 20 && double_1 < screen.width - 20;
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return this.visible && mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height && mouseX >= 20 && mouseX < screen.width - 20;
     }
     
     public Optional<FormattedText[]> getTooltip() {

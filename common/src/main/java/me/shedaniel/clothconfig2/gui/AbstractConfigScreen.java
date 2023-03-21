@@ -211,47 +211,47 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     }
     
     @Override
-    public boolean mouseReleased(double double_1, double double_2, int int_1) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (this.focusedBinding != null && this.startedKeyCode != null && !this.startedKeyCode.isUnknown() && focusedBinding.isAllowMouse()) {
             focusedBinding.setValue(startedKeyCode);
             setFocusedBinding(null);
             return true;
         }
-        return super.mouseReleased(double_1, double_2, int_1);
+        return super.mouseReleased(mouseX, mouseY, button);
     }
     
     @Override
-    public boolean keyReleased(int int_1, int int_2, int int_3) {
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         if (this.focusedBinding != null && this.startedKeyCode != null && focusedBinding.isAllowKey()) {
             focusedBinding.setValue(startedKeyCode);
             setFocusedBinding(null);
             return true;
         }
-        return super.keyReleased(int_1, int_2, int_3);
+        return super.keyReleased(keyCode, scanCode, modifiers);
     }
     
     @Override
-    public boolean mouseClicked(double double_1, double double_2, int int_1) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.focusedBinding != null && this.startedKeyCode != null && focusedBinding.isAllowMouse()) {
             if (startedKeyCode.isUnknown())
-                startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(int_1));
+                startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(button));
             else if (focusedBinding.isAllowModifiers()) {
                 if (startedKeyCode.getType() == InputConstants.Type.KEYSYM) {
                     int code = startedKeyCode.getKeyCode().getValue();
                     if (Minecraft.ON_OSX ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
-                        startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(int_1));
+                        startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(button));
                         return true;
                     } else if (code == 344 || code == 340) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
-                        startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(int_1));
+                        startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(button));
                         return true;
                     } else if (code == 342 || code == 346) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
-                        startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(int_1));
+                        startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(button));
                         return true;
                     }
                 }
@@ -260,45 +260,45 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         } else {
             if (this.focusedBinding != null)
                 return true;
-            return super.mouseClicked(double_1, double_2, int_1);
+            return super.mouseClicked(mouseX, mouseY, button);
         }
     }
     
     @Override
-    public boolean keyPressed(int int_1, int int_2, int int_3) {
-        if (this.focusedBinding != null && (focusedBinding.isAllowKey() || int_1 == 256)) {
-            if (int_1 != 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (this.focusedBinding != null && (focusedBinding.isAllowKey() || keyCode == 256)) {
+            if (keyCode != 256) {
                 if (startedKeyCode.isUnknown())
-                    startedKeyCode.setKeyCode(InputConstants.getKey(int_1, int_2));
+                    startedKeyCode.setKeyCode(InputConstants.getKey(keyCode, scanCode));
                 else if (focusedBinding.isAllowModifiers()) {
                     if (startedKeyCode.getType() == InputConstants.Type.KEYSYM) {
                         int code = startedKeyCode.getKeyCode().getValue();
                         if (Minecraft.ON_OSX ? (code == 343 || code == 347) : (code == 341 || code == 345)) {
                             Modifier modifier = startedKeyCode.getModifier();
                             startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
-                            startedKeyCode.setKeyCode(InputConstants.getKey(int_1, int_2));
+                            startedKeyCode.setKeyCode(InputConstants.getKey(keyCode, scanCode));
                             return true;
                         } else if (code == 344 || code == 340) {
                             Modifier modifier = startedKeyCode.getModifier();
                             startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
-                            startedKeyCode.setKeyCode(InputConstants.getKey(int_1, int_2));
+                            startedKeyCode.setKeyCode(InputConstants.getKey(keyCode, scanCode));
                             return true;
                         } else if (code == 342 || code == 346) {
                             Modifier modifier = startedKeyCode.getModifier();
                             startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
-                            startedKeyCode.setKeyCode(InputConstants.getKey(int_1, int_2));
+                            startedKeyCode.setKeyCode(InputConstants.getKey(keyCode, scanCode));
                             return true;
                         }
                     }
-                    if (Minecraft.ON_OSX ? (int_1 == 343 || int_1 == 347) : (int_1 == 341 || int_1 == 345)) {
+                    if (Minecraft.ON_OSX ? (keyCode == 343 || keyCode == 347) : (keyCode == 341 || keyCode == 345)) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), true, modifier.hasShift()));
                         return true;
-                    } else if (int_1 == 344 || int_1 == 340) {
+                    } else if (keyCode == 344 || keyCode == 340) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(modifier.hasAlt(), modifier.hasControl(), true));
                         return true;
-                    } else if (int_1 == 342 || int_1 == 346) {
+                    } else if (keyCode == 342 || keyCode == 346) {
                         Modifier modifier = startedKeyCode.getModifier();
                         startedKeyCode.setModifier(Modifier.of(true, modifier.hasControl(), modifier.hasShift()));
                         return true;
@@ -310,12 +310,12 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
             }
             return true;
         }
-        if (this.focusedBinding != null && int_1 != 256)
+        if (this.focusedBinding != null && keyCode != 256)
             return true;
-        if (int_1 == 256 && this.shouldCloseOnEsc()) {
+        if (keyCode == 256 && this.shouldCloseOnEsc()) {
             return quit();
         }
-        return super.keyPressed(int_1, int_2, int_3);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
     
     protected final boolean quit() {

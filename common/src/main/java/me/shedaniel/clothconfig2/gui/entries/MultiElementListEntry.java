@@ -229,8 +229,8 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         private boolean isHovered;
         
         @Override
-        public boolean mouseClicked(double double_1, double double_2, int int_1) {
-            if (rectangle.contains(double_1, double_2)) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (rectangle.contains(mouseX, mouseY)) {
                 expanded = !expanded;
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return isHovered = true;

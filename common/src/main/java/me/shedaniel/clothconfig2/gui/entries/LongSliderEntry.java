@@ -174,17 +174,17 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         }
         
         @Override
-        public boolean keyPressed(int int_1, int int_2, int int_3) {
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
             if (!isEditable())
                 return false;
-            return super.keyPressed(int_1, int_2, int_3);
+            return super.keyPressed(keyCode, scanCode, modifiers);
         }
         
         @Override
-        public boolean mouseDragged(double double_1, double double_2, int int_1, double double_3, double double_4) {
+        public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
             if (!isEditable())
                 return false;
-            return super.mouseDragged(double_1, double_2, int_1, double_3, double_4);
+            return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         }
         
         public double getValue() {

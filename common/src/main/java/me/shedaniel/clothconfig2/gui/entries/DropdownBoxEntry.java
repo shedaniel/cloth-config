@@ -161,8 +161,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public boolean mouseScrolled(double double_1, double double_2, double double_3) {
-        return selectionElement.mouseScrolled(double_1, double_2, double_3);
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        return selectionElement.mouseScrolled(mouseX, mouseY, amount);
     }
     
     public static class SelectionElement<R> extends AbstractContainerEventHandler implements Widget {
@@ -199,9 +199,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean mouseScrolled(double double_1, double double_2, double double_3) {
+        public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
             if (menu.isExpanded())
-                return menu.mouseScrolled(double_1, double_2, double_3);
+                return menu.mouseScrolled(mouseX, mouseY, amount);
             return false;
         }
         
@@ -226,9 +226,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean mouseClicked(double double_1, double double_2, int int_1) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
             dontReFocus = false;
-            boolean b = super.mouseClicked(double_1, double_2, int_1);
+            boolean b = super.mouseClicked(mouseX, mouseY, button);
             if (dontReFocus) {
                 setFocused(null);
                 dontReFocus = false;
@@ -465,20 +465,20 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean mouseDragged(double double_1, double double_2, int int_1, double double_3, double double_4) {
+        public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
             if (!isExpanded())
                 return false;
-            if (int_1 == 0 && this.scrolling) {
-                if (double_2 < (double) lastRectangle.y + lastRectangle.height) {
+            if (button == 0 && this.scrolling) {
+                if (mouseY < (double) lastRectangle.y + lastRectangle.height) {
                     scrollTo(0, false);
-                } else if (double_2 > (double) lastRectangle.y + lastRectangle.height + getHeight()) {
+                } else if (mouseY > (double) lastRectangle.y + lastRectangle.height + getHeight()) {
                     scrollTo(getMaxScrollPosition(), false);
                 } else {
                     double double_5 = Math.max(1, this.getMaxScrollPosition());
                     int int_2 = getHeight();
                     int int_3 = Mth.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
                     double double_6 = Math.max(1.0D, double_5 / (double) (int_2 - int_3));
-                    this.offset(double_4 * double_6, false);
+                    this.offset(deltaY * double_6, false);
                 }
                 target = Mth.clamp(target, 0, getMaxScrollPosition());
                 return true;
@@ -487,9 +487,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean mouseScrolled(double mouseX, double mouseY, double double_3) {
+        public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
             if (isMouseOver(mouseX, mouseY)) {
-                offset(ClothConfigInitializer.getScrollStep() * -double_3, true);
+                offset(ClothConfigInitializer.getScrollStep() * -amount, true);
                 return true;
             }
             return false;
@@ -500,11 +500,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean mouseClicked(double double_1, double double_2, int int_1) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
             if (!isExpanded())
                 return false;
-            updateScrollingState(double_1, double_2, int_1);
-            return super.mouseClicked(double_1, double_2, int_1) || scrolling;
+            updateScrollingState(mouseX, mouseY, button);
+            return super.mouseClicked(mouseX, mouseY, button) || scrolling;
         }
         
         public void offset(double value, boolean animated) {
@@ -639,7 +639,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int int_1) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
             boolean b = rendering && mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
             if (b) {
                 getEntry().selectionElement.topRenderer.setValue(r);
@@ -725,12 +725,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 }
                 
                 @Override
-                public boolean keyPressed(int int_1, int int_2, int int_3) {
-                    if (int_1 == 257 || int_1 == 335) {
+                public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+                    if (keyCode == 257 || keyCode == 335) {
                         DefaultSelectionTopCellElement.this.selectFirstRecommendation();
                         return true;
                     }
-                    return isSuggestionMode() && super.keyPressed(int_1, int_2, int_3);
+                    return isSuggestionMode() && super.keyPressed(keyCode, scanCode, modifiers);
                 }
                 
                 @Override
