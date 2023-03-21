@@ -120,7 +120,7 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
             @ConfigEntry.BoundedDiscrete(min = -100, max = 100)
             public int intSlider = 50;
     
-            @ConfigEntry.Gui.DependsOn(value = "option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
+            @ConfigEntry.Gui.DependsOn(value = ".coolToggle", conditions = {"true"})
             public boolean dependsOnCoolToggle1 = false;
     
             @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"}, hiddenWhenNotMet = true)
@@ -131,16 +131,18 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     
             @ConfigEntry.Gui.TransitiveObject
             @ConfigEntry.Gui.DependsOn(value = "text.autoconfig.autoconfig1u_example.option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
+            @ConfigEntry.Gui.DependsOn(value = ".coolEnum", conditions = {"good", "excellent"})
             public DependantObject dependantObject = new DependantObject();
             public static class DependantObject {
                 @ConfigEntry.Gui.PrefixText
                 public boolean toggle1 = false;
+                @ConfigEntry.Gui.DependsOn(value = "..intSlider", conditions = {"> 70", "< -70"})
+                
                 public boolean toggle2 = true;
             }
     
             @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
             @ConfigEntry.Gui.DependsOn(value = "option.moduleC.dependencySubCategory.coolToggle", conditions = {"true"})
-            @ConfigEntry.Gui.DependsOn(value = "option.moduleC.dependencySubCategory.coolEnum", conditions = {"good", "excellent"})
             public DependantCollapsible dependantCollapsible = new DependantCollapsible();
             public static class DependantCollapsible {
                 public boolean toggle1 = false;

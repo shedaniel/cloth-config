@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * {@code DependencyManager} is used by {@link me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess GuiRegistryAccess} implementations
@@ -28,14 +29,18 @@ import java.util.stream.Collectors;
 public class DependencyManager {
     
     private record FlaggedCondition(EnumSet<Condition.Flag> flags, String condition) {}
-    private record EntryRecord(ConfigEntry<?> gui, Set<DependsOn> dependencies, Set<DependsOnGroup> groupDependencies) {
+    private record DependsOnRecord(String baseI18n, DependsOn dependency) {}
+    private record DependsOnGroupRecord(String baseI18n, DependsOnGroup dependency) {}
+    private record EntryRecord(ConfigEntry<?> gui, Set<DependsOnRecord> dependencies, Set<DependsOnGroupRecord> dependencyGroups) {
         boolean hasDependencies() {
-            return !(dependencies().isEmpty() && groupDependencies().isEmpty());
+            return !(dependencies().isEmpty() && dependencyGroups().isEmpty());
         }
     }
     
-    private static final Character FLAG_PREFIX = '{';
-    private static final Character FLAG_SUFFIX = '}';
+    private static final char STEP_UP_PREFIX = '.';
+    private static final char I18N_JOINER = '.';
+    private static final char FLAG_PREFIX = '{';
+    private static final char FLAG_SUFFIX = '}';
     
     private final Map<String, EntryRecord> registry = new LinkedHashMap<>();
     
@@ -46,6 +51,9 @@ public class DependencyManager {
     /**
      * Define a prefix which {@link #getEntry(String i18n)} will add
      * to i18n keys if they don't already start with it.
+     * <br><br>
+     * Should normally be set to the i18n key of the root {@link me.shedaniel.autoconfig.annotation.Config @Config}
+     * class.
      * 
      * @param prefix the i18n prefix 
      */
@@ -63,18 +71,61 @@ public class DependencyManager {
      */
     public Optional<ConfigEntry<?>> getEntry(String i18n) {
         String key = prefix != null && i18n.startsWith(prefix) ?
-                i18n : "%s.%s".formatted(prefix, i18n);
+                i18n : prefix + I18N_JOINER + i18n;
         return Optional.ofNullable(registry.get(key)).map(EntryRecord::gui);
+    }
+    
+    /**
+     * @param i18nBase an absolute i18n key, to be used as the base reference point of the relative key
+     * @param i18nKey either a relative or absolute i18n key
+     * @return the absolute i18n key
+     * @see DependsOn#value()
+     */
+    private String parseRelativeI18n(String i18nBase, String i18nKey) {
+        // Count how many "steps up" are at the start of the key string,
+        int steps = 0;
+        for (char c : i18nKey.toCharArray()) {
+            if (STEP_UP_PREFIX == c) steps++;
+            else break;
+        }
+    
+        // Not a relative key
+        if (steps < 1) return i18nKey;
+    
+        // Get the key without any "step" chars
+        String key = i18nKey.substring(steps);
+        String base = i18nBase;
+    
+        // Move `base` up one level for each "step" that was counted
+        // Start from 1 since the first "step" is just indicating that the key is relative
+        for (int i = 1; i < steps; i++) {
+            base = i18nParent(base);
+            if (base == null)
+                throw new IllegalArgumentException("Too many steps up (%d) relative to \"%s\"".formatted(steps, i18nBase));
+        }
+    
+        return base + I18N_JOINER + key;
+    }
+    
+    private String i18nParent(String i18n) {
+        int index = i18n.lastIndexOf(I18N_JOINER);
+        
+        // No parent to be found
+        if (index < 1)
+            return null;
+        
+        return i18n.substring(0, index);
     }
     
     /**
      * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
      *
-     * @param entry the config entry GUI
-     * @param field a {@link Field} with dependency annotations present
+     * @param entry     the config entry GUI
+     * @param field     a {@link Field} with dependency annotations present
+     * @param fieldI18n the i18n key of the field (not the GUI)
      * @see #buildDependencies()
      */
-    public void register(ConfigEntry<?> entry, @Nullable Field field) {
+    public void register(ConfigEntry<?> entry, @Nullable Field field, @Nullable String fieldI18n) {
         Collection<DependsOn> singles = null;
         Collection<DependsOnGroup> groups = null;
         
@@ -84,8 +135,12 @@ public class DependencyManager {
             if (field.isAnnotationPresent(DependsOnGroup.class))
                 groups = Collections.singleton(field.getAnnotation(DependsOnGroup.class));
         }
-
-        register(entry, singles, groups);
+        
+        String baseI18n = Optional.ofNullable(fieldI18n)
+                .map(this::i18nParent)
+                .orElse(null);
+    
+        register(entry, singles, groups, baseI18n);
     }
     
     /**
@@ -94,29 +149,41 @@ public class DependencyManager {
      * Explicitly provide one or more {@link DependsOn @DependsOn} or {@link DependsOnGroup @DependsOnGroup}
      * annotations to be later applied to this entry.
      *
-     * @param entry        the config entry GUI
-     * @param dependencies a {@link Collection} of {@link DependsOn @DependsOn} annotations
-     * @param groupDependencies a {@link Collection} of {@link DependsOnGroup @DependsOnGroup} annotations
+     * @param entry            the config entry GUI
+     * @param dependencies     a {@link Collection} of {@link DependsOn @DependsOn} annotations
+     * @param dependencyGroups a {@link Collection} of {@link DependsOnGroup @DependsOnGroup} annotations
+     * @param baseI18n         
      * @see #buildDependencies()
      */
-    public void register(ConfigEntry<?> entry, @Nullable Collection<DependsOn> dependencies, @Nullable Collection<DependsOnGroup> groupDependencies) {
+    public void register(ConfigEntry<?> entry, @Nullable Collection<DependsOn> dependencies, @Nullable Collection<DependsOnGroup> dependencyGroups, @Nullable String baseI18n) {
         String key = entry.getI18nKey();
     
         // Get the already defined sets if they exist
         Optional<EntryRecord> record = Optional.ofNullable(registry.get(key));
-        Set<DependsOn> singles = record
+        Set<DependsOnRecord> singles = record
                 .map(EntryRecord::dependencies)
                 .orElseGet(LinkedHashSet::new);
-        Set<DependsOnGroup> groups = record
-                .map(EntryRecord::groupDependencies)
+        Set<DependsOnGroupRecord> groups = record
+                .map(EntryRecord::dependencyGroups)
                 .orElseGet(LinkedHashSet::new);
     
-        // Add any dependency annotations provided
-        if (dependencies != null && !dependencies.isEmpty())
-            singles.addAll(dependencies);
-        if (groupDependencies != null && !groupDependencies.isEmpty())
-            groups.addAll(groupDependencies);
+        // Filter the provided dependency annotations and map them to the appropriate records
+        Set<DependsOnRecord> newSingles = Stream.ofNullable(dependencies)
+                .flatMap(Collection::stream)
+                .filter(single -> singles.stream().noneMatch(depRecord -> depRecord.dependency.equals(single)))
+                .map(single -> new DependsOnRecord(baseI18n, single))
+                .collect(Collectors.toUnmodifiableSet());
         
+        Set<DependsOnGroupRecord> newGroups = Stream.ofNullable(dependencyGroups)
+                .flatMap(Collection::stream)
+                .filter(group -> groups.stream().noneMatch(depRecord -> depRecord.dependency.equals(group)))
+                .map(group -> new DependsOnGroupRecord(baseI18n, group))
+                .collect(Collectors.toUnmodifiableSet());
+        
+        // Add the new records to the sets
+        singles.addAll(newSingles);
+        groups.addAll(newGroups);
+    
         registry.put(key, new EntryRecord(entry, singles, groups));
     }
     
@@ -128,12 +195,11 @@ public class DependencyManager {
     public void buildDependencies() {
         registry.values().stream()
                 .filter(EntryRecord::hasDependencies)
-                .forEach(record -> {
-                    // Combine the dependencies,
-                    // then add the result to the config entry
-                    Optional.ofNullable(combineDependencies(record.dependencies(), record.groupDependencies()))
-                            .ifPresent(record.gui()::setDependency);
-                });
+                .forEach(record ->
+                        // Combine the dependencies,
+                        // then add the result to the config entry
+                        Optional.ofNullable(combineDependencies(record.dependencies(), record.dependencyGroups()))
+                                .ifPresent(record.gui()::setDependency));
     }
     
     /**
@@ -143,18 +209,18 @@ public class DependencyManager {
      * Note: a {@link List} containing only one valid dependency annotation is treated as providing only one dependency,
      * provided no other dependencies are passed in explicitly.
      *
-     * @param dependencies a {@link Collection} of {@link DependsOn @DependsOn} annotations
-     * @param groupDependencies  a {@link Collection} of {@link DependsOnGroup @DependsOnGroup} annotations
+     * @param dependencies     a {@link Collection} of {@link DependsOn @DependsOn} annotations
+     * @param dependencyGroups a {@link Collection} of {@link DependsOnGroup @DependsOnGroup} annotations
      * @return a single {@link Dependency} or {@link DependencyGroup} representing all dependencies provided,
-     *                     or {@code null} if {@code dependencies} is empty
+     * or {@code null} if {@code dependencies} is empty
      */
-    private @Nullable Dependency combineDependencies(@NotNull Collection<DependsOn> dependencies, @NotNull Collection<DependsOnGroup> groupDependencies) {
+    private @Nullable Dependency combineDependencies(@NotNull Collection<DependsOnRecord> dependencies, @NotNull Collection<DependsOnGroupRecord> dependencyGroups) {
         // Build each annotation
         List<Dependency> singles = dependencies.stream()
-                .map(this::buildDependency)
+                .map(single -> buildDependency(single.baseI18n(), single.dependency()))
                 .toList();
-        List<Dependency> groups = groupDependencies.stream()
-                .map(this::buildDependency)
+        List<Dependency> groups = dependencyGroups.stream()
+                .map(group -> buildDependency(group.baseI18n(), group.dependency()))
                 .collect(Collectors.toCollection(ArrayList::new));
     
         // Return early if we only have one dependency
@@ -180,18 +246,19 @@ public class DependencyManager {
      * <br><br>
      * If there is an issue building any child dependency, a {@link RuntimeException} will be thrown.
      *
-     * @param annotation The {@link DependsOnGroup @DependsOnGroup} annotation defining the group
+     * @param i18nBase The base reference key, used as a starting point for relative i18n keys.
+     * @param dependencyGroup The {@link DependsOnGroup @DependsOnGroup} annotation defining the group
      * @return The built {@link DependencyGroup}
      * @throws RuntimeException when there is an issue building one of the group's dependencies
      */
-    public DependencyGroup buildDependency(DependsOnGroup annotation) {
+    public DependencyGroup buildDependency(String i18nBase, DependsOnGroup dependencyGroup) {
         // Build each dependency as defined in DependsOn annotations
-        Dependency[] dependencies = Arrays.stream(annotation.value())
-                .map(this::buildDependency)
+        Dependency[] dependencies = Arrays.stream(dependencyGroup.value())
+                .map(dependency -> buildDependency(i18nBase, dependency))
                 .toArray(Dependency[]::new);
         
         // Return the appropriate DependencyGroup variant
-        return switch (annotation.condition()) {
+        return switch (dependencyGroup.condition()) {
             case ALL  -> Dependency.all(dependencies);
             case NONE -> Dependency.none(dependencies);
             case ANY  -> Dependency.any(dependencies);
@@ -205,13 +272,14 @@ public class DependencyManager {
      * Currently, supports {@link BooleanListEntry} and {@link EnumListEntry} dependencies.
      * If a different config entry type is used, a {@link RuntimeException} will be thrown.
      *
+     * @param i18nBase The base reference key, used as a starting point for relative i18n keys.
      * @param annotation The {@link DependsOn @DependsOn} annotation defining the dependency
      * @return The built {@link Dependency}
      * @throws RuntimeException when an unsupported dependency type is used, or the annotation is somehow invalid
      */
-    public Dependency buildDependency(DependsOn annotation) {
+    public Dependency buildDependency(String i18nBase, DependsOn annotation) {
         String key = annotation.value();
-        ConfigEntry<?> dependency = getEntry(key)
+        ConfigEntry<?> dependency = getEntry(parseRelativeI18n(i18nBase, key))
                 .orElseThrow(() -> new RuntimeException("Specified dependency not found: \"%s\"".formatted(key)));
     
         if (dependency instanceof BooleanListEntry booleanListEntry)

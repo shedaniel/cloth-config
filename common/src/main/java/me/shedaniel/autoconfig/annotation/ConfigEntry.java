@@ -171,7 +171,25 @@ public class ConfigEntry {
         @Repeatable(DependsOnGroup.class)
         public @interface DependsOn {
             /**
-             * The i18n key of the field to depend on
+             * The i18n key of the field to depend on.
+             * <br><br>
+             * Can be either absolute or relative. Relative keys must start with a '{@code .}' character, multiple
+             * '{@code .}' characters can be used to reference parent keys. Absolute keys can either include or omit
+             * the part or the key referencing the root {@link Config @Config} class.
+             * <br><br>
+             * For example, the following keys are equivalent when referenced from a field with key
+             * <em>"{@code text.autoconfig.example.option.module.childObject.someOption}"</em>:
+             * <ul>
+             *     <li>Absolute: <em>"{@code text.autoconfig.example.option.module.childObject.otherOption}"</em></li>
+             *     <li>Absolute: <em>"{@code option.module.childObject.otherOption}"</em></li>
+             *     <li>Relative: <em>"{@code .otherOption}"</em></li>
+             * </ul>
+             * An option in a different object <em>"{@code siblingObject}"</em> could be referenced using any of the following:
+             * <ul>
+             *     <li>Absolute: <em>"{@code text.autoconfig.example.option.module.siblingObject.otherOption}"</em></li>
+             *     <li>Absolute: <em>"{@code option.module.siblingObject.otherOption}"</em></li>
+             *     <li>Relative: <em>"{@code ..siblingObject.otherOption}"</em></li> (uses multiple '{@code .}' characters)
+             * </ul>
              */
             String value();
     

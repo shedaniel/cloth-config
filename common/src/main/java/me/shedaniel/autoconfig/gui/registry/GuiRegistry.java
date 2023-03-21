@@ -77,7 +77,7 @@ public final class GuiRegistry extends AbstractGuiRegistry {
         
         if (guis != null) {
             DependencyManager dependencies = registry.getDependencyManager();
-            guis.forEach(gui -> dependencies.register(gui, field));
+            guis.forEach(gui -> dependencies.register(gui, field, i18n));
         }
         
         return guis;
@@ -103,7 +103,7 @@ public final class GuiRegistry extends AbstractGuiRegistry {
     
         if (guis != null) {
             DependencyManager dependencies = registry.getDependencyManager();
-            guis.forEach(gui -> dependencies.register(gui, field));
+            guis.forEach(gui -> dependencies.register(gui, field, i18n));
         }
         
         return guis;
