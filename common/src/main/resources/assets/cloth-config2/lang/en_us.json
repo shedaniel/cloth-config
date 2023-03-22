@@ -55,6 +55,7 @@
     "text.cloth-config.dependencies.conditions.approx": "≈ %s",
     "text.cloth-config.dependencies.conditions.enabled": "enabled",
     "text.cloth-config.dependencies.conditions.disabled": "disabled",
+    "text.cloth-config.dependencies.conditions.set_to": "set to %s",
     "text.cloth-config.quoted": "\"%s\"",
     "modifier.cloth-config.alt": "Alt + %s",
     "modifier.cloth-config.ctrl": "Ctrl + %s",
