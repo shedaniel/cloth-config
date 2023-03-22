@@ -315,12 +315,11 @@ public class DependencyManager {
             throw new IllegalStateException("Boolean dependencies require exactly one condition, found " + conditions.size());
         
         // Finally, build the dependency and return it
-        BooleanDependency booleanDependency = Dependency.disabledWhenNotMet(dependency, conditions.get(0));
-        booleanDependency.hiddenWhenNotMet(annotation.hiddenWhenNotMet());
-        
-        return booleanDependency;
+        return Dependency.builder(dependency)
+                .hideWhenNotMet(annotation.hiddenWhenNotMet())
+                .withConditions(conditions)
+                .build();
     }
-    
     
     /**
      * Builds a {@link EnumDependency} defined in the {@link DependsOn @DependsOn} annotation, depending on the given {@link EnumListEntry}.
@@ -330,7 +329,7 @@ public class DependencyManager {
      * @return the generated dependency
      */
     public static <T extends Enum<?>> EnumDependency<T> buildDependency(DependsOn annotation, EnumListEntry<T> dependency) {
-        // List of valid values for the depended-on SelectionListEntry
+        // List of valid values for the depended-on EnumListEntry
         List<T> possibleValues = dependency.getValues();
 
         // Convert each condition to the appropriate type, by
@@ -342,25 +341,26 @@ public class DependencyManager {
                     EnumCondition<T> condition = new EnumCondition<>(possibleValues.stream()
                             .filter(val -> val.toString().equalsIgnoreCase(string))
                             .findAny()
-                            .orElseThrow(() -> new IllegalStateException("Invalid SelectionDependency condition was defined: \"%s\"\nValid options: %s".formatted(record.condition(), possibleValues))));
+                            .orElseThrow(() -> new IllegalStateException("Invalid EnumCondition was defined: \"%s\"\nValid options: %s".formatted(record.condition(), possibleValues))));
                     condition.setFlags(record.flags());
                     return condition;
                 })
                 .toList();
     
-        // Check enough conditions were parsed
-        if (conditions.isEmpty())
-            throw new IllegalStateException("SelectionList dependency requires at least one condition");
-    
         // Finally, build the dependency and return it
-        EnumDependency<T> enumDependency = Dependency.disabledWhenNotMet(dependency, conditions.get(0));
-        if (conditions.size() > 1)
-            enumDependency.addConditions(conditions.subList(1, conditions.size()));
-        enumDependency.hiddenWhenNotMet(annotation.hiddenWhenNotMet());
-    
-        return enumDependency;
+        return Dependency.builder(dependency)
+                .hideWhenNotMet(annotation.hiddenWhenNotMet())
+                .withConditions(conditions)
+                .build();
     }
     
+    /**
+     * Builds a {@link NumberDependency} defined in the {@link DependsOn @DependsOn} annotation, depending on the given {@link NumberConfigEntry}.
+     *
+     * @param annotation the {@link DependsOn @DependsOn} annotation that defines the dependency
+     * @param dependency the {@link NumberConfigEntry} to be depended on
+     * @return the generated dependency
+     */
     public static <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependsOn annotation, NumberConfigEntry<T> dependency) {
         Class<T> type = dependency.getType();
         
@@ -374,15 +374,11 @@ public class DependencyManager {
                 })
                 .toList();
     
-        if (conditions.isEmpty())
-            throw new IllegalStateException("Number dependencies require at least one condition.");
-    
-        NumberDependency<T> numberDependency = Dependency.disabledWhenNotMet(dependency, conditions.get(0));
-        if (conditions.size() > 1)
-            numberDependency.addConditions(conditions.subList(1, conditions.size()));
-        numberDependency.hiddenWhenNotMet(annotation.hiddenWhenNotMet());
-        
-        return numberDependency;
+        // Finally, build the dependency and return it
+        return Dependency.builder(dependency)
+                .hideWhenNotMet(annotation.hiddenWhenNotMet())
+                .withConditions(conditions)
+                .build();
     }
     
     /**

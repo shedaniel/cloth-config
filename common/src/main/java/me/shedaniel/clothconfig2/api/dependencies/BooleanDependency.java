@@ -4,14 +4,16 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.ApiStatus;
 
 public class BooleanDependency extends ComplexDependency<Boolean, BooleanCondition, BooleanListEntry, BooleanDependency> {
     
     private boolean useActualText;
     
-    BooleanDependency(BooleanListEntry entry, BooleanCondition condition) {
+    @ApiStatus.Internal
+    @Deprecated
+    public BooleanDependency(BooleanListEntry entry) {
         super(entry);
-        setCondition(condition);
     }
     
     @Override

@@ -1,22 +1,41 @@
 package me.shedaniel.clothconfig2.api.dependencies;
 
-import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
+import me.shedaniel.clothconfig2.api.dependencies.builders.BooleanDependencyBuilder;
+import me.shedaniel.clothconfig2.api.dependencies.builders.DependencyGroupBuilder;
+import me.shedaniel.clothconfig2.api.dependencies.builders.EnumDependencyBuilder;
+import me.shedaniel.clothconfig2.api.dependencies.builders.NumberDependencyBuilder;
 import me.shedaniel.clothconfig2.api.entries.NumberConfigEntry;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 import static me.shedaniel.clothconfig2.api.dependencies.DependencyGroup.Condition.*;
 
 public interface Dependency {
+    
+    static DependencyGroupBuilder groupBuilder() {
+        return new DependencyGroupBuilder();
+    }
+    
+    static BooleanDependencyBuilder builder(BooleanListEntry gui) {
+        return new BooleanDependencyBuilder(gui);
+    }
+    
+    static <T extends Enum<?>> EnumDependencyBuilder<T> builder(EnumListEntry<T> gui) {
+        return new EnumDependencyBuilder<>(gui);
+    }
+    
+    static <T extends Number & Comparable<T>> NumberDependencyBuilder<T> builder(NumberConfigEntry<T> gui) {
+        return new NumberDependencyBuilder<>(gui);
+    }
+    
+    static DependencyGroupBuilder groupBuilder(DependencyGroup.Condition condition) {
+        return groupBuilder().withCondition(condition);
+    }
     
     /**
      * Generates a {@link DependencyGroup} that depends on all of its dependencies being met.
@@ -26,7 +45,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup all(Dependency... dependencies) {
-        return new DependencyGroup(ALL, dependencies);
+        return groupBuilder(ALL).withChildren(dependencies).build();
     }
     /**
      * Generates a {@link DependencyGroup} that depends on all of its dependencies being met.
@@ -36,7 +55,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup all(Collection<Dependency> dependencies) {
-        return all(dependencies.toArray(Dependency[]::new));
+        return groupBuilder(ALL).withChildren(dependencies).build();
     }
     
     /**
@@ -48,7 +67,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup none(Dependency... dependencies) {
-        return new DependencyGroup(NONE, dependencies);
+        return groupBuilder(NONE).withChildren(dependencies).build();
     }
     /**
      * Generates a {@link DependencyGroup} that depends on none of its dependencies being met.
@@ -59,7 +78,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup none(Collection<Dependency> dependencies) {
-        return none(dependencies.toArray(Dependency[]::new));
+        return groupBuilder(NONE).withChildren(dependencies).build();
     }
     
     /**
@@ -71,7 +90,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup any(Dependency... dependencies) {
-        return new DependencyGroup(ANY, dependencies);
+        return groupBuilder(ANY).withChildren(dependencies).build();
     }
     /**
      * Generates a {@link DependencyGroup} that depends on any of its dependencies being met.
@@ -82,7 +101,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup any(Collection<Dependency> dependencies) {
-        return any(dependencies.toArray(Dependency[]::new));
+        return groupBuilder(ANY).withChildren(dependencies).build();
     }
     
     /**
@@ -95,7 +114,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup one(Dependency... dependencies) {
-        return new DependencyGroup(ONE, dependencies);
+        return groupBuilder(ONE).withChildren(dependencies).build();
     }
     /**
      * Generates a {@link DependencyGroup} that depends on exactly one of its dependencies being met.
@@ -107,193 +126,7 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup one(Collection<Dependency> dependencies) {
-        return one(dependencies.toArray(Dependency[]::new));
-    }
-    
-    /**
-     * Generates a {@link BooleanDependency}, dependent on {@code entry}'s value being {@code true}.
-     * <br>
-     * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
-     * 
-     * @param entry the {@link BooleanListEntry} that is depended on.
-     * @return the generated {@link BooleanDependency}.
-     */
-    static @NotNull BooleanDependency hiddenWhenNotMet(BooleanListEntry entry) {
-        return hiddenWhenNotMet(entry, new BooleanCondition(true));
-    }
-    
-    /**
-     * Generates a {@link BooleanDependency}, dependent on {@code entry}'s value matching {@code condition}.
-     * <br>
-     * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
-     *
-     * @param entry the {@link BooleanListEntry} that is depended on.
-     * @param condition a {@link BooleanCondition} to check against {@code entry}
-     * @return the generated {@link BooleanDependency}.
-     */
-    static @NotNull BooleanDependency hiddenWhenNotMet(BooleanListEntry entry, BooleanCondition condition) {
-        BooleanDependency dependency = new BooleanDependency(entry, condition);
-        dependency.hiddenWhenNotMet(true);
-        return dependency;
-    }
-    
-    /**
-     * Generates a {@link BooleanDependency}, dependent on {@code entry}'s value being {@code true}.
-     * <br>
-     * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
-     *
-     * @param entry the {@link BooleanListEntry} that is depended on.
-     * @return the generated {@link BooleanDependency}.
-     */
-    static @NotNull BooleanDependency disabledWhenNotMet(BooleanListEntry entry) {
-        return disabledWhenNotMet(entry, new BooleanCondition(true));
-    }
-    
-    /**
-     * Generates a {@link BooleanDependency}, dependent on {@code entry}'s value matching {@code condition}.
-     * <br>
-     * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
-     *
-     * @param entry the {@link BooleanListEntry} that is depended on.
-     * @param condition a {@link BooleanCondition} to check against {@code entry}
-     * @return the generated {@link BooleanDependency}.
-     */
-    static @NotNull BooleanDependency disabledWhenNotMet(BooleanListEntry entry, BooleanCondition condition) {
-        return new BooleanDependency(entry, condition);
-    }
-    
-    /**
-     * Generates a {@link EnumDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
-     * <br>
-     * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
-     *
-     * @param entry the {@link EnumListEntry} that is depended on.
-     * @param condition the expected value for {@code entry}
-     * @param conditions optional additional values
-     * @return the generated {@link EnumDependency}.
-     */
-    @SafeVarargs
-    static @NotNull <T extends Enum<?>> EnumDependency<T> hiddenWhenNotMet(EnumListEntry<T> entry, T condition, T... conditions) {
-        EnumDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
-        dependency.hiddenWhenNotMet(true);
-        return dependency;
-    }
-    
-    /**
-     * Generates a {@link EnumDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
-     * <br>
-     * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
-     *
-     * @param entry the {@link EnumListEntry} that is depended on.
-     * @param condition a {@link EnumCondition} to check against {@code entry}
-     * @param conditions optional additional {@code condition}s
-     * @return the generated {@link EnumDependency}.
-     */
-    @SafeVarargs
-    static @NotNull <T extends Enum<?>> EnumDependency<T> hiddenWhenNotMet(EnumListEntry<T> entry, EnumCondition<T> condition, EnumCondition<T>... conditions) {
-        EnumDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
-        dependency.hiddenWhenNotMet(true);
-        return dependency;
-    }
-    
-    /**
-     * Generates a {@link EnumDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
-     * <br>
-     * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
-     *
-     * @param entry the {@link EnumListEntry} that is depended on.
-     * @param condition the expected value for {@code entry}
-     * @param conditions optional additional values
-     * @return the generated {@link EnumDependency}.
-     */
-    @SafeVarargs
-    static @NotNull <T extends Enum<?>> EnumDependency<T> disabledWhenNotMet(EnumListEntry<T> entry, T condition, T... conditions) {
-        return disabledWhenNotMet(entry, new EnumCondition<>(condition))
-                .withConditions(Arrays.stream(conditions).map(EnumCondition::new).toList());
-    }
-    
-    /**
-     * Generates a {@link EnumDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
-     * <br>
-     * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
-     *
-     * @param entry the {@link EnumListEntry} that is depended on.
-     * @param condition the expected value for {@code entry}
-     * @param conditions optional additional values
-     * @return the generated {@link EnumDependency}.
-     */
-    @SafeVarargs
-    static @NotNull <T extends Enum<?>> EnumDependency<T> disabledWhenNotMet(EnumListEntry<T> entry, EnumCondition<T> condition, EnumCondition<T>... conditions) {
-        EnumDependency<T> dependency = new EnumDependency<>(entry, condition);
-        dependency.addConditions(List.of(conditions));
-        return dependency;
-    }
-    
-    /**
-     * Generates a {@link NumberDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
-     * <br>
-     * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
-     *
-     * @param entry the numeric config entry that is depended on.
-     * @param condition the expected value for {@code entry}
-     * @param conditions optional additional values
-     * @return the generated {@link NumberDependency}.
-     */
-    @SafeVarargs
-    static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> hiddenWhenNotMet(NumberConfigEntry<T> entry, T condition, T... conditions) {
-        return hiddenWhenNotMet(entry, new NumberCondition<>(condition))
-                .withConditions(Arrays.stream(conditions).map(NumberCondition::new).toList());
-    }
-    
-    /**
-     * Generates a {@link NumberDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
-     * <br>
-     * Any entry with this dependency will be <strong>hidden</strong> when the dependency is unmet.
-     *
-     * @param entry the numeric config entry that is depended on.
-     * @param condition the expected value for {@code entry}
-     * @param conditions optional additional values
-     * @return the generated {@link NumberDependency}.
-     */
-    @SafeVarargs
-    static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> hiddenWhenNotMet(NumberConfigEntry<T> entry, NumberCondition<T> condition, NumberCondition<T>... conditions) {
-        NumberDependency<T> dependency = disabledWhenNotMet(entry, condition, conditions);
-        dependency.hiddenWhenNotMet(true);
-        return dependency;
-    }
-    
-    /**
-     * Generates a {@link NumberDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
-     * <br>
-     * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
-     *
-     * @param entry the numeric config entry that is depended on.
-     * @param condition the expected value for {@code entry}
-     * @param conditions optional additional values
-     * @return the generated {@link NumberDependency}.
-     */
-    @SafeVarargs
-    static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> disabledWhenNotMet(NumberConfigEntry<T> entry, T condition, T... conditions) {
-        return disabledWhenNotMet(entry, new NumberCondition<>(condition))
-                .withConditions(Arrays.stream(conditions).map(NumberCondition::new).toList());
-    }
-    
-    /**
-     * Generates a {@link NumberDependency}, dependent on {@code entry}'s value matching one of the {@code conditions}.
-     * <br>
-     * Any entry with this dependency will be <strong>disabled</strong> (but still visible) when the dependency is unmet.
-     *
-     * @param entry the numeric config entry that is depended on.
-     * @param condition the expected value for {@code entry}
-     * @param conditions optional additional values
-     * @return the generated {@link NumberDependency}.
-     */
-    @SafeVarargs
-    static @NotNull <T extends Number & Comparable<T>> NumberDependency<T> disabledWhenNotMet(NumberConfigEntry<T> entry, NumberCondition<T> condition, NumberCondition<T>... conditions) {
-        NumberDependency<T> dependency = new NumberDependency<>(entry);
-        dependency.addCondition(condition);
-        dependency.addConditions(List.of(conditions));
-        return dependency;
+        return groupBuilder(ONE).withChildren(dependencies).build();
     }
     
     /**

@@ -3,22 +3,21 @@ package me.shedaniel.clothconfig2.api.dependencies;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class DependencyGroup implements Dependency {
     
     protected Boolean shouldHide = null;
     private final Condition condition;
-    private final List<Dependency> children = new ArrayList<>();
+    private final Set<Dependency> children = new LinkedHashSet<>();
     
-    DependencyGroup(Condition condition, Dependency... children) {
+    @ApiStatus.Internal
+    @Deprecated
+    public DependencyGroup(Condition condition) {
         this.condition = condition;
-        Collections.addAll(this.children, children);
     }
     
     @Override
@@ -61,6 +60,24 @@ public class DependencyGroup implements Dependency {
         this.shouldHide = shouldHide;
     }
     
+    /**
+     * Adds one or more children to the dependency.
+     *
+     * @param children a {@link Collection} of child dependencies to be added
+     */
+    public final void addChildren(Collection<Dependency> children) {
+        this.children.addAll(children);
+    }
+    
+    /**
+     * Adds one or more children to the dependency.
+     *
+     * @param children one or more child dependencies to be added
+     */
+    public final void addChildren(Dependency... children) {
+        Collections.addAll(this.children, children);
+    }
+    
     @Override
     public Component getShortDescription() {
         return Component.translatable("text.cloth-config.dependency_groups.short_description", children.size());
@@ -81,8 +98,13 @@ public class DependencyGroup implements Dependency {
         List<Component> lines = new ArrayList<>();
         switch (children.size()) {
             case 1 -> {
-                // FIXME this tooltip will be wrong when this.condition is NONE
-                return children.get(0).getTooltip();
+                Dependency child = children.stream()
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException("Impossible state"));
+                if (this.condition == Condition.NONE) {
+                    // FIXME this tooltip will be wrong when this.condition is NONE
+                }
+                return child.getTooltip();
             }
             case 2 ->
                     lines.add(Component.translatable("text.cloth-config.dependency_groups.two_dependencies", conditionText,
