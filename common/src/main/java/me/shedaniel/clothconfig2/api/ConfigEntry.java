@@ -1,4 +1,4 @@
-package me.shedaniel.clothconfig2.api.entries;
+package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import net.minecraft.network.chat.Component;

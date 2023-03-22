@@ -1,10 +1,10 @@
 package me.shedaniel.clothconfig2.api.dependencies;
 
+import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.builders.BooleanDependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.builders.DependencyGroupBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.builders.EnumDependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.builders.NumberDependencyBuilder;
-import me.shedaniel.clothconfig2.api.entries.NumberConfigEntry;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import net.minecraft.network.chat.Component;

@@ -6,7 +6,7 @@ import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 
 import java.util.Collection;
 
-public class BooleanDependencyBuilder extends AbstractDependencyBuilder<Boolean, BooleanListEntry, BooleanDependency, BooleanCondition, BooleanDependencyBuilder> {
+public class BooleanDependencyBuilder extends AbstractDependencyBuilder<Boolean, BooleanListEntry, BooleanCondition, BooleanDependency, BooleanDependencyBuilder> {
     
     public BooleanDependencyBuilder(BooleanListEntry gui) {
         super(gui);

@@ -8,22 +8,22 @@ import java.util.Collection;
  * Represents an abstract dependency.
  * 
  * @param <C> The type used for the condition
- * @param <E> the depended on type
+ * @param <E> The depended-on element type
  */
 public abstract class AbstractDependency<C, E> implements Dependency {
-    private final E entry;
+    private final E element;
     
     private final Collection<C> conditions = new ArrayList<>();
     
     private boolean shouldHide = false;
     
-    protected AbstractDependency(E entry) {this.entry = entry;}
+    protected AbstractDependency(E element) {this.element = element;}
     
     /**
      * @return the element that is depended on
      */
-    public final E getEntry() {
-        return entry;
+    public final E getElement() {
+        return element;
     }
     
     @Override
@@ -77,7 +77,7 @@ public abstract class AbstractDependency<C, E> implements Dependency {
         if (obj instanceof AbstractDependency<?,?> dependency) {
             if (this.shouldHide != dependency.shouldHide)
                 return false;
-            if (!this.entry.equals(dependency.entry))
+            if (!this.element.equals(dependency.element))
                 return false;
             if (this.conditions.size() != dependency.conditions.size())
                 return false;
@@ -90,6 +90,6 @@ public abstract class AbstractDependency<C, E> implements Dependency {
     
     @Override
     public int hashCode() {
-        return Boolean.hashCode(this.shouldHide) + 8*this.entry.hashCode() + 16*this.conditions.hashCode();
+        return Boolean.hashCode(this.shouldHide) + 8 * this.element.hashCode() + 16 * this.conditions.hashCode();
     }
 }

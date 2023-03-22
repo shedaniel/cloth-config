@@ -2,6 +2,10 @@ package me.shedaniel.clothconfig2.api.dependencies.builders;
 
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 
+/**
+ * @param <D> the {@link Dependency} type that will be built
+ * @param <SELF> the type to be returned by chainable methods
+ */
 public interface DependencyBuilder<D extends Dependency, SELF extends DependencyBuilder<D, SELF>> {
     
     /**

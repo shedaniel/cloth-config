@@ -1,7 +1,7 @@
 package me.shedaniel.clothconfig2.api.dependencies;
 
+import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-import me.shedaniel.clothconfig2.api.entries.ConfigEntry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * {@inheritDoc}
- *
  * Represents a dependency on a {@link ConfigEntry}
- * <br><br>
- * In this implementation, the condition {@code C} is represented using a {@link Condition} object.
+ *
+ * @param <T> the type this dependency deals with
+ * @param <C> the {@link Condition} type
+ * @param <E> the {@link ConfigEntry} type
  */
-public abstract class ComplexDependency<T, C extends Condition<T>, E extends ConfigEntry<T>> extends AbstractDependency<C, E> {
+public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>, C extends Condition<T>> extends AbstractDependency<C, E> {
     
-    protected ComplexDependency(E entry) {
+    protected ConfigEntryDependency(E entry) {
         super(entry);
     }
     
@@ -32,7 +32,7 @@ public abstract class ComplexDependency<T, C extends Condition<T>, E extends Con
      */
     @Override
     public boolean check() {
-        T value = getEntry().getValue();
+        T value = getElement().getValue();
         return getConditions().stream().anyMatch(condition -> condition.check(value));
     }
     
@@ -52,10 +52,10 @@ public abstract class ComplexDependency<T, C extends Condition<T>, E extends Con
                     .map(this::getConditionText)
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Expected exactly one condition")));
-            return Component.translatable("text.cloth-config.dependencies.short_description.single", getEntry().getFieldName(), condition);
+            return Component.translatable("text.cloth-config.dependencies.short_description.single", getElement().getFieldName(), condition);
         }
     
-        return Component.translatable("text.cloth-config.dependencies.short_description.many", getEntry().getFieldName(), conditions);
+        return Component.translatable("text.cloth-config.dependencies.short_description.many", getElement().getFieldName(), conditions);
     }
     
     /**
@@ -68,7 +68,7 @@ public abstract class ComplexDependency<T, C extends Condition<T>, E extends Con
             throw new IllegalStateException("Expected at least one condition to be defined");
         
         // Get the name of the depended-on entry, and style it bold.
-        Component dependencyName = MutableComponent.create(getEntry().getFieldName().getContents())
+        Component dependencyName = MutableComponent.create(getElement().getFieldName().getContents())
                 .withStyle(ChatFormatting.BOLD);
         
         // Get the text for each condition, again styled bold.

@@ -5,7 +5,7 @@ import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 
-public class BooleanDependency extends ComplexDependency<Boolean, BooleanCondition, BooleanListEntry> {
+public class BooleanDependency extends ConfigEntryDependency<Boolean, BooleanListEntry, BooleanCondition> {
     
     private boolean useActualText;
     
@@ -20,7 +20,7 @@ public class BooleanDependency extends ComplexDependency<Boolean, BooleanConditi
         if (this.useActualText)
             return Component.translatable("text.cloth-config.dependencies.conditions.set_to",
                         Component.translatable("text.cloth-config.quoted",
-                                getEntry().getYesNoText(condition.inverted() != condition.getValue())));
+                                getElement().getYesNoText(condition.inverted() != condition.getValue())));
         
         return super.getConditionText(condition);
     }
@@ -31,7 +31,7 @@ public class BooleanDependency extends ComplexDependency<Boolean, BooleanConditi
                 .map(this::getConditionText)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("BooleanDependency requires exactly one condition"));
-        return Component.translatable("text.cloth-config.dependencies.short_description.single", getEntry().getFieldName(), condition);
+        return Component.translatable("text.cloth-config.dependencies.short_description.single", getElement().getFieldName(), condition);
     }
     
     public void useActualText(boolean shouldUseActualText) {

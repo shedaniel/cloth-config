@@ -1,11 +1,11 @@
 package me.shedaniel.clothconfig2.api.dependencies.builders;
 
+import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.NumberDependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
-import me.shedaniel.clothconfig2.api.entries.NumberConfigEntry;
 import org.jetbrains.annotations.ApiStatus;
 
-public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends AbstractDependencyBuilder<T, NumberConfigEntry<T>, NumberDependency<T>, NumberCondition<T>, NumberDependencyBuilder<T>> {
+public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends AbstractDependencyBuilder<T, NumberConfigEntry<T>, NumberCondition<T>, NumberDependency<T>, NumberDependencyBuilder<T>> {
     
     @ApiStatus.Internal
     @Deprecated

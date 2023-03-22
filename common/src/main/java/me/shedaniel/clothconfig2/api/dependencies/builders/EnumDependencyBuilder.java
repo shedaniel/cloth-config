@@ -4,7 +4,7 @@ import me.shedaniel.clothconfig2.api.dependencies.EnumDependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 
-public class EnumDependencyBuilder<T extends Enum<?>> extends AbstractDependencyBuilder<T, EnumListEntry<T>, EnumDependency<T>, EnumCondition<T>, EnumDependencyBuilder<T>> {
+public class EnumDependencyBuilder<T extends Enum<?>> extends AbstractDependencyBuilder<T, EnumListEntry<T>, EnumCondition<T>, EnumDependency<T>, EnumDependencyBuilder<T>> {
     
     public EnumDependencyBuilder(EnumListEntry<T> gui) {
         super(gui);

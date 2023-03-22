@@ -19,7 +19,7 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
-import me.shedaniel.clothconfig2.api.entries.NumberConfigEntry;
+import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 

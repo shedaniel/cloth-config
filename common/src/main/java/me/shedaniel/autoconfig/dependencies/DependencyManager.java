@@ -2,13 +2,13 @@ package me.shedaniel.autoconfig.dependencies;
 
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOn;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOnGroup;
+import me.shedaniel.clothconfig2.api.ConfigEntry;
+import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.*;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
-import me.shedaniel.clothconfig2.api.entries.ConfigEntry;
-import me.shedaniel.clothconfig2.api.entries.NumberConfigEntry;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import org.jetbrains.annotations.NotNull;
