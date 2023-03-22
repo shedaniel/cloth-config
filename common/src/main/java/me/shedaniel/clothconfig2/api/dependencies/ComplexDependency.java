@@ -63,10 +63,10 @@ public abstract class ComplexDependency<T, C extends Condition<T>, E extends Con
                     .map(this::getConditionText)
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Expected exactly one condition")));
-            return Component.translatable("text.cloth-config.short_description.single", getEntry().getFieldName(), condition);
+            return Component.translatable("text.cloth-config.dependencies.short_description.single", getEntry().getFieldName(), condition);
         }
     
-        return Component.translatable("text.cloth-config.short_description.many", getEntry().getFieldName(), conditions);
+        return Component.translatable("text.cloth-config.dependencies.short_description.many", getEntry().getFieldName(), conditions);
     }
     
     /**
