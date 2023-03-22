@@ -228,11 +228,13 @@ public class DependencyManager {
         // Combine multiple dependencies if necessary,
         // add the result to the groups list
         if (!singles.isEmpty())
-            groups.add(singles.size() == 1 ? singles.get(0) : Dependency.all(singles));
+            groups.add(singles.size() == 1 ? singles.get(0) : Dependency.groupBuilder().withChildren(singles).build());
         
         // Return a group that depends on all dependencies & groups
         // Filtered to remove any duplicates
-        return Dependency.all(groups.stream().distinct().toList());
+        return Dependency.groupBuilder()
+                .withChildren(groups.stream().distinct().toList())
+                .build();
     }
     
     /**
@@ -250,14 +252,12 @@ public class DependencyManager {
         Dependency[] dependencies = Arrays.stream(dependencyGroup.value())
                 .map(dependency -> buildDependency(i18nBase, dependency))
                 .toArray(Dependency[]::new);
-        
-        // Return the appropriate DependencyGroup variant
-        return switch (dependencyGroup.condition()) {
-            case ALL  -> Dependency.all(dependencies);
-            case NONE -> Dependency.none(dependencies);
-            case ANY  -> Dependency.any(dependencies);
-            case ONE  -> Dependency.one(dependencies);
-        };
+    
+        // Build and return the DependencyGroup
+        return Dependency.groupBuilder()
+                .withCondition(dependencyGroup.condition())
+                .withChildren(dependencies)
+                .build();
     }
     
     /**

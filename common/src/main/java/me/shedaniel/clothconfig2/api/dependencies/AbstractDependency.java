@@ -1,7 +1,5 @@
 package me.shedaniel.clothconfig2.api.dependencies;
 
-import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,9 +9,8 @@ import java.util.Collection;
  * 
  * @param <C> The type used for the condition
  * @param <E> the depended on type
- * @param <SELF> the type to return from chainable methods, i.e. the lowest sub-class
  */
-public abstract class AbstractDependency<C, E, SELF extends AbstractDependency<C, E, SELF>> implements Dependency {
+public abstract class AbstractDependency<C, E> implements Dependency {
     private final E entry;
     
     private final Collection<C> conditions = new ArrayList<>();
@@ -49,18 +46,6 @@ public abstract class AbstractDependency<C, E, SELF extends AbstractDependency<C
     }
     
     /**
-     * Clears any conditions already defined and adds the condition provided
-     * <br>
-     * You can use {@code addCondition()} to add condition(s) without removing existing conditions.
-     *
-     * @param condition the new condition to be set
-     */
-    public final void setCondition(C condition) {
-        conditions.clear();
-        conditions.add(condition);
-    }
-    
-    /**
      * Adds one or more conditions to the dependency. If any condition matches the entry's value,
      * then the dependency is met.
      * <br>
@@ -85,37 +70,11 @@ public abstract class AbstractDependency<C, E, SELF extends AbstractDependency<C
         this.conditions.addAll(conditions);
     }
     
-    /**
-     * Add multiple condition to the dependency.
-     *
-     * @param conditions a {@link Collection} of {@link Condition}s to be checked against the config entry 
-     * @return this dependency instance
-     * @see #withCondition(Object)
-     */
-    @SuppressWarnings("unchecked")
-    public SELF withConditions(Collection<C> conditions) {
-        addConditions(conditions);
-        return (SELF) this;
-    }
-    
-    /**
-     * Add a condition to the dependency.
-     *
-     * @param condition the {@link Condition} to be checked against the config entry 
-     * @return this dependency instance
-     * @see #withConditions(Collection) 
-     */
-    @SuppressWarnings("unchecked")
-    public SELF withCondition(C condition) {
-        addCondition(condition);
-        return (SELF) this;
-    }
-    
     @Override
     public boolean equals(Object obj) {
         if (super.equals(obj))
             return true;
-        if (obj instanceof AbstractDependency<?,?,?> dependency) {
+        if (obj instanceof AbstractDependency<?,?> dependency) {
             if (this.shouldHide != dependency.shouldHide)
                 return false;
             if (!this.entry.equals(dependency.entry))

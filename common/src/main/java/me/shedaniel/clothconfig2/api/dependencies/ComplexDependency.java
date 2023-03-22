@@ -18,7 +18,7 @@ import java.util.Optional;
  * <br><br>
  * In this implementation, the condition {@code C} is represented using a {@link Condition} object.
  */
-public abstract class ComplexDependency<T, C extends Condition<T>, E extends ConfigEntry<T>, SELF extends ComplexDependency<T, C, E, SELF>> extends AbstractDependency<C, E, SELF> {
+public abstract class ComplexDependency<T, C extends Condition<T>, E extends ConfigEntry<T>> extends AbstractDependency<C, E> {
     
     protected ComplexDependency(E entry) {
         super(entry);
@@ -35,17 +35,6 @@ public abstract class ComplexDependency<T, C extends Condition<T>, E extends Con
         T value = getEntry().getValue();
         return getConditions().stream().anyMatch(condition -> condition.check(value));
     }
-    
-    /**
-     * Add a condition to the dependency. The condition is met if the depended-on config entry's
-     * value is equal to the condition's value.
-     * 
-     * @param value the value to be compared with the config entry 
-     * @return this dependency instance
-     * @see AbstractDependency#withCondition(Object) 
-     * @see AbstractDependency#withConditions(Collection) 
-     */
-    public abstract SELF withSimpleCondition(T value);
     
     protected Component getConditionText(C condition) {
         return condition.getText();

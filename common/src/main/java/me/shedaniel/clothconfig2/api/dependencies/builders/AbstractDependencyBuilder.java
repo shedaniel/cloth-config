@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, D extends ComplexDependency<T, C, E, D>, C extends Condition<T>, SELF extends AbstractDependencyBuilder<T, E, D, C, SELF>> implements DependencyBuilder<D, SELF> {
+public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, D extends ComplexDependency<T, C, E>, C extends Condition<T>, SELF extends AbstractDependencyBuilder<T, E, D, C, SELF>> implements DependencyBuilder<D, SELF> {
     
     protected final E gui;
     protected final Set<C> conditions = new HashSet<>();

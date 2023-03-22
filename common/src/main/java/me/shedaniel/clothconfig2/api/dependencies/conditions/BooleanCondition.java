@@ -14,7 +14,7 @@ public class BooleanCondition extends Condition<Boolean> {
     
     @Override
     public Component getText() {
-        String value = inverted() != this.value ? "enabled" : "disabled";
-        return Component.translatable("text.cloth-config.dependencies.conditions.%s".formatted(value));
+        return Component.translatable("text.cloth-config.dependencies.conditions.%s"
+                .formatted(inverted() != this.value ? "enabled" : "disabled"));
     }
 }

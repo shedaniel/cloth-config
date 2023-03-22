@@ -10,16 +10,11 @@ import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Optional;
 
 import static me.shedaniel.clothconfig2.api.dependencies.DependencyGroup.Condition.*;
 
 public interface Dependency {
-    
-    static DependencyGroupBuilder groupBuilder() {
-        return new DependencyGroupBuilder();
-    }
     
     static BooleanDependencyBuilder builder(BooleanListEntry gui) {
         return new BooleanDependencyBuilder(gui);
@@ -33,8 +28,8 @@ public interface Dependency {
         return new NumberDependencyBuilder<>(gui);
     }
     
-    static DependencyGroupBuilder groupBuilder(DependencyGroup.Condition condition) {
-        return groupBuilder().withCondition(condition);
+    static DependencyGroupBuilder groupBuilder() {
+        return new DependencyGroupBuilder();
     }
     
     /**
@@ -45,17 +40,10 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup all(Dependency... dependencies) {
-        return groupBuilder(ALL).withChildren(dependencies).build();
-    }
-    /**
-     * Generates a {@link DependencyGroup} that depends on all of its dependencies being met.
-     * <br>
-     * 
-     * @param dependencies a {@link Collection} of dependencies to be included in the group 
-     * @return the generated group
-     */
-    static @NotNull DependencyGroup all(Collection<Dependency> dependencies) {
-        return groupBuilder(ALL).withChildren(dependencies).build();
+        return groupBuilder()
+                .withCondition(ALL)
+                .withChildren(dependencies)
+                .build();
     }
     
     /**
@@ -67,18 +55,10 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup none(Dependency... dependencies) {
-        return groupBuilder(NONE).withChildren(dependencies).build();
-    }
-    /**
-     * Generates a {@link DependencyGroup} that depends on none of its dependencies being met.
-     * <br>
-     * I.e. the group is unmet if any of its dependencies are met.
-     *
-     * @param dependencies a {@link Collection} of dependencies to be included in the group 
-     * @return the generated group
-     */
-    static @NotNull DependencyGroup none(Collection<Dependency> dependencies) {
-        return groupBuilder(NONE).withChildren(dependencies).build();
+        return groupBuilder()
+                .withCondition(NONE)
+                .withChildren(dependencies)
+                .build();
     }
     
     /**
@@ -90,18 +70,10 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup any(Dependency... dependencies) {
-        return groupBuilder(ANY).withChildren(dependencies).build();
-    }
-    /**
-     * Generates a {@link DependencyGroup} that depends on any of its dependencies being met.
-     * <br>
-     * I.e. the group is met if one or more of its dependencies are met. 
-     *
-     * @param dependencies a {@link Collection} of dependencies to be included in the group 
-     * @return the generated group
-     */
-    static @NotNull DependencyGroup any(Collection<Dependency> dependencies) {
-        return groupBuilder(ANY).withChildren(dependencies).build();
+        return groupBuilder()
+                .withCondition(ANY)
+                .withChildren(dependencies)
+                .build();
     }
     
     /**
@@ -114,19 +86,10 @@ public interface Dependency {
      * @return the generated group
      */
     static @NotNull DependencyGroup one(Dependency... dependencies) {
-        return groupBuilder(ONE).withChildren(dependencies).build();
-    }
-    /**
-     * Generates a {@link DependencyGroup} that depends on exactly one of its dependencies being met.
-     * <br>
-     * I.e. the group is met if precisely one dependency is met, however the group is unmet if more than one
-     * (or less than one) are met.
-     *
-     * @param dependencies a {@link Collection} of dependencies to be included in the group 
-     * @return the generated group
-     */
-    static @NotNull DependencyGroup one(Collection<Dependency> dependencies) {
-        return groupBuilder(ONE).withChildren(dependencies).build();
+        return groupBuilder()
+                .withCondition(ONE)
+                .withChildren(dependencies)
+                .build();
     }
     
     /**

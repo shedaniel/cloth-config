@@ -13,8 +13,7 @@ public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Boolean> hidden = Optional.empty();
     
-    public DependencyGroupBuilder() {
-    }
+    public DependencyGroupBuilder() {}
     
     @Override
     public DependencyGroup build() {
