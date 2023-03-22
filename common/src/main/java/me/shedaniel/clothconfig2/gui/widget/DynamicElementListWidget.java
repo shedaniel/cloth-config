@@ -32,11 +32,11 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         super(client, width, height, top, bottom, backgroundLocation);
     }
     
-    public boolean changeFocus(boolean boolean_1) {
-        boolean boolean_2 = super.changeFocus(boolean_1);
-        if (boolean_2)
+    public boolean changeFocus(boolean moveForward) {
+        boolean hasFocus = super.changeFocus(moveForward);
+        if (hasFocus)
             this.ensureVisible(this.getFocused());
-        return boolean_2;
+        return hasFocus;
     }
     
     protected boolean isSelected(int int_1) {
