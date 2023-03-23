@@ -18,16 +18,37 @@ public abstract class Condition<T> {
         this.value = value;
     }
     
-    public abstract boolean check(T value);
+    /**
+     * Checks whether the provided value matches the condition's value, ignoring any {@link Flag flags}, such as
+     * <em>'{@code !}' inversion</em>, which should be handled in {@link #check(Object) check(T)} instead.
+     *
+     * @param value the value to check against this condition
+     * @return whether {@code value} satisfies this condition
+     */
+    protected boolean matches(T value) {
+        return getValue().equals(value);
+    }
     
-    public abstract Component getText();
+    /**
+     * Checks if the condition is met by the provided value.
+     * 
+     * @param value the value to check against this condition
+     * @return whether {@code value} satisfies this condition
+     */
+    public final boolean check(T value) {
+        return inverted() != matches(value);
+    }
+    
+    protected abstract Component getTextInternal();
+    
+    public Component getText() {
+        if (inverted())
+            return Component.translatable("text.cloth-config.dependencies.conditions.not", getTextInternal());
+        return getTextInternal();
+    }
     
     public final boolean inverted() {
         return getFlags().contains(Flag.INVERTED);
-    }
-    
-    public final boolean ignoreCase() {
-        return getFlags().contains(Flag.IGNORE_CASE);
     }
     
     public final EnumSet<Flag> getFlags() {
@@ -80,7 +101,7 @@ public abstract class Condition<T> {
     public enum Flag {
     
         /**
-         * When set, the condition check is inverted. I.e. {@link Condition#check(Object)} will return {@code true} if
+         * When set, the condition check is inverted. I.e. {@link Condition#matches(Object)} will return {@code true} if
          * the check evaluated to {@code false} and vice-versa.
          */
         INVERTED('!'),

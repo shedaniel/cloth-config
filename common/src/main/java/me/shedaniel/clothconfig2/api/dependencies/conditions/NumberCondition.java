@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.api.dependencies.conditions;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,8 +19,10 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
     private final Operator operator;
     private final boolean integer;
     
+    private int formatPrecision = -1;
+    
     public NumberCondition(T value) {
-        this(Operator.EQUALS, value);
+        this(Operator.EQUAL, value);
     }
 
     public NumberCondition(Operator operator, T value) {
@@ -82,7 +85,7 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
             operator = optional.get();
             numberPart = stripped.substring(operator.toString().length());
         } else {
-            operator = Operator.EQUALS;
+            operator = Operator.EQUAL;
             numberPart = stripped;
         }
         
@@ -104,16 +107,15 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
     }
     
     @Override
-    public boolean check(T value) {
-        boolean check = switch (this.operator) {
-            case EQUALS        -> 0 == compareTo(value);
-            case NOT           -> 0 != compareTo(value);
+    protected boolean matches(T value) {
+        return switch (this.operator) {
+            case EQUAL -> 0 == compareTo(value);
+            case NOT_EQUAL -> 0 != compareTo(value);
             case GREATER       -> 0 >  compareTo(value);
             case GREATER_EQUAL -> 0 >= compareTo(value);
             case LESS          -> 0 <  compareTo(value);
             case LESS_EQUAL    -> 0 <= compareTo(value);
         };
-        return inverted() != check;
     }
     
     @Override
@@ -122,12 +124,41 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
         return this.value.compareTo(value);
     }
     
+    public void setFormatPrecision(int places) {
+        formatPrecision = places;
+    }
+    
+    private int formatPrecision() {
+        // if -1, calculate an appropriate precision for the scale of the number
+        if (formatPrecision < 0) {
+            long l = Math.abs(getValue().longValue());
+            if (l == 0) {
+                double d = Math.abs(getValue().doubleValue());
+                if (d == 0)
+                    return 0;
+                if (d < 0.01)
+                    return 4;
+                if (d < 0.1)
+                    return 3;
+                return 2;
+            }
+            if (l > 99)
+                return 0;
+            if (l > 9)
+                return 1;
+            return 2;
+        }
+        return formatPrecision;
+    }
+    
     @Override
-    public Component getText() {
-        return Component.translatable(
+    protected Component getTextInternal() {
+        MutableComponent condition = Component.translatable(
                 "text.cloth-config.dependencies.conditions.%s".formatted(this.operator.name().toLowerCase()),
-                // FIXME rounding floats to 2 places may not be appropriate for some config-entry ranges
-                integer ? this.value.toString() : formatDouble(this.value.doubleValue(), 2));
+                integer ? this.value.toString() : formatDouble(this.value.doubleValue(), formatPrecision()));
+        if (inverted())
+            condition = Component.translatable("not", condition);
+        return condition;
     }
     
     private static String formatDouble(double value, int places) {
@@ -140,8 +171,8 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
      * A mathematical comparison operator
      */
     public enum Operator {
-        EQUALS("=="),
-        NOT("!="),
+        EQUAL("=="),
+        NOT_EQUAL("!="),
         GREATER(">"),
         GREATER_EQUAL(">="),
         LESS("<"),

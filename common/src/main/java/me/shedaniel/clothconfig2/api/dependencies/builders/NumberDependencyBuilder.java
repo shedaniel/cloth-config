@@ -23,6 +23,8 @@ public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends A
         if (conditions.isEmpty())
             throw new IllegalArgumentException("Number dependencies require at least one condition.");
         
+        // TODO set each condition's formatPrecision to something sensible for the gui's range
+        
         return finishBuilding(new NumberDependency<>(this.gui));
     }
 }
