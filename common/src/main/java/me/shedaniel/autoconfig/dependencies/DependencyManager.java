@@ -5,6 +5,7 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOnGroup;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.*;
+import me.shedaniel.clothconfig2.api.dependencies.builders.BooleanDependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
@@ -311,14 +312,19 @@ public class DependencyManager {
                 })
                 .toList();
         
-        if (conditions.size() != 1)
-            throw new IllegalStateException("Boolean dependencies require exactly one condition, found " + conditions.size());
+        // Start building the dependency
+        BooleanDependencyBuilder builder = Dependency.builder(dependency)
+                .hideWhenNotMet(annotation.hiddenWhenNotMet());
         
-        // Finally, build the dependency and return it
-        return Dependency.builder(dependency)
-                .hideWhenNotMet(annotation.hiddenWhenNotMet())
-                .withConditions(conditions)
-                .build();
+        // BooleanDependencyBuilder supports zero or one condition being set 
+        if (!conditions.isEmpty()) {
+            if (conditions.size() != 1)
+                throw new IllegalStateException("Boolean dependencies require exactly one condition, found " + conditions.size());
+            
+            builder.withCondition(conditions.get(0));
+        }
+            
+        return builder.build();
     }
     
     /**

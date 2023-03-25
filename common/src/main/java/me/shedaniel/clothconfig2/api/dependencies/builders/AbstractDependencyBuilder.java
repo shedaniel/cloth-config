@@ -5,10 +5,6 @@ import me.shedaniel.clothconfig2.api.dependencies.ConfigEntryDependency;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @param <T> the type the dependency deals with
  * @param <E> the {@link ConfigEntry} type depended-on
@@ -19,7 +15,6 @@ import java.util.Set;
 public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C extends Condition<T>, D extends ConfigEntryDependency<T, E, C>, SELF extends AbstractDependencyBuilder<T, E, C, D, SELF>> implements DependencyBuilder<D, SELF> {
     
     protected final E gui;
-    protected final Set<C> conditions = new HashSet<>();
     private boolean hidden = false;
     
     protected AbstractDependencyBuilder(E gui) {
@@ -27,17 +22,15 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C e
     }
     
     /**
-     * Finishes building the given {@code dependency} by applying anything defined in this abstract class, for example
-     * applying any conditions added using {@link #withCondition(Condition) withCondition()}.
+     * Finishes building the given {@code dependency} by applying anything defined in this abstract class.
      * <br><br>
      * Should be used by implementations of {@link #build()}.
      * 
      * @param dependency the dependency to finish building
      * @return the built dependency
      */
-    protected final D finishBuilding(D dependency) {
+    protected D finishBuilding(D dependency) {
         dependency.hiddenWhenNotMet(hidden);
-        dependency.addConditions(this.conditions);
         return dependency;
     }
     
@@ -58,27 +51,7 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C e
      * @param condition a {@link Condition condition} to be added to the dependency being built
      * @return this instance, for chaining
      */
-    public SELF withCondition(C condition) {
-        @SuppressWarnings("unchecked") SELF self = (SELF) this;
-        
-        this.conditions.add(condition);
-        
-        return self;
-    }
-    
-    /**
-     * Add multiple {@link Condition conditions} to the dependency being built.
-     * 
-     * @param conditions a {@link Collection} containing {@link Condition conditions} to be added to the dependency being built
-     * @return this instance, for chaining
-     */
-    public SELF withConditions(Collection<C> conditions) {
-        @SuppressWarnings("unchecked") SELF self = (SELF) this;
-        
-        this.conditions.addAll(conditions);
-        
-        return self;
-    }
+    public abstract SELF withCondition(C condition);
     
     @Override
     public SELF hideWhenNotMet(boolean shouldHide) {

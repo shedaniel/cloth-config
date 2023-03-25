@@ -4,9 +4,12 @@ import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 
-import java.util.Collection;
+import java.util.Collections;
 
 public class BooleanDependencyBuilder extends AbstractDependencyBuilder<Boolean, BooleanListEntry, BooleanCondition, BooleanDependency, BooleanDependencyBuilder> {
+    
+    
+    private BooleanCondition condition = null;
     
     public BooleanDependencyBuilder(BooleanListEntry gui) {
         super(gui);
@@ -19,32 +22,22 @@ public class BooleanDependencyBuilder extends AbstractDependencyBuilder<Boolean,
     
     @Override
     public BooleanDependencyBuilder withCondition(BooleanCondition condition) {
-        if (!this.conditions.isEmpty())
+        if (this.condition != null)
             throw new IllegalArgumentException("BooleanDependency does not support multiple conditions");
-        return super.withCondition(condition);
-    }
-    
-    /**
-     * @deprecated {@link BooleanDependency} does not support multiple conditions, use {@link #withCondition(BooleanCondition)}
-     *             instead
-     */
-    @Override
-    @Deprecated
-    public BooleanDependencyBuilder withConditions(Collection<BooleanCondition> conditions) {
-        if (!this.conditions.isEmpty() || conditions.size() > 1)
-            throw new IllegalArgumentException("BooleanDependency does not support multiple conditions");
-        return super.withConditions(conditions);
+        this.condition = condition;
+        
+        return this;
     }
     
     @Override
     public BooleanDependency build() {
         // Default condition is "true"
-        if (conditions.isEmpty())
-            conditions.add(new BooleanCondition(true));
-        // Ensure we haven't got multiple conditions
-        else if (conditions.size() > 1)
-            throw new IllegalStateException("BooleanDependency does not support multiple conditions");
-
-        return finishBuilding(new BooleanDependency(this.gui));
+        if (condition == null)
+            condition = new BooleanCondition(true);
+    
+        BooleanDependency dependency = new BooleanDependency(this.gui);
+        dependency.addConditions(Collections.singletonList(condition));
+    
+        return finishBuilding(dependency);
     }
 }
