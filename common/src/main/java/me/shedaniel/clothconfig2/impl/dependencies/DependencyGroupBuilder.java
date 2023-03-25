@@ -1,7 +1,7 @@
-package me.shedaniel.clothconfig2.api.dependencies.builders;
+package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
-import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
+import me.shedaniel.clothconfig2.api.dependencies.DependencyBuilder;
 
 import java.util.*;
 

@@ -1,9 +1,9 @@
-package me.shedaniel.clothconfig2.api.dependencies;
+package me.shedaniel.clothconfig2.impl.dependencies;
 
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -14,9 +14,7 @@ public class DependencyGroup implements Dependency {
     private final Condition condition;
     private final Set<Dependency> children = new LinkedHashSet<>();
     
-    @ApiStatus.Internal
-    @Deprecated
-    public DependencyGroup(Condition condition) {
+    DependencyGroup(Condition condition) {
         this.condition = condition;
     }
     

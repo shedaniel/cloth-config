@@ -1,6 +1,5 @@
-package me.shedaniel.clothconfig2.api.dependencies.builders;
+package me.shedaniel.clothconfig2.impl.dependencies;
 
-import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 

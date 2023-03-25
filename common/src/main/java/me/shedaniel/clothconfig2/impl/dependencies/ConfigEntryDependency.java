@@ -1,4 +1,4 @@
-package me.shedaniel.clothconfig2.api.dependencies;
+package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;

@@ -1,17 +1,14 @@
-package me.shedaniel.clothconfig2.api.dependencies;
+package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.ApiStatus;
 
 public class BooleanDependency extends ConfigEntryDependency<Boolean, BooleanListEntry, BooleanCondition> {
     
     private boolean useActualText;
     
-    @ApiStatus.Internal
-    @Deprecated
-    public BooleanDependency(BooleanListEntry entry) {
+    BooleanDependency(BooleanListEntry entry) {
         super(entry);
     }
     

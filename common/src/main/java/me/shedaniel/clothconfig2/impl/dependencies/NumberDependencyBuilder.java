@@ -1,7 +1,6 @@
-package me.shedaniel.clothconfig2.api.dependencies.builders;
+package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
-import me.shedaniel.clothconfig2.api.dependencies.NumberDependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
 import org.jetbrains.annotations.ApiStatus;
 

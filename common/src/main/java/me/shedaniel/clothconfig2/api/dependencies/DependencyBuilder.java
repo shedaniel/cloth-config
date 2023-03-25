@@ -1,6 +1,4 @@
-package me.shedaniel.clothconfig2.api.dependencies.builders;
-
-import me.shedaniel.clothconfig2.api.dependencies.Dependency;
+package me.shedaniel.clothconfig2.api.dependencies;
 
 /**
  * @param <D> the {@link Dependency} type that will be built

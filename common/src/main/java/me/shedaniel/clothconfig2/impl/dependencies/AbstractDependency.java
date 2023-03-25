@@ -1,4 +1,6 @@
-package me.shedaniel.clothconfig2.api.dependencies;
+package me.shedaniel.clothconfig2.impl.dependencies;
+
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 
 import java.util.ArrayList;
 import java.util.Arrays;

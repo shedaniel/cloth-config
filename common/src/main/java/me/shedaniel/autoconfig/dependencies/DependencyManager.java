@@ -4,14 +4,14 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOn;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOnGroup;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
-import me.shedaniel.clothconfig2.api.dependencies.*;
-import me.shedaniel.clothconfig2.api.dependencies.builders.BooleanDependencyBuilder;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
+import me.shedaniel.clothconfig2.impl.dependencies.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

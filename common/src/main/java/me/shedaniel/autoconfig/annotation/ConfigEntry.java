@@ -19,9 +19,9 @@
 
 package me.shedaniel.autoconfig.annotation;
 
-import me.shedaniel.clothconfig2.api.dependencies.BooleanDependency;
-import me.shedaniel.clothconfig2.api.dependencies.DependencyGroup;
-import me.shedaniel.clothconfig2.api.dependencies.EnumDependency;
+import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependency;
+import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
+import me.shedaniel.clothconfig2.impl.dependencies.EnumDependency;
 
 import java.lang.annotation.*;
 

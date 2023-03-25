@@ -1,6 +1,5 @@
-package me.shedaniel.clothconfig2.api.dependencies.builders;
+package me.shedaniel.clothconfig2.impl.dependencies;
 
-import me.shedaniel.clothconfig2.api.dependencies.EnumDependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 
