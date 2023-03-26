@@ -261,6 +261,12 @@ public class ConfigEntry {
              * @see DependencyGroup.Condition
              */
             DependencyGroup.Condition condition() default DependencyGroup.Condition.ALL;
+    
+            /**
+             * Whether this group should be logically inverted. For example an inverted group with an
+             * {@link DependencyGroup.Condition#ALL "ALL" condition} set would be considered met if any one dependency was unmet.
+             */
+            boolean inverted() default false;
         }
     }
 }

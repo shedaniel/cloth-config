@@ -12,12 +12,13 @@ public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup
     private DependencyGroup.Condition condition = DependencyGroup.Condition.ALL;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Boolean> hidden = Optional.empty();
+    private boolean inverted = false;
     
     public DependencyGroupBuilder() {}
     
     @Override
     public DependencyGroup build() {
-        DependencyGroup group = new DependencyGroup(this.condition);
+        DependencyGroup group = new DependencyGroup(this.condition, this.inverted);
         group.addChildren(this.children);
         hidden.ifPresent(group::hiddenWhenNotMet);
         return group;
@@ -46,6 +47,26 @@ public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup
     
     public DependencyGroupBuilder defaultHideBehaviour() {
         this.hidden = Optional.empty();
+        return this;
+    }
+    
+    /**
+     * The dependency condition will be inverted.
+     * 
+     * @return this instance, for chaining
+     */
+    public DependencyGroupBuilder inverted() {
+        return inverted(true);
+    }
+    
+    /**
+     * Set whether the dependency condition should be inverted.
+     *
+     * @param inverted whether the condition should be inverted
+     * @return this instance, for chaining
+     */
+    public DependencyGroupBuilder inverted(boolean inverted) {
+        this.inverted = inverted;
         return this;
     }
 }

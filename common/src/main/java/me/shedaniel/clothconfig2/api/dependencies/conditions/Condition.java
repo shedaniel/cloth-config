@@ -41,8 +41,8 @@ public abstract class Condition<T> {
     
     protected abstract Component getTextInternal();
     
-    public Component getText() {
-        if (inverted())
+    public Component getText(boolean inverted) {
+        if (inverted != inverted())
             return Component.translatable("text.cloth-config.dependencies.conditions.not", getTextInternal());
         return getTextInternal();
     }

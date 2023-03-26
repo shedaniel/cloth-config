@@ -8,15 +8,16 @@ public class BooleanCondition extends Condition<Boolean> {
     }
     
     @Override
-    public Component getText() {
+    public Component getText(boolean inverted) {
         // For booleans, we can handle inversion ourselves
         // No need to call super.getText()
-        return getTextInternal();
+        boolean invert = inverted != inverted();
+        return Component.translatable("text.cloth-config.dependencies.conditions.%s"
+                .formatted(invert != getValue() ? "enabled" : "disabled"));
     }
     
     @Override
     protected Component getTextInternal() {
-        return Component.translatable("text.cloth-config.dependencies.conditions.%s"
-                .formatted(inverted() != this.value ? "enabled" : "disabled"));
+        return getText(false);
     }
 }

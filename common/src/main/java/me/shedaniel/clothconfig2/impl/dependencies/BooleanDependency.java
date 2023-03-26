@@ -13,22 +13,22 @@ public class BooleanDependency extends ConfigEntryDependency<Boolean, BooleanLis
     }
     
     @Override
-    protected Component getConditionText(BooleanCondition condition) {
+    protected Component getConditionText(BooleanCondition condition, boolean inverted) {
         if (this.useActualText)
             return Component.translatable("text.cloth-config.dependencies.conditions.set_to",
                         Component.translatable("text.cloth-config.quoted",
                                 getElement().getYesNoText(condition.inverted() != condition.getValue())));
         
-        return super.getConditionText(condition);
+        return super.getConditionText(condition, inverted);
     }
     
     @Override
-    public Component getShortDescription() {
-        Component condition = this.getConditions().stream()
-                .map(this::getConditionText)
+    public Component getShortDescription(boolean inverted) {
+        Component conditionText = this.getConditions().stream()
+                .map(condition -> getConditionText(condition, inverted))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("BooleanDependency requires exactly one condition"));
-        return Component.translatable("text.cloth-config.dependencies.short_description.single", getElement().getFieldName(), condition);
+        return Component.translatable("text.cloth-config.dependencies.short_description.single", getElement().getFieldName(), conditionText);
     }
     
     public void useActualText(boolean shouldUseActualText) {

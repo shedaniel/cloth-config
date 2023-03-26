@@ -5,6 +5,7 @@ import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.*;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -122,12 +123,22 @@ public interface Dependency {
      * 
      * @return a {@link Component} containing the description
      */
-    Component getShortDescription();
+    default Component getShortDescription() {
+        return getShortDescription(false);
+    }
+    
+    @ApiStatus.Internal
+    Component getShortDescription(boolean inverted);
     
     /**
      * Generates a tooltip for this dependency.
      * 
      * @return an {@link Optional} containing the tooltip, otherwise {@code Optional.empty()}.
      */
-    Optional<Component[]> getTooltip();
+    default Optional<Component[]> getTooltip() {
+        return getTooltip(false);
+    }
+    
+    @ApiStatus.Internal
+    Optional<Component[]> getTooltip(boolean inverted);
 }

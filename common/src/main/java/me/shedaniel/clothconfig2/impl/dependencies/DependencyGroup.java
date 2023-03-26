@@ -10,18 +10,21 @@ import java.util.stream.Stream;
 
 public class DependencyGroup implements Dependency {
     
-    protected Boolean shouldHide = null;
     private final Condition condition;
     private final Set<Dependency> children = new LinkedHashSet<>();
+    private final boolean inverted;
     
-    DependencyGroup(Condition condition) {
+    private Boolean shouldHide = null;
+    
+    DependencyGroup(Condition condition, boolean inverted) {
         this.condition = condition;
+        this.inverted = inverted;
     }
     
     @Override
     public boolean check() {
         Stream<Dependency> stream = this.children.stream();
-        return switch (this.condition) {
+        return inverted() != switch (this.condition) {
             case ALL -> stream.allMatch(Dependency::check);
             case NONE -> stream.noneMatch(Dependency::check);
             case ANY -> stream.anyMatch(Dependency::check);
@@ -46,6 +49,10 @@ public class DependencyGroup implements Dependency {
         }
 
         return hiddenWhenNotMet();
+    }
+    
+    public boolean inverted() {
+        return this.inverted;
     }
     
     @Override
@@ -77,7 +84,8 @@ public class DependencyGroup implements Dependency {
     }
     
     @Override
-    public Component getShortDescription() {
+    public Component getShortDescription(boolean inverted) {
+        // Inversion can be ignored here as we only print how many things are depended on, not what their conditions are
         return Component.translatable("text.cloth-config.dependency_groups.short_description", children.size());
     }
     
@@ -86,23 +94,24 @@ public class DependencyGroup implements Dependency {
     }
     
     /**
-     * {@inheritDoc} For example, <em>Depends on all of "XYZ Toggle" being set to "Yes" and "A cool enum" being one of 3 values.</em>
+     * {@inheritDoc} For example, <em>Depends on all of "XYZ Toggle" being enabled and "A cool enum" being one of 3 values.</em>
      */
-    @Override
-    public Optional<Component[]> getTooltip() {
-        Component conditionText = Component.translatable(condition.i18n);
-        List<Component> descriptions = children.stream().map(Dependency::getShortDescription).toList();
+    public Optional<Component[]> getTooltip(boolean inverted) {
+        boolean invert = inverted != inverted();
+        Component conditionText = Component.translatable(condition.getI18n(invert));
+        List<Component> descriptions = children.stream()
+                .map(Dependency::getShortDescription)
+                .toList();
         
         List<Component> lines = new ArrayList<>();
         switch (children.size()) {
             case 1 -> {
-                Dependency child = children.stream()
+                // If the group only has one child, return its tooltip instead
+                return children.stream()
+                        // The condition "none of one" is effectively inversion
+                        .map(child -> child.getTooltip(invert != (this.condition == Condition.NONE)))
                         .findFirst()
-                        .orElseThrow(() -> new IllegalStateException("Impossible state"));
-                if (this.condition == Condition.NONE) {
-                    // FIXME this tooltip will be wrong when this.condition is NONE
-                }
-                return child.getTooltip();
+                        .orElseThrow(() -> new IllegalStateException("Can't find any elements in list of 1"));
             }
             case 2 ->
                     lines.add(Component.translatable("text.cloth-config.dependency_groups.two_dependencies", conditionText,
@@ -157,21 +166,29 @@ public class DependencyGroup implements Dependency {
 
         /**
          * This condition is true if all dependencies are met, i.e. none are unmet.
+         * 
+         * <p>Effectively logical AND, the inverse of {@code NAND}.
          */
         ALL("text.cloth-config.dependency_groups.condition.all"),
     
         /**
          * This condition is true if all dependencies are unmet, i.e. none are met.
+         * 
+         * <p>Effectively logical NOR, the inverse of {@link Condition#ANY OR}.
          */
         NONE("text.cloth-config.dependency_groups.condition.none"),
     
         /**
          * This condition is true if any dependency is met.
+         * 
+         * <p>Effectively logical OR, the inverse of {@link Condition#NONE NOR}.
          */
         ANY("text.cloth-config.dependency_groups.condition.any"),
         
         /**
          * This condition is true if exactly one dependency is met.
+         * 
+         * <p>Effectively logical XOR, the inverse of {@code XNOR}.
          */
         ONE("text.cloth-config.dependency_groups.condition.one");
     
@@ -179,6 +196,18 @@ public class DependencyGroup implements Dependency {
     
         Condition(String i18n) {
             this.i18n = i18n;
+        }
+    
+        public String getI18n(boolean inverted) {
+            if (!inverted)
+                return this.i18n;
+            
+            return switch (this) {
+                case ALL -> "text.cloth-config.dependency_groups.condition.not_all";
+                case ANY -> NONE.i18n;
+                case NONE -> ANY.i18n;
+                case ONE -> "text.cloth-config.dependency_groups.condition.not_one";
+            };
         }
     }
 }

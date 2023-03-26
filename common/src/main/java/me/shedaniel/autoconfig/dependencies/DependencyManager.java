@@ -256,6 +256,7 @@ public class DependencyManager {
     
         // Build and return the DependencyGroup
         return Dependency.groupBuilder()
+                .inverted(dependencyGroup.inverted())
                 .withCondition(dependencyGroup.condition())
                 .withChildren(dependencies)
                 .build();

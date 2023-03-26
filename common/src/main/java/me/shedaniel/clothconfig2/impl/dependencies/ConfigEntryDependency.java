@@ -36,23 +36,23 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>, C exten
         return getConditions().stream().anyMatch(condition -> condition.check(value));
     }
     
-    protected Component getConditionText(C condition) {
-        return condition.getText();
+    protected Component getConditionText(C condition, boolean inverted) {
+        return condition.getText(inverted);
     }
     
     @Override
-    public Component getShortDescription() {
+    public Component getShortDescription(boolean inverted) {
         int conditions = getConditions().size();
         
         if (conditions == 0)
             throw new IllegalStateException("Required at least one condition");
     
         if (conditions == 1) {
-            Component condition = (this.getConditions().stream()
-                    .map(this::getConditionText)
+            Component conditionText = (this.getConditions().stream()
+                    .map(condition -> getConditionText(condition, inverted))
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Expected exactly one condition")));
-            return Component.translatable("text.cloth-config.dependencies.short_description.single", getElement().getFieldName(), condition);
+            return Component.translatable("text.cloth-config.dependencies.short_description.single", getElement().getFieldName(), conditionText);
         }
     
         return Component.translatable("text.cloth-config.dependencies.short_description.many", getElement().getFieldName(), conditions);
@@ -62,7 +62,7 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>, C exten
      * {@inheritDoc} For example <em>Depends on "Some Config Entry" being set to "YES".</em>
      */
     @Override
-    public Optional<Component[]> getTooltip() {
+    public Optional<Component[]> getTooltip(boolean inverted) {
         Collection<C> conditions = getConditions();
         if (conditions.isEmpty())
             throw new IllegalStateException("Expected at least one condition to be defined");
@@ -74,7 +74,7 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>, C exten
         // Get the text for each condition, again styled bold.
         List<Component> conditionTexts = conditions.stream()
                 .distinct()
-                .map(this::getConditionText)
+                .map(condition -> getConditionText(condition, inverted))
                 .toList();
         
         // Generate a slightly different tooltip depending on how many conditions are defined
