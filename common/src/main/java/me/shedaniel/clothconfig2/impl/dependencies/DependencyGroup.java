@@ -3,7 +3,6 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -83,50 +82,127 @@ public class DependencyGroup implements Dependency {
         Collections.addAll(this.children, children);
     }
     
-    @Override
-    public Component getShortDescription(boolean inverted) {
-        // Inversion can be ignored here as we only print how many things are depended on, not what their conditions are
-        return Component.translatable("text.cloth-config.dependency_groups.short_description", children.size());
-    }
-    
     public void unsetHiddenWhenNotMet() {
         this.shouldHide = null;
     }
     
-    /**
-     * {@inheritDoc} For example, <em>Depends on all of "XYZ Toggle" being enabled and "A cool enum" being one of 3 values.</em>
-     */
-    public Optional<Component[]> getTooltip(boolean inverted) {
+    @Override
+    public Component getShortDescription(boolean inverted) {
         boolean invert = inverted != inverted();
-        Component conditionText = Component.translatable(condition.getI18n(invert));
-        List<Component> descriptions = children.stream()
-                .map(Dependency::getShortDescription)
-                .toList();
-        
-        List<Component> lines = new ArrayList<>();
-        switch (children.size()) {
+        int amount = children.size();
+        switch (amount) {
             case 1 -> {
-                // If the group only has one child, return its tooltip instead
                 return children.stream()
-                        // The condition "none of one" is effectively inversion
-                        .map(child -> child.getTooltip(invert != (this.condition == Condition.NONE)))
-                        .findFirst()
+                        .map(child -> getShortDescription(invertChild(invert)))
+                        .findAny()
                         .orElseThrow(() -> new IllegalStateException("Can't find any elements in list of 1"));
             }
-            case 2 ->
-                    lines.add(Component.translatable("text.cloth-config.dependency_groups.two_dependencies", conditionText,
-                        MutableComponent.create(descriptions.get(0).getContents()).withStyle(ChatFormatting.ITALIC),
-                        MutableComponent.create(descriptions.get(1).getContents()).withStyle(ChatFormatting.ITALIC)));
-            default ->
-                    lines.add(Component.translatable("text.cloth-config.dependency_groups.many_dependencies", conditionText));
+            case 2 -> {
+                List<Dependency> list = children.stream().toList();
+                return Component.translatable("text.cloth-config.dependency_groups.short_description.two",
+                        Component.translatable(condition.getI18n(invert)),
+                        list.get(0).getShortDescription(),
+                        Component.translatable(condition.getJoiningI18n(invert)),
+                        list.get(1).getShortDescription());
+            }
+            default -> {
+                return Component.translatable("text.cloth-config.dependency_groups.short_description.many",
+                        Component.translatable(condition.getI18n(invert)),
+                        amount);
+            }
+        }
+    }
+    
+    /**
+     * {@inheritDoc} For example: 
+     * <br><em>Depends on all of the following being true:</em>
+     * <br><em>- "XYZ Toggle" being enabled</em>
+     * <br><em>- "A cool enum" being one of 3 values</em>
+     */
+    public Optional<Component[]> getTooltip(boolean inverted) {
+        // Only return a tooltip if the group condition is unmet
+        if (inverted != check())
+            return Optional.empty();
+
+        boolean invert = inverted != inverted();
+        
+        // If only one child, return its tooltip
+        if (children.size() == 1) {
+            return children.stream()
+                    .map(child -> child.getTooltip(invertChild(invert)))
+                    .findAny()
+                    .orElseThrow(() -> new IllegalStateException("Can't find any elements in list of 1"));
         }
         
-        if (children.size() > 2)
-            lines.addAll(descriptions.stream()
-                .map(description -> Component.translatable("text.cloth-config.dependencies.list_entry", description))
-                .toList());
+        // Handle inverted conditions
+        if (invert) {
+            return Optional.of(switch (condition) {
+                case ALL -> // "Not all" - at least one child must be false
+                        tooltipFor(Condition.ANY, met(), false);
+                case NONE -> // Effectively "any" - at least one child must be true
+                        tooltipFor(Condition.ANY, unmet(), true);
+                case ANY -> // Effectively "none" - all children must be false
+                        tooltipFor(Condition.ALL, met(), false);
+                case ONE ->
+                    // "not one" - none or multiple children must be true
+                        tooltipFor(Condition.ONE.getI18n(true), children, true);
+            });
+        }
         
-        return Optional.of(lines.toArray(Component[]::new));
+        // Handle normal conditions
+        return Optional.of(switch (condition) {
+            case ALL -> // All children must be true
+                    tooltipFor(Condition.ALL, unmet(), true);
+            case NONE -> // "None" - all children must be false
+                    tooltipFor(Condition.ALL, met(), false);
+            case ANY -> // "Any" - at least one child must be true
+                    tooltipFor(Condition.ANY, unmet(), true);
+            case ONE -> // Exactly one child must be true:
+                    tooltipFor(Condition.ONE, children, true);
+        });
+    }
+    
+    private boolean invertChild(boolean inverted) {
+        // Check if the condition is effectively inversion when dealing with only one child
+        return switch (condition) {
+            case ALL, ANY, ONE -> inverted; // met if only child is true
+            case NONE -> !inverted;         // met if only child is false
+        };
+    }
+    
+    private List<Dependency> met() {
+        return children.stream()
+                .filter(Dependency::check)
+                .toList();
+    }
+    
+    private List<Dependency> unmet() {
+        return children.stream()
+                .filter(dependency -> !dependency.check())
+                .toList();
+    }
+    
+    private Component[] tooltipFor(Condition condition, Collection<Dependency> dependencies, boolean value) {
+        if (dependencies.size() == 1) {
+            // TODO handle cases with only one or two met
+        }
+        return tooltipFor(condition.i18n, dependencies, value);
+    }
+    
+    private Component[] tooltipFor(String conditionKey, Collection<Dependency> dependencies, boolean value) {
+        Component conditionText = Component.translatable(conditionKey)
+                .withStyle(ChatFormatting.BOLD);
+        Component valueText = Component.translatable(value ? "text.cloth-config.true" : "text.cloth-config.false")
+                .withStyle(ChatFormatting.BOLD);
+        
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable("text.cloth-config.dependency_groups.tooltip", conditionText, valueText));
+        lines.addAll(dependencies.stream()
+                        .map(Dependency::getShortDescription)
+                        .map(description -> Component.translatable("text.cloth-config.dependencies.list_entry", description))
+                        .toList());
+
+        return lines.toArray(Component[]::new);
     }
     
     @Override
@@ -207,6 +283,17 @@ public class DependencyGroup implements Dependency {
                 case ANY -> NONE.i18n;
                 case NONE -> ANY.i18n;
                 case ONE -> "text.cloth-config.dependency_groups.condition.not_one";
+            };
+        }
+    
+        public String getJoiningI18n(boolean invert) {
+            final String and = "text.cloth-config.and";
+            final String or = "text.cloth-config.or";
+            return switch (this) {
+                case ALL -> invert ? or : and;
+                case NONE -> invert ? and : or;
+                case ANY -> or;
+                case ONE -> and;
             };
         }
     }
