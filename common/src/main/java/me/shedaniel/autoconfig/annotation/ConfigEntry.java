@@ -21,7 +21,6 @@ package me.shedaniel.autoconfig.annotation;
 
 import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependency;
 import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
-import me.shedaniel.clothconfig2.impl.dependencies.EnumDependency;
 
 import java.lang.annotation.*;
 
@@ -213,11 +212,16 @@ public class ConfigEntry {
              * </ul>
              * 
              * <h2>Quantity
-             * <p>Some dependency types may be stricter about the number of conditions defined.
-             * For example:
              * <ul>
-             *     <li>{@link BooleanDependency} requires exactly one condition be defined</li>
-             *     <li>{@link EnumDependency} requires one or more conditions be defined</li>
+             *     <li>
+             *         {@link BooleanDependency Boolean} dependencies require zero or one conditions.
+             *         If no conditions are defined, <em>{@code "true"}</em> is assumed.
+             *         If multiple conditions are defined, an {@link IllegalArgumentException} will be thrown.
+             *     </li>
+             *     <li>
+             *         All other dependency types require one or more conditions be defined.
+             *         If no conditions are defined, an {@link IllegalArgumentException} will be thrown.
+             *     </li>
              * </ul>
              * 
              * <h2>Flags
@@ -238,7 +242,7 @@ public class ConfigEntry {
              *     <li>'{@code i}' <em>insensitive</em>: a text-based condition will ignore capitalization.</li>
              * </ul>
              */
-            String[] conditions();
+            String[] conditions() default {};
         }
     
         /**
