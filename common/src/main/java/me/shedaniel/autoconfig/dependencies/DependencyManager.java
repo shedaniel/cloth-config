@@ -420,6 +420,6 @@ public class DependencyManager {
             
             return new FlaggedCondition(Condition.Flag.fromString(flagString), conditionString);
         }
-        return new FlaggedCondition(Condition.Flag.NONE, condition);
+        return new FlaggedCondition(EnumSet.noneOf(Condition.Flag.class), condition);
     }
 }

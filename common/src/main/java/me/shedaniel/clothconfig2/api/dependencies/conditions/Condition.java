@@ -12,7 +12,7 @@ public abstract class Condition<T> {
     
     protected final T value;
     
-    private final EnumSet<Flag> flags = Flag.NONE;
+    private final EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
     
     protected Condition(T value) {
         this.value = value;
@@ -125,8 +125,7 @@ public abstract class Condition<T> {
          */
         IGNORE_CASE('i');
     
-        public static final EnumSet<Flag> ALL = EnumSet.allOf(Flag.class);
-        public static final EnumSet<Flag> NONE = EnumSet.noneOf(Flag.class);
+        private static final EnumSet<Flag> ALL = EnumSet.allOf(Flag.class);
     
         private static final String VALID_FLAGS = Arrays.stream(Flag.values())
                 .map(flag -> flag.symbol)
