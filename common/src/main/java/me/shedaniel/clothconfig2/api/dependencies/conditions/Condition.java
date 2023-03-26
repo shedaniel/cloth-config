@@ -96,7 +96,21 @@ public abstract class Condition<T> {
         return this.value;
     }
     
-    // FIXME need to override equals() and hashCode() for ComplexDependency.equals() to work correctly
+    @Override
+    public int hashCode() {
+        return flags.hashCode() + 8 * value.hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (super.equals(obj))
+            return true;
+        if (obj instanceof Condition<?> condition) {
+            return this.value.equals(condition.value)
+                && this.flags.equals(condition.flags);
+        }
+        return false;
+    }
     
     public enum Flag {
     

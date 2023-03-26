@@ -248,11 +248,23 @@ public class DependencyManager {
      * @return The built {@link DependencyGroup}
      * @throws RuntimeException when there is an issue building one of the group's dependencies
      */
-    public DependencyGroup buildDependency(String i18nBase, DependsOnGroup dependencyGroup) {
+    public Dependency buildDependency(String i18nBase, DependsOnGroup dependencyGroup) {
         // Build each dependency as defined in DependsOn annotations
         Dependency[] dependencies = Arrays.stream(dependencyGroup.value())
                 .map(dependency -> buildDependency(i18nBase, dependency))
+                .distinct()
                 .toArray(Dependency[]::new);
+        
+        // If there's only one child, don't bother making a group
+        // unless the group is being used to invert the child
+        if (dependencies.length == 1) {
+            boolean invert = switch (dependencyGroup.condition()) {
+                case ALL, ANY, ONE -> dependencyGroup.inverted();
+                case NONE -> !dependencyGroup.inverted();
+            };
+            if (!invert)
+                return dependencies[0];
+        }
     
         // Build and return the DependencyGroup
         return Dependency.groupBuilder()

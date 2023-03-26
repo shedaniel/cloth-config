@@ -167,6 +167,21 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
         return NumberFormat.getInstance().format(bigDecimal);
     }
     
+    @Override
+    public int hashCode() {
+        return super.hashCode() + 64 * operator.hashCode() + 128 * Boolean.hashCode(integer) + 256 * Integer.hashCode(formatPrecision);
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (super.equals(obj) && obj instanceof NumberCondition<?> condition) {
+            return operator == condition.operator
+                && integer == condition.integer
+                && formatPrecision == condition.formatPrecision;
+        }
+        return false;
+    }
+    
     /**
      * A mathematical comparison operator
      */
