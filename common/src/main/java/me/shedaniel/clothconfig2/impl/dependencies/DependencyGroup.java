@@ -5,9 +5,14 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class DependencyGroup implements Dependency {
+    
+    private static final Predicate<Dependency> ALL = dependency -> true;
+    private static final Predicate<Dependency> MET = Dependency::check;
+    private static final Predicate<Dependency> UNMET = dependency -> !dependency.check();
     
     private final Condition condition;
     private final Set<Dependency> children = new LinkedHashSet<>();
@@ -89,21 +94,21 @@ public class DependencyGroup implements Dependency {
     @Override
     public Component getShortDescription(boolean inverted) {
         boolean invert = inverted != inverted();
-        int amount = children.size();
+        List<Dependency> dependencies = flatChildren(invert, ALL);
+        int amount = dependencies.size();
         switch (amount) {
             case 1 -> {
-                return children.stream()
+                return dependencies.stream()
                         .map(child -> getShortDescription(invertChild(invert)))
                         .findAny()
                         .orElseThrow(() -> new IllegalStateException("Can't find any elements in list of 1"));
             }
             case 2 -> {
-                List<Dependency> list = children.stream().toList();
                 return Component.translatable("text.cloth-config.dependency_groups.short_description.two",
                         Component.translatable(condition.getI18n(invert)),
-                        list.get(0).getShortDescription(),
+                        dependencies.get(0).getShortDescription(),
                         Component.translatable(condition.getJoiningI18n(invert)),
-                        list.get(1).getShortDescription());
+                        dependencies.get(1).getShortDescription());
             }
             default -> {
                 return Component.translatable("text.cloth-config.dependency_groups.short_description.many",
@@ -138,28 +143,55 @@ public class DependencyGroup implements Dependency {
         if (invert) {
             return Optional.of(switch (condition) {
                 case ALL -> // "Not all" - at least one child must be false
-                        tooltipFor(Condition.ANY, met(), false);
+                        tooltipFor(Condition.ANY, flatChildren(true, MET), false);
                 case NONE -> // Effectively "any" - at least one child must be true
-                        tooltipFor(Condition.ANY, unmet(), true);
+                        tooltipFor(Condition.ANY, flatChildren(true, UNMET), true);
                 case ANY -> // Effectively "none" - all children must be false
-                        tooltipFor(Condition.ALL, met(), false);
-                case ONE ->
-                    // "not one" - none or multiple children must be true
-                        tooltipFor(Condition.ONE.getI18n(true), children, true);
+                        tooltipFor(Condition.ALL, flatChildren(true, MET), false);
+                case ONE -> // "not one" - none or multiple children must be true
+                        tooltipFor(Condition.ONE.getI18n(true), flatChildren(true, ALL), true);
             });
         }
-        
+    
         // Handle normal conditions
         return Optional.of(switch (condition) {
             case ALL -> // All children must be true
-                    tooltipFor(Condition.ALL, unmet(), true);
+                    tooltipFor(Condition.ALL, flatChildren(UNMET), true);
             case NONE -> // "None" - all children must be false
-                    tooltipFor(Condition.ALL, met(), false);
+                    tooltipFor(Condition.ALL, flatChildren(MET), false);
             case ANY -> // "Any" - at least one child must be true
-                    tooltipFor(Condition.ANY, unmet(), true);
+                    tooltipFor(Condition.ANY, flatChildren(UNMET), true);
             case ONE -> // Exactly one child must be true:
-                    tooltipFor(Condition.ONE, children, true);
+                    tooltipFor(Condition.ONE, flatChildren(ALL), true);
         });
+    }
+    
+    private List<Dependency> flatChildren(Predicate<Dependency> predicate) {
+        return flatChildren(false, predicate);
+    }
+    
+    private List<Dependency> flatChildren(boolean inverted, Predicate<Dependency> predicate) {
+        // It doesn't make sense to flatten groups with condition "exactly one"
+        if (condition == Condition.ONE)
+            return children.stream()
+                    .filter(predicate)
+                    .toList();
+        
+        List<Dependency> flattened = new ArrayList<>(children.size() * 2);
+        children.stream()
+                .filter(predicate)
+                .forEach(child -> {
+            if (child instanceof DependencyGroup group) {
+                // TODO can we flatten in some inverted scenarios?
+                if (condition == group.condition && !(inverted || group.inverted())) {
+                    flattened.addAll(group.flatChildren(inverted, predicate));
+                    return;
+                }
+            }
+            flattened.add(child);
+        });
+        
+        return flattened;
     }
     
     private boolean invertChild(boolean inverted) {
