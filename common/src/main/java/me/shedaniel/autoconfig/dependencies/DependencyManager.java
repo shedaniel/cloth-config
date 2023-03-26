@@ -218,23 +218,24 @@ public class DependencyManager {
                 .map(group -> buildDependency(group.baseI18n(), group.annotation()))
                 .collect(Collectors.toCollection(ArrayList::new));
     
-        // Return early if we only have one dependency
-        if (singles.isEmpty() && groups.isEmpty())
-            return null;
-        else if (groups.isEmpty() && singles.size() == 1)
-            return singles.get(0);
-        else if (singles.isEmpty() && groups.size() == 1)
-            return groups.get(0);
-    
         // Combine multiple dependencies if necessary,
         // add the result to the groups list
         if (!singles.isEmpty())
             groups.add(singles.size() == 1 ? singles.get(0) : Dependency.groupBuilder().withChildren(singles).build());
+    
+        // Filter duplicates before checking quantities
+        List<Dependency> children = groups.stream().distinct().toList();
+        
+        // Don't build a group if we only have one dependency
+        if (children.isEmpty())
+            return null;
+        else if (children.size() == 1)
+            return children.get(0);
         
         // Return a group that depends on all dependencies & groups
         // Filtered to remove any duplicates
         return Dependency.groupBuilder()
-                .withChildren(groups.stream().distinct().toList())
+                .withChildren(children)
                 .build();
     }
     
