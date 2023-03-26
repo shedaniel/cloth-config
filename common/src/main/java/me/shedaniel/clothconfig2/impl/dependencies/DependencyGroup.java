@@ -99,7 +99,7 @@ public class DependencyGroup implements Dependency {
         switch (amount) {
             case 1 -> {
                 return dependencies.stream()
-                        .map(child -> getShortDescription(invertChild(invert)))
+                        .map(child -> getShortDescription(shouldInvertChild(invert)))
                         .findAny()
                         .orElseThrow(() -> new IllegalStateException("Can't find any elements in list of 1"));
             }
@@ -134,7 +134,7 @@ public class DependencyGroup implements Dependency {
         // If only one child, return its tooltip
         if (children.size() == 1) {
             return children.stream()
-                    .map(child -> child.getTooltip(invertChild(invert)))
+                    .map(child -> child.getTooltip(shouldInvertChild(invert)))
                     .findAny()
                     .orElseThrow(() -> new IllegalStateException("Can't find any elements in list of 1"));
         }
@@ -194,7 +194,7 @@ public class DependencyGroup implements Dependency {
         return flattened;
     }
     
-    private boolean invertChild(boolean inverted) {
+    private boolean shouldInvertChild(boolean inverted) {
         // Check if the condition is effectively inversion when dealing with only one child
         return switch (condition) {
             case ALL, ANY, ONE -> inverted; // met if only child is true
