@@ -106,6 +106,13 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
         return new NumberCondition<>(operator, number);
     }
     
+    public static <T extends Number & Comparable<T>> @NotNull NumberCondition<T> fromConditionString(@NotNull Class<T> type, @NotNull String condition) throws IllegalArgumentException {
+        Flag.FlaggedString record = Flag.fromConditionString(condition);
+        NumberCondition<T> numberCondition = fromString(type, record.condition());
+        numberCondition.setFlags(record.flags());
+        return numberCondition;
+    }
+    
     @Override
     protected boolean matches(T value) {
         return switch (this.operator) {

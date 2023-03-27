@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.api;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 public interface ConfigEntry<T> {
@@ -35,6 +36,7 @@ public interface ConfigEntry<T> {
                 translatable.getKey() : component.getString();
     }
     
+    @Contract(pure = true)
     default Class<T> getType() {
         //noinspection unchecked
         return (Class<T>) getValue().getClass();

@@ -8,7 +8,6 @@ import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
@@ -38,8 +37,6 @@ public class DependencyManager {
     
     private static final char STEP_UP_PREFIX = '.';
     private static final char I18N_JOINER = '.';
-    private static final char FLAG_PREFIX = '{';
-    private static final char FLAG_SUFFIX = '}';
     
     private final Map<String, EntryRecord> registry = new LinkedHashMap<>();
     
@@ -279,11 +276,11 @@ public class DependencyManager {
      *
      * @param dependency The {@link DependencyRecord} annotation defining the dependency
      * @return The built {@link Dependency}
-     * @throws RuntimeException when an unsupported dependency type is used, or the annotation is somehow invalid
+     * @throws IllegalArgumentException if the defined dependency is invalid
      */
     public Dependency buildDependency(DependencyRecord dependency) {
         ConfigEntry<?> gui = getEntry(dependency.getTargetI18n())
-                .orElseThrow(() -> new RuntimeException("Specified dependency not found: \"%s\"".formatted(dependency.i18n())));
+                .orElseThrow(() -> new IllegalArgumentException("Specified dependency not found: \"%s\"".formatted(dependency.i18n())));
         
         if (gui instanceof BooleanListEntry booleanListEntry)
             return buildDependency(dependency, booleanListEntry);
@@ -292,7 +289,7 @@ public class DependencyManager {
         else if (gui instanceof NumberConfigEntry<?> numberConfigEntry)
             return buildDependency(dependency, numberConfigEntry);
         else
-            throw new RuntimeException("Unsupported dependency type: %s".formatted(gui.getClass().getSimpleName()));
+            throw new IllegalArgumentException("Unsupported dependency type: %s".formatted(gui.getClass().getSimpleName()));
     }
     
     /**
@@ -304,20 +301,7 @@ public class DependencyManager {
      */
     public static BooleanDependency buildDependency(DependencyRecord dependency, BooleanListEntry gui) {
         List<BooleanCondition> conditions = Arrays.stream(dependency.conditions())
-                .map(DependencyManager::parseFlags)
-                .map(parsed -> {
-                    // The switch expression is functionally equivalent to Boolean::parseBoolean,
-                    // but allows us to throw a RuntimeException
-                    String string = parsed.condition().strip().toLowerCase();
-                    BooleanCondition condition = new BooleanCondition(switch (string) {
-                        case "true" -> true;
-                        case "false" -> false;
-                        default ->
-                                throw new IllegalStateException("Unexpected condition \"%s\" for Boolean dependency (expected \"true\" or \"false\").".formatted(string));
-                    });
-                    condition.setFlags(parsed.flags());
-                    return condition;
-                })
+                .map(BooleanCondition::fromConditionString)
                 .toList();
         
         // Start building the dependency
@@ -326,7 +310,7 @@ public class DependencyManager {
         // BooleanDependencyBuilder supports zero or one condition being set 
         if (!conditions.isEmpty()) {
             if (conditions.size() != 1)
-                throw new IllegalStateException("Boolean dependencies require exactly one condition, found " + conditions.size());
+                throw new IllegalArgumentException("Boolean dependencies require exactly one condition, found " + conditions.size());
             
             builder.withCondition(conditions.get(0));
         }
@@ -342,25 +326,11 @@ public class DependencyManager {
      * @return the generated dependency
      */
     public static <T extends Enum<?>> EnumDependency<T> buildDependency(DependencyRecord dependency, EnumListEntry<T> gui) {
-        // List of valid values for the depended-on EnumListEntry
-        List<T> possibleValues = gui.getValues();
-
-        // Convert each condition to the appropriate type, by
-        // mapping the dependency conditions to matched possible values
-        List<EnumCondition<T>> conditions = Arrays.stream(dependency.conditions())
-                .map(DependencyManager::parseFlags)
-                .map(parsed -> {
-                    String string = parsed.condition().strip().toLowerCase();
-                    EnumCondition<T> condition = new EnumCondition<>(possibleValues.stream()
-                            .filter(val -> val.toString().equalsIgnoreCase(string))
-                            .findAny()
-                            .orElseThrow(() -> new IllegalStateException("Invalid EnumCondition was defined: \"%s\"\nValid options: %s".formatted(parsed.condition(), possibleValues))));
-                    condition.setFlags(parsed.flags());
-                    return condition;
-                })
-                .toList();
+        Class<T> type = gui.getType();
+        Set<EnumCondition<T>> conditions = Arrays.stream(dependency.conditions())
+                .map(condition -> EnumCondition.fromConditionString(type, condition))
+                .collect(Collectors.toUnmodifiableSet());
     
-        // Finally, build the dependency and return it
         return Dependency.builder(gui)
                 .withConditions(conditions)
                 .build();
@@ -375,18 +345,10 @@ public class DependencyManager {
      */
     public static <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependencyRecord dependency, NumberConfigEntry<T> gui) {
         Class<T> type = gui.getType();
-        
-        List<NumberCondition<T>> conditions = Arrays.stream(dependency.conditions())
-                .map(DependencyManager::parseFlags)
-                .map(parsed -> {
-                    String string = parsed.condition().strip().toLowerCase();
-                    NumberCondition<T> condition = NumberCondition.fromString(type, string);
-                    condition.setFlags(parsed.flags());
-                    return condition;
-                })
-                .toList();
+        Set<NumberCondition<T>> conditions = Arrays.stream(dependency.conditions())
+                .map(condition -> NumberCondition.fromConditionString(type, condition))
+                .collect(Collectors.toUnmodifiableSet());
     
-        // Finally, build the dependency and return it
         return Dependency.builder(gui)
                 .withConditions(conditions)
                 .build();
@@ -419,30 +381,6 @@ public class DependencyManager {
         
         return i18n.substring(0, index);
     }
-    
-    /**
-     * @param condition a condition string that may or may not begin with {@link Condition.Flag flags}
-     * @return a {@link FlaggedCondition record} containing the parsed {@link Condition.Flag flags}
-     *         and the remainder of the condition string
-     * @throws IllegalArgumentException if the condition string begins a flags section without ending it
-     * @see EnableIf#conditions() Public API documentation
-     */
-    private static FlaggedCondition parseFlags(String condition) throws IllegalArgumentException {
-        if (FLAG_PREFIX == condition.charAt(0)) {
-            int flagEnd = condition.indexOf(FLAG_SUFFIX);
-            if (flagEnd < 0)
-                throw new IllegalArgumentException("Condition \"%1$s\" starts with the flag prefix '%2$s', but the flag suffix '%3$s' was not found. Did you mean \"%2$s%3$s%1$s\"?"
-                        .formatted(condition, FLAG_PREFIX, FLAG_SUFFIX));
-            
-            String flagString = condition.substring(1, flagEnd);
-            String conditionString = condition.substring(flagEnd + 1);
-            
-            return new FlaggedCondition(Condition.Flag.fromString(flagString), conditionString);
-        }
-        return new FlaggedCondition(EnumSet.noneOf(Condition.Flag.class), condition);
-    }
-    
-    private record FlaggedCondition(EnumSet<Condition.Flag> flags, String condition) {}
     
     private record DependencyRecord(String baseI18n, String i18n, String[] conditions) {
         private DependencyRecord(String baseI18n, EnableIf annotation) {

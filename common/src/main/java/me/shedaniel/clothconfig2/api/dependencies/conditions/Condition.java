@@ -1,5 +1,6 @@
 package me.shedaniel.clothconfig2.api.dependencies.conditions;
 
+import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import net.minecraft.network.chat.Component;
 
 import java.util.Arrays;
@@ -60,7 +61,7 @@ public abstract class Condition<T> {
     }
     
     public final void setFlags(String flags) {
-        setFlags(Flag.fromString(flags));
+        setFlags(Flag.parseFlags(flags));
     }
     
     public final void setFlags() {
@@ -72,7 +73,7 @@ public abstract class Condition<T> {
     }
     
     public final void resetFlags(String flags) {
-        resetFlags(Flag.fromString(flags));
+        resetFlags(Flag.parseFlags(flags));
     }
     
     public final void resetFlags() {
@@ -89,7 +90,7 @@ public abstract class Condition<T> {
     }
     
     public final void flipFlags(String flags) {
-        flipFlags(Flag.fromString(flags));
+        flipFlags(Flag.parseFlags(flags));
     }
     
     public T getValue() {
@@ -126,6 +127,8 @@ public abstract class Condition<T> {
         IGNORE_CASE('i');
     
         private static final EnumSet<Flag> ALL = EnumSet.allOf(Flag.class);
+        private static final char FLAG_PREFIX = '{';
+        private static final char FLAG_SUFFIX = '}';
     
         private static final String VALID_FLAGS = Arrays.stream(Flag.values())
                 .map(flag -> flag.symbol)
@@ -152,8 +155,8 @@ public abstract class Condition<T> {
          * @return an {@link EnumSet} containing each {@link Flag} found in {@code flags}
          * @throws IllegalArgumentException if {@code flags} contains any unrecognised characters
          */
-        public static EnumSet<Flag> fromString(String flags) throws IllegalArgumentException {
-            // Flags are case-insensitive
+        public static EnumSet<Flag> parseFlags(String flags) throws IllegalArgumentException {
+            // Flags are case-insensitive  TODO is this dumb?
             String symbols = flags.toLowerCase();
             
             // Map the flag string to an EnumSet
@@ -170,5 +173,29 @@ public abstract class Condition<T> {
             
             return flagSet;
         }
+        
+        /**
+         * @param condition a string that may or may not begin with {@link Condition.Flag flags}
+         * @return a {@link FlaggedString record} containing the parsed {@link Condition.Flag flags}
+         *         and the remainder of the provided condition string
+         * @throws IllegalArgumentException if the condition string begins a flags section without ending it
+         * @see ConfigEntry.Gui.EnableIf#conditions() Public API documentation
+         */
+        public static FlaggedString fromConditionString(String condition) throws IllegalArgumentException {
+            if (FLAG_PREFIX == condition.charAt(0)) {
+                int end = condition.indexOf(FLAG_SUFFIX);
+                if (end < 0)
+                    throw new IllegalArgumentException("\"%1$s\" starts with the flag prefix '%2$s', but the flag suffix '%3$s' was not found. Did you mean \"%2$s%3$s%1$s\"?"
+                            .formatted(condition, FLAG_PREFIX, FLAG_SUFFIX));
+            
+                String flags = condition.substring(1, end);
+                String string = condition.substring(end + 1);
+            
+                return new FlaggedString(parseFlags(flags), string);
+            }
+            return new FlaggedString(EnumSet.noneOf(Flag.class), condition);
+        }
+    
+        public record FlaggedString(EnumSet<Flag> flags, String condition) {}
     }
 }
