@@ -279,7 +279,7 @@ public class DependencyManager {
      * @throws IllegalArgumentException if the defined dependency is invalid
      */
     public Dependency buildDependency(DependencyRecord dependency) {
-        ConfigEntry<?> gui = getEntry(dependency.getTargetI18n())
+        ConfigEntry<?> gui = getEntry(dependency.i18n())
                 .orElseThrow(() -> new IllegalArgumentException("Specified dependency not found: \"%s\"".formatted(dependency.i18n())));
         
         if (gui instanceof BooleanListEntry booleanListEntry)
@@ -368,6 +368,40 @@ public class DependencyManager {
     }
     
     /**
+     * Gets the targeted i18n key, using {@code i18nBase} as a <em>base reference</em> if {@code  i18nKey} is relative.
+     * 
+     * @param i18nBase an absolute i18n key, to be used as the base reference point of the relative key
+     * @param i18nKey either a relative or absolute i18n key
+     * @return the absolute i18n key
+     * @see EnableIf#value() Public API documentation
+     */
+    private static String parseRelativeI18n(String i18nBase, String i18nKey) {
+        // Count how many "steps up" are at the start of the key string,
+        int steps = 0;
+        for (char c : i18nKey.toCharArray()) {
+            if (STEP_UP_PREFIX == c) steps++;
+            else break;
+        }
+        
+        // Not a relative key
+        if (steps < 1) return i18nKey;
+        
+        // Get the key without any "step" chars
+        String key = i18nKey.substring(steps);
+        String base = i18nBase;
+        
+        // Move `base` up one level for each "step" that was counted
+        // Start from 1 since the first "step" is just indicating that the key is relative
+        for (int i = 1; i < steps; i++) {
+            base = i18nParent(base);
+            if (base == null)
+                throw new IllegalArgumentException("Too many steps up (%d) relative to \"%s\"".formatted(steps, i18nBase));
+        }
+        
+        return base + I18N_JOINER + key;
+    }
+    
+    /**
      * Gets the parent of the provided i18n key. For example <em>{@code "a.good.child"}</em> returns <em>{@code "a.good"}</em>. 
      * @param i18n the key to get the parent of
      * @return the parent of {@code i18n}
@@ -382,53 +416,30 @@ public class DependencyManager {
         return i18n.substring(0, index);
     }
     
-    private record DependencyRecord(String baseI18n, String i18n, String[] conditions) {
+    private record DependencyRecord(String i18n, String[] conditions) {
         private DependencyRecord(String baseI18n, EnableIf annotation) {
             this(baseI18n, annotation.value(), annotation.conditions());
         }
         private DependencyRecord(String baseI18n, ShowIf annotation) {
             this(baseI18n, annotation.value(), annotation.conditions());
         }
-    
-        /**
-         * Gets the targeted i18n key, using {@link #baseI18n()} as a <em>base reference</em> if {@link #i18n()} is relative.
-         * 
-         * @return the absolute i18n key
-         * @see EnableIf#value() Public API documentation
-         */
-        private String getTargetI18n() {
-            // Count how many "steps up" are at the start of the key string,
-            int steps = 0;
-            for (char c : i18n.toCharArray()) {
-                if (STEP_UP_PREFIX == c) steps++;
-                else break;
-            }
-        
-            // Not a relative key
-            if (steps < 1) return i18n;
-        
-            // Get the key without any "step" chars
-            String key = i18n.substring(steps);
-            String base = baseI18n;
-        
-            // Move `base` up one level for each "step" that was counted
-            // Start from 1 since the first "step" is just indicating that the key is relative
-            for (int i = 1; i < steps; i++) {
-                base = i18nParent(base);
-                if (base == null)
-                    throw new IllegalArgumentException("Too many steps up (%d) relative to \"%s\"".formatted(steps, baseI18n));
-            }
-        
-            return base + I18N_JOINER + key;
+        public DependencyRecord(String baseI18n, String i18n, String[] conditions) {
+            this(parseRelativeI18n(baseI18n, i18n), conditions);
         }
     }
     
-    private record DependencyGroupRecord(String baseI18n, DependencyGroup.Condition condition, boolean inverted, DependencyRecord[] children) {
+    private record DependencyGroupRecord(DependencyGroup.Condition condition, boolean inverted, DependencyRecord[] children) {
         private DependencyGroupRecord(String baseI18n, EnableIfGroup annotation) {
-            this(baseI18n, annotation.condition(), annotation.inverted(), Arrays.stream(annotation.value()).map(child -> new DependencyRecord(baseI18n, child)).toArray(DependencyRecord[]::new));
+            this(annotation.condition(), annotation.inverted(),
+                    Arrays.stream(annotation.value())
+                            .map(child -> new DependencyRecord(baseI18n, child))
+                            .toArray(DependencyRecord[]::new));
         }
         private DependencyGroupRecord(String baseI18n, ShowIfGroup annotation) {
-            this(baseI18n, annotation.condition(), annotation.inverted(), Arrays.stream(annotation.value()).map(child -> new DependencyRecord(baseI18n, child)).toArray(DependencyRecord[]::new));
+            this(annotation.condition(), annotation.inverted(),
+                 Arrays.stream(annotation.value())
+                         .map(child -> new DependencyRecord(baseI18n, child))
+                         .toArray(DependencyRecord[]::new));
         }
     }
     
