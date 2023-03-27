@@ -98,27 +98,6 @@ public interface Dependency {
     boolean check();
     
     /**
-     * Checks if this dependency is currently unmet and an entry with this dependency should be hidden.
-     *
-     * @return whether dependent entries should be hidden
-     */
-    default boolean hidden() {
-        return !check() && hiddenWhenNotMet();
-    }
-    
-    /**
-     * @return whether entries with this dependency should hide when this dependency is unmet, instead of simply being disabled.
-     */
-    boolean hiddenWhenNotMet();
-    
-    /**
-     * Sets whether entries with this dependency should hide when this dependency is unmet, instead of simply being disabled.
-     * 
-     * @param shouldHide whether dependant entries should hide
-     */
-    void hiddenWhenNotMet(boolean shouldHide);
-    
-    /**
      * Get a short description of this dependency. For use by GUIs, e.g. {@link DependencyGroup} tooltips.
      * 
      * @return a {@link Component} containing the description

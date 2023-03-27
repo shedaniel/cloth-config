@@ -164,29 +164,29 @@ public class ClothConfigDemo {
         BooleanListEntry dependency = entryBuilder.startBooleanToggle(Component.literal("A cool toggle"), false).setTooltip(Component.literal("Toggle me...")).build();
         depends.add(dependency);
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true)
-                .withDependency(Dependency.builder(dependency).build()).build());
+                .setEnabledIf(Dependency.builder(dependency).build()).build());
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I only appear when cool is toggled..."), true)
-                .withDependency(Dependency.builder(dependency).hideWhenNotMet().build()).build());
+                .setShownIf(Dependency.builder(dependency).build()).build());
         SubCategoryBuilder dependantSub = entryBuilder.startSubCategory(Component.literal("How do deps work with sub-categories?"))
-                .withDependency(Dependency.builder(dependency).build());
+                .setEnabledIf(Dependency.builder(dependency).build());
         dependantSub.add(entryBuilder.startTextDescription(Component.literal("This sub category depends on Cool being toggled")).build());
         dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Example entry"), true).build());
         dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Another example..."), true).build());
         depends.add(dependantSub.build());
         depends.add(entryBuilder.startLongList(Component.literal("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L))
-                .withDependency(Dependency.builder(dependency).build()).build());
+                .setEnabledIf(Dependency.builder(dependency).build()).build());
         EnumListEntry<DependencyDemoEnum> enumDependency = entryBuilder.startEnumSelector(Component.literal("Select a good or bad option"), DependencyDemoEnum.class, DependencyDemoEnum.OKAY).build();
         depends.add(enumDependency);
         IntegerSliderEntry intDependency = entryBuilder.startIntSlider(Component.literal("Select something big or small"), 50, -100, 100).build();
         depends.add(intDependency);
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when a good option is chosen..."), true).setTooltip(Component.literal("Select good or better above"))
-                .withDependency(Dependency.builder(enumDependency)
+                .setEnabledIf(Dependency.builder(enumDependency)
                                 .withCondition(DependencyDemoEnum.EXCELLENT)
                                 .withCondition(DependencyDemoEnum.GOOD)
                                 .build())
                 .build());
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I need a good option AND a cool toggle!"), true).setTooltip(Component.literal("Select good or better and also toggle cool"))
-                .withDependency(Dependency.all(
+                .setEnabledIf(Dependency.all(
                         Dependency.builder(dependency).build(),
                         Dependency.builder(enumDependency)
                                 .withCondition(DependencyDemoEnum.EXCELLENT)
@@ -195,7 +195,7 @@ public class ClothConfigDemo {
                 .build());
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when numbers are awesome!"), true)
                 .setTooltip(Component.literal("Move the slider above..."))
-                .withDependency(Dependency.builder(intDependency)
+                .setEnabledIf(Dependency.builder(intDependency)
                                 .withCondition(new NumberCondition<>(NumberCondition.Operator.LESS, -70))
                                 .withCondition(new NumberCondition<>(NumberCondition.Operator.GREATER, 70))
                                 .build())
@@ -203,8 +203,7 @@ public class ClothConfigDemo {
     
         testing.addEntry(depends.build());
         testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I appear when bad option is chosen..."), true)
-                .withDependency(Dependency.builder(enumDependency)
-                        .hideWhenNotMet()
+                .setShownIf(Dependency.builder(enumDependency)
                         .withCondition(DependencyDemoEnum.HORRIBLE)
                         .withCondition(DependencyDemoEnum.BAD)
                         .build())

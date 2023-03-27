@@ -18,8 +18,6 @@ public class DependencyGroup implements Dependency {
     private final Set<Dependency> children = new LinkedHashSet<>();
     private final boolean inverted;
     
-    private Boolean shouldHide = null;
-    
     DependencyGroup(Condition condition, boolean inverted) {
         this.condition = condition;
         this.inverted = inverted;
@@ -36,37 +34,8 @@ public class DependencyGroup implements Dependency {
         };
     }
     
-    @Override
-    public boolean hidden() {
-        if (check())
-            return false;
-
-        // If shouldHide isn't explicitly defined, we should check if any of the groups (unmet) members have shouldHide set
-        if (shouldHide == null) {
-            // If condition is NONE, it doesn't make sense to use child-dependencies' hidden value
-            if (this.condition == Condition.NONE)
-                return false;
-        
-            return this.children.stream()
-                    .filter(Dependency::hiddenWhenNotMet)
-                    .anyMatch(dependency -> !dependency.check());
-        }
-
-        return hiddenWhenNotMet();
-    }
-    
     public boolean inverted() {
         return this.inverted;
-    }
-    
-    @Override
-    public boolean hiddenWhenNotMet() {
-        return shouldHide != null && shouldHide;
-    }
-    
-    @Override
-    public void hiddenWhenNotMet(boolean shouldHide) {
-        this.shouldHide = shouldHide;
     }
     
     /**
@@ -85,10 +54,6 @@ public class DependencyGroup implements Dependency {
      */
     public final void addChildren(Dependency... children) {
         Collections.addAll(this.children, children);
-    }
-    
-    public void unsetHiddenWhenNotMet() {
-        this.shouldHide = null;
     }
     
     @Override
@@ -244,15 +209,6 @@ public class DependencyGroup implements Dependency {
         if (obj instanceof DependencyGroup group) {
             if (this.condition != group.condition)
                 return false;
-            if (this.shouldHide == null) {
-                if (group.shouldHide != null)
-                    return false;
-            } else {
-                if (group.shouldHide == null)
-                    return false;
-                if (this.shouldHide.booleanValue() != group.shouldHide.booleanValue())
-                    return false;
-            }
             if (this.children.size() != group.children.size())
                 return false;
             // True if every child has an equivalent
@@ -264,7 +220,7 @@ public class DependencyGroup implements Dependency {
     
     @Override
     public int hashCode() {
-        return (shouldHide == null ? 0 : shouldHide.hashCode()) + 8*condition.hashCode() + 16*children.hashCode();
+        return 8 * condition.hashCode() + 16 * children.hashCode();
     }
     
     /**

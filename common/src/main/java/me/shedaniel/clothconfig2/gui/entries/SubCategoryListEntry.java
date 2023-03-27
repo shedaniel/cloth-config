@@ -69,7 +69,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     
     @Override
     public boolean isExpanded() {
-        return expanded && dependenciesMet();
+        return expanded && isEnabled();
     }
     
     @Override
@@ -104,7 +104,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
             @Override
             public Iterator<AbstractConfigListEntry> iterator() {
                 return Iterators.filter(entries.iterator(), entry -> {
-                    return !entry.hidden() && getConfigScreen() != null && getConfigScreen().matchesSearch(entry.getSearchTags());
+                    return entry.isShown() && getConfigScreen() != null && getConfigScreen().matchesSearch(entry.getSearchTags());
                 });
             }
             
@@ -131,7 +131,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         RenderSystem.setShaderTexture(0, CONFIG_TEX);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         boolean insideWidget = widget.rectangle.contains(mouseX, mouseY);
-        blit(matrices, x - 15, y + 5, 24, (dependenciesMet() ? (insideWidget ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9);
+        blit(matrices, x - 15, y + 5, 24, (isEnabled() ? (insideWidget ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9);
         Minecraft.getInstance().font.drawShadow(matrices, getDisplayedFieldName().getVisualOrderText(), x, y + 6, insideWidget ? 0xffe6fe16 : 0xffffffff);
         for (AbstractConfigListEntry<?> entry : entries) {
             entry.setParent((DynamicEntryListWidget) getParent());
@@ -149,7 +149,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public void updateSelected(boolean isSelected) {
         for (AbstractConfigListEntry<?> entry : entries) {
-            entry.updateSelected(isExpanded() && isSelected && getFocused() == entry && !entry.hidden() && getConfigScreen().matchesSearch(entry.getSearchTags()));
+            entry.updateSelected(isExpanded() && isSelected && getFocused() == entry && entry.isShown() && getConfigScreen().matchesSearch(entry.getSearchTags()));
         }
     }
     
@@ -248,7 +248,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int int_1) {
-            if (dependenciesMet() && rectangle.contains(mouseX, mouseY)) {
+            if (isEnabled() && rectangle.contains(mouseX, mouseY)) {
                 setExpanded(!expanded);
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return isHovered = true;

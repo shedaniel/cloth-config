@@ -1,7 +1,9 @@
 package me.shedaniel.autoconfig.dependencies;
 
-import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOn;
-import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.DependsOnGroup;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnableIf;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnableIfGroup;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.ShowIf;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.ShowIfGroup;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
@@ -22,21 +24,17 @@ import java.util.stream.Stream;
 
 /**
  * {@code DependencyManager} is used by {@link me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess GuiRegistryAccess} implementations
- * to handle generating dependencies defined in {@link DependsOn @DependsOn} and {@link DependsOnGroup @DependsOnGroup}
+ * to handle generating dependencies defined in supported annotations.
  * annotations.
  * <br><br>
- * It is necessary to register <strong>all</strong> config entry GUIs with the {@code DependencyManager} instance before building any dependencies. 
+ * It is necessary to register <strong>all</strong> config entry GUIs with the {@code DependencyManager} instance before building any dependencies.
+ *
+ * @see EnableIf @EnableIf
+ * @see EnableIfGroup @EnableIfGroup
+ * @see ShowIf @ShowIf
+ * @see ShowIfGroup @ShowIfGroup
  */
 public class DependencyManager {
-    
-    private record FlaggedCondition(EnumSet<Condition.Flag> flags, String condition) {}
-    private record DependsOnRecord(String baseI18n, DependsOn annotation) {}
-    private record DependsOnGroupRecord(String baseI18n, DependsOnGroup annotation) {}
-    private record EntryRecord(ConfigEntry<?> gui, Set<DependsOnRecord> dependencies, Set<DependsOnGroupRecord> dependencyGroups) {
-        boolean hasDependencies() {
-            return !(dependencies().isEmpty() && dependencyGroups().isEmpty());
-        }
-    }
     
     private static final char STEP_UP_PREFIX = '.';
     private static final char I18N_JOINER = '.';
@@ -77,48 +75,6 @@ public class DependencyManager {
     }
     
     /**
-     * @param i18nBase an absolute i18n key, to be used as the base reference point of the relative key
-     * @param i18nKey either a relative or absolute i18n key
-     * @return the absolute i18n key
-     * @see DependsOn#value() Public API documentation
-     */
-    private String parseRelativeI18n(String i18nBase, String i18nKey) {
-        // Count how many "steps up" are at the start of the key string,
-        int steps = 0;
-        for (char c : i18nKey.toCharArray()) {
-            if (STEP_UP_PREFIX == c) steps++;
-            else break;
-        }
-    
-        // Not a relative key
-        if (steps < 1) return i18nKey;
-    
-        // Get the key without any "step" chars
-        String key = i18nKey.substring(steps);
-        String base = i18nBase;
-    
-        // Move `base` up one level for each "step" that was counted
-        // Start from 1 since the first "step" is just indicating that the key is relative
-        for (int i = 1; i < steps; i++) {
-            base = i18nParent(base);
-            if (base == null)
-                throw new IllegalArgumentException("Too many steps up (%d) relative to \"%s\"".formatted(steps, i18nBase));
-        }
-    
-        return base + I18N_JOINER + key;
-    }
-    
-    private String i18nParent(String i18n) {
-        int index = i18n.lastIndexOf(I18N_JOINER);
-        
-        // No parent to be found
-        if (index < 1)
-            return null;
-        
-        return i18n.substring(0, index);
-    }
-    
-    /**
      * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
      *
      * @param entry     the config entry GUI
@@ -127,59 +83,88 @@ public class DependencyManager {
      * @see #buildDependencies()
      */
     public void register(ConfigEntry<?> entry, @Nullable Field field, @Nullable String fieldI18n) {
-        Collection<DependsOn> singles = null;
-        Collection<DependsOnGroup> groups = null;
+        Set<EnableIf> enableIfs = null;
+        Set<EnableIfGroup> enableIfGroups = null;
+        Set<ShowIf> showIfs = null;
+        Set<ShowIfGroup> showIfGroups = null;
         
         if (field != null) {
-            if (field.isAnnotationPresent(DependsOn.class))
-                singles = Collections.singleton(field.getAnnotation(DependsOn.class));
-            if (field.isAnnotationPresent(DependsOnGroup.class))
-                groups = Collections.singleton(field.getAnnotation(DependsOnGroup.class));
+            if (field.isAnnotationPresent(EnableIf.class))
+                enableIfs = Collections.singleton(field.getAnnotation(EnableIf.class));
+            if (field.isAnnotationPresent(EnableIfGroup.class))
+                enableIfGroups = Collections.singleton(field.getAnnotation(EnableIfGroup.class));
+            if (field.isAnnotationPresent(ShowIf.class))
+                showIfs = Collections.singleton(field.getAnnotation(ShowIf.class));
+            if (field.isAnnotationPresent(ShowIfGroup.class))
+                showIfGroups = Collections.singleton(field.getAnnotation(ShowIfGroup.class));
         }
         
         String baseI18n = Optional.ofNullable(fieldI18n)
-                .map(this::i18nParent)
+                .map(DependencyManager::i18nParent)
                 .orElse(null);
     
-        register(entry, singles, groups, baseI18n);
+        register(entry, enableIfs, enableIfGroups, showIfs, showIfGroups, baseI18n);
     }
     
     /**
      * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
      * <br><br>
-     * Explicitly provide one or more {@link DependsOn @DependsOn} or {@link DependsOnGroup @DependsOnGroup}
+     * Explicitly provide one or more {@link EnableIf @EnableIf} or {@link EnableIfGroup @EnableIfGroup}
      * annotations to be later applied to this entry.
      *
      * @param entry            the config entry GUI
-     * @param dependencies     a {@link Collection} of {@link DependsOn @DependsOn} annotations
-     * @param dependencyGroups a {@link Collection} of {@link DependsOnGroup @DependsOnGroup} annotations
+     * @param enableIfs     a {@link Collection} of {@link EnableIf @EnableIf} annotations
+     * @param enableIfGroups a {@link Collection} of {@link EnableIfGroup @EnableIfGroup} annotations
      * @param baseI18n         an absolute i18n key, to be used as the base reference of the dependencies
      * @see #buildDependencies()
      */
-    public void register(ConfigEntry<?> entry, @Nullable Collection<DependsOn> dependencies, @Nullable Collection<DependsOnGroup> dependencyGroups, @Nullable String baseI18n) {
+    public void register(
+            ConfigEntry<?> entry,
+            @Nullable Collection<EnableIf> enableIfs,
+            @Nullable Collection<EnableIfGroup> enableIfGroups,
+            @Nullable Collection<ShowIf> showIfs,
+            @Nullable Collection<ShowIfGroup> showIfGroups,
+            @Nullable String baseI18n)
+    {
         String key = entry.getI18nKey();
     
         // Get the already defined sets if they exist
         Optional<EntryRecord> optional = Optional.ofNullable(registry.get(key));
-        Set<DependsOnRecord> singles = optional
-                .map(EntryRecord::dependencies)
+        Set<DependencyRecord> enableIfRecords = optional
+                .map(EntryRecord::enableIfDependencies)
                 .orElseGet(LinkedHashSet::new);
-        Set<DependsOnGroupRecord> groups = optional
-                .map(EntryRecord::dependencyGroups)
+        Set<DependencyGroupRecord> enableIfGroupRecords = optional
+                .map(EntryRecord::enableIfGroups)
+                .orElseGet(LinkedHashSet::new);
+        Set<DependencyRecord> showIfRecords = optional
+                .map(EntryRecord::showIfDependencies)
+                .orElseGet(LinkedHashSet::new);
+        Set<DependencyGroupRecord> showIfGroupRecords = optional
+                .map(EntryRecord::showIfGroups)
                 .orElseGet(LinkedHashSet::new);
     
         // Add the new dependencies to the appropriate sets
-        singles.addAll(Stream.ofNullable(dependencies)
+        enableIfRecords.addAll(Stream.ofNullable(enableIfs)
                 .flatMap(Collection::stream)
-                .map(single -> new DependsOnRecord(baseI18n, single))
+                .map(single -> new DependencyRecord(baseI18n, single))
                 .collect(Collectors.toUnmodifiableSet()));
     
-        groups.addAll(Stream.ofNullable(dependencyGroups)
+        enableIfGroupRecords.addAll(Stream.ofNullable(enableIfGroups)
                 .flatMap(Collection::stream)
-                .map(group -> new DependsOnGroupRecord(baseI18n, group))
+                .map(group -> new DependencyGroupRecord(baseI18n, group))
                 .collect(Collectors.toUnmodifiableSet()));
         
-        registry.put(key, new EntryRecord(entry, singles, groups));
+        showIfRecords.addAll(Stream.ofNullable(showIfs)
+                .flatMap(Collection::stream)
+                .map(single -> new DependencyRecord(baseI18n, single))
+                .collect(Collectors.toUnmodifiableSet()));
+    
+        showIfGroupRecords.addAll(Stream.ofNullable(showIfGroups)
+                .flatMap(Collection::stream)
+                .map(group -> new DependencyGroupRecord(baseI18n, group))
+                .collect(Collectors.toUnmodifiableSet()));
+        
+        registry.put(key, new EntryRecord(entry, enableIfRecords, enableIfGroupRecords, showIfRecords, showIfGroupRecords));
     }
     
     /**
@@ -190,11 +175,17 @@ public class DependencyManager {
     public void buildDependencies() {
         registry.values().stream()
                 .filter(EntryRecord::hasDependencies)
-                .forEach(record ->
-                        // Combine the dependencies,
-                        // then add the result to the config entry
-                        Optional.ofNullable(combineDependencies(record.dependencies(), record.dependencyGroups()))
-                                .ifPresent(record.gui()::setDependency));
+                .forEach(record -> {
+                    // Combine the dependencies, then add the result to the config entry
+                    
+                    // "enable if" dependencies:
+                    Optional.ofNullable(combineDependencies(record.enableIfDependencies(), record.enableIfGroups()))
+                            .ifPresent(record.gui()::setEnableIfDependency);
+                    
+                    // "show if" dependencies:
+                    Optional.ofNullable(combineDependencies(record.showIfDependencies(), record.showIfGroups()))
+                            .ifPresent(record.gui()::setShowIfDependency);
+                });
     }
     
     /**
@@ -204,18 +195,19 @@ public class DependencyManager {
      * Note: a {@link List} containing only one valid dependency annotation is treated as providing only one dependency,
      * provided no other dependencies are passed in explicitly.
      *
-     * @param dependencies     a {@link Collection} of {@link DependsOn @DependsOn} annotations
-     * @param dependencyGroups a {@link Collection} of {@link DependsOnGroup @DependsOnGroup} annotations
+     * @param dependencies a {@link Collection} of "enable if" {@link DependencyRecord}s
+     * @param dependencyGroups a {@link Collection} of "enable if" {@link DependencyGroupRecord}s
      * @return a single {@link Dependency} or {@link DependencyGroup} representing all dependencies provided,
      * or {@code null} if {@code dependencies} is empty
      */
-    private @Nullable Dependency combineDependencies(@NotNull Collection<DependsOnRecord> dependencies, @NotNull Collection<DependsOnGroupRecord> dependencyGroups) {
+    private @Nullable Dependency combineDependencies(@NotNull Collection<DependencyRecord> dependencies, @NotNull Collection<DependencyGroupRecord> dependencyGroups)
+    {
         // Build each annotation
         List<Dependency> singles = dependencies.stream()
-                .map(single -> buildDependency(single.baseI18n(), single.annotation()))
+                .map(this::buildDependency)
                 .toList();
         List<Dependency> groups = dependencyGroups.stream()
-                .map(group -> buildDependency(group.baseI18n(), group.annotation()))
+                .map(this::buildDependency)
                 .collect(Collectors.toCollection(ArrayList::new));
     
         // Combine multiple dependencies if necessary,
@@ -244,15 +236,14 @@ public class DependencyManager {
      * <br><br>
      * If there is an issue building any child dependency, a {@link RuntimeException} will be thrown.
      *
-     * @param i18nBase The base reference key, used as a starting point for relative i18n keys.
-     * @param dependencyGroup The {@link DependsOnGroup @DependsOnGroup} annotation defining the group
+     * @param dependencyGroup The {@link DependencyGroupRecord} defining the group
      * @return The built {@link DependencyGroup}
      * @throws RuntimeException when there is an issue building one of the group's dependencies
      */
-    public Dependency buildDependency(String i18nBase, DependsOnGroup dependencyGroup) {
+    public Dependency buildDependency(DependencyGroupRecord dependencyGroup) {
         // Build each dependency as defined in DependsOn annotations
-        Dependency[] dependencies = Arrays.stream(dependencyGroup.value())
-                .map(dependency -> buildDependency(i18nBase, dependency))
+        Dependency[] dependencies = Arrays.stream(dependencyGroup.children())
+                .map(this::buildDependency)
                 .distinct()
                 .toArray(Dependency[]::new);
         
@@ -278,57 +269,59 @@ public class DependencyManager {
     /**
      * Build a {@link Dependency} as defined in the annotation.
      * <br><br>
-     * Currently, supports {@link BooleanListEntry} and {@link EnumListEntry} dependencies.
-     * If a different config entry type is used, a {@link RuntimeException} will be thrown.
+     * <p>Currently, supports depending on the following:
+     * <ul>
+     *     <li>{@link BooleanDependency} from {@link BooleanListEntry}</li>
+     *     <li>{@link EnumDependency} from {@link EnumListEntry}</li>
+     *     <li>{@link NumberDependency} from entries implementing {@link NumberConfigEntry}</li>
+     * </ul>
+     * <p>If a different config entry type is used, a {@link RuntimeException} will be thrown.
      *
-     * @param i18nBase The base reference key, used as a starting point for relative i18n keys.
-     * @param annotation The {@link DependsOn @DependsOn} annotation defining the dependency
+     * @param dependency The {@link DependencyRecord} annotation defining the dependency
      * @return The built {@link Dependency}
      * @throws RuntimeException when an unsupported dependency type is used, or the annotation is somehow invalid
      */
-    public Dependency buildDependency(String i18nBase, DependsOn annotation) {
-        String key = annotation.value();
-        ConfigEntry<?> dependency = getEntry(parseRelativeI18n(i18nBase, key))
-                .orElseThrow(() -> new RuntimeException("Specified dependency not found: \"%s\"".formatted(key)));
-    
-        if (dependency instanceof BooleanListEntry booleanListEntry)
-            return buildDependency(annotation, booleanListEntry);
-        else if (dependency instanceof EnumListEntry<?> selectionListEntry)
-            return buildDependency(annotation, selectionListEntry);
-        else if (dependency instanceof NumberConfigEntry<?> numberConfigEntry)
-            return buildDependency(annotation, numberConfigEntry);
+    public Dependency buildDependency(DependencyRecord dependency) {
+        ConfigEntry<?> gui = getEntry(dependency.getTargetI18n())
+                .orElseThrow(() -> new RuntimeException("Specified dependency not found: \"%s\"".formatted(dependency.i18n())));
+        
+        if (gui instanceof BooleanListEntry booleanListEntry)
+            return buildDependency(dependency, booleanListEntry);
+        else if (gui instanceof EnumListEntry<?> selectionListEntry)
+            return buildDependency(dependency, selectionListEntry);
+        else if (gui instanceof NumberConfigEntry<?> numberConfigEntry)
+            return buildDependency(dependency, numberConfigEntry);
         else
-            throw new RuntimeException("Unsupported dependency type: %s".formatted(dependency.getClass().getSimpleName()));
+            throw new RuntimeException("Unsupported dependency type: %s".formatted(gui.getClass().getSimpleName()));
     }
     
     /**
-     * Builds a {@link BooleanDependency} defined in the {@link DependsOn @DependsOn} annotation, depending on the given {@link BooleanListEntry}.
+     * Builds a {@link BooleanDependency} defined in the {@link DependencyRecord}, depending on the given {@link BooleanListEntry}.
      * 
-     * @param annotation the {@link DependsOn @DependsOn} annotation that defines the dependency
-     * @param dependency the {@link BooleanListEntry} to be depended on
+     * @param dependency the {@link DependencyRecord} that defines the dependency
+     * @param gui the {@link BooleanListEntry} to be depended on
      * @return the generated dependency
      */
-    public static BooleanDependency buildDependency(DependsOn annotation, BooleanListEntry dependency) {
-        List<BooleanCondition> conditions = Arrays.stream(annotation.conditions())
+    public static BooleanDependency buildDependency(DependencyRecord dependency, BooleanListEntry gui) {
+        List<BooleanCondition> conditions = Arrays.stream(dependency.conditions())
                 .map(DependencyManager::parseFlags)
-                .map(record -> {
+                .map(parsed -> {
                     // The switch expression is functionally equivalent to Boolean::parseBoolean,
                     // but allows us to throw a RuntimeException
-                    String string = record.condition().strip().toLowerCase();
+                    String string = parsed.condition().strip().toLowerCase();
                     BooleanCondition condition = new BooleanCondition(switch (string) {
                         case "true" -> true;
                         case "false" -> false;
                         default ->
                                 throw new IllegalStateException("Unexpected condition \"%s\" for Boolean dependency (expected \"true\" or \"false\").".formatted(string));
                     });
-                    condition.setFlags(record.flags());
+                    condition.setFlags(parsed.flags());
                     return condition;
                 })
                 .toList();
         
         // Start building the dependency
-        BooleanDependencyBuilder builder = Dependency.builder(dependency)
-                .hideWhenNotMet(annotation.hiddenWhenNotMet());
+        BooleanDependencyBuilder builder = Dependency.builder(gui);
         
         // BooleanDependencyBuilder supports zero or one condition being set 
         if (!conditions.isEmpty()) {
@@ -342,63 +335,89 @@ public class DependencyManager {
     }
     
     /**
-     * Builds a {@link EnumDependency} defined in the {@link DependsOn @DependsOn} annotation, depending on the given {@link EnumListEntry}.
+     * Builds a {@link EnumDependency} defined in the {@link DependencyRecord}, depending on the given {@link EnumListEntry}.
      *
-     * @param annotation the {@link DependsOn @DependsOn} annotation that defines the dependency
-     * @param dependency the {@link EnumListEntry} to be depended on
+     * @param dependency the {@link DependencyRecord} that defines the dependency
+     * @param gui the {@link EnumListEntry} to be depended on
      * @return the generated dependency
      */
-    public static <T extends Enum<?>> EnumDependency<T> buildDependency(DependsOn annotation, EnumListEntry<T> dependency) {
+    public static <T extends Enum<?>> EnumDependency<T> buildDependency(DependencyRecord dependency, EnumListEntry<T> gui) {
         // List of valid values for the depended-on EnumListEntry
-        List<T> possibleValues = dependency.getValues();
+        List<T> possibleValues = gui.getValues();
 
         // Convert each condition to the appropriate type, by
         // mapping the dependency conditions to matched possible values
-        List<EnumCondition<T>> conditions = Arrays.stream(annotation.conditions())
+        List<EnumCondition<T>> conditions = Arrays.stream(dependency.conditions())
                 .map(DependencyManager::parseFlags)
-                .map(record -> {
-                    String string = record.condition().strip().toLowerCase();
+                .map(parsed -> {
+                    String string = parsed.condition().strip().toLowerCase();
                     EnumCondition<T> condition = new EnumCondition<>(possibleValues.stream()
                             .filter(val -> val.toString().equalsIgnoreCase(string))
                             .findAny()
-                            .orElseThrow(() -> new IllegalStateException("Invalid EnumCondition was defined: \"%s\"\nValid options: %s".formatted(record.condition(), possibleValues))));
-                    condition.setFlags(record.flags());
+                            .orElseThrow(() -> new IllegalStateException("Invalid EnumCondition was defined: \"%s\"\nValid options: %s".formatted(parsed.condition(), possibleValues))));
+                    condition.setFlags(parsed.flags());
                     return condition;
                 })
                 .toList();
     
         // Finally, build the dependency and return it
-        return Dependency.builder(dependency)
-                .hideWhenNotMet(annotation.hiddenWhenNotMet())
+        return Dependency.builder(gui)
                 .withConditions(conditions)
                 .build();
     }
     
     /**
-     * Builds a {@link NumberDependency} defined in the {@link DependsOn @DependsOn} annotation, depending on the given {@link NumberConfigEntry}.
+     * Builds a {@link NumberDependency} defined in the {@link DependencyRecord}, depending on the given {@link NumberConfigEntry}.
      *
-     * @param annotation the {@link DependsOn @DependsOn} annotation that defines the dependency
-     * @param dependency the {@link NumberConfigEntry} to be depended on
+     * @param dependency the {@link DependencyRecord} that defines the dependency
+     * @param gui the {@link NumberConfigEntry} to be depended on
      * @return the generated dependency
      */
-    public static <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependsOn annotation, NumberConfigEntry<T> dependency) {
-        Class<T> type = dependency.getType();
+    public static <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependencyRecord dependency, NumberConfigEntry<T> gui) {
+        Class<T> type = gui.getType();
         
-        List<NumberCondition<T>> conditions = Arrays.stream(annotation.conditions())
+        List<NumberCondition<T>> conditions = Arrays.stream(dependency.conditions())
                 .map(DependencyManager::parseFlags)
-                .map(record -> {
-                    String string = record.condition().strip().toLowerCase();
+                .map(parsed -> {
+                    String string = parsed.condition().strip().toLowerCase();
                     NumberCondition<T> condition = NumberCondition.fromString(type, string);
-                    condition.setFlags(record.flags());
+                    condition.setFlags(parsed.flags());
                     return condition;
                 })
                 .toList();
     
         // Finally, build the dependency and return it
-        return Dependency.builder(dependency)
-                .hideWhenNotMet(annotation.hiddenWhenNotMet())
+        return Dependency.builder(gui)
                 .withConditions(conditions)
                 .build();
+    }
+    
+    /**
+     * Return true if a supported dependency annotation is <em>present</em> on the provided field.
+     *
+     * @param field the field to check
+     * @return whether the provided field has dependency annotations present
+     */
+    public static boolean hasDependencyAnnotation(Field field) {
+        return field.isAnnotationPresent(EnableIf.class)
+               || field.isAnnotationPresent(EnableIfGroup.class)
+               || field.isAnnotationPresent(ShowIf.class)
+               || field.isAnnotationPresent(ShowIfGroup.class);
+    }
+    
+    /**
+     * Gets the parent of the provided i18n key. For example <em>{@code "a.good.child"}</em> returns <em>{@code "a.good"}</em>. 
+     * @param i18n the key to get the parent of
+     * @return the parent of {@code i18n}
+     */
+    private static String i18nParent(String i18n) {
+        int index = i18n.lastIndexOf(I18N_JOINER);
+        
+        // No parent to be found
+        if (index < 1)
+            return null;
+        
+        return i18n.substring(0, index);
     }
     
     /**
@@ -406,7 +425,7 @@ public class DependencyManager {
      * @return a {@link FlaggedCondition record} containing the parsed {@link Condition.Flag flags}
      *         and the remainder of the condition string
      * @throws IllegalArgumentException if the condition string begins a flags section without ending it
-     * @see DependsOn#conditions() Public API documentation
+     * @see EnableIf#conditions() Public API documentation
      */
     private static FlaggedCondition parseFlags(String condition) throws IllegalArgumentException {
         if (FLAG_PREFIX == condition.charAt(0)) {
@@ -421,5 +440,74 @@ public class DependencyManager {
             return new FlaggedCondition(Condition.Flag.fromString(flagString), conditionString);
         }
         return new FlaggedCondition(EnumSet.noneOf(Condition.Flag.class), condition);
+    }
+    
+    private record FlaggedCondition(EnumSet<Condition.Flag> flags, String condition) {}
+    
+    private record DependencyRecord(String baseI18n, String i18n, String[] conditions) {
+        private DependencyRecord(String baseI18n, EnableIf annotation) {
+            this(baseI18n, annotation.value(), annotation.conditions());
+        }
+        private DependencyRecord(String baseI18n, ShowIf annotation) {
+            this(baseI18n, annotation.value(), annotation.conditions());
+        }
+    
+        /**
+         * Gets the targeted i18n key, using {@link #baseI18n()} as a <em>base reference</em> if {@link #i18n()} is relative.
+         * 
+         * @return the absolute i18n key
+         * @see EnableIf#value() Public API documentation
+         */
+        private String getTargetI18n() {
+            // Count how many "steps up" are at the start of the key string,
+            int steps = 0;
+            for (char c : i18n.toCharArray()) {
+                if (STEP_UP_PREFIX == c) steps++;
+                else break;
+            }
+        
+            // Not a relative key
+            if (steps < 1) return i18n;
+        
+            // Get the key without any "step" chars
+            String key = i18n.substring(steps);
+            String base = baseI18n;
+        
+            // Move `base` up one level for each "step" that was counted
+            // Start from 1 since the first "step" is just indicating that the key is relative
+            for (int i = 1; i < steps; i++) {
+                base = i18nParent(base);
+                if (base == null)
+                    throw new IllegalArgumentException("Too many steps up (%d) relative to \"%s\"".formatted(steps, baseI18n));
+            }
+        
+            return base + I18N_JOINER + key;
+        }
+    }
+    
+    private record DependencyGroupRecord(String baseI18n, DependencyGroup.Condition condition, boolean inverted, DependencyRecord[] children) {
+        private DependencyGroupRecord(String baseI18n, EnableIfGroup annotation) {
+            this(baseI18n, annotation.condition(), annotation.inverted(), Arrays.stream(annotation.value()).map(child -> new DependencyRecord(baseI18n, child)).toArray(DependencyRecord[]::new));
+        }
+        private DependencyGroupRecord(String baseI18n, ShowIfGroup annotation) {
+            this(baseI18n, annotation.condition(), annotation.inverted(), Arrays.stream(annotation.value()).map(child -> new DependencyRecord(baseI18n, child)).toArray(DependencyRecord[]::new));
+        }
+    }
+    
+    private record EntryRecord(
+            ConfigEntry<?> gui,
+            Set<DependencyRecord> enableIfDependencies,
+            Set<DependencyGroupRecord> enableIfGroups,
+            Set<DependencyRecord> showIfDependencies,
+            Set<DependencyGroupRecord> showIfGroups)
+    {
+        boolean hasDependencies() {
+            return !(
+                        enableIfDependencies().isEmpty() &&
+                        enableIfGroups().isEmpty() &&
+                        showIfDependencies().isEmpty() &&
+                        showIfGroups().isEmpty()
+            );
+        }
     }
 }

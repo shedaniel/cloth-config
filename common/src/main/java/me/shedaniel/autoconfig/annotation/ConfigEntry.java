@@ -156,19 +156,20 @@ public class ConfigEntry {
     
         /**
          * Depends on the referenced field.
-         * <br>
+         * If the dependency is not met, the annotated field's config entry will be disabled.
+         * <br><br>
          * A field can be annotated multiple times.
          * All defined dependencies must be met for the config entry to be enabled.
-         * <br>
-         * Alternatively, {@link DependsOnGroup} can also be used to define multiple dependencies,
+         * <br><br>
+         * Alternatively, {@link EnableIfGroup @EnableIfGroup} can also be used to define multiple dependencies,
          * optionally using alternative group-matching conditions such as {@code any}, {@code none}, or exactly {@code one}. 
          * 
-         * @see DependsOnGroup
+         * @see EnableIfGroup
          */
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.FIELD)
-        @Repeatable(DependsOnGroup.class)
-        public @interface DependsOn {
+        @Repeatable(EnableIfGroup.class)
+        public @interface EnableIf {
             /**
              * The i18n key of the field to depend on.
              * <br><br>
@@ -191,12 +192,6 @@ public class ConfigEntry {
              * </ul>
              */
             String value();
-    
-            /**
-             * If set to true, the annotated field will be hidden (instead of
-             * simply being disabled) when the dependency is unmet.
-             */
-            boolean hiddenWhenNotMet() default false;
     
             /**
              * One or more conditions to be checked against the dependency's value.
@@ -252,12 +247,12 @@ public class ConfigEntry {
          */
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.FIELD)
-        public @interface DependsOnGroup {
+        public @interface EnableIfGroup {
         
             /**
              * The dependencies to be included in the group.
              */
-            DependsOn[] value();
+            EnableIf[] value();
         
             /**
              * The condition for this group to be met. By defaults, require all dependencies to be met.
@@ -266,6 +261,62 @@ public class ConfigEntry {
              */
             DependencyGroup.Condition condition() default DependencyGroup.Condition.ALL;
     
+            /**
+             * Whether this group should be logically inverted. For example an inverted group with an
+             * {@link DependencyGroup.Condition#ALL "ALL" condition} set would be considered met if any one dependency was unmet.
+             */
+            boolean inverted() default false;
+        }
+    
+        /**
+         * Depends on the referenced field.
+         * If the dependency is not met, the annotated field's config entry will be completely hidden from menus.
+         * <br>
+         * A field can be annotated multiple times.
+         * All defined dependencies must be met for the config entry to be enabled.
+         * <br>
+         * Alternatively, {@link ShowIfGroup @ShowIfGroup} can also be used to define multiple dependencies,
+         * optionally using alternative group-matching conditions such as {@code any}, {@code none}, or exactly {@code one}. 
+         *
+         * @see ShowIfGroup
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        @Repeatable(ShowIfGroup.class)
+        public @interface ShowIf {
+    
+            /**
+             * @see EnableIf#value() 
+             */
+            String value();
+    
+            /**
+             * @see EnableIf#conditions() 
+             */
+            String[] conditions() default {};
+        }
+    
+        /**
+         * Defines a group of dependencies, with a "group-matching" {@link DependencyGroup.Condition} to be met.
+         *
+         * @see DependencyGroup.Condition
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface ShowIfGroup {
+        
+            /**
+             * The dependencies to be included in the group.
+             */
+            ShowIf[] value();
+        
+            /**
+             * The condition for this group to be met. By defaults, require all dependencies to be met.
+             *
+             * @see DependencyGroup.Condition
+             */
+            DependencyGroup.Condition condition() default DependencyGroup.Condition.ALL;
+        
             /**
              * Whether this group should be logically inverted. For example an inverted group with an
              * {@link DependencyGroup.Condition#ALL "ALL" condition} set would be considered met if any one dependency was unmet.

@@ -4,6 +4,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+import org.jetbrains.annotations.Contract;
 
 /**
  * @param <T> the type the dependency deals with
@@ -12,25 +13,24 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
  * @param <D> the {@link Dependency} type that will be built
  * @param <SELF> the type to be returned by chainable methods
  */
-public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C extends Condition<T>, D extends ConfigEntryDependency<T, E, C>, SELF extends AbstractDependencyBuilder<T, E, C, D, SELF>> implements DependencyBuilder<D, SELF> {
+public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C extends Condition<T>, D extends ConfigEntryDependency<T, E, C>, SELF extends AbstractDependencyBuilder<T, E, C, D, SELF>> implements DependencyBuilder<D> {
     
     protected final E gui;
-    private boolean hidden = false;
     
     protected AbstractDependencyBuilder(E gui) {
         this.gui = gui;
     }
     
     /**
-     * Finishes building the given {@code dependency} by applying anything defined in this abstract class.
+     * Finishes building the given {@link Dependency dependency} by applying anything defined in this abstract class.
      * <br><br>
      * Should be used by implementations of {@link #build()}.
      * 
      * @param dependency the dependency to finish building
-     * @return the built dependency
+     * @return the finished dependency
      */
+    @Contract(value = "_ -> param1", mutates = "param1")
     protected D finishBuilding(D dependency) {
-        dependency.hiddenWhenNotMet(hidden);
         return dependency;
     }
     
@@ -52,13 +52,4 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C e
      * @return this instance, for chaining
      */
     public abstract SELF withCondition(C condition);
-    
-    @Override
-    public SELF hideWhenNotMet(boolean shouldHide) {
-        @SuppressWarnings("unchecked") SELF self = (SELF) this;
-        
-        this.hidden = shouldHide;
-        
-        return self;
-    }
 }

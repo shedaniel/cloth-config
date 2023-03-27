@@ -17,8 +17,6 @@ public abstract class AbstractDependency<C, E> implements Dependency {
     
     private final Collection<C> conditions = new ArrayList<>();
     
-    private boolean shouldHide = false;
-    
     protected AbstractDependency(E element) {this.element = element;}
     
     /**
@@ -26,16 +24,6 @@ public abstract class AbstractDependency<C, E> implements Dependency {
      */
     public final E getElement() {
         return element;
-    }
-    
-    @Override
-    public final boolean hiddenWhenNotMet() {
-        return shouldHide;
-    }
-    
-    @Override
-    public final void hiddenWhenNotMet(boolean shouldHide) {
-        this.shouldHide = shouldHide;
     }
     
     /**
@@ -77,8 +65,6 @@ public abstract class AbstractDependency<C, E> implements Dependency {
         if (super.equals(obj))
             return true;
         if (obj instanceof AbstractDependency<?,?> dependency) {
-            if (this.shouldHide != dependency.shouldHide)
-                return false;
             if (!this.element.equals(dependency.element))
                 return false;
             if (this.conditions.size() != dependency.conditions.size())
@@ -92,6 +78,6 @@ public abstract class AbstractDependency<C, E> implements Dependency {
     
     @Override
     public int hashCode() {
-        return Boolean.hashCode(this.shouldHide) + 8 * this.element.hashCode() + 16 * this.conditions.hashCode();
+        return 8 * this.element.hashCode() + 16 * this.conditions.hashCode();
     }
 }

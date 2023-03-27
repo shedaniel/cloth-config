@@ -120,41 +120,41 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
             @ConfigEntry.BoundedDiscrete(min = -100, max = 100)
             public int intSlider = 50;
     
-            @ConfigEntry.Gui.DependsOn(".coolToggle")
+            @ConfigEntry.Gui.EnableIf(".coolToggle")
             public boolean dependsOnCoolToggle1 = false;
     
-            @ConfigEntry.Gui.DependsOn(value = ".coolToggle", conditions = {"{!}false"}, hiddenWhenNotMet = true)
+            @ConfigEntry.Gui.ShowIf(value = ".coolToggle", conditions = {"{!}false"})
             public boolean dependsOnCoolToggle2 = false;
             
-            @ConfigEntry.Gui.DependsOn(value = ".intSlider", conditions = {"> 70", "< -70"})
+            @ConfigEntry.Gui.EnableIf(value = ".intSlider", conditions = {"> 70", "< -70"})
             public boolean dependsOnIntSlider = true;
     
             @ConfigEntry.Gui.TransitiveObject
-            @ConfigEntry.Gui.DependsOn(".coolToggle")
-            @ConfigEntry.Gui.DependsOn(value = ".coolEnum", conditions = {"good", "excellent"})
+            @ConfigEntry.Gui.EnableIf(".coolToggle")
+            @ConfigEntry.Gui.EnableIf(value = ".coolEnum", conditions = {"good", "excellent"})
             public DependantObject dependantObject = new DependantObject();
             public static class DependantObject {
                 @ConfigEntry.Gui.PrefixText
                 public boolean toggle1 = false;
-                @ConfigEntry.Gui.DependsOn(value = "..intSlider", conditions = {"> 70", "< -70"})
+                @ConfigEntry.Gui.EnableIf(value = "..intSlider", conditions = {"> 70", "< -70"})
                 
                 public boolean toggle2 = true;
             }
     
             @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
-            @ConfigEntry.Gui.DependsOn(".coolToggle")
+            @ConfigEntry.Gui.EnableIf(".coolToggle")
             public DependantCollapsible dependantCollapsible = new DependantCollapsible();
             public static class DependantCollapsible {
                 public boolean toggle1 = false;
                 public boolean toggle2 = true;
             }
     
-            @ConfigEntry.Gui.DependsOn(value = ".coolToggle", conditions = {"true"})
+            @ConfigEntry.Gui.EnableIf(value = ".coolToggle", conditions = {"true"})
             public List<Integer> list = Arrays.asList(1, 2, 3);
     
         }
     
-        @ConfigEntry.Gui.DependsOn(value = ".dependencySubCategory.coolToggle", conditions = {"true"})
+        @ConfigEntry.Gui.EnableIf(value = ".dependencySubCategory.coolToggle", conditions = {"true"})
         public boolean dependsOnCoolToggleOutside = false;
         
     }

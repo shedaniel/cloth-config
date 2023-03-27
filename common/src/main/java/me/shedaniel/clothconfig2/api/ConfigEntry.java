@@ -10,20 +10,22 @@ public interface ConfigEntry<T> {
     T getValue();
     
     /**
-     * Get the entry's dependency.
-     *
-     * @return the {@link Dependency}
-     */
-    Dependency getDependency();
-    
-    /**
-     * Sets the entry's dependency. Whenever the dependency is unmet, the entry will be disabled.
+     * Sets the entry's "enable if" dependency. Whenever the dependency is unmet, the entry will be disabled.
      * <br>
      * Passing in a {@code null} value will remove the entry's dependency.
      *
      * @param dependency the new dependency. 
      */
-    void setDependency(@Nullable Dependency dependency);
+    void setEnableIfDependency(@Nullable Dependency dependency);
+    
+    /**
+     * Sets the entry's "show if" dependency. Whenever the dependency is unmet, the entry will be hidden from menus.
+     * <br>
+     * Passing in a {@code null} value will remove the entry's dependency.
+     *
+     * @param dependency the new dependency. 
+     */
+    void setShowIfDependency(@Nullable Dependency dependency);
     
     Component getFieldName();
     

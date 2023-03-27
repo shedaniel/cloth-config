@@ -56,7 +56,8 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     private Iterable<String> additionalSearchTags = null;
     
     @Nullable
-    private Dependency dependency = null;
+    private Dependency enableIfDependency = null;
+    private Dependency showIfDependency = null;
     
     public final void setReferenceProviderEntries(@Nullable List<ReferenceProvider<?>> referencableEntries) {
         this.referencableEntries = referencableEntries;
@@ -94,36 +95,49 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
             text = text.withStyle(ChatFormatting.ITALIC);
         if (!hasError && !isEdited)
             text = text.withStyle(ChatFormatting.GRAY);
-        if (!dependenciesMet())
+        if (!isEnabled())
             text = text.withStyle(ChatFormatting.DARK_GRAY);
         return text;
     }
     
     /**
-     * True if no dependency exists, otherwise true if the dependency conditions are currently met.
+     * True if no "enable if" dependency is set, otherwise true if the dependency conditions are currently met.
+     * <p>
+     * Never true if {@link #isShown()} is false.
      * 
-     * @return whether dependency conditions are met. 
+     * @return whether the config entry is enabled
+     * @see #isShown() 
      */
-    public boolean dependenciesMet() {
-        return dependency == null || dependency.check();
+    public boolean isEnabled() {
+        return isShown() && (enableIfDependency == null || enableIfDependency.check());
     }
     
     /**
-     * If an unmet dependency has {@link Dependency#hiddenWhenNotMet() hiddenWhenNotMet()} set to true, then the config entry
-     * should be hidden from menus.
-     * 
-     * @return whether the config entry should be hidden.
+     * True if no "show if" dependency is set, otherwise true if the dependency conditions are currently met.
+     *
+     * @return whether the config entry is shown in menus
+     * @see #isEnabled()
      */
-    public boolean hidden() {
-        return dependency != null && dependency.hidden();
+    public boolean isShown() {
+        return showIfDependency == null || showIfDependency.check();
     }
     
-    public void setDependency(@Nullable Dependency dependency) {
-        this.dependency = dependency;
+    @Override
+    public void setEnableIfDependency(@Nullable Dependency dependency) {
+        this.enableIfDependency = dependency;
     }
     
-    public @Nullable Dependency getDependency() {
-        return dependency;
+    public @Nullable Dependency getEnableIfDependency() {
+        return enableIfDependency;
+    }
+    
+    @Override
+    public void setShowIfDependency(@Nullable Dependency dependency) {
+        this.showIfDependency = dependency;
+    }
+    
+    public @Nullable Dependency getShowIfDependency() {
+        return showIfDependency;
     }
     
     public Iterator<String> getSearchTags() {

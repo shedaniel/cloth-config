@@ -134,7 +134,7 @@ public class DefaultGuiProviders {
                     List<AbstractConfigListEntry> children = getChildren(i18n, field, config, defaults, guiProvider);
     
                     // Apply the field's dependency to its children
-                    if (!children.isEmpty() && (field.isAnnotationPresent(ConfigEntry.Gui.DependsOnGroup.class) || field.isAnnotationPresent(ConfigEntry.Gui.DependsOn.class))) {
+                    if (!children.isEmpty() && DependencyManager.hasDependencyAnnotation(field)) {
                         DependencyManager dependencies = guiProvider.getDependencyManager();
                         children.forEach(gui -> dependencies.register(gui, field, i18n));
                     }

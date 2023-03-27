@@ -2,12 +2,9 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
-import org.jetbrains.annotations.ApiStatus;
 
 public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends MultiConditionDependencyBuilder<T, NumberConfigEntry<T>, NumberCondition<T>, NumberDependency<T>, NumberDependencyBuilder<T>> {
     
-    @ApiStatus.Internal
-    @Deprecated
     public NumberDependencyBuilder(NumberConfigEntry<T> gui) {
         super(gui, 1);
     }

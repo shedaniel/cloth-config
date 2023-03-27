@@ -91,7 +91,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return this.children().stream()
                 .filter(entry -> {
                     if (entry instanceof AbstractConfigEntry<?> configEntry)
-                        return !configEntry.hidden();
+                        return configEntry.isShown();
                     return true;
                 })
                 .toList();

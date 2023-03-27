@@ -91,9 +91,7 @@ public class StringFieldBuilder extends AbstractFieldBuilder<String, StringListE
         entry.setTooltipSupplier(() -> getTooltipSupplier().apply(entry.getValue()));
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
-        if (dependency != null)
-            entry.setDependency(dependency);
-        return entry;
+        return finishBuilding(entry);
     }
     
 }

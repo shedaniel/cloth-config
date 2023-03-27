@@ -71,16 +71,21 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     }
     
     private Optional<Component[]> getDependencyTooltip() {
-        @Nullable Dependency dependency = getDependency();
-        if (dependency == null)
-            return Optional.empty();
+        @Nullable Dependency enableIf = getEnableIfDependency();
+        @Nullable Dependency showIf = getShowIfDependency();
     
         // TODO consider showing all tooltips, not just for unmet
-        if (dependency.check())
+        if ((enableIf == null || enableIf.check()) && (showIf == null || showIf.check()))
             return Optional.empty();
 
-        return dependency.getTooltip();
+        // FIXME include tooltips for both "enable if" AND "show if" dependencies
+        if (enableIf != null)
+            return enableIf.getTooltip();
     
+        if (showIf != null)
+            return showIf.getTooltip();
+        
+        return Optional.empty();
     }
     
     public Optional<Component[]> getTooltip() {

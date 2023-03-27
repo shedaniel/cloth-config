@@ -3,15 +3,16 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyBuilder;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup, DependencyGroupBuilder> {
+public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup> {
     
     private final Set<Dependency> children = new HashSet<>();
     
     private DependencyGroup.Condition condition = DependencyGroup.Condition.ALL;
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Optional<Boolean> hidden = Optional.empty();
     private boolean inverted = false;
     
     public DependencyGroupBuilder() {}
@@ -20,7 +21,6 @@ public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup
     public DependencyGroup build() {
         DependencyGroup group = new DependencyGroup(this.condition, this.inverted);
         group.addChildren(this.children);
-        hidden.ifPresent(group::hiddenWhenNotMet);
         return group;
     }
     
@@ -36,17 +36,6 @@ public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup
     
     public DependencyGroupBuilder withChildren(Collection<Dependency> dependencies) {
         this.children.addAll(dependencies);
-        return this;
-    }
-    
-    @Override
-    public DependencyGroupBuilder hideWhenNotMet(boolean shouldHide) {
-        this.hidden = Optional.of(shouldHide);
-        return this;
-    }
-    
-    public DependencyGroupBuilder defaultHideBehaviour() {
-        this.hidden = Optional.empty();
         return this;
     }
     
