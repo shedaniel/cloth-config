@@ -99,11 +99,36 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
         this.requireRestart = requireRestart;
     }
     
+    /**
+     * Sets a dependency that when unmet will disable the built config entry.
+     * <br><br>
+     * If an "enable if" dependency is already set, it will be overwritten. If you wish for the config entry to have multiple
+     * dependencies, you can pass this method a {@link me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup DependencyGroup}
+     * built using {@link Dependency#groupBuilder()} or one of the various helper methods such as {@link Dependency#all(Dependency...)}.
+     *
+     * @param dependency the {@link Dependency dependency} required to enable the config entry
+     * @return this instance, for chaining
+     * @see Dependency 
+     */
+    @Contract(mutates = "this")
     @SuppressWarnings("unchecked")
     public final SELF setEnabledIf(Dependency dependency) {
         this.enableIfDependency = dependency;
         return (SELF) this;
     }
+    
+    /**
+     * Sets a dependency that when unmet will cause the built config entry to be hidden from menus.
+     * <br><br>
+     * If a "show if" dependency is already set, it will be overwritten. If you wish for the config entry to have multiple
+     * dependencies, you can pass this method a {@link me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup DependencyGroup}
+     * built using {@link Dependency#groupBuilder()} or one of the various helper methods such as {@link Dependency#all(Dependency...)}.
+     * 
+     * @param dependency the {@link Dependency dependency} required to show the config entry in menus
+     * @return this instance, for chaining
+      @see Dependency 
+     */
+    @Contract(mutates = "this")
     @SuppressWarnings("unchecked")
     public final SELF setShownIf(Dependency dependency) {
         this.showIfDependency = dependency;
