@@ -122,7 +122,8 @@ public class DependencyManager {
      */
     public void register(
             ConfigEntry<?> entry,
-            @Nullable String i18nBase, @Nullable Collection<EnableIf> enableIfAnnotations,
+            @Nullable String i18nBase,
+            @Nullable Collection<EnableIf> enableIfAnnotations,
             @Nullable Collection<EnableIfGroup> enableIfGroupAnnotations,
             @Nullable Collection<ShowIf> showIfAnnotations,
             @Nullable Collection<ShowIfGroup> showIfGroupAnnotations)
@@ -384,7 +385,7 @@ public class DependencyManager {
      * @return the absolute i18n key
      * @see EnableIf#value() Public API documentation
      */
-    private static String parseRelativeI18n(String i18nBase, String i18nKey) {
+    static String parseRelativeI18n(@Nullable String i18nBase, String i18nKey) {
         // Count how many "steps up" are at the start of the key string,
         int steps = 0;
         for (char c : i18nKey.toCharArray()) {
@@ -393,7 +394,11 @@ public class DependencyManager {
         }
         
         // Not a relative key
-        if (steps < 1) return i18nKey;
+        if (steps < 1)
+            return i18nKey;
+        
+        if (i18nBase == null)
+            throw new IllegalArgumentException("Relative i18n key cannot be used without a base-reference");
         
         // Get the key without any "step" chars
         String key = i18nKey.substring(steps);
@@ -423,78 +428,5 @@ public class DependencyManager {
             return null;
         
         return i18n.substring(0, index);
-    }
-    
-    /**
-     * Keeps track of a registered config entry and any associated dependency definitions
-     * 
-     * @param gui the config entry 
-     * @param enableIfDependencies a set of definitions that should enable/disable the config entry
-     * @param enableIfGroups a set of group definitions that should enable/disable the config entry
-     * @param showIfDependencies a set of definitions that should show/hide the config entry
-     * @param showIfGroups a set of group definitions that should show/hide the config entry
-     */
-    private record EntryRecord(
-            ConfigEntry<?> gui,
-            Set<DependencyDefinition> enableIfDependencies,
-            Set<DependencyGroupDefinition> enableIfGroups,
-            Set<DependencyDefinition> showIfDependencies,
-            Set<DependencyGroupDefinition> showIfGroups)
-    {
-        /**
-         * @return whether this config entry has any associated dependency definitions
-         */
-        boolean hasDependencies() {
-            return !(
-                    enableIfDependencies().isEmpty() &&
-                    enableIfGroups().isEmpty() &&
-                    showIfDependencies().isEmpty() &&
-                    showIfGroups().isEmpty()
-            );
-        }
-    }
-    
-    /**
-     * A record defining a dependency to be built.
-     * Can be declared using either an {@link EnableIf @EnableIf} or {@link ShowIf @ShowIf} annotation.
-     * 
-     * @param i18n the absolute i18n key of the depended-on config entry
-     * @param conditions an array of condition strings to be parsed
-     * @see DependencyGroupDefinition
-     */
-    private record DependencyDefinition(String i18n, String[] conditions) {
-        private DependencyDefinition(String i18nBase, EnableIf annotation) {
-            this(i18nBase, annotation.value(), annotation.conditions());
-        }
-        private DependencyDefinition(String i18nBase, ShowIf annotation) {
-            this(i18nBase, annotation.value(), annotation.conditions());
-        }
-        public DependencyDefinition(String i18nBase, String i18nKey, String[] conditions) {
-            this(parseRelativeI18n(i18nBase, i18nKey), conditions);
-        }
-    }
-    
-    /**
-     * A record defining a group dependency to be built.
-     * Can be declared using either an {@link EnableIfGroup @EnableIfGroup} or {@link ShowIfGroup @ShowIfGroup} annotation.
-     *
-     * @param condition the {@link DependencyGroup.Condition condition} defining how many children must be met
-     * @param inverted whether the dependency group should be logically inverted
-     * @param children an array of dependency {@link DependencyDefinition definitions} to be included in the group
-     * @see DependencyDefinition
-     */
-    private record DependencyGroupDefinition(DependencyGroup.Condition condition, boolean inverted, DependencyDefinition[] children) {
-        private DependencyGroupDefinition(String i18nBase, EnableIfGroup annotation) {
-            this(annotation.condition(), annotation.inverted(),
-                    Arrays.stream(annotation.value())
-                            .map(child -> new DependencyDefinition(i18nBase, child))
-                            .toArray(DependencyDefinition[]::new));
-        }
-        private DependencyGroupDefinition(String i18nBase, ShowIfGroup annotation) {
-            this(annotation.condition(), annotation.inverted(),
-                 Arrays.stream(annotation.value())
-                         .map(child -> new DependencyDefinition(i18nBase, child))
-                         .toArray(DependencyDefinition[]::new));
-        }
     }
 }
