@@ -98,11 +98,11 @@ public class DependencyManager {
                 showIfGroups = Collections.singleton(field.getAnnotation(ShowIfGroup.class));
         }
         
-        String baseI18n = Optional.ofNullable(fieldI18n)
+        String i18nBase = Optional.ofNullable(fieldI18n)
                 .map(DependencyManager::i18nParent)
                 .orElse(null);
     
-        register(entry, baseI18n, enableIfs, enableIfGroups, showIfs, showIfGroups);
+        register(entry, i18nBase, enableIfs, enableIfGroups, showIfs, showIfGroups);
     }
     
     /**
@@ -112,7 +112,7 @@ public class DependencyManager {
      * annotations to be applied to this entry.
      *
      * @param entry                    the config entry GUI
-     * @param baseI18n                 an absolute i18n key, to be used as the base reference of the dependencies
+     * @param i18nBase                 an absolute i18n key, to be used as the base reference of the dependencies
      * @param enableIfAnnotations      a {@link Collection} of {@link EnableIf @EnableIf} annotations
      * @param enableIfGroupAnnotations a {@link Collection} of {@link EnableIfGroup @EnableIfGroup} annotations
      * @param showIfAnnotations        a {@link Collection} of {@link ShowIf @ShowIf} annotations
@@ -122,7 +122,7 @@ public class DependencyManager {
      */
     public void register(
             ConfigEntry<?> entry,
-            @Nullable String baseI18n, @Nullable Collection<EnableIf> enableIfAnnotations,
+            @Nullable String i18nBase, @Nullable Collection<EnableIf> enableIfAnnotations,
             @Nullable Collection<EnableIfGroup> enableIfGroupAnnotations,
             @Nullable Collection<ShowIf> showIfAnnotations,
             @Nullable Collection<ShowIfGroup> showIfGroupAnnotations)
@@ -151,22 +151,22 @@ public class DependencyManager {
         // Add the new dependencies to the appropriate sets
         enableIfs.addAll(Stream.ofNullable(enableIfAnnotations)
                 .flatMap(Collection::stream)
-                .map(single -> new DependencyDefinition(baseI18n, single))
+                .map(single -> new DependencyDefinition(i18nBase, single))
                 .collect(Collectors.toUnmodifiableSet()));
     
         enableIfGroups.addAll(Stream.ofNullable(enableIfGroupAnnotations)
                 .flatMap(Collection::stream)
-                .map(group -> new DependencyGroupDefinition(baseI18n, group))
+                .map(group -> new DependencyGroupDefinition(i18nBase, group))
                 .collect(Collectors.toUnmodifiableSet()));
         
         showIfs.addAll(Stream.ofNullable(showIfAnnotations)
                 .flatMap(Collection::stream)
-                .map(single -> new DependencyDefinition(baseI18n, single))
+                .map(single -> new DependencyDefinition(i18nBase, single))
                 .collect(Collectors.toUnmodifiableSet()));
     
         showIfGroups.addAll(Stream.ofNullable(showIfGroupAnnotations)
                 .flatMap(Collection::stream)
-                .map(group -> new DependencyGroupDefinition(baseI18n, group))
+                .map(group -> new DependencyGroupDefinition(i18nBase, group))
                 .collect(Collectors.toUnmodifiableSet()));
         
         registry.put(i18n, new EntryRecord(entry, enableIfs, enableIfGroups, showIfs, showIfGroups));
@@ -425,33 +425,15 @@ public class DependencyManager {
         return i18n.substring(0, index);
     }
     
-    private record DependencyDefinition(String i18n, String[] conditions) {
-        private DependencyDefinition(String baseI18n, EnableIf annotation) {
-            this(baseI18n, annotation.value(), annotation.conditions());
-        }
-        private DependencyDefinition(String baseI18n, ShowIf annotation) {
-            this(baseI18n, annotation.value(), annotation.conditions());
-        }
-        public DependencyDefinition(String baseI18n, String i18n, String[] conditions) {
-            this(parseRelativeI18n(baseI18n, i18n), conditions);
-        }
-    }
-    
-    private record DependencyGroupDefinition(DependencyGroup.Condition condition, boolean inverted, DependencyDefinition[] children) {
-        private DependencyGroupDefinition(String baseI18n, EnableIfGroup annotation) {
-            this(annotation.condition(), annotation.inverted(),
-                    Arrays.stream(annotation.value())
-                            .map(child -> new DependencyDefinition(baseI18n, child))
-                            .toArray(DependencyDefinition[]::new));
-        }
-        private DependencyGroupDefinition(String baseI18n, ShowIfGroup annotation) {
-            this(annotation.condition(), annotation.inverted(),
-                 Arrays.stream(annotation.value())
-                         .map(child -> new DependencyDefinition(baseI18n, child))
-                         .toArray(DependencyDefinition[]::new));
-        }
-    }
-    
+    /**
+     * Keeps track of a registered config entry and any associated dependency definitions
+     * 
+     * @param gui the config entry 
+     * @param enableIfDependencies a set of definitions that should enable/disable the config entry
+     * @param enableIfGroups a set of group definitions that should enable/disable the config entry
+     * @param showIfDependencies a set of definitions that should show/hide the config entry
+     * @param showIfGroups a set of group definitions that should show/hide the config entry
+     */
     private record EntryRecord(
             ConfigEntry<?> gui,
             Set<DependencyDefinition> enableIfDependencies,
@@ -459,13 +441,60 @@ public class DependencyManager {
             Set<DependencyDefinition> showIfDependencies,
             Set<DependencyGroupDefinition> showIfGroups)
     {
+        /**
+         * @return whether this config entry has any associated dependency definitions
+         */
         boolean hasDependencies() {
             return !(
-                        enableIfDependencies().isEmpty() &&
-                        enableIfGroups().isEmpty() &&
-                        showIfDependencies().isEmpty() &&
-                        showIfGroups().isEmpty()
+                    enableIfDependencies().isEmpty() &&
+                    enableIfGroups().isEmpty() &&
+                    showIfDependencies().isEmpty() &&
+                    showIfGroups().isEmpty()
             );
+        }
+    }
+    
+    /**
+     * A record defining a dependency to be built.
+     * Can be declared using either an {@link EnableIf @EnableIf} or {@link ShowIf @ShowIf} annotation.
+     * 
+     * @param i18n the absolute i18n key of the depended-on config entry
+     * @param conditions an array of condition strings to be parsed
+     * @see DependencyGroupDefinition
+     */
+    private record DependencyDefinition(String i18n, String[] conditions) {
+        private DependencyDefinition(String i18nBase, EnableIf annotation) {
+            this(i18nBase, annotation.value(), annotation.conditions());
+        }
+        private DependencyDefinition(String i18nBase, ShowIf annotation) {
+            this(i18nBase, annotation.value(), annotation.conditions());
+        }
+        public DependencyDefinition(String i18nBase, String i18nKey, String[] conditions) {
+            this(parseRelativeI18n(i18nBase, i18nKey), conditions);
+        }
+    }
+    
+    /**
+     * A record defining a group dependency to be built.
+     * Can be declared using either an {@link EnableIfGroup @EnableIfGroup} or {@link ShowIfGroup @ShowIfGroup} annotation.
+     *
+     * @param condition the {@link DependencyGroup.Condition condition} defining how many children must be met
+     * @param inverted whether the dependency group should be logically inverted
+     * @param children an array of dependency {@link DependencyDefinition definitions} to be included in the group
+     * @see DependencyDefinition
+     */
+    private record DependencyGroupDefinition(DependencyGroup.Condition condition, boolean inverted, DependencyDefinition[] children) {
+        private DependencyGroupDefinition(String i18nBase, EnableIfGroup annotation) {
+            this(annotation.condition(), annotation.inverted(),
+                    Arrays.stream(annotation.value())
+                            .map(child -> new DependencyDefinition(i18nBase, child))
+                            .toArray(DependencyDefinition[]::new));
+        }
+        private DependencyGroupDefinition(String i18nBase, ShowIfGroup annotation) {
+            this(annotation.condition(), annotation.inverted(),
+                 Arrays.stream(annotation.value())
+                         .map(child -> new DependencyDefinition(i18nBase, child))
+                         .toArray(DependencyDefinition[]::new));
         }
     }
 }
