@@ -8,6 +8,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ConfigEntryMatcher;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
@@ -71,6 +72,27 @@ public class DependencyManager {
         String key = prefix != null && i18n.startsWith(prefix) ?
                 i18n : prefix + I18N_JOINER + i18n;
         return Optional.ofNullable(registry.get(key)).map(EntryRecord::gui);
+    }
+    
+    /**
+     * Gets the config entry GUI associated with the given i18n key, so long as the config entry can handle the
+     * provided type.
+     *
+     * @param <T>  the type the GUI must support
+     * @param type the type the GUI must support
+     * @param i18n the i18n key
+     * @return An {@link Optional} containing config entry or {@code Optional.empty()}
+     */
+    private <T> Optional<ConfigEntry<T>> getEntry(Class<T> type, String i18n) {
+        return getEntry(i18n).map(entry -> {
+                    // Entry's type must extend from the provided type 
+                    if (!type.isAssignableFrom(entry.getType()))
+                        return null;
+                    
+                    // If type is assignable, we can safely cast to <T>
+                    @SuppressWarnings("unchecked") ConfigEntry<T> tEntry = (ConfigEntry<T>) entry;
+                    return tEntry;
+                });
     }
     
     /**
@@ -309,22 +331,28 @@ public class DependencyManager {
      * @param gui the {@link BooleanListEntry} to be depended on
      * @return the generated dependency
      */
-    public static BooleanDependency buildDependency(DependencyDefinition dependency, BooleanListEntry gui) {
-        List<BooleanCondition> conditions = dependency.conditions().stream()
-                .map(BooleanCondition::fromConditionString)
-                .toList();
-        
+    public BooleanDependency buildDependency(DependencyDefinition dependency, BooleanListEntry gui) {
+        LinkedList<BooleanCondition> conditions = dependency.conditions().stream()
+                .map(StaticConditionDefinition::toBooleanCondition)
+                .collect(Collectors.toCollection(LinkedList::new));
+    
+        Set<ConfigEntryMatcher<Boolean>> matchers = dependency.matching().stream()
+                .map(condition -> condition.toMatcher(getEntry(Boolean.class, condition.i18n())
+                        .orElseThrow(() -> new IllegalArgumentException("Specified config entry not found: \"%s\"".formatted(condition.i18n())))))
+                .collect(Collectors.toUnmodifiableSet());
+    
         // Start building the dependency
         BooleanDependencyBuilder builder = Dependency.builder(gui);
         
         // BooleanDependencyBuilder supports zero or one condition being set 
         if (!conditions.isEmpty()) {
-            if (conditions.size() != 1)
+            if (conditions.size() != 1 && matchers.isEmpty())
                 throw new IllegalArgumentException("Boolean dependencies require exactly one condition, found " + conditions.size());
             
-            builder.withCondition(conditions.get(0));
+            builder.withCondition(conditions.getFirst());
         }
-            
+        
+        builder.matching(matchers);         
         return builder.build();
     }
     
@@ -335,14 +363,20 @@ public class DependencyManager {
      * @param gui the {@link EnumListEntry} to be depended on
      * @return the generated dependency
      */
-    public static <T extends Enum<?>> EnumDependency<T> buildDependency(DependencyDefinition dependency, EnumListEntry<T> gui) {
+    public <T extends Enum<?>> EnumDependency<T> buildDependency(DependencyDefinition dependency, EnumListEntry<T> gui) {
         Class<T> type = gui.getType();
         Set<EnumCondition<T>> conditions = dependency.conditions().stream()
-                .map(condition -> EnumCondition.fromConditionString(type, condition))
+                .map(condition -> condition.toEnumCondition(type))
+                .collect(Collectors.toUnmodifiableSet());
+    
+        Set<ConfigEntryMatcher<T>> matchers = dependency.matching().stream()
+                .map(condition -> condition.toMatcher(getEntry(type, condition.i18n())
+                        .orElseThrow(() -> new IllegalArgumentException("Specified config entry not found: \"%s\"".formatted(condition.i18n())))))
                 .collect(Collectors.toUnmodifiableSet());
     
         return Dependency.builder(gui)
                 .withConditions(conditions)
+                .matching(matchers)
                 .build();
     }
     
@@ -353,14 +387,20 @@ public class DependencyManager {
      * @param gui the {@link NumberConfigEntry} to be depended on
      * @return the generated dependency
      */
-    public static <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependencyDefinition dependency, NumberConfigEntry<T> gui) {
+    public <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependencyDefinition dependency, NumberConfigEntry<T> gui) {
         Class<T> type = gui.getType();
         Set<NumberCondition<T>> conditions = dependency.conditions().stream()
-                .map(condition -> NumberCondition.fromConditionString(type, condition))
+                .map(condition -> condition.toNumberCondition(type))
+                .collect(Collectors.toUnmodifiableSet());
+    
+        Set<ConfigEntryMatcher<T>> matchers = dependency.matching().stream()
+                .map(condition -> condition.toComparableMatcher(getEntry(type, condition.i18n())
+                        .orElseThrow(() -> new IllegalArgumentException("Specified config entry not found: \"%s\"".formatted(condition.i18n())))))
                 .collect(Collectors.toUnmodifiableSet());
     
         return Dependency.builder(gui)
                 .withConditions(conditions)
+                .matching(matchers)
                 .build();
     }
     

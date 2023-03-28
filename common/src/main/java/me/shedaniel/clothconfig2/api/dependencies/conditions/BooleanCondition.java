@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.api.dependencies.conditions;
 
 import net.minecraft.network.chat.Component;
 
-public class BooleanCondition extends Condition<Boolean> {
+public class BooleanCondition extends StaticCondition<Boolean> {
     public BooleanCondition(Boolean value) {
         super(value);
     }
@@ -17,13 +17,6 @@ public class BooleanCondition extends Condition<Boolean> {
             default ->
                     throw new IllegalStateException("Unexpected condition \"%s\" for Boolean dependency (expected \"true\" or \"false\").".formatted(string));
         });
-    }
-    
-    public static BooleanCondition fromConditionString(String condition) throws IllegalArgumentException {
-        Condition.Flag.FlaggedString record = Condition.Flag.fromConditionString(condition);
-        BooleanCondition booleanCondition = fromString(record.condition());
-        booleanCondition.setFlags(record.flags());
-        return booleanCondition;
     }
     
     @Override

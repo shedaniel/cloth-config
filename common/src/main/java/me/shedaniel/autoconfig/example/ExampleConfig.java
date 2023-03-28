@@ -110,9 +110,12 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
         @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
         public DependencySubCategory dependencySubCategory = new DependencySubCategory();
         public static class DependencySubCategory {
-            
+    
             @ConfigEntry.Gui.Tooltip
             public boolean coolToggle = false;
+    
+            @ConfigEntry.Gui.Tooltip
+            public boolean lameToggle = true;
             
             @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
             public DependencyDemoEnum coolEnum = DependencyDemoEnum.OKAY;
@@ -125,13 +128,16 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     
             @ConfigEntry.Gui.ShowIf(value = ".coolToggle", conditions = {"{!}false"})
             public boolean dependsOnCoolToggle2 = false;
+    
+            @ConfigEntry.Gui.EnableIf(value = ".coolToggle", matching = {".lameToggle"})
+            public boolean dependsOnToggleMatch = false;
             
             @ConfigEntry.Gui.EnableIf(value = ".intSlider", conditions = {"> 70", "< -70"})
             public boolean dependsOnIntSlider = true;
     
             @ConfigEntry.Gui.TransitiveObject
             @ConfigEntry.Gui.EnableIf(".coolToggle")
-            @ConfigEntry.Gui.EnableIf(value = ".coolEnum", conditions = {"good", "excellent"})
+            @ConfigEntry.Gui.EnableIf(value = ".coolEnum", conditions = {"{i}good", "EXCELLENT"})
             public DependantObject dependantObject = new DependantObject();
             public static class DependantObject {
                 @ConfigEntry.Gui.PrefixText

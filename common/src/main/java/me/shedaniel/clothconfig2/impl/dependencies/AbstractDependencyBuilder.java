@@ -4,7 +4,10 @@ import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ConfigEntryMatcher;
 import org.jetbrains.annotations.Contract;
+
+import java.util.Collection;
 
 /**
  * @param <T> the type the dependency deals with
@@ -13,7 +16,7 @@ import org.jetbrains.annotations.Contract;
  * @param <D> the {@link Dependency} type that will be built
  * @param <SELF> the type to be returned by chainable methods
  */
-public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C extends Condition<T>, D extends ConfigEntryDependency<T, E, C>, SELF extends AbstractDependencyBuilder<T, E, C, D, SELF>> implements DependencyBuilder<D> {
+public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C extends Condition<T>, D extends ConfigEntryDependency<T, E>, SELF extends AbstractDependencyBuilder<T, E, C, D, SELF>> implements DependencyBuilder<D> {
     
     protected final E gui;
     
@@ -52,4 +55,8 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C e
      * @return this instance, for chaining
      */
     public abstract SELF withCondition(C condition);
+    
+    public abstract SELF matching(Collection<ConfigEntryMatcher<T>> comparators);
+    
+    public abstract SELF matching(ConfigEntryMatcher<T> comparator);
 }

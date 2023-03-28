@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ConfigEntryMatcher;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -15,14 +16,13 @@ import java.util.Set;
  * @param <D> the {@link Dependency} type that will be built
  * @param <SELF> the type to be returned by chainable methods
  */
-public abstract class MultiConditionDependencyBuilder<T, E extends ConfigEntry<T>, C extends Condition<T>, D extends ConfigEntryDependency<T, E, C>, SELF extends MultiConditionDependencyBuilder<T, E, C, D, SELF>> extends AbstractDependencyBuilder<T, E, C, D, SELF> {
+public abstract class MultiConditionDependencyBuilder<T, E extends ConfigEntry<T>, C extends Condition<T>, D extends ConfigEntryDependency<T, E>, SELF extends MultiConditionDependencyBuilder<T, E, C, D, SELF>> extends AbstractDependencyBuilder<T, E, C, D, SELF> {
     
-    protected final Set<C> conditions = new HashSet<>();
-    private final int minConditions;
+    protected final Set<Condition<T>> conditions = new HashSet<>();
+    private final int minConditions = 1;
     
-    protected MultiConditionDependencyBuilder(E gui, int requiredConditions) {
+    protected MultiConditionDependencyBuilder(E gui) {
         super(gui);
-        this.minConditions = requiredConditions;
     }
     
     /**
@@ -61,6 +61,20 @@ public abstract class MultiConditionDependencyBuilder<T, E extends ConfigEntry<T
         
         this.conditions.addAll(conditions);
         
+        return self;
+    }
+    
+    @Override
+    public SELF matching(Collection<ConfigEntryMatcher<T>> comparators) {
+        @SuppressWarnings("unchecked") SELF self = (SELF) this;
+        this.conditions.addAll(comparators);
+        return self;
+    }
+    
+    @Override
+    public SELF matching(ConfigEntryMatcher<T> comparator) {
+        @SuppressWarnings("unchecked") SELF self = (SELF) this;
+        conditions.add(comparator);
         return self;
     }
 }

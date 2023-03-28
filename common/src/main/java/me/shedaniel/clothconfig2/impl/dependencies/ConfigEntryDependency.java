@@ -2,6 +2,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.StaticCondition;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -15,10 +16,9 @@ import java.util.Optional;
  * Represents a dependency on a {@link ConfigEntry}
  *
  * @param <T> the type this dependency deals with
- * @param <C> the {@link Condition} type
  * @param <E> the {@link ConfigEntry} type
  */
-public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>, C extends Condition<T>> extends AbstractDependency<C, E> {
+public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>> extends AbstractDependency<Condition<T>, E> {
     
     protected ConfigEntryDependency(E entry) {
         super(entry);
@@ -36,7 +36,12 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>, C exten
         return getConditions().stream().anyMatch(condition -> condition.check(value));
     }
     
-    protected Component getConditionText(C condition, boolean inverted) {
+    protected Component getConditionText(Condition<T> condition, boolean inverted) {
+        return condition instanceof StaticCondition<T> staticCondition ?
+                getConditionText(staticCondition, inverted) : condition.getText(inverted);
+    }
+    
+    protected Component getConditionText(StaticCondition<T> condition, boolean inverted) {
         return condition.getText(inverted);
     }
     
@@ -49,7 +54,7 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>, C exten
     
         if (conditions == 1) {
             Component conditionText = (this.getConditions().stream()
-                    .map(condition -> getConditionText(condition, inverted))
+                    .map(condition -> condition.getText(inverted))
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Expected exactly one condition")));
             return Component.translatable("text.cloth-config.dependencies.short_description.single", getElement().getFieldName(), conditionText);
@@ -63,7 +68,7 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>, C exten
      */
     @Override
     public Optional<Component[]> getTooltip(boolean inverted) {
-        Collection<C> conditions = getConditions();
+        Collection<Condition<T>> conditions = getConditions();
         if (conditions.isEmpty())
             throw new IllegalStateException("Expected at least one condition to be defined");
         

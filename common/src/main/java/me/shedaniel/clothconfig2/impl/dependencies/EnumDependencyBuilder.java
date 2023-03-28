@@ -6,7 +6,7 @@ import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 public class EnumDependencyBuilder<T extends Enum<?>> extends MultiConditionDependencyBuilder<T, EnumListEntry<T>, EnumCondition<T>, EnumDependency<T>, EnumDependencyBuilder<T>> {
     
     public EnumDependencyBuilder(EnumListEntry<T> gui) {
-        super(gui, 1);
+        super(gui);
     }
     
     @Override

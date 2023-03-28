@@ -2,30 +2,28 @@ package me.shedaniel.clothconfig2.api.dependencies.conditions;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public class NumberCondition<T extends Number & Comparable<T>> extends Condition<T> implements Comparable<T> {
+public class NumberCondition<T extends Number & Comparable<T>> extends StaticCondition<T> {
 
     private static final Pattern WHITESPACE = Pattern.compile("\\s");
     
-    private final Operator operator;
+    private final ComparisonOperator operator;
     private final boolean integer;
     
     private int formatPrecision = -1;
     
     public NumberCondition(T value) {
-        this(Operator.EQUAL, value);
+        this(ComparisonOperator.EQUAL, value);
     }
 
-    public NumberCondition(Operator operator, T value) {
+    public NumberCondition(ComparisonOperator operator, T value) {
         super(value);
         this.operator = operator;
         
@@ -47,7 +45,7 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
      *     <li>{@link Float}</li>
      * </ul>
      * 
-     * The condition string can optionally begin with a mathematical {@link Operator comparison operator}.
+     * The condition string can optionally begin with a mathematical {@link ComparisonOperator comparison operator}.
      * For example, the condition <em>"{@code >10}"</em> is true when the depended-on entry's value is greater than 10.
      * 
      * <br><br>
@@ -65,27 +63,25 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
      * Any whitespace in the condition string will be completely ignored.
      * 
      * @param type a class defining what type of number the {@code NumberCondition} will handle
-     * @param condition a string that can be parsed into type {@code T}, optionally prefixed with a {@link Operator comparison operator} 
+     * @param condition a string that can be parsed into type {@code T}, optionally prefixed with a {@link ComparisonOperator comparison operator} 
      * @param <T> the type of {@link Number} the {@code NumberCondition} will deal with, must be {@link Comparable} with
      *           other instances of type {@code T}
      * @return a {@code NumberCondition} representing the given {@code condition}
      * @throws NumberFormatException if the {@code condition} string cannot be parsed into type {@code T}
      * @throws IllegalArgumentException if the given {@code type} ({@code T}) is not supported
-     * @see Operator
+     * @see ComparisonOperator
      */
     public static <T extends Number & Comparable<T>> @NotNull NumberCondition<T> fromString(@NotNull Class<T> type, @NotNull String condition) throws IllegalArgumentException {
         String stripped = WHITESPACE.matcher(condition).replaceAll("");
-        Optional<Operator> optional = Arrays.stream(Operator.values())
-                .filter(value -> stripped.startsWith(value.toString()))
-                .findAny();
+        Optional<ComparisonOperator> optional = Optional.ofNullable(ComparisonOperator.startsWith(stripped));
         
-        Operator operator;
+        ComparisonOperator operator;
         String numberPart;
         if (optional.isPresent()) {
             operator = optional.get();
             numberPart = stripped.substring(operator.toString().length());
         } else {
-            operator = Operator.EQUAL;
+            operator = ComparisonOperator.EQUAL;
             numberPart = stripped;
         }
         
@@ -106,29 +102,9 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
         return new NumberCondition<>(operator, number);
     }
     
-    public static <T extends Number & Comparable<T>> @NotNull NumberCondition<T> fromConditionString(@NotNull Class<T> type, @NotNull String condition) throws IllegalArgumentException {
-        Flag.FlaggedString record = Flag.fromConditionString(condition);
-        NumberCondition<T> numberCondition = fromString(type, record.condition());
-        numberCondition.setFlags(record.flags());
-        return numberCondition;
-    }
-    
     @Override
     protected boolean matches(T value) {
-        return switch (this.operator) {
-            case EQUAL -> 0 == compareTo(value);
-            case NOT_EQUAL -> 0 != compareTo(value);
-            case GREATER       -> 0 >  compareTo(value);
-            case GREATER_EQUAL -> 0 >= compareTo(value);
-            case LESS          -> 0 <  compareTo(value);
-            case LESS_EQUAL    -> 0 <= compareTo(value);
-        };
-    }
-    
-    @Override
-    @Contract(pure = true)
-    public int compareTo(@NotNull T value) {
-        return this.value.compareTo(value);
+        return operator.compare(value, getValue());
     }
     
     public void setFormatPrecision(int places) {
@@ -162,7 +138,7 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
     protected Component getTextInternal() {
         MutableComponent condition = Component.translatable(
                 "text.cloth-config.dependencies.conditions.%s".formatted(this.operator.name().toLowerCase()),
-                integer ? this.value.toString() : formatDouble(this.value.doubleValue(), formatPrecision()));
+                integer ? getValue().toString() : formatDouble(getValue().doubleValue(), formatPrecision()));
         if (inverted())
             condition = Component.translatable("not", condition);
         return condition;
@@ -189,26 +165,4 @@ public class NumberCondition<T extends Number & Comparable<T>> extends Condition
         return false;
     }
     
-    /**
-     * A mathematical comparison operator
-     */
-    public enum Operator {
-        EQUAL("=="),
-        NOT_EQUAL("!="),
-        GREATER(">"),
-        GREATER_EQUAL(">="),
-        LESS("<"),
-        LESS_EQUAL("<=");
-        
-        private final String symbol;
-        
-        Operator(String symbol) {
-            this.symbol = symbol;
-        }
-        
-        @Override
-        public String toString() {
-            return this.symbol;
-        }
-    }
 }

@@ -56,7 +56,7 @@ public abstract class AbstractDependency<C, E> implements Dependency {
      *
      * @param conditions a {@link Collection} of conditions to be added
      */
-    public final void addConditions(Collection<C> conditions) {
+    public final void addConditions(Collection<? extends C> conditions) {
         this.conditions.addAll(conditions);
     }
     

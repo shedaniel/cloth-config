@@ -6,7 +6,7 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
 public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends MultiConditionDependencyBuilder<T, NumberConfigEntry<T>, NumberCondition<T>, NumberDependency<T>, NumberDependencyBuilder<T>> {
     
     public NumberDependencyBuilder(NumberConfigEntry<T> gui) {
-        super(gui, 1);
+        super(gui);
     }
     
     @Override

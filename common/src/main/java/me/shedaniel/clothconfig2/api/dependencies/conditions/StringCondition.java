@@ -4,7 +4,7 @@ import net.minecraft.network.chat.Component;
 
 import java.util.function.BiPredicate;
 
-public class StringCondition extends Condition<String> {
+public class StringCondition extends StaticCondition<String> {
     
     public StringCondition(String value) {
         super(value);
@@ -18,7 +18,7 @@ public class StringCondition extends Condition<String> {
     }
     
     public final boolean ignoreCase() {
-        return getFlags().contains(Flag.IGNORE_CASE);
+        return getFlags().contains(ConditionFlag.IGNORE_CASE);
     }
     
     @Override

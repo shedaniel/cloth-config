@@ -1,5 +1,6 @@
 package me.shedaniel.clothconfig2.api.dependencies;
 
+import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
@@ -24,6 +25,10 @@ public interface Dependency {
     
     static <T extends Number & Comparable<T>> NumberDependencyBuilder<T> builder(NumberConfigEntry<T> gui) {
         return new NumberDependencyBuilder<>(gui);
+    }
+    
+    static <T, E extends ConfigEntry<T>> ComparatorDependencyBuilder<T> comparatorBuilder(E type) {
+        return new ComparatorDependencyBuilder<>(type);
     }
     
     static DependencyGroupBuilder groupBuilder() {

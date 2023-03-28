@@ -19,6 +19,8 @@
 
 package me.shedaniel.autoconfig.annotation;
 
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ConditionFlag;
 import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependency;
 import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
 
@@ -220,7 +222,7 @@ public class ConfigEntry {
              * </ul>
              * 
              * <h2>Flags
-             * <p>The value can optionally be prefixed with "{@link me.shedaniel.clothconfig2.api.dependencies.conditions.Condition.Flag flags}"
+             * <p>The value can optionally be prefixed with "{@link ConditionFlag flags}"
              * that affect how the condition is applied.
              * <p>If the value starts with '<code>{</code>' then a corresponding '<code>}</code>' must be present.
              * Any characters within the <code>{</code> and <code>}</code> will be interpreted as flags.
@@ -238,6 +240,30 @@ public class ConfigEntry {
              * </ul>
              */
             String[] conditions() default {};
+    
+            /**
+             * One or more i18n keys referencing config entries. The dependency is met if the {@link #value() depended-on}
+             * config entry's value matches the value of at least one config entry listed here.
+             * 
+             * <p>A single dependency should not define both static conditions and reference matching conditions. I.e. if
+             * {@link #conditions()} is used, this parameter should not be (and vice-versa). If both are present an
+             * {@link IllegalArgumentException} will be thrown at runtime.
+             * 
+             * <p>
+             * All config entries must use a type compatible with the depended-on config entry referenced in {@link #value()}.
+             * For example, if the depended-on config entry is a {@link me.shedaniel.clothconfig2.gui.entries.BooleanListEntry boolean config entry}
+             * then only other boolean config entries should be listed.
+             * 
+             * <p>As with static conditions, flags can be prefixed to the reference string. Refer to the static condition
+             * {@link #conditions() documentation} for more detail.
+             * 
+             * <p>If the dependency is numeric, a {@link ComparisonOperator comparison operator}
+             * can be included before the i18n key (optionally separated by whitespace, for readability).
+             * If present the appropriate comparison will be used instead of checking equality.
+             * For example, if <em>'{@code >}'</em> is included before the i18n key, the condition is true when the
+             * depended-on config entry's value is greater than the other config entry's value.
+             */
+            String[] matching() default {};
         }
     
         /**
@@ -291,9 +317,14 @@ public class ConfigEntry {
             String value();
     
             /**
-             * @see EnableIf#conditions() 
+             * @see EnableIf#conditions()
              */
             String[] conditions() default {};
+    
+            /**
+             * @see EnableIf#matching()
+             */
+            String[] matching() default {};
         }
     
         /**

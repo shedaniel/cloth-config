@@ -24,6 +24,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.autoconfig.util.Utils;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
 import me.shedaniel.clothconfig2.gui.entries.*;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
@@ -161,12 +162,19 @@ public class ClothConfigDemo {
         ));
         
         SubCategoryBuilder depends = entryBuilder.startSubCategory(Component.literal("Dependencies")).setExpanded(true);
+        LinkedList<BooleanListEntry> toggles = new LinkedList<>();
         BooleanListEntry dependency = entryBuilder.startBooleanToggle(Component.literal("A cool toggle"), false).setTooltip(Component.literal("Toggle me...")).build();
-        depends.add(dependency);
-        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true)
+        toggles.add(dependency);
+        toggles.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true)
                 .setEnabledIf(Dependency.builder(dependency).build()).build());
-        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only appear when cool is toggled..."), true)
+        toggles.add(entryBuilder.startBooleanToggle(Component.literal("I only appear when cool is toggled..."), true)
                 .setShownIf(Dependency.builder(dependency).build()).build());
+        depends.addAll(toggles);
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool matches one of these toggles ^^"), true)
+                        .setEnabledIf(Dependency.comparatorBuilder(toggles.removeFirst())
+                                .matching(toggles)
+                                .build())
+                .build());
         SubCategoryBuilder dependantSub = entryBuilder.startSubCategory(Component.literal("How do deps work with sub-categories?"))
                 .setEnabledIf(Dependency.builder(dependency).build());
         dependantSub.add(entryBuilder.startTextDescription(Component.literal("This sub category depends on Cool being toggled")).build());
@@ -196,8 +204,8 @@ public class ClothConfigDemo {
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when numbers are awesome!"), true)
                 .setTooltip(Component.literal("Move the slider above..."))
                 .setEnabledIf(Dependency.builder(intDependency)
-                                .withCondition(new NumberCondition<>(NumberCondition.Operator.LESS, -70))
-                                .withCondition(new NumberCondition<>(NumberCondition.Operator.GREATER, 70))
+                                .withCondition(new NumberCondition<>(ComparisonOperator.LESS, -70))
+                                .withCondition(new NumberCondition<>(ComparisonOperator.GREATER, 70))
                                 .build())
                 .build());
     
