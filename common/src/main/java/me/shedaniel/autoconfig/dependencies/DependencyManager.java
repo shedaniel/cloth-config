@@ -249,7 +249,7 @@ public class DependencyManager {
      */
     public Dependency buildDependency(DependencyGroupDefinition dependencyGroup) {
         // Build each child DependencyDefinition
-        Dependency[] dependencies = Arrays.stream(dependencyGroup.children())
+        Dependency[] dependencies = dependencyGroup.children().stream()
                 .map(this::buildDependency)
                 .distinct()
                 .toArray(Dependency[]::new);
@@ -310,7 +310,7 @@ public class DependencyManager {
      * @return the generated dependency
      */
     public static BooleanDependency buildDependency(DependencyDefinition dependency, BooleanListEntry gui) {
-        List<BooleanCondition> conditions = Arrays.stream(dependency.conditions())
+        List<BooleanCondition> conditions = dependency.conditions().stream()
                 .map(BooleanCondition::fromConditionString)
                 .toList();
         
@@ -337,7 +337,7 @@ public class DependencyManager {
      */
     public static <T extends Enum<?>> EnumDependency<T> buildDependency(DependencyDefinition dependency, EnumListEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<EnumCondition<T>> conditions = Arrays.stream(dependency.conditions())
+        Set<EnumCondition<T>> conditions = dependency.conditions().stream()
                 .map(condition -> EnumCondition.fromConditionString(type, condition))
                 .collect(Collectors.toUnmodifiableSet());
     
@@ -355,7 +355,7 @@ public class DependencyManager {
      */
     public static <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependencyDefinition dependency, NumberConfigEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<NumberCondition<T>> conditions = Arrays.stream(dependency.conditions())
+        Set<NumberCondition<T>> conditions = dependency.conditions().stream()
                 .map(condition -> NumberCondition.fromConditionString(type, condition))
                 .collect(Collectors.toUnmodifiableSet());
     
