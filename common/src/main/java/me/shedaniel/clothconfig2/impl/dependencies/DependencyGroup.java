@@ -142,7 +142,7 @@ public class DependencyGroup implements Dependency {
                     .filter(predicate)
                     .toList();
         
-        List<Dependency> flattened = new ArrayList<>(children.size() * 2);
+        List<Dependency> flattened = new LinkedList<>();
         children.stream()
                 .filter(predicate)
                 .forEach(child -> {
