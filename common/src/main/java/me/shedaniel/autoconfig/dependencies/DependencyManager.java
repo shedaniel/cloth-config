@@ -271,20 +271,17 @@ public class DependencyManager {
      */
     public Dependency buildDependency(DependencyGroupDefinition dependencyGroup) {
         // Build each child DependencyDefinition
-        Dependency[] dependencies = dependencyGroup.children().stream()
-                .map(this::buildDependency)
-                .distinct()
-                .toArray(Dependency[]::new);
+        Set<Dependency> dependencies = dependencyGroup.buildChildren(this::buildDependency);
         
         // If there's only one child, don't bother making a group
         // unless the group is being used to invert the child
-        if (dependencies.length == 1) {
+        if (dependencies.size() == 1) {
             boolean invert = switch (dependencyGroup.condition()) {
                 case ALL, ANY, ONE -> dependencyGroup.inverted();
                 case NONE -> !dependencyGroup.inverted();
             };
             if (!invert)
-                return dependencies[0];
+                return dependencies.iterator().next();
         }
     
         // Build and return the DependencyGroup
@@ -332,24 +329,18 @@ public class DependencyManager {
      * @return the generated dependency
      */
     public BooleanDependency buildDependency(DependencyDefinition dependency, BooleanListEntry gui) {
-        LinkedList<BooleanCondition> conditions = dependency.conditions().stream()
-                .map(StaticConditionDefinition::toBooleanCondition)
-                .collect(Collectors.toCollection(LinkedList::new));
-    
-        Set<ConfigEntryMatcher<Boolean>> matchers = dependency.matching().stream()
-                .map(condition -> condition.toMatcher(getEntry(Boolean.class, condition.i18n())
-                        .orElseThrow(() -> new IllegalArgumentException("Specified config entry not found: \"%s\"".formatted(condition.i18n())))))
-                .collect(Collectors.toUnmodifiableSet());
+        Set<BooleanCondition> conditions = dependency.buildConditions(StaticConditionDefinition::toBooleanCondition);
+        Set<ConfigEntryMatcher<Boolean>> matchers = dependency.buildMatchers(Boolean.class, this::getEntry);
     
         // Start building the dependency
         BooleanDependencyBuilder builder = Dependency.builder(gui);
         
         // BooleanDependencyBuilder supports zero or one condition being set 
         if (!conditions.isEmpty()) {
-            if (conditions.size() != 1 && matchers.isEmpty())
+            if (conditions.size() != 1)
                 throw new IllegalArgumentException("Boolean dependencies require exactly one condition, found " + conditions.size());
-            
-            builder.withCondition(conditions.getFirst());
+    
+            conditions.forEach(builder::withCondition);
         }
         
         builder.matching(matchers);         
@@ -365,14 +356,8 @@ public class DependencyManager {
      */
     public <T extends Enum<?>> EnumDependency<T> buildDependency(DependencyDefinition dependency, EnumListEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<EnumCondition<T>> conditions = dependency.conditions().stream()
-                .map(condition -> condition.toEnumCondition(type))
-                .collect(Collectors.toUnmodifiableSet());
-    
-        Set<ConfigEntryMatcher<T>> matchers = dependency.matching().stream()
-                .map(condition -> condition.toMatcher(getEntry(type, condition.i18n())
-                        .orElseThrow(() -> new IllegalArgumentException("Specified config entry not found: \"%s\"".formatted(condition.i18n())))))
-                .collect(Collectors.toUnmodifiableSet());
+        Set<EnumCondition<T>> conditions = dependency.buildConditions(condition -> condition.toEnumCondition(type));
+        Set<ConfigEntryMatcher<T>> matchers = dependency.buildMatchers(type, this::getEntry);
     
         return Dependency.builder(gui)
                 .withConditions(conditions)
@@ -389,14 +374,8 @@ public class DependencyManager {
      */
     public <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependencyDefinition dependency, NumberConfigEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<NumberCondition<T>> conditions = dependency.conditions().stream()
-                .map(condition -> condition.toNumberCondition(type))
-                .collect(Collectors.toUnmodifiableSet());
-    
-        Set<ConfigEntryMatcher<T>> matchers = dependency.matching().stream()
-                .map(condition -> condition.toComparableMatcher(getEntry(type, condition.i18n())
-                        .orElseThrow(() -> new IllegalArgumentException("Specified config entry not found: \"%s\"".formatted(condition.i18n())))))
-                .collect(Collectors.toUnmodifiableSet());
+        Set<NumberCondition<T>> conditions = dependency.buildConditions(condition -> condition.toNumberCondition(type));
+        Set<ConfigEntryMatcher<T>> matchers = dependency.buildComparableMatchers(type, this::getEntry);
     
         return Dependency.builder(gui)
                 .withConditions(conditions)

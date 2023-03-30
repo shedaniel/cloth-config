@@ -2,11 +2,13 @@ package me.shedaniel.autoconfig.dependencies;
 
 
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -31,5 +33,9 @@ record DependencyGroupDefinition(DependencyGroup.Condition condition, boolean in
                 Arrays.stream(annotation.value())
                         .map(child -> new DependencyDefinition(i18nBase, child))
                         .collect(Collectors.toUnmodifiableSet()));
+    }
+    
+    Set<Dependency> buildChildren(Function<DependencyDefinition, Dependency> builder) {
+        return this.children().stream().map(builder).collect(Collectors.toUnmodifiableSet());
     }
 }
