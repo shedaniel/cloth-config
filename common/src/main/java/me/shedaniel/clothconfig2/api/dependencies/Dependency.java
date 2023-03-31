@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-import static me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup.Condition.*;
+import static me.shedaniel.clothconfig2.api.dependencies.GroupRequirement.*;
 
 public interface Dependency {
     

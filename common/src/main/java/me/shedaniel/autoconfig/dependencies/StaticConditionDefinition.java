@@ -15,8 +15,8 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
     /**
      * @param condition a string that may or may not begin with {@link ConditionFlag flags}
      * @return a {@link StaticConditionDefinition record} containing the parsed {@link ConditionFlag flags}
-     * and the remainder of the provided condition string
-     * @throws IllegalArgumentException if the condition string begins a flags section without ending it
+     * and the remainder of the provided requirement string
+     * @throws IllegalArgumentException if the requirement string begins a flags section without ending it
      * @see ConfigEntry.Gui.EnableIf#conditions() Public API documentation
      */
     static StaticConditionDefinition fromConditionString(String condition) throws IllegalArgumentException {

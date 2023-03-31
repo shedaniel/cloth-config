@@ -135,8 +135,8 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
             public boolean dependsOnIntSlider = true;
     
             @ConfigEntry.Gui.TransitiveObject
-            @ConfigEntry.Gui.EnableIf(value = ".coolToggle", tooltip = false)
-            @ConfigEntry.Gui.EnableIf(value = ".coolEnum", conditions = {"{i}good", "EXCELLENT"}, tooltip = false)
+            @ConfigEntry.Gui.EnableIf(".coolToggle")
+            @ConfigEntry.Gui.EnableIf(value = ".coolEnum", conditions = {"{i}good", "EXCELLENT"})
             public DependantObject dependantObject = new DependantObject();
             public static class DependantObject {
                 @ConfigEntry.Gui.PrefixText

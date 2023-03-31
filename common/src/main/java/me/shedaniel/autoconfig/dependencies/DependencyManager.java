@@ -280,9 +280,9 @@ public class DependencyManager {
         // If there's only one child, don't bother making a group
         // unless the group is being used to invert the child
         if (dependencies.size() == 1) {
-            boolean invert = switch (definition.condition()) {
+            boolean invert = switch (definition.requirement()) {
                 case ALL, ANY, ONE -> definition.inverted();
-                case NONE -> !definition.inverted();
+                case NONE, NOT_ALL, NOT_ONE -> !definition.inverted();
             };
             if (!invert)
                 return dependencies.iterator().next();
@@ -292,7 +292,7 @@ public class DependencyManager {
         return Dependency.groupBuilder()
                 .generateTooltip(definition.tooltip())
                 .inverted(definition.inverted())
-                .withCondition(definition.condition())
+                .withCondition(definition.requirement())
                 .withChildren(dependencies)
                 .build();
     }
@@ -339,10 +339,10 @@ public class DependencyManager {
         // Start building the dependency
         BooleanDependencyBuilder builder = Dependency.builder(gui);
         
-        // BooleanDependencyBuilder supports zero or one condition being set 
+        // BooleanDependencyBuilder supports zero or one requirement being set 
         if (!conditions.isEmpty()) {
             if (conditions.size() != 1)
-                throw new IllegalArgumentException("Boolean dependencies require exactly one condition, found " + conditions.size());
+                throw new IllegalArgumentException("Boolean dependencies require exactly one requirement, found " + conditions.size());
     
             conditions.forEach(builder::matching);
         }

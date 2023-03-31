@@ -2,6 +2,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyBuilder;
+import me.shedaniel.clothconfig2.api.dependencies.GroupRequirement;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -12,7 +13,7 @@ public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup
     
     private final Set<Dependency> children = new HashSet<>();
     
-    private DependencyGroup.Condition condition = DependencyGroup.Condition.ALL;
+    private GroupRequirement condition = GroupRequirement.ALL;
     private boolean inverted = false;
     private boolean tooltip = true;
     
@@ -31,7 +32,7 @@ public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup
         return this;
     }
     
-    public DependencyGroupBuilder withCondition(DependencyGroup.Condition condition) {
+    public DependencyGroupBuilder withCondition(GroupRequirement condition) {
         this.condition = condition;
         return this;
     }

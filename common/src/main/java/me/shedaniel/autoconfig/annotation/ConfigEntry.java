@@ -19,10 +19,10 @@
 
 package me.shedaniel.autoconfig.annotation;
 
+import me.shedaniel.clothconfig2.api.dependencies.GroupRequirement;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ConditionFlag;
 import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependency;
-import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
 
 import java.lang.annotation.*;
 
@@ -277,9 +277,9 @@ public class ConfigEntry {
         }
     
         /**
-         * Defines a group of dependencies, with a "group-matching" {@link DependencyGroup.Condition} to be met.
+         * Defines a group of dependencies, with a "group-matching" {@link GroupRequirement} to be met.
          * 
-         * @see DependencyGroup.Condition
+         * @see GroupRequirement
          */
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.FIELD)
@@ -293,13 +293,13 @@ public class ConfigEntry {
             /**
              * The condition for this group to be met. By defaults, require all dependencies to be met.
              *
-             * @see DependencyGroup.Condition
+             * @see GroupRequirement
              */
-            DependencyGroup.Condition condition() default DependencyGroup.Condition.ALL;
+            GroupRequirement condition() default GroupRequirement.ALL;
     
             /**
              * Whether this group should be logically inverted. For example an inverted group with an
-             * {@link DependencyGroup.Condition#ALL "ALL" condition} set would be considered met if any one dependency was unmet.
+             * {@link GroupRequirement#ALL "ALL" condition} set would be considered met if any one dependency was unmet.
              */
             boolean inverted() default false;
     
@@ -348,9 +348,9 @@ public class ConfigEntry {
         }
     
         /**
-         * Defines a group of dependencies, with a "group-matching" {@link DependencyGroup.Condition} to be met.
+         * Defines a group of dependencies, with a "group-matching" {@link GroupRequirement} to be met.
          *
-         * @see DependencyGroup.Condition
+         * @see GroupRequirement
          */
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.FIELD)
@@ -364,13 +364,13 @@ public class ConfigEntry {
             /**
              * The condition for this group to be met. By defaults, require all dependencies to be met.
              *
-             * @see DependencyGroup.Condition
+             * @see GroupRequirement
              */
-            DependencyGroup.Condition condition() default DependencyGroup.Condition.ALL;
+            GroupRequirement condition() default GroupRequirement.ALL;
         
             /**
              * Whether this group should be logically inverted. For example an inverted group with an
-             * {@link DependencyGroup.Condition#ALL "ALL" condition} set would be considered met if any one dependency was unmet.
+             * {@link GroupRequirement#ALL "ALL" condition} set would be considered met if any one dependency was unmet.
              */
             boolean inverted() default false;
     
