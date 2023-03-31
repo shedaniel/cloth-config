@@ -7,7 +7,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -48,21 +47,15 @@ record DependencyDefinition(String i18n, Set<StaticConditionDefinition> conditio
         return this.conditions().stream().map(mapper).collect(Collectors.toUnmodifiableSet());
     }
     
-    <T> Set<ConfigEntryMatcher<T>> buildMatchers(Class<T> type, BiFunction<Class<T>, String, Optional<? extends me.shedaniel.clothconfig2.api.ConfigEntry<T>>> getEntry) {
+    <T> Set<ConfigEntryMatcher<T>> buildMatchers(Class<T> type, BiFunction<Class<T>, String, ? extends me.shedaniel.clothconfig2.api.ConfigEntry<T>> getEntry) {
         return this.matching().stream()
-                .map(def -> def.toMatcher(
-                        getEntry.apply(type, def.i18n())
-                                .orElseThrow(() -> new IllegalArgumentException("Specified config entry of type \"%s\" not found: \"%s\""
-                                        .formatted(type.getSimpleName(), def.i18n())))))
+                .map(def -> def.toMatcher(getEntry.apply(type, def.i18n())))
                 .collect(Collectors.toUnmodifiableSet());
     }
     
-    <T extends Comparable<T>> Set<ConfigEntryMatcher<T>> buildComparableMatchers(Class<T> type, BiFunction<Class<T>, String, Optional<? extends me.shedaniel.clothconfig2.api.ConfigEntry<T>>> getEntry) {
+    <T extends Comparable<T>> Set<ConfigEntryMatcher<T>> buildComparableMatchers(Class<T> type, BiFunction<Class<T>, String, ? extends me.shedaniel.clothconfig2.api.ConfigEntry<T>> getEntry) {
         return this.matching().stream()
-                .map(def -> def.toComparableMatcher(
-                        getEntry.apply(type, def.i18n())
-                                .orElseThrow(() -> new IllegalArgumentException("Specified config entry of type \"%s\" not found: \"%s\""
-                                        .formatted(type.getSimpleName(), def.i18n())))))
+                .map(def -> def.toComparableMatcher(getEntry.apply(type, def.i18n())))
                 .collect(Collectors.toUnmodifiableSet());
     }
     

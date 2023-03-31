@@ -62,16 +62,18 @@ public class DependencyManager {
     
     /**
      * Get the config entry GUI associated with the given i18n key.
-     * If a prefix has been defined on this instance, it can optionally be ommitted
-     * from the i18n key.
+     * If a prefix has been defined on this instance, it can optionally be omitted from the i18n key.
      *
      * @param i18n the i18n key 
-     * @return An {@link Optional} containing config entry or {@code Optional.empty()}
+     * @return The matching config entry
+     * @throws IllegalArgumentException if a matching config entry is not found
      */
-    public Optional<ConfigEntry<?>> getEntry(String i18n) {
+    public ConfigEntry<?> getEntry(String i18n) throws IllegalArgumentException {
         String key = prefix != null && i18n.startsWith(prefix) ?
                 i18n : prefix + I18N_JOINER + i18n;
-        return Optional.ofNullable(registry.get(key)).map(EntryRecord::gui);
+        return Optional.ofNullable(registry.get(key))
+                .map(EntryRecord::gui)
+                .orElseThrow(() -> new IllegalArgumentException("Specified config entry not found: \"%s\"".formatted(i18n)));
     }
     
     /**
@@ -79,20 +81,22 @@ public class DependencyManager {
      * provided type.
      *
      * @param <T>  the type the GUI must support
-     * @param type the type the GUI must support
+     * @param type a {@code Class} representing type {@code <T>}
      * @param i18n the i18n key
-     * @return An {@link Optional} containing config entry or {@code Optional.empty()}
+     * @return The matching config entry
+     * @throws IllegalArgumentException if a matching config entry supporting type {@code <T>} is not found
      */
-    private <T> Optional<ConfigEntry<T>> getEntry(Class<T> type, String i18n) {
-        return getEntry(i18n).map(entry -> {
-                    // Entry's type must extend from the provided type 
-                    if (!type.isAssignableFrom(entry.getType()))
-                        return null;
-                    
-                    // If type is assignable, we can safely cast to <T>
-                    @SuppressWarnings("unchecked") ConfigEntry<T> tEntry = (ConfigEntry<T>) entry;
-                    return tEntry;
-                });
+    private <T> ConfigEntry<T> getEntry(Class<T> type, String i18n) throws IllegalArgumentException {
+        ConfigEntry<?> entry = getEntry(i18n);
+        
+        // Entry's type must extend from the provided type 
+        if (!type.isAssignableFrom(entry.getType()))
+            throw new IllegalArgumentException("Specified config entry does not support the required type. Found %s, required %s for \"%s\"."
+                    .formatted(entry.getType().getSimpleName(), type.getSimpleName(), i18n));
+    
+        // If type is assignable, we can safely cast to <T>
+        @SuppressWarnings("unchecked") ConfigEntry<T> tEntry = (ConfigEntry<T>) entry;
+        return tEntry;
     }
     
     /**
@@ -308,8 +312,7 @@ public class DependencyManager {
      * @throws IllegalArgumentException if the defined dependency is invalid
      */
     public Dependency buildDependency(DependencyDefinition dependency) {
-        ConfigEntry<?> gui = getEntry(dependency.i18n())
-                .orElseThrow(() -> new IllegalArgumentException("Specified dependency not found: \"%s\"".formatted(dependency.i18n())));
+        ConfigEntry<?> gui = getEntry(dependency.i18n());
         
         if (gui instanceof BooleanListEntry booleanListEntry)
             return buildDependency(dependency, booleanListEntry);
