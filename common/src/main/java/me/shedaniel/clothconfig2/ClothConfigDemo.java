@@ -189,31 +189,31 @@ public class ClothConfigDemo {
         depends.add(intDependency);
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when a good option is chosen..."), true).setTooltip(Component.literal("Select good or better above"))
                 .setEnabledIf(Dependency.builder(enumDependency)
-                                .withCondition(DependencyDemoEnum.EXCELLENT)
-                                .withCondition(DependencyDemoEnum.GOOD)
+                                .matching(DependencyDemoEnum.EXCELLENT)
+                                .matching(DependencyDemoEnum.GOOD)
                                 .build())
                 .build());
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I need a good option AND a cool toggle!"), true).setTooltip(Component.literal("Select good or better and also toggle cool"))
                 .setEnabledIf(Dependency.all(
                         Dependency.builder(dependency).build(),
                         Dependency.builder(enumDependency)
-                                .withCondition(DependencyDemoEnum.EXCELLENT)
-                                .withCondition(DependencyDemoEnum.GOOD)
+                                .matching(DependencyDemoEnum.EXCELLENT)
+                                .matching(DependencyDemoEnum.GOOD)
                                 .build()))
                 .build());
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when numbers are awesome!"), true)
                 .setTooltip(Component.literal("Move the slider above..."))
                 .setEnabledIf(Dependency.builder(intDependency)
-                                .withCondition(new NumberCondition<>(ComparisonOperator.LESS, -70))
-                                .withCondition(new NumberCondition<>(ComparisonOperator.GREATER, 70))
+                                .matching(new NumberCondition<>(ComparisonOperator.LESS, -70))
+                                .matching(new NumberCondition<>(ComparisonOperator.GREATER, 70))
                                 .build())
                 .build());
     
         testing.addEntry(depends.build());
         testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I appear when bad option is chosen..."), true)
                 .setShownIf(Dependency.builder(enumDependency)
-                        .withCondition(DependencyDemoEnum.HORRIBLE)
-                        .withCondition(DependencyDemoEnum.BAD)
+                        .matching(DependencyDemoEnum.HORRIBLE)
+                        .matching(DependencyDemoEnum.BAD)
                         .build())
                 .setTooltip(Component.literal("Hopefully I keep my index"))
                 .build());

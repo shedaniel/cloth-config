@@ -344,10 +344,10 @@ public class DependencyManager {
             if (conditions.size() != 1)
                 throw new IllegalArgumentException("Boolean dependencies require exactly one condition, found " + conditions.size());
     
-            conditions.forEach(builder::withCondition);
+            conditions.forEach(builder::matching);
         }
         
-        builder.matching(matchers);
+        builder.withMatchers(matchers);
         builder.generateTooltip(definition.tooltip());
         return builder.build();
     }
@@ -366,7 +366,7 @@ public class DependencyManager {
     
         return Dependency.builder(gui)
                 .withConditions(conditions)
-                .matching(matchers)
+                .withConditions(matchers)
                 .generateTooltip(definition.tooltip())
                 .build();
     }
@@ -385,7 +385,7 @@ public class DependencyManager {
     
         return Dependency.builder(gui)
                 .withConditions(conditions)
-                .matching(matchers)
+                .withConditions(matchers)
                 .generateTooltip(definition.tooltip())
                 .build();
     }

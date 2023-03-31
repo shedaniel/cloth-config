@@ -3,22 +3,19 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 
-public class EnumDependencyBuilder<T extends Enum<?>> extends MultiConditionDependencyBuilder<T, EnumListEntry<T>, EnumCondition<T>, EnumDependency<T>, EnumDependencyBuilder<T>> {
+public class EnumDependencyBuilder<T extends Enum<?>> extends MultiConditionDependencyBuilder<T, EnumListEntry<T>, EnumDependency<T>, EnumDependencyBuilder<T>> {
     
     public EnumDependencyBuilder(EnumListEntry<T> gui) {
         super(gui);
     }
     
     @Override
-    public EnumDependencyBuilder<T> withCondition(T condition) {
-        return withCondition(new EnumCondition<>(condition));
+    public EnumDependencyBuilder<T> matching(T condition) {
+        return matching(new EnumCondition<>(condition));
     }
     
     @Override
     public EnumDependency<T> build() {
-        if (conditions.isEmpty())
-            throw new IllegalStateException("EnumDependency requires at least one condition");
-        
         return finishBuilding(new EnumDependency<>(this.gui));
     }
 }
