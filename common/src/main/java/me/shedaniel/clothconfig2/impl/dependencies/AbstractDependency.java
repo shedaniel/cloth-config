@@ -3,7 +3,6 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -34,19 +33,6 @@ public abstract class AbstractDependency<C, E> implements Dependency {
      */
     public final Collection<C> getConditions() {
         return conditions;
-    }
-    
-    /**
-     * Adds one or more conditions to the dependency. If any condition matches the entry's value,
-     * then the dependency is met.
-     * <br>
-     * Unlike {@code setCondition()}, existing conditions are not removed.
-     *
-     * @param conditions the conditions to be added
-     */
-    @SafeVarargs
-    public final void addCondition(C... conditions) {
-        addConditions(Arrays.asList(conditions));
     }
     
     /**

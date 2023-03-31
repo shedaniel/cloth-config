@@ -55,7 +55,7 @@ public abstract class MultiConditionDependencyBuilder<T, E extends ConfigEntry<T
      * @param conditions a {@link Collection} containing {@link Condition conditions} to be added to the dependency being built
      * @return this instance, for chaining
      */
-    public SELF withConditions(Collection<? extends Condition<T>> conditions) {
+    public SELF matching(Collection<? extends Condition<T>> conditions) {
         @SuppressWarnings("unchecked") SELF self = (SELF) this;
         
         this.conditions.addAll(conditions);

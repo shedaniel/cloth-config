@@ -347,7 +347,7 @@ public class DependencyManager {
             conditions.forEach(builder::matching);
         }
         
-        builder.withMatchers(matchers);
+        builder.matching(matchers);
         builder.generateTooltip(definition.tooltip());
         return builder.build();
     }
@@ -365,8 +365,8 @@ public class DependencyManager {
         Set<ConfigEntryMatcher<T>> matchers = definition.buildMatchers(type, this::getEntry);
     
         return Dependency.builder(gui)
-                .withConditions(conditions)
-                .withConditions(matchers)
+                .matching(conditions)
+                .matching(matchers)
                 .generateTooltip(definition.tooltip())
                 .build();
     }
@@ -384,8 +384,8 @@ public class DependencyManager {
         Set<ConfigEntryMatcher<T>> matchers = definition.buildComparableMatchers(type, this::getEntry);
     
         return Dependency.builder(gui)
-                .withConditions(conditions)
-                .withConditions(matchers)
+                .matching(conditions)
+                .matching(matchers)
                 .generateTooltip(definition.tooltip())
                 .build();
     }

@@ -6,13 +6,7 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.ConfigEntryMatcher;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-public class BooleanDependencyBuilder extends AbstractDependencyBuilder<Boolean, BooleanListEntry, BooleanDependency, BooleanDependencyBuilder> {
-    
-    private final Set<ConfigEntryMatcher<Boolean>> matchers = new HashSet<>();
+public class BooleanDependencyBuilder extends MultiConditionDependencyBuilder<Boolean, BooleanListEntry, BooleanDependency, BooleanDependencyBuilder> {
     
     private @Nullable Condition<Boolean> condition = null;
     
@@ -28,8 +22,7 @@ public class BooleanDependencyBuilder extends AbstractDependencyBuilder<Boolean,
     @Override
     public BooleanDependencyBuilder matching(Condition<Boolean> condition) {
         if (condition instanceof ConfigEntryMatcher<Boolean> matcher) {
-            matchers.add(matcher);
-            return this;
+            return super.matching(matcher);
         }
         
         if (this.condition != null)
@@ -43,14 +36,14 @@ public class BooleanDependencyBuilder extends AbstractDependencyBuilder<Boolean,
     @Override
     public BooleanDependency build() {
         // Default condition is "true"
-        if (condition == null && matchers.isEmpty())
+        if (condition == null && conditions.isEmpty()) {
             condition = new BooleanCondition(true);
-    
-        BooleanDependency dependency = new BooleanDependency(this.gui);
-        dependency.addConditions(matchers);
+        }
+        
+        // Add the static condition to the conditions list
         if (condition != null)
-            dependency.addConditions(Collections.singletonList(condition));
+            super.matching(condition);
     
-        return finishBuilding(dependency);
+        return finishBuilding(new BooleanDependency(this.gui));
     }
 }
