@@ -9,12 +9,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ComparatorDependencyBuilder<T> implements DependencyBuilder<ComparatorDependency<T>> {
+public class ComparatorDependencyBuilder<T> implements DependencyBuilder<ComparatorDependency<T>, ComparatorDependencyBuilder<T>> {
     private final Set<ConfigEntryMatcher<T>> conditions = new HashSet<>();
     private final ConfigEntry<T> gui;
+    private boolean tooltip = true;
     
     public <E extends ConfigEntry<T>> ComparatorDependencyBuilder(E gui) {
-        
         this.gui = gui;
     }
     
@@ -23,8 +23,15 @@ public class ComparatorDependencyBuilder<T> implements DependencyBuilder<Compara
         if (conditions.isEmpty())
             throw new IllegalArgumentException("ComparatorDependency requires at least 1 condition.");
         ComparatorDependency<T> dependency = new ComparatorDependency<>(this.gui);
+        dependency.shouldGenerateTooltip(tooltip);
         dependency.addConditions(conditions);
         return dependency;
+    }
+    
+    @Override
+    public ComparatorDependencyBuilder<T> generateTooltip(boolean shouldGenerate) {
+        this.tooltip = shouldGenerate;
+        return this;
     }
     
     public <E extends ConfigEntry<T>> ComparatorDependencyBuilder<T> matching(E... gui) {

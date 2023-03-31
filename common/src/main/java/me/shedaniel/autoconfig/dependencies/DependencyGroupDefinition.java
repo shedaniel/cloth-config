@@ -17,19 +17,20 @@ import java.util.stream.Collectors;
  *
  * @param condition the {@link DependencyGroup.Condition condition} defining how many children must be met
  * @param inverted whether the dependency group should be logically inverted
+ * @param tooltip whether the dependency group should auto-generate tooltips
  * @param children dependency definitions to be included in the group
  * @see DependencyDefinition
  */
 @ApiStatus.Internal
-record DependencyGroupDefinition(DependencyGroup.Condition condition, boolean inverted, Set<DependencyDefinition> children) {
+record DependencyGroupDefinition(DependencyGroup.Condition condition, boolean inverted, boolean tooltip, Set<DependencyDefinition> children) {
     DependencyGroupDefinition(String i18nBase, ConfigEntry.Gui.EnableIfGroup annotation) {
-        this(annotation.condition(), annotation.inverted(),
+        this(annotation.condition(), annotation.inverted(), annotation.tooltip(),
                 Arrays.stream(annotation.value())
                         .map(child -> new DependencyDefinition(i18nBase, child))
                         .collect(Collectors.toUnmodifiableSet()));
     }
     DependencyGroupDefinition(String i18nBase, ConfigEntry.Gui.ShowIfGroup annotation) {
-        this(annotation.condition(), annotation.inverted(),
+        this(annotation.condition(), annotation.inverted(), annotation.tooltip(),
                 Arrays.stream(annotation.value())
                         .map(child -> new DependencyDefinition(i18nBase, child))
                         .collect(Collectors.toUnmodifiableSet()));

@@ -8,20 +8,27 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup> {
+public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup, DependencyGroupBuilder> {
     
     private final Set<Dependency> children = new HashSet<>();
     
     private DependencyGroup.Condition condition = DependencyGroup.Condition.ALL;
     private boolean inverted = false;
+    private boolean tooltip = true;
     
     public DependencyGroupBuilder() {}
     
     @Override
     public DependencyGroup build() {
-        DependencyGroup group = new DependencyGroup(this.condition, this.inverted);
+        DependencyGroup group = new DependencyGroup(this.condition, this.inverted, this.tooltip);
         group.addChildren(this.children);
         return group;
+    }
+    
+    @Override
+    public DependencyGroupBuilder generateTooltip(boolean shouldGenerate) {
+        this.tooltip = shouldGenerate;
+        return this;
     }
     
     public DependencyGroupBuilder withCondition(DependencyGroup.Condition condition) {

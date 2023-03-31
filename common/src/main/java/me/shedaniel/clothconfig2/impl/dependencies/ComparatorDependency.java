@@ -23,7 +23,7 @@ public class ComparatorDependency<T> extends ConfigEntryDependency<T, ConfigEntr
     }
     
     @Override
-    public Optional<Component[]> getTooltip(boolean inverted) {
-        return super.getTooltip(inverted);
+    public Optional<Component[]> getTooltip(boolean inverted, String effectKey) {
+        return super.getTooltip(inverted, effectKey);
     }
 }

@@ -3,24 +3,22 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class DependencyGroup implements Dependency {
     
-    private static final Predicate<Dependency> ALL = dependency -> true;
-    private static final Predicate<Dependency> MET = Dependency::check;
-    private static final Predicate<Dependency> UNMET = dependency -> !dependency.check();
-    
     private final Condition condition;
     private final Set<Dependency> children = new LinkedHashSet<>();
     private final boolean inverted;
+    private final boolean generateTooltip;
     
-    DependencyGroup(Condition condition, boolean inverted) {
+    DependencyGroup(Condition condition, boolean inverted, boolean generateTooltip) {
         this.condition = condition;
         this.inverted = inverted;
+        this.generateTooltip = generateTooltip;
     }
     
     @Override
@@ -59,7 +57,7 @@ public class DependencyGroup implements Dependency {
     @Override
     public Component getShortDescription(boolean inverted) {
         boolean invert = inverted != inverted();
-        List<Dependency> dependencies = flatChildren(invert, ALL);
+        List<Dependency> dependencies = flatChildren(invert);
         int amount = dependencies.size();
         switch (amount) {
             case 1 -> {
@@ -89,67 +87,65 @@ public class DependencyGroup implements Dependency {
      * <br><em>- "XYZ Toggle" being enabled</em>
      * <br><em>- "A cool enum" being one of 3 values</em>
      */
-    public Optional<Component[]> getTooltip(boolean inverted) {
-        // Only return a tooltip if the group condition is unmet
-        if (inverted != check())
+    public Optional<Component[]> getTooltip(boolean inverted, String effectKey) {
+        if (!generateTooltip)
             return Optional.empty();
 
         boolean invert = inverted != inverted();
         
         // If only one child, return its tooltip
-        if (children.size() == 1) {
-            return children.stream()
-                    .map(child -> child.getTooltip(shouldInvertChild(invert)))
-                    .findAny()
-                    .orElseThrow(() -> new IllegalStateException("Can't find any elements in list of 1"));
-        }
+        if (children.size() == 1)
+            return children.iterator().next().getTooltip(shouldInvertChild(invert), effectKey);
         
         // Handle inverted conditions
         if (invert) {
-            return Optional.of(switch (condition) {
+            return Optional.ofNullable(switch (condition) {
                 case ALL -> // "Not all" - at least one child must be false
-                        tooltipFor(Condition.ANY, flatChildren(true, MET), false);
+                        tooltipFor(effectKey, Condition.ANY, flatChildren(invert), false, invert);
                 case NONE -> // Effectively "any" - at least one child must be true
-                        tooltipFor(Condition.ANY, flatChildren(true, UNMET), true);
+                        tooltipFor(effectKey, Condition.ANY, flatChildren(invert), true, invert);
                 case ANY -> // Effectively "none" - all children must be false
-                        tooltipFor(Condition.ALL, flatChildren(true, MET), false);
+                        tooltipFor(effectKey, Condition.ALL, flatChildren(invert), false, invert);
                 case ONE -> // "not one" - none or multiple children must be true
-                        tooltipFor(Condition.ONE.getI18n(true), flatChildren(true, ALL), true);
+                        tooltipFor(effectKey, Condition.ONE.getI18n(invert), flatChildren(true), true);
             });
         }
     
         // Handle normal conditions
-        return Optional.of(switch (condition) {
+        return Optional.ofNullable(switch (condition) {
             case ALL -> // All children must be true
-                    tooltipFor(Condition.ALL, flatChildren(UNMET), true);
+                    tooltipFor(effectKey, Condition.ALL, flatChildren(invert), true, invert);
             case NONE -> // "None" - all children must be false
-                    tooltipFor(Condition.ALL, flatChildren(MET), false);
+                    tooltipFor(effectKey, Condition.ALL, flatChildren(invert), false, invert);
             case ANY -> // "Any" - at least one child must be true
-                    tooltipFor(Condition.ANY, flatChildren(UNMET), true);
+                    tooltipFor(effectKey, Condition.ANY, flatChildren(invert), true, invert);
             case ONE -> // Exactly one child must be true:
-                    tooltipFor(Condition.ONE, flatChildren(ALL), true);
+                    tooltipFor(effectKey, Condition.ONE, flatChildren(invert), true, invert);
         });
     }
     
-    private List<Dependency> flatChildren(Predicate<Dependency> predicate) {
-        return flatChildren(false, predicate);
+    @Override
+    public boolean hasTooltip() {
+        return generateTooltip;
     }
     
-    private List<Dependency> flatChildren(boolean inverted, Predicate<Dependency> predicate) {
+    private List<Dependency> flatChildren() {
+        return flatChildren(false);
+    }
+    
+    private List<Dependency> flatChildren(boolean inverted) {
         // It doesn't make sense to flatten groups with condition "exactly one"
         if (condition == Condition.ONE)
-            return children.stream()
-                    .filter(predicate)
-                    .toList();
+            return children.stream().toList();
         
         List<Dependency> flattened = new LinkedList<>();
         children.stream()
-                .filter(predicate)
+                .filter(Dependency::hasTooltip)
                 .forEach(child -> {
             if (child instanceof DependencyGroup group) {
                 // TODO can we flatten in some inverted scenarios?
                 if (condition == group.condition && !(inverted || group.inverted())) {
-                    flattened.addAll(group.flatChildren(inverted, predicate));
+                    flattened.addAll(group.flatChildren(inverted));
                     return;
                 }
             }
@@ -167,33 +163,28 @@ public class DependencyGroup implements Dependency {
         };
     }
     
-    private List<Dependency> met() {
-        return children.stream()
-                .filter(Dependency::check)
-                .toList();
-    }
-    
-    private List<Dependency> unmet() {
-        return children.stream()
-                .filter(dependency -> !dependency.check())
-                .toList();
-    }
-    
-    private Component[] tooltipFor(Condition condition, Collection<Dependency> dependencies, boolean value) {
+    private @Nullable Component[] tooltipFor(String effectKey, Condition condition, Collection<Dependency> dependencies, boolean value, boolean inverted) {
         if (dependencies.size() == 1) {
-            // TODO handle cases with only one or two met
+            // handle cases with only one or two dependencies
+            // TODO test edge cases
+            return dependencies.iterator().next()
+                    .getTooltip(inverted, effectKey).orElse(null);
         }
-        return tooltipFor(condition.i18n, dependencies, value);
+        return tooltipFor(effectKey, condition.i18n, dependencies, value);
     }
     
-    private Component[] tooltipFor(String conditionKey, Collection<Dependency> dependencies, boolean value) {
+    private @Nullable Component[] tooltipFor(String effectKey, String conditionKey, Collection<Dependency> dependencies, boolean value) {
+        if (dependencies.isEmpty())
+            return null;
+        
+        Component effectText = Component.translatable(effectKey);
         Component conditionText = Component.translatable(conditionKey)
                 .withStyle(ChatFormatting.BOLD);
         Component valueText = Component.translatable(value ? "text.cloth-config.true" : "text.cloth-config.false")
                 .withStyle(ChatFormatting.BOLD);
         
         List<Component> lines = new ArrayList<>();
-        lines.add(Component.translatable("text.cloth-config.dependency_groups.tooltip", conditionText, valueText));
+        lines.add(Component.translatable("text.cloth-config.dependency_groups.tooltip", effectText, conditionText, valueText));
         lines.addAll(dependencies.stream()
                         .map(Dependency::getShortDescription)
                         .map(description -> Component.translatable("text.cloth-config.dependencies.list_entry", description))

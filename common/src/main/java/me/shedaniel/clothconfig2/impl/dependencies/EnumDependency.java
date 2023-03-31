@@ -12,7 +12,7 @@ public class EnumDependency<T extends Enum<?>> extends ConfigEntryDependency<T, 
     }
     
     @Override
-    protected Component getConditionText(StaticCondition<T> condition, boolean inverted) {
+    protected Component getStaticConditionText(StaticCondition<T> condition, boolean inverted) {
         MutableComponent text = Component.translatable("text.cloth-config.quoted", getElement().getTextFor(condition.getValue()));
         if (condition.inverted())
             text = Component.translatable("text.cloth-config.dependencies.conditions.not", text);

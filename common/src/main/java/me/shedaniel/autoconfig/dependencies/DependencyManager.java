@@ -269,20 +269,20 @@ public class DependencyManager {
      * <br><br>
      * If there is an issue building any child dependency, a {@link RuntimeException} will be thrown.
      *
-     * @param dependencyGroup The {@link DependencyGroupDefinition} defining the group
+     * @param definition The {@link DependencyGroupDefinition} defining the group
      * @return The built {@link DependencyGroup}
      * @throws RuntimeException when there is an issue building one of the group's dependencies
      */
-    public Dependency buildDependency(DependencyGroupDefinition dependencyGroup) {
+    public Dependency buildDependency(DependencyGroupDefinition definition) {
         // Build each child DependencyDefinition
-        Set<Dependency> dependencies = dependencyGroup.buildChildren(this::buildDependency);
+        Set<Dependency> dependencies = definition.buildChildren(this::buildDependency);
         
         // If there's only one child, don't bother making a group
         // unless the group is being used to invert the child
         if (dependencies.size() == 1) {
-            boolean invert = switch (dependencyGroup.condition()) {
-                case ALL, ANY, ONE -> dependencyGroup.inverted();
-                case NONE -> !dependencyGroup.inverted();
+            boolean invert = switch (definition.condition()) {
+                case ALL, ANY, ONE -> definition.inverted();
+                case NONE -> !definition.inverted();
             };
             if (!invert)
                 return dependencies.iterator().next();
@@ -290,8 +290,9 @@ public class DependencyManager {
     
         // Build and return the DependencyGroup
         return Dependency.groupBuilder()
-                .inverted(dependencyGroup.inverted())
-                .withCondition(dependencyGroup.condition())
+                .generateTooltip(definition.tooltip())
+                .inverted(definition.inverted())
+                .withCondition(definition.condition())
                 .withChildren(dependencies)
                 .build();
     }
@@ -327,13 +328,13 @@ public class DependencyManager {
     /**
      * Builds a {@link BooleanDependency} defined in the {@link DependencyDefinition}, depending on the given {@link BooleanListEntry}.
      * 
-     * @param dependency the {@link DependencyDefinition} that defines the dependency
+     * @param definition the {@link DependencyDefinition} that defines the dependency
      * @param gui the {@link BooleanListEntry} to be depended on
      * @return the generated dependency
      */
-    public BooleanDependency buildDependency(DependencyDefinition dependency, BooleanListEntry gui) {
-        Set<BooleanCondition> conditions = dependency.buildConditions(StaticConditionDefinition::toBooleanCondition);
-        Set<ConfigEntryMatcher<Boolean>> matchers = dependency.buildMatchers(Boolean.class, this::getEntry);
+    public BooleanDependency buildDependency(DependencyDefinition definition, BooleanListEntry gui) {
+        Set<BooleanCondition> conditions = definition.buildConditions(StaticConditionDefinition::toBooleanCondition);
+        Set<ConfigEntryMatcher<Boolean>> matchers = definition.buildMatchers(Boolean.class, this::getEntry);
     
         // Start building the dependency
         BooleanDependencyBuilder builder = Dependency.builder(gui);
@@ -346,43 +347,46 @@ public class DependencyManager {
             conditions.forEach(builder::withCondition);
         }
         
-        builder.matching(matchers);         
+        builder.matching(matchers);
+        builder.generateTooltip(definition.tooltip());
         return builder.build();
     }
     
     /**
      * Builds a {@link EnumDependency} defined in the {@link DependencyDefinition}, depending on the given {@link EnumListEntry}.
      *
-     * @param dependency the {@link DependencyDefinition} that defines the dependency
+     * @param definition the {@link DependencyDefinition} that defines the dependency
      * @param gui the {@link EnumListEntry} to be depended on
      * @return the generated dependency
      */
-    public <T extends Enum<?>> EnumDependency<T> buildDependency(DependencyDefinition dependency, EnumListEntry<T> gui) {
+    public <T extends Enum<?>> EnumDependency<T> buildDependency(DependencyDefinition definition, EnumListEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<EnumCondition<T>> conditions = dependency.buildConditions(condition -> condition.toEnumCondition(type));
-        Set<ConfigEntryMatcher<T>> matchers = dependency.buildMatchers(type, this::getEntry);
+        Set<EnumCondition<T>> conditions = definition.buildConditions(condition -> condition.toEnumCondition(type));
+        Set<ConfigEntryMatcher<T>> matchers = definition.buildMatchers(type, this::getEntry);
     
         return Dependency.builder(gui)
                 .withConditions(conditions)
                 .matching(matchers)
+                .generateTooltip(definition.tooltip())
                 .build();
     }
     
     /**
      * Builds a {@link NumberDependency} defined in the {@link DependencyDefinition}, depending on the given {@link NumberConfigEntry}.
      *
-     * @param dependency the {@link DependencyDefinition} that defines the dependency
+     * @param definition the {@link DependencyDefinition} that defines the dependency
      * @param gui the {@link NumberConfigEntry} to be depended on
      * @return the generated dependency
      */
-    public <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependencyDefinition dependency, NumberConfigEntry<T> gui) {
+    public <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependencyDefinition definition, NumberConfigEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<NumberCondition<T>> conditions = dependency.buildConditions(condition -> condition.toNumberCondition(type));
-        Set<ConfigEntryMatcher<T>> matchers = dependency.buildComparableMatchers(type, this::getEntry);
+        Set<NumberCondition<T>> conditions = definition.buildConditions(condition -> condition.toNumberCondition(type));
+        Set<ConfigEntryMatcher<T>> matchers = definition.buildComparableMatchers(type, this::getEntry);
     
         return Dependency.builder(gui)
                 .withConditions(conditions)
                 .matching(matchers)
+                .generateTooltip(definition.tooltip())
                 .build();
     }
     

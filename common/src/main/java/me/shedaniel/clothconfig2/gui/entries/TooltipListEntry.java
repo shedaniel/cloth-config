@@ -22,7 +22,6 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.Tooltip;
-import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.math.Point;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -71,21 +70,18 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     }
     
     private Optional<Component[]> getDependencyTooltip() {
-        @Nullable Dependency enableIf = getEnableIfDependency();
-        @Nullable Dependency showIf = getShowIfDependency();
-    
-        // TODO consider showing all tooltips, not just for unmet
-        if ((enableIf == null || enableIf.check()) && (showIf == null || showIf.check()))
-            return Optional.empty();
-
-        // FIXME include tooltips for both "enable if" AND "show if" dependencies
-        if (enableIf != null)
-            return enableIf.getTooltip();
-    
-        if (showIf != null)
-            return showIf.getTooltip();
+        final String enable = "text.cloth-config.dependencies.enabled";
+        final String show = "text.cloth-config.dependencies.shown";
+        Component[] tooltip = Stream.concat(
+                        Stream.ofNullable(getEnableIfDependency())
+                                .map(dependency -> dependency.getTooltip(enable)),
+                        Stream.ofNullable(getShowIfDependency())
+                                .map(dependency -> dependency.getTooltip(show)))
+                .flatMap(Optional::stream)
+                .flatMap(Arrays::stream)
+                .toArray(Component[]::new);
         
-        return Optional.empty();
+        return tooltip.length < 1 ? Optional.empty() : Optional.of(tooltip);
     }
     
     public Optional<Component[]> getTooltip() {

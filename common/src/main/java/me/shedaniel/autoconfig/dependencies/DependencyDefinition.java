@@ -17,24 +17,24 @@ import java.util.stream.Collectors;
  * Can be declared using either an {@link ConfigEntry.Gui.EnableIf @EnableIf} or {@link ConfigEntry.Gui.ShowIf @ShowIf} annotation.
  *
  * @param i18n the absolute i18n key of the depended-on config entry
+ * @param tooltip whether the dependency should auto-generate tooltips
  * @param conditions flagged strings to be parsed into dependency conditions
  * @param matching flagged strings to be parsed into dynamic dependency conditions
  * @see DependencyGroupDefinition
  */
 @ApiStatus.Internal
-record DependencyDefinition(String i18n, Set<StaticConditionDefinition> conditions, Set<MatcherConditionDefinition> matching) {
+record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDefinition> conditions, Set<MatcherConditionDefinition> matching) {
     
     DependencyDefinition(@Nullable String i18nBase, ConfigEntry.Gui.EnableIf annotation) {
-        this(i18nBase, annotation.value(), annotation.conditions(), annotation.matching());
+        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.conditions(), annotation.matching());
     }
     
     DependencyDefinition(@Nullable String i18nBase, ConfigEntry.Gui.ShowIf annotation) {
-        this(i18nBase, annotation.value(), annotation.conditions(), annotation.matching());
+        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.conditions(), annotation.matching());
     }
     
-    private DependencyDefinition(@Nullable String i18nBase, String i18nKey, String[] conditions, String[] matching) {
-        this(
-                DependencyManager.parseRelativeI18n(i18nBase, i18nKey),
+    private DependencyDefinition(@Nullable String i18nBase, String i18nKey, boolean tooltip, String[] conditions, String[] matching) {
+        this(DependencyManager.parseRelativeI18n(i18nBase, i18nKey), tooltip,
                 Arrays.stream(conditions)
                         .map(StaticConditionDefinition::fromConditionString)
                         .collect(Collectors.toUnmodifiableSet()), 

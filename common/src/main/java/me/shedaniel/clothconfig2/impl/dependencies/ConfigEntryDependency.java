@@ -37,11 +37,14 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>> extends
     }
     
     protected Component getConditionText(Condition<T> condition, boolean inverted) {
-        return condition instanceof StaticCondition<T> staticCondition ?
-                getConditionText(staticCondition, inverted) : condition.getText(inverted);
+        if (condition instanceof StaticCondition<T> staticCondition)
+            return Component.translatable("text.cloth-config.dependencies.is", getStaticConditionText(staticCondition, inverted));
+    
+        Component text = MutableComponent.create(condition.getText(inverted).getContents()).withStyle(ChatFormatting.BOLD);
+        return Component.translatable("text.cloth-config.dependencies.matches", text);
     }
     
-    protected Component getConditionText(StaticCondition<T> condition, boolean inverted) {
+    protected Component getStaticConditionText(StaticCondition<T> condition, boolean inverted) {
         return condition.getText(inverted);
     }
     
@@ -67,14 +70,13 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>> extends
      * {@inheritDoc} For example <em>Depends on "Some Config Entry" being set to "YES".</em>
      */
     @Override
-    public Optional<Component[]> getTooltip(boolean inverted) {
+    public Optional<Component[]> getTooltip(boolean inverted, String effectKey) {
+        if (!hasTooltip())
+            return Optional.empty();
+        
         Collection<Condition<T>> conditions = getConditions();
         if (conditions.isEmpty())
             throw new IllegalStateException("Expected at least one condition to be defined");
-        
-        // Get the name of the depended-on entry, and style it bold.
-        Component dependencyName = MutableComponent.create(getElement().getFieldName().getContents())
-                .withStyle(ChatFormatting.BOLD);
         
         // Get the text for each condition, again styled bold.
         List<Component> conditionTexts = conditions.stream()
@@ -82,13 +84,17 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>> extends
                 .map(condition -> getConditionText(condition, inverted))
                 .toList();
         
-        // Generate a slightly different tooltip depending on how many conditions are defined
+        // Build the main line of the tooltip
         List<Component> tooltip = new ArrayList<>();
-        tooltip.add(switch (conditionTexts.size()) {
-            case 1 -> Component.translatable("text.cloth-config.dependencies.one_condition", dependencyName, conditionTexts.get(0));
-            case 2 -> Component.translatable("text.cloth-config.dependencies.two_conditions", dependencyName, conditionTexts.get(0), conditionTexts.get(1));
-            default -> Component.translatable("text.cloth-config.dependencies.many_conditions", dependencyName);
-        });
+        Component effect = Component.translatable(effectKey);
+        Component gui = MutableComponent.create(getElement().getFieldName().getContents())
+                .withStyle(ChatFormatting.BOLD);
+        Component condition = switch (conditionTexts.size()) {
+            case 1 -> Component.translatable("text.cloth-config.dependencies.one_condition", conditionTexts.get(0));
+            case 2 -> Component.translatable("text.cloth-config.dependencies.two_conditions", conditionTexts.get(0), conditionTexts.get(1));
+            default -> Component.translatable("text.cloth-config.dependencies.many_conditions");
+        };
+        tooltip.add(Component.translatable("text.cloth-config.dependencies.tooltip", effect, gui, condition));
         
         // If many conditions, print them as a list
         if (conditionTexts.size() > 2) {

@@ -13,13 +13,13 @@ public class BooleanDependency extends ConfigEntryDependency<Boolean, BooleanLis
     }
     
     @Override
-    protected Component getConditionText(StaticCondition<Boolean> condition, boolean inverted) {
+    protected Component getStaticConditionText(StaticCondition<Boolean> condition, boolean inverted) {
         if (this.useActualText)
             return Component.translatable("text.cloth-config.dependencies.conditions.set_to",
                         Component.translatable("text.cloth-config.quoted",
                                 getElement().getYesNoText(condition.inverted() != condition.getValue())));
         
-        return super.getConditionText(condition, inverted);
+        return super.getStaticConditionText(condition, inverted);
     }
     
     @Override

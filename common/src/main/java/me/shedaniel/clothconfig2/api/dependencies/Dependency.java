@@ -119,10 +119,12 @@ public interface Dependency {
      * 
      * @return an {@link Optional} containing the tooltip, otherwise {@code Optional.empty()}.
      */
-    default Optional<Component[]> getTooltip() {
-        return getTooltip(false);
+    default Optional<Component[]> getTooltip(String effectKey) {
+        return getTooltip(false, effectKey);
     }
     
     @ApiStatus.Internal
-    Optional<Component[]> getTooltip(boolean inverted);
+    Optional<Component[]> getTooltip(boolean inverted, String effectKey);
+    
+    boolean hasTooltip();
 }

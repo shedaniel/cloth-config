@@ -16,6 +16,7 @@ public abstract class AbstractDependency<C, E> implements Dependency {
     private final E element;
     
     private final Collection<C> conditions = new ArrayList<>();
+    private boolean generateTooltips = true;
     
     protected AbstractDependency(E element) {this.element = element;}
     
@@ -79,5 +80,14 @@ public abstract class AbstractDependency<C, E> implements Dependency {
     @Override
     public int hashCode() {
         return 8 * this.element.hashCode() + 16 * this.conditions.hashCode();
+    }
+    
+    public void shouldGenerateTooltip(boolean shouldGenerate) {
+        this.generateTooltips = shouldGenerate;
+    }
+    
+    @Override
+    public boolean hasTooltip() {
+        return this.generateTooltips;
     }
 }

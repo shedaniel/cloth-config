@@ -16,9 +16,10 @@ import java.util.Collection;
  * @param <D> the {@link Dependency} type that will be built
  * @param <SELF> the type to be returned by chainable methods
  */
-public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C extends Condition<T>, D extends ConfigEntryDependency<T, E>, SELF extends AbstractDependencyBuilder<T, E, C, D, SELF>> implements DependencyBuilder<D> {
+public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C extends Condition<T>, D extends ConfigEntryDependency<T, E>, SELF extends AbstractDependencyBuilder<T, E, C, D, SELF>> implements DependencyBuilder<D, SELF> {
     
     protected final E gui;
+    private boolean tooltip = true;
     
     protected AbstractDependencyBuilder(E gui) {
         this.gui = gui;
@@ -34,6 +35,7 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C e
      */
     @Contract(value = "_ -> param1", mutates = "param1")
     protected D finishBuilding(D dependency) {
+        dependency.shouldGenerateTooltip(tooltip);
         return dependency;
     }
     
@@ -59,4 +61,10 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, C e
     public abstract SELF matching(Collection<ConfigEntryMatcher<T>> comparators);
     
     public abstract SELF matching(ConfigEntryMatcher<T> comparator);
+    
+    public SELF generateTooltip(boolean shouldGenerate) {
+        @SuppressWarnings("unchecked") SELF self = (SELF) this;
+        this.tooltip = shouldGenerate;
+        return self;
+    }
 }
