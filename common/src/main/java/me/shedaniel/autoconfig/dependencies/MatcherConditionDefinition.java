@@ -1,5 +1,6 @@
 package me.shedaniel.autoconfig.dependencies;
 
+import me.shedaniel.autoconfig.util.RelativeI18n;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparativeConfigEntryMatcher;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
@@ -30,7 +31,7 @@ record MatcherConditionDefinition(EnumSet<ConditionFlag> flags, @Nullable Compar
                     .map(String::stripLeading);
     
         // Parse the i18n reference
-        definition = definition.map(string -> DependencyManager.parseRelativeI18n(i18nBase, string));
+        definition = definition.map(string -> RelativeI18n.parse(i18nBase, string));
         
         return new MatcherConditionDefinition(definition.flags(), operator, definition.condition());
     }

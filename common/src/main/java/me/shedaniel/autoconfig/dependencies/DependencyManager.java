@@ -4,6 +4,7 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnableIf;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnableIfGroup;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.ShowIf;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.ShowIfGroup;
+import me.shedaniel.autoconfig.util.RelativeI18n;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
@@ -31,9 +32,6 @@ import java.util.stream.Stream;
  */
 public class DependencyManager {
     
-    private static final char STEP_UP_PREFIX = '.';
-    private static final char I18N_JOINER = '.';
-    
     private final Map<String, EntryRecord> registry = new LinkedHashMap<>();
     
     private @Nullable String prefix;
@@ -41,7 +39,7 @@ public class DependencyManager {
     public DependencyManager() {}
     
     /**
-     * Define a prefix which {@link #getEntry(String i18n)} will add
+     * Define a prefix which {@link #register(ConfigEntry, Field, String) register()} will add
      * to i18n keys if they don't already start with it.
      * <br><br>
      * Should normally be set to the i18n key of the root {@link me.shedaniel.autoconfig.annotation.Config @Config}
@@ -55,16 +53,13 @@ public class DependencyManager {
     
     /**
      * Get the config entry GUI associated with the given i18n key.
-     * If a prefix has been defined on this instance, it can optionally be omitted from the i18n key.
      *
      * @param i18n the i18n key 
      * @return The matching config entry
      * @throws IllegalArgumentException if a matching config entry is not found
      */
     public ConfigEntry<?> getEntry(String i18n) throws IllegalArgumentException {
-        String key = prefix != null && i18n.startsWith(prefix) ?
-                i18n : prefix + I18N_JOINER + i18n;
-        return Optional.ofNullable(registry.get(key))
+        return Optional.ofNullable(registry.get(i18n))
                 .map(EntryRecord::gui)
                 .orElseThrow(() -> new IllegalArgumentException("Specified config entry not found: \"%s\"".formatted(i18n)));
     }
@@ -79,7 +74,7 @@ public class DependencyManager {
      * @return The matching config entry
      * @throws IllegalArgumentException if a matching config entry supporting type {@code <T>} is not found
      */
-    <T> ConfigEntry<T> getEntry(Class<T> type, String i18n) throws IllegalArgumentException {
+    public <T> ConfigEntry<T> getEntry(Class<T> type, String i18n) throws IllegalArgumentException {
         ConfigEntry<?> entry = getEntry(i18n);
         
         // Entry's type must extend from the provided type 
@@ -118,7 +113,7 @@ public class DependencyManager {
         }
         
         String i18nBase = Optional.ofNullable(fieldI18n)
-                .map(DependencyManager::i18nParent)
+                .map(RelativeI18n::parent)
                 .orElse(null);
     
         register(entry, i18nBase, enableIfs, enableIfGroups, showIfs, showIfGroups);
@@ -171,22 +166,22 @@ public class DependencyManager {
         // Add the new dependencies to the appropriate sets
         enableIfs.addAll(Stream.ofNullable(enableIfAnnotations)
                 .flatMap(Collection::stream)
-                .map(single -> new DependencyDefinition(i18nBase, single))
+                .map(single -> new DependencyDefinition(prefix, i18nBase, single))
                 .collect(Collectors.toUnmodifiableSet()));
     
         enableIfGroups.addAll(Stream.ofNullable(enableIfGroupAnnotations)
                 .flatMap(Collection::stream)
-                .map(group -> new DependencyGroupDefinition(i18nBase, group))
+                .map(group -> new DependencyGroupDefinition(prefix, i18nBase, group))
                 .collect(Collectors.toUnmodifiableSet()));
         
         showIfs.addAll(Stream.ofNullable(showIfAnnotations)
                 .flatMap(Collection::stream)
-                .map(single -> new DependencyDefinition(i18nBase, single))
+                .map(single -> new DependencyDefinition(prefix, i18nBase, single))
                 .collect(Collectors.toUnmodifiableSet()));
     
         showIfGroups.addAll(Stream.ofNullable(showIfGroupAnnotations)
                 .flatMap(Collection::stream)
-                .map(group -> new DependencyGroupDefinition(i18nBase, group))
+                .map(group -> new DependencyGroupDefinition(prefix, i18nBase, group))
                 .collect(Collectors.toUnmodifiableSet()));
         
         registry.put(i18n, new EntryRecord(entry, enableIfs, enableIfGroups, showIfs, showIfGroups));
@@ -272,56 +267,4 @@ public class DependencyManager {
                || field.isAnnotationPresent(ShowIfGroup.class);
     }
     
-    /**
-     * Gets the targeted i18n key, using {@code i18nBase} as a <em>base reference</em> if {@code  i18nKey} is relative.
-     * 
-     * @param i18nBase an absolute i18n key, to be used as the base reference point of the relative key
-     * @param i18nKey either a relative or absolute i18n key
-     * @return the absolute i18n key
-     * @see EnableIf#value() Public API documentation
-     */
-    static String parseRelativeI18n(@Nullable String i18nBase, String i18nKey) {
-        // Count how many "steps up" are at the start of the key string,
-        int steps = 0;
-        for (char c : i18nKey.toCharArray()) {
-            if (STEP_UP_PREFIX == c) steps++;
-            else break;
-        }
-        
-        // Not a relative key
-        if (steps < 1)
-            return i18nKey;
-        
-        if (i18nBase == null)
-            throw new IllegalArgumentException("Relative i18n key cannot be used without a base-reference");
-        
-        // Get the key without any "step" chars
-        String key = i18nKey.substring(steps);
-        String base = i18nBase;
-        
-        // Move `base` up one level for each "step" that was counted
-        // Start from 1 since the first "step" is just indicating that the key is relative
-        for (int i = 1; i < steps; i++) {
-            base = i18nParent(base);
-            if (base == null)
-                throw new IllegalArgumentException("Too many steps up (%d) relative to \"%s\"".formatted(steps, i18nBase));
-        }
-        
-        return base + I18N_JOINER + key;
-    }
-    
-    /**
-     * Gets the parent of the provided i18n key. For example <em>{@code "a.good.child"}</em> returns <em>{@code "a.good"}</em>. 
-     * @param i18n the key to get the parent of
-     * @return the parent of {@code i18n}
-     */
-    private static String i18nParent(String i18n) {
-        int index = i18n.lastIndexOf(I18N_JOINER);
-        
-        // No parent to be found
-        if (index < 1)
-            return null;
-        
-        return i18n.substring(0, index);
-    }
 }

@@ -6,6 +6,7 @@ import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.GroupRequirement;
 import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -24,16 +25,16 @@ import java.util.stream.Collectors;
  */
 @ApiStatus.Internal
 record DependencyGroupDefinition(GroupRequirement requirement, boolean inverted, boolean tooltip, Set<DependencyDefinition> children) {
-    DependencyGroupDefinition(String i18nBase, ConfigEntry.Gui.EnableIfGroup annotation) {
+    DependencyGroupDefinition(@Nullable String prefix, String i18nBase, ConfigEntry.Gui.EnableIfGroup annotation) {
         this(annotation.condition(), annotation.inverted(), annotation.tooltip(),
                 Arrays.stream(annotation.value())
-                        .map(child -> new DependencyDefinition(i18nBase, child))
+                        .map(child -> new DependencyDefinition(prefix, i18nBase, child))
                         .collect(Collectors.toUnmodifiableSet()));
     }
-    DependencyGroupDefinition(String i18nBase, ConfigEntry.Gui.ShowIfGroup annotation) {
+    DependencyGroupDefinition(@Nullable String prefix, String i18nBase, ConfigEntry.Gui.ShowIfGroup annotation) {
         this(annotation.condition(), annotation.inverted(), annotation.tooltip(),
                 Arrays.stream(annotation.value())
-                        .map(child -> new DependencyDefinition(i18nBase, child))
+                        .map(child -> new DependencyDefinition(prefix, i18nBase, child))
                         .collect(Collectors.toUnmodifiableSet()));
     }
     

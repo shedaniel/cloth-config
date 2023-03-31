@@ -1,6 +1,7 @@
 package me.shedaniel.autoconfig.dependencies;
 
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.util.RelativeI18n;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.*;
@@ -32,16 +33,16 @@ import java.util.stream.Collectors;
 @ApiStatus.Internal
 record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDefinition> conditions, Set<MatcherConditionDefinition> matching) {
     
-    DependencyDefinition(@Nullable String i18nBase, ConfigEntry.Gui.EnableIf annotation) {
-        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.conditions(), annotation.matching());
+    DependencyDefinition(@Nullable String prefix, @Nullable String i18nBase, ConfigEntry.Gui.EnableIf annotation) {
+        this(prefix, i18nBase, annotation.value(), annotation.tooltip(), annotation.conditions(), annotation.matching());
     }
     
-    DependencyDefinition(@Nullable String i18nBase, ConfigEntry.Gui.ShowIf annotation) {
-        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.conditions(), annotation.matching());
+    DependencyDefinition(@Nullable String prefix, @Nullable String i18nBase, ConfigEntry.Gui.ShowIf annotation) {
+        this(prefix, i18nBase, annotation.value(), annotation.tooltip(), annotation.conditions(), annotation.matching());
     }
     
-    private DependencyDefinition(@Nullable String i18nBase, String i18nKey, boolean tooltip, String[] conditions, String[] matching) {
-        this(DependencyManager.parseRelativeI18n(i18nBase, i18nKey), tooltip,
+    private DependencyDefinition(@Nullable String prefix, @Nullable String i18nBase, String i18nKey, boolean tooltip, String[] conditions, String[] matching) {
+        this(RelativeI18n.parse(prefix, i18nBase, i18nKey), tooltip,
                 Arrays.stream(conditions)
                         .map(StaticConditionDefinition::fromConditionString)
                         .collect(Collectors.toUnmodifiableSet()), 
