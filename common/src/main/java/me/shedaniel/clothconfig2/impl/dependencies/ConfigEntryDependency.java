@@ -1,5 +1,6 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
+import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.StaticCondition;
@@ -7,10 +8,10 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Represents a dependency on a {@link ConfigEntry}
@@ -85,7 +86,6 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>> extends
                 .toList();
         
         // Build the main line of the tooltip
-        List<Component> tooltip = new ArrayList<>();
         Component effect = Component.translatable(effectKey);
         Component gui = MutableComponent.create(getElement().getFieldName().getContents())
                 .withStyle(ChatFormatting.BOLD);
@@ -94,18 +94,18 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>> extends
             case 2 -> Component.translatable("text.cloth-config.dependencies.two_conditions", conditionTexts.get(0), conditionTexts.get(1));
             default -> Component.translatable("text.cloth-config.dependencies.many_conditions");
         };
-        tooltip.add(Component.translatable("text.cloth-config.dependencies.tooltip", effect, gui, condition));
-        
+    
+        // Build the final array using a stream of lines
+        Stream<Component> stream = Stream.of(Component.translatable("text.cloth-config.dependencies.tooltip", effect, gui, condition));
+    
         // If many conditions, print them as a list
         if (conditionTexts.size() > 2) {
-            tooltip.addAll(conditionTexts.stream()
-                    .map(text -> Component.translatable("text.cloth-config.dependencies.list_entry", text))
-                    .toList());
+            stream = Streams.concat(stream, conditionTexts.stream()
+                    .map(text -> Component.translatable("text.cloth-config.dependencies.list_entry", text)));
         }
-        
-        if (tooltip.isEmpty())
-            return Optional.empty();
-        
-        return Optional.of(tooltip.toArray(Component[]::new));
+    
+        Component[] tooltip = stream.toArray(Component[]::new);
+    
+        return tooltip.length > 0 ? Optional.of(tooltip) : Optional.empty();
     }
 }

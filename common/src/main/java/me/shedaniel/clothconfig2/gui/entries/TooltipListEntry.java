@@ -81,7 +81,7 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
                 .flatMap(Arrays::stream)
                 .toArray(Component[]::new);
         
-        return tooltip.length < 1 ? Optional.empty() : Optional.of(tooltip);
+        return tooltip.length > 0 ? Optional.of(tooltip) : Optional.empty();
     }
     
     public Optional<Component[]> getTooltip() {

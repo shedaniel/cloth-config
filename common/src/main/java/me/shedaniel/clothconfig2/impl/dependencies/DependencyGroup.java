@@ -1,5 +1,6 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
+import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -182,15 +183,15 @@ public class DependencyGroup implements Dependency {
                 .withStyle(ChatFormatting.BOLD);
         Component valueText = Component.translatable(value ? "text.cloth-config.true" : "text.cloth-config.false")
                 .withStyle(ChatFormatting.BOLD);
-        
-        List<Component> lines = new ArrayList<>();
-        lines.add(Component.translatable("text.cloth-config.dependency_groups.tooltip", effectText, conditionText, valueText));
-        lines.addAll(dependencies.stream()
-                        .map(Dependency::getShortDescription)
-                        .map(description -> Component.translatable("text.cloth-config.dependencies.list_entry", description))
-                        .toList());
-
-        return lines.toArray(Component[]::new);
+    
+        return Streams.concat(
+                        // First line
+                        Stream.of(Component.translatable("text.cloth-config.dependency_groups.tooltip", effectText, conditionText, valueText)),
+                        // Additional lines
+                        dependencies.stream()
+                                .map(Dependency::getShortDescription)
+                                .map(description -> Component.translatable("text.cloth-config.dependencies.list_entry", description))
+                ).toArray(Component[]::new);
     }
     
     @Override
