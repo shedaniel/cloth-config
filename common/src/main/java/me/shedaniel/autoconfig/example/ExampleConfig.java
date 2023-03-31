@@ -114,7 +114,6 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
             @ConfigEntry.Gui.Tooltip
             public boolean coolToggle = false;
     
-            @ConfigEntry.Gui.Tooltip
             public boolean lameToggle = true;
             
             @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
