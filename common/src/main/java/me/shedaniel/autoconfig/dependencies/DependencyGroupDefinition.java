@@ -4,6 +4,7 @@ package me.shedaniel.autoconfig.dependencies;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.GroupRequirement;
+import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
@@ -38,5 +39,38 @@ record DependencyGroupDefinition(GroupRequirement requirement, boolean inverted,
     
     Set<Dependency> buildChildren(Function<DependencyDefinition, Dependency> builder) {
         return this.children().stream().map(builder).collect(Collectors.toUnmodifiableSet());
+    }
+    
+    /**
+     * Build a {@link DependencyGroup} as defined in the {@link DependencyGroupDefinition definition}.
+     * <br><br>
+     * If there is an issue building any child dependency, a {@link RuntimeException} will be thrown.
+     *
+     * @param manager a DependencyManager that has all config entries registered
+     * @return The built {@link DependencyGroup}
+     * @throws RuntimeException when there is an issue building one of the group's dependencies
+     */
+    public Dependency build(DependencyManager manager) {
+        // Build each child DependencyDefinition
+        Set<Dependency> dependencies = this.buildChildren(child -> child.build(manager));
+        
+        // If there's only one child, don't bother making a group
+        // unless the group is being used to invert the child
+        if (dependencies.size() == 1) {
+            boolean invert = switch (this.requirement()) {
+                case ALL, ANY, ONE -> this.inverted();
+                case NONE, NOT_ALL, NOT_ONE -> !this.inverted();
+            };
+            if (!invert)
+                return dependencies.iterator().next();
+        }
+        
+        // Build and return the DependencyGroup
+        return Dependency.groupBuilder()
+                .generateTooltip(this.tooltip())
+                .inverted(this.inverted())
+                .withCondition(this.requirement())
+                .withChildren(dependencies)
+                .build();
     }
 }

@@ -5,15 +5,8 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnableIfGroup;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.ShowIf;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.ShowIfGroup;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
-import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ConfigEntryMatcher;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
-import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
-import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
-import me.shedaniel.clothconfig2.impl.dependencies.*;
+import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,7 +79,7 @@ public class DependencyManager {
      * @return The matching config entry
      * @throws IllegalArgumentException if a matching config entry supporting type {@code <T>} is not found
      */
-    private <T> ConfigEntry<T> getEntry(Class<T> type, String i18n) throws IllegalArgumentException {
+    <T> ConfigEntry<T> getEntry(Class<T> type, String i18n) throws IllegalArgumentException {
         ConfigEntry<?> entry = getEntry(i18n);
         
         // Entry's type must extend from the provided type 
@@ -100,12 +93,12 @@ public class DependencyManager {
     }
     
     /**
-     * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
+     * Register a new or transformed config entry for later use by {@link #build()}.
      *
      * @param entry     the {@link me.shedaniel.autoconfig.annotation.ConfigEntry config entry} GUI to be registered
      * @param field     a {@link Field} which may have dependency annotations present
      * @param fieldI18n the i18n key of the field (not necessarily the GUI)
-     * @see #buildDependencies()
+     * @see #build()
      */
     public void register(ConfigEntry<?> entry, @Nullable Field field, @Nullable String fieldI18n) {
         Set<EnableIf> enableIfs = null;
@@ -132,7 +125,7 @@ public class DependencyManager {
     }
     
     /**
-     * Register a new or transformed config entry for later use by {@link #buildDependencies()}.
+     * Register a new or transformed config entry for later use by {@link #build()}.
      * <br><br>
      * Explicitly provide one or more {@link EnableIf @EnableIf} or {@link EnableIfGroup @EnableIfGroup}
      * annotations to be applied to this entry.
@@ -144,7 +137,7 @@ public class DependencyManager {
      * @param showIfAnnotations        a {@link Collection} of {@link ShowIf @ShowIf} annotations
      * @param showIfGroupAnnotations   a {@link Collection} of {@link ShowIfGroup @ShowIfGroup} annotations
      * @see #register(ConfigEntry, Field, String)
-     * @see #buildDependencies()
+     * @see #build()
      */
     public void register(
             ConfigEntry<?> entry,
@@ -203,10 +196,12 @@ public class DependencyManager {
      * Builds the dependencies for all registered config entries.
      * <br><br>
      * <strong>All config entries</strong> must be registered <strong>before</strong> running this method.
+     * <br><br>
+     * If a field has multiple dependencies declared, they will be combined using {@link #combineDependencies(Collection, Collection) combineDependencies()}.
      * 
      * @see #register(ConfigEntry, Field, String)
      */
-    public void buildDependencies() {
+    public void build() {
         registry.values().stream()
                 .filter(EntryRecord::hasDependencies)
                 .forEach(entry -> {
@@ -237,10 +232,10 @@ public class DependencyManager {
     {
         // Build each dependency
         List<Dependency> singles = dependencies.stream()
-                .map(this::buildDependency)
+                .map(single -> single.build(this))
                 .toList();
         List<Dependency> groups = dependencyGroups.stream()
-                .map(this::buildDependency)
+                .map(group -> group.build(this))
                 .collect(Collectors.toCollection(ArrayList::new));
     
         // Combine multiple dependencies if necessary,
@@ -261,132 +256,6 @@ public class DependencyManager {
         // Filtered to remove any duplicates
         return Dependency.groupBuilder()
                 .withChildren(children)
-                .build();
-    }
-    
-    /**
-     * Build a {@link DependencyGroup} as defined in the {@link DependencyGroupDefinition definition}.
-     * <br><br>
-     * If there is an issue building any child dependency, a {@link RuntimeException} will be thrown.
-     *
-     * @param definition The {@link DependencyGroupDefinition} defining the group
-     * @return The built {@link DependencyGroup}
-     * @throws RuntimeException when there is an issue building one of the group's dependencies
-     */
-    public Dependency buildDependency(DependencyGroupDefinition definition) {
-        // Build each child DependencyDefinition
-        Set<Dependency> dependencies = definition.buildChildren(this::buildDependency);
-        
-        // If there's only one child, don't bother making a group
-        // unless the group is being used to invert the child
-        if (dependencies.size() == 1) {
-            boolean invert = switch (definition.requirement()) {
-                case ALL, ANY, ONE -> definition.inverted();
-                case NONE, NOT_ALL, NOT_ONE -> !definition.inverted();
-            };
-            if (!invert)
-                return dependencies.iterator().next();
-        }
-    
-        // Build and return the DependencyGroup
-        return Dependency.groupBuilder()
-                .generateTooltip(definition.tooltip())
-                .inverted(definition.inverted())
-                .withCondition(definition.requirement())
-                .withChildren(dependencies)
-                .build();
-    }
-    
-    /**
-     * Build a {@link Dependency} as defined in the {@link DependencyDefinition definition}.
-     * <br><br>
-     * <p>Currently, supports depending on the following:
-     * <ul>
-     *     <li>{@link BooleanDependency} from {@link BooleanListEntry}</li>
-     *     <li>{@link EnumDependency} from {@link EnumListEntry}</li>
-     *     <li>{@link NumberDependency} from entries implementing {@link NumberConfigEntry}</li>
-     * </ul>
-     * <p>If a different config entry type is used, a {@link RuntimeException} will be thrown.
-     *
-     * @param dependency The {@link DependencyDefinition} defining the dependency
-     * @return The built {@link Dependency}
-     * @throws IllegalArgumentException if the defined dependency is invalid
-     */
-    public Dependency buildDependency(DependencyDefinition dependency) {
-        ConfigEntry<?> gui = getEntry(dependency.i18n());
-        
-        if (gui instanceof BooleanListEntry booleanListEntry)
-            return buildDependency(dependency, booleanListEntry);
-        else if (gui instanceof EnumListEntry<?> selectionListEntry)
-            return buildDependency(dependency, selectionListEntry);
-        else if (gui instanceof NumberConfigEntry<?> numberConfigEntry)
-            return buildDependency(dependency, numberConfigEntry);
-        else
-            throw new IllegalArgumentException("Unsupported dependency type: %s".formatted(gui.getClass().getSimpleName()));
-    }
-    
-    /**
-     * Builds a {@link BooleanDependency} defined in the {@link DependencyDefinition}, depending on the given {@link BooleanListEntry}.
-     * 
-     * @param definition the {@link DependencyDefinition} that defines the dependency
-     * @param gui the {@link BooleanListEntry} to be depended on
-     * @return the generated dependency
-     */
-    public BooleanDependency buildDependency(DependencyDefinition definition, BooleanListEntry gui) {
-        Set<BooleanCondition> conditions = definition.buildConditions(StaticConditionDefinition::toBooleanCondition);
-        Set<ConfigEntryMatcher<Boolean>> matchers = definition.buildMatchers(Boolean.class, this::getEntry);
-    
-        // Start building the dependency
-        BooleanDependencyBuilder builder = Dependency.builder(gui);
-        
-        // BooleanDependencyBuilder supports zero or one requirement being set 
-        if (!conditions.isEmpty()) {
-            if (conditions.size() != 1)
-                throw new IllegalArgumentException("Boolean dependencies require exactly one requirement, found " + conditions.size());
-    
-            conditions.forEach(builder::matching);
-        }
-        
-        builder.matching(matchers);
-        builder.generateTooltip(definition.tooltip());
-        return builder.build();
-    }
-    
-    /**
-     * Builds a {@link EnumDependency} defined in the {@link DependencyDefinition}, depending on the given {@link EnumListEntry}.
-     *
-     * @param definition the {@link DependencyDefinition} that defines the dependency
-     * @param gui the {@link EnumListEntry} to be depended on
-     * @return the generated dependency
-     */
-    public <T extends Enum<?>> EnumDependency<T> buildDependency(DependencyDefinition definition, EnumListEntry<T> gui) {
-        Class<T> type = gui.getType();
-        Set<EnumCondition<T>> conditions = definition.buildConditions(condition -> condition.toEnumCondition(type));
-        Set<ConfigEntryMatcher<T>> matchers = definition.buildMatchers(type, this::getEntry);
-    
-        return Dependency.builder(gui)
-                .matching(conditions)
-                .matching(matchers)
-                .generateTooltip(definition.tooltip())
-                .build();
-    }
-    
-    /**
-     * Builds a {@link NumberDependency} defined in the {@link DependencyDefinition}, depending on the given {@link NumberConfigEntry}.
-     *
-     * @param definition the {@link DependencyDefinition} that defines the dependency
-     * @param gui the {@link NumberConfigEntry} to be depended on
-     * @return the generated dependency
-     */
-    public <T extends Number & Comparable<T>> NumberDependency<T> buildDependency(DependencyDefinition definition, NumberConfigEntry<T> gui) {
-        Class<T> type = gui.getType();
-        Set<NumberCondition<T>> conditions = definition.buildConditions(condition -> condition.toNumberCondition(type));
-        Set<ConfigEntryMatcher<T>> matchers = definition.buildComparableMatchers(type, this::getEntry);
-    
-        return Dependency.builder(gui)
-                .matching(conditions)
-                .matching(matchers)
-                .generateTooltip(definition.tooltip())
                 .build();
     }
     

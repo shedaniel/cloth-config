@@ -1,8 +1,15 @@
 package me.shedaniel.autoconfig.dependencies;
 
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ConfigEntryMatcher;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.StaticCondition;
+import me.shedaniel.clothconfig2.api.NumberConfigEntry;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.*;
+import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
+import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
+import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependency;
+import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependencyBuilder;
+import me.shedaniel.clothconfig2.impl.dependencies.EnumDependency;
+import me.shedaniel.clothconfig2.impl.dependencies.NumberDependency;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,5 +66,96 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
                 .collect(Collectors.toUnmodifiableSet());
     }
     
+    /**
+     * Build a {@link Dependency} as defined in this definition.
+     * <br><br>
+     * <p>Currently, supports depending on the following:
+     * <ul>
+     *     <li>{@link BooleanDependency} from {@link BooleanListEntry}</li>
+     *     <li>{@link EnumDependency} from {@link EnumListEntry}</li>
+     *     <li>{@link NumberDependency} from entries implementing {@link NumberConfigEntry}</li>
+     * </ul>
+     * <p>If a different config entry type is used, a {@link RuntimeException} will be thrown.
+     *
+     * @param manager a DependencyManager that has all config entries registered
+     * @return The built {@link Dependency}
+     * @throws IllegalArgumentException if the defined dependency is invalid
+     */
+    public Dependency build(DependencyManager manager) {
+        me.shedaniel.clothconfig2.api.ConfigEntry<?> gui = manager.getEntry(this.i18n());
+        
+        if (gui instanceof BooleanListEntry booleanListEntry)
+            return this.build(manager, booleanListEntry);
+        else if (gui instanceof EnumListEntry<?> enumListEntry)
+            return this.build(manager, enumListEntry);
+        else if (gui instanceof NumberConfigEntry<?> numberConfigEntry)
+            return this.build(manager, numberConfigEntry);
+        else
+            throw new IllegalArgumentException("Unsupported dependency type: %s".formatted(gui.getClass().getSimpleName()));
+    }
     
+    /**
+     * Builds a {@link BooleanDependency} defined in this definition, depending on the given {@link BooleanListEntry}.
+     *
+     * @param manager a DependencyManager that has all config entries registered
+     * @param gui      the {@link BooleanListEntry} to be depended on
+     * @return the generated dependency
+     */
+    public BooleanDependency build(DependencyManager manager, BooleanListEntry gui) {
+        Set<BooleanCondition> conditions = this.buildConditions(StaticConditionDefinition::toBooleanCondition);
+        Set<ConfigEntryMatcher<Boolean>> matchers = this.buildMatchers(Boolean.class, manager::getEntry);
+        
+        // Start building the dependency
+        BooleanDependencyBuilder builder = Dependency.builder(gui);
+        
+        // BooleanDependencyBuilder supports zero or one requirement being set 
+        if (!conditions.isEmpty()) {
+            if (conditions.size() != 1)
+                throw new IllegalArgumentException("Boolean dependencies require exactly one requirement, found " + conditions.size());
+            
+            conditions.forEach(builder::matching);
+        }
+        
+        builder.matching(matchers);
+        builder.generateTooltip(this.tooltip());
+        return builder.build();
+    }
+    
+    /**
+     * Builds a {@link EnumDependency} defined in this definition, depending on the given {@link EnumListEntry}.
+     *
+     * @param manager a DependencyManager that has all config entries registered
+     * @param gui      the {@link EnumListEntry} to be depended on
+     * @return the generated dependency
+     */
+    public <T extends Enum<?>> EnumDependency<T> build(DependencyManager manager, EnumListEntry<T> gui) {
+        Class<T> type = gui.getType();
+        Set<EnumCondition<T>> conditions = this.buildConditions(condition -> condition.toEnumCondition(type));
+        Set<ConfigEntryMatcher<T>> matchers = this.buildMatchers(type, manager::getEntry);
+    
+        return Dependency.builder(gui)
+                .matching(conditions)
+                .matching(matchers)
+                .generateTooltip(this.tooltip())
+                .build();
+    }
+    
+    /**
+     * Builds a {@link NumberDependency} defined in this definition, depending on the given {@link NumberConfigEntry}.
+     *
+     * @param manager a DependencyManager that has all config entries registered
+     * @param gui      the {@link NumberConfigEntry} to be depended on
+     * @return the generated dependency
+     */
+    public <T extends Number & Comparable<T>> NumberDependency<T> build(DependencyManager manager, NumberConfigEntry<T> gui) {
+        Class<T> type = gui.getType();
+        Set<NumberCondition<T>> conditions = this.buildConditions(condition -> condition.toNumberCondition(type));
+        Set<ConfigEntryMatcher<T>> matchers = this.buildComparableMatchers(type, manager::getEntry);
+        
+        return Dependency.builder(gui)
+                .matching(conditions)
+                .matching(matchers)
+                .generateTooltip(this.tooltip())
+                .build();
+    }
 }

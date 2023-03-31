@@ -133,7 +133,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
                         )
                 );
     
-        registry.getDependencyManager().buildDependencies();
+        registry.getDependencyManager().build();
         
         return buildFunction.apply(builder);
     }
