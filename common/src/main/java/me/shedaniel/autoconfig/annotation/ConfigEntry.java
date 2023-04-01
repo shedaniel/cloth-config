@@ -197,6 +197,15 @@ public class ConfigEntry {
              * way of informing users that the annotated config entry has particular dependencies.
              */
             boolean tooltip() default true;
+    
+            /**
+             * Allow building the dependency even if no type-specific builder is implemented.
+             * 
+             * @deprecated it strongly recommended that generic dependencies are only used with dynamic
+             *       {@link #matching() matcher} conditions.
+             */
+            @Deprecated
+            boolean allowGeneric() default false;
         }
     
         /**
@@ -268,6 +277,14 @@ public class ConfigEntry {
               @see EnableIf#tooltip() 
              */
             boolean tooltip() default true;
+    
+            /**
+             * @see EnableIf#allowGeneric()
+             * @deprecated it strongly recommended that generic dependencies are only used with dynamic
+             *       {@link EnableIf#matching() matcher} conditions.
+             */
+            @Deprecated
+            boolean allowGeneric() default false;
         }
     
         /**

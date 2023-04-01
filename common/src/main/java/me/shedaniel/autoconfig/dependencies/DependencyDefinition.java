@@ -23,22 +23,23 @@ import java.util.stream.Collectors;
  *
  * @param i18n the absolute i18n key of the depended-on config entry
  * @param tooltip whether the dependency should auto-generate tooltips
+ * @param allowGeneric whether the dependency should still be built if a type-specific dependency is not supported
  * @param conditions flagged strings to be parsed into dependency conditions
  * @param matching flagged strings to be parsed into dynamic dependency conditions
  * @see DependencyGroupDefinition
  */
-record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDefinition> conditions, Set<MatcherConditionDefinition> matching) {
+record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, Set<StaticConditionDefinition> conditions, Set<MatcherConditionDefinition> matching) {
     
     DependencyDefinition(@Nullable String i18nBase, EnableIf annotation) {
-        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.conditions(), annotation.matching());
+        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.allowGeneric(), annotation.conditions(), annotation.matching());
     }
     
     DependencyDefinition(@Nullable String i18nBase, ShowIf annotation) {
-        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.conditions(), annotation.matching());
+        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.allowGeneric(), annotation.conditions(), annotation.matching());
     }
     
-    private DependencyDefinition(@Nullable String i18nBase, String i18nKey, boolean tooltip, String[] conditions, String[] matching) {
-        this(RelativeI18n.parse(i18nBase, i18nKey), tooltip,
+    private DependencyDefinition(@Nullable String i18nBase, String i18nKey, boolean tooltip, boolean allowGeneric, String[] conditions, String[] matching) {
+        this(RelativeI18n.parse(i18nBase, i18nKey), tooltip, allowGeneric,
                 Arrays.stream(conditions)
                         .map(StaticConditionDefinition::fromConditionString)
                         .collect(Collectors.toUnmodifiableSet()), 
@@ -88,8 +89,10 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
             return this.build(manager, enumListEntry);
         else if (gui instanceof NumberConfigEntry<?> numberConfigEntry)
             return this.build(manager, numberConfigEntry);
-        else
+        else if (this.allowGeneric())
             return this.buildGeneric(manager, gui);
+        else
+            throw new IllegalArgumentException("Unsupported dependency type: %s".formatted(gui.getClass().getSimpleName()));
     }
     
     /**
