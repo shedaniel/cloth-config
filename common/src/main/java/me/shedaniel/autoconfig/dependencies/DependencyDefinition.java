@@ -3,7 +3,6 @@ package me.shedaniel.autoconfig.dependencies;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.EnableIf;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.ShowIf;
 import me.shedaniel.autoconfig.util.RelativeI18n;
-import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.*;
@@ -17,7 +16,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,19 +49,19 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
                         .collect(Collectors.toUnmodifiableSet()));
     }
     
-    <T extends StaticCondition<?>> Set<T> buildConditions(Function<StaticConditionDefinition, T> mapper) {
-        return this.conditions().stream().map(mapper).collect(Collectors.toUnmodifiableSet());
+    private <T extends StaticCondition<?>> Set<T> buildConditions(Function<StaticConditionDefinition, T> builder) {
+        return this.conditions().stream().map(builder).collect(Collectors.toUnmodifiableSet());
     }
     
-    <T> Set<ConfigEntryMatcher<T>> buildMatchers(Class<T> type, BiFunction<Class<T>, String, ? extends ConfigEntry<T>> getEntry) {
+    private <T> Set<MatcherCondition<T>> buildMatchers(Class<T> type, DependencyManager manager) {
         return this.matching().stream()
-                .map(def -> def.toMatcher(getEntry.apply(type, def.i18n())))
+                .map(definition -> definition.toMatcher(manager.getEntry(type, definition.i18n())))
                 .collect(Collectors.toUnmodifiableSet());
     }
     
-    <T extends Comparable<T>> Set<ConfigEntryMatcher<T>> buildComparableMatchers(Class<T> type, BiFunction<Class<T>, String, ? extends ConfigEntry<T>> getEntry) {
+    private <T extends Comparable<T>> Set<ComparativeMatcherCondition<T>> buildComparableMatchers(Class<T> type, DependencyManager manager) {
         return this.matching().stream()
-                .map(def -> def.toComparableMatcher(getEntry.apply(type, def.i18n())))
+                .map(definition -> definition.toComparableMatcher(manager.getEntry(type, definition.i18n())))
                 .collect(Collectors.toUnmodifiableSet());
     }
     
@@ -72,11 +70,11 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
      * <br><br>
      * <p>Currently, supports depending on the following:
      * <ul>
-     *     <li>{@link BooleanDependency} from {@link BooleanListEntry}</li>
-     *     <li>{@link EnumDependency} from {@link EnumListEntry}</li>
+     *     <li>{@link BooleanDependency} from {@link BooleanListEntry} entries</li>
+     *     <li>{@link EnumDependency} from {@link EnumListEntry} entries</li>
      *     <li>{@link NumberDependency} from entries implementing {@link NumberConfigEntry}</li>
      * </ul>
-     * <p>If a different config entry type is used, a {@link RuntimeException} will be thrown.
+     * <p>If a different config entry type is depended-on, an {@link IllegalArgumentException} will be thrown.
      *
      * @param manager a DependencyManager that has all config entries registered
      * @return The built {@link Dependency}
@@ -99,12 +97,12 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
      * Builds a {@link BooleanDependency} defined in this definition, depending on the given {@link BooleanListEntry}.
      *
      * @param manager a DependencyManager that has all config entries registered
-     * @param gui      the {@link BooleanListEntry} to be depended on
+     * @param gui     the {@link BooleanListEntry} to be depended on
      * @return the generated dependency
      */
     public BooleanDependency build(DependencyManager manager, BooleanListEntry gui) {
         Set<BooleanCondition> conditions = this.buildConditions(StaticConditionDefinition::toBooleanCondition);
-        Set<ConfigEntryMatcher<Boolean>> matchers = this.buildMatchers(Boolean.class, manager::getEntry);
+        Set<MatcherCondition<Boolean>> matchers = this.buildMatchers(Boolean.class, manager);
         
         // Start building the dependency
         BooleanDependencyBuilder builder = Dependency.builder(gui);
@@ -126,13 +124,13 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
      * Builds a {@link EnumDependency} defined in this definition, depending on the given {@link EnumListEntry}.
      *
      * @param manager a DependencyManager that has all config entries registered
-     * @param gui      the {@link EnumListEntry} to be depended on
+     * @param gui     the {@link EnumListEntry} to be depended on
      * @return the generated dependency
      */
     public <T extends Enum<?>> EnumDependency<T> build(DependencyManager manager, EnumListEntry<T> gui) {
         Class<T> type = gui.getType();
         Set<EnumCondition<T>> conditions = this.buildConditions(condition -> condition.toEnumCondition(type));
-        Set<ConfigEntryMatcher<T>> matchers = this.buildMatchers(type, manager::getEntry);
+        Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
     
         return Dependency.builder(gui)
                 .matching(conditions)
@@ -145,13 +143,13 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
      * Builds a {@link NumberDependency} defined in this definition, depending on the given {@link NumberConfigEntry}.
      *
      * @param manager a DependencyManager that has all config entries registered
-     * @param gui      the {@link NumberConfigEntry} to be depended on
+     * @param gui     the {@link NumberConfigEntry} to be depended on
      * @return the generated dependency
      */
     public <T extends Number & Comparable<T>> NumberDependency<T> build(DependencyManager manager, NumberConfigEntry<T> gui) {
         Class<T> type = gui.getType();
         Set<NumberCondition<T>> conditions = this.buildConditions(condition -> condition.toNumberCondition(type));
-        Set<ConfigEntryMatcher<T>> matchers = this.buildComparableMatchers(type, manager::getEntry);
+        Set<ComparativeMatcherCondition<T>> matchers = this.buildComparableMatchers(type, manager);
         
         return Dependency.builder(gui)
                 .matching(conditions)

@@ -3,15 +3,15 @@ package me.shedaniel.clothconfig2.api.dependencies.conditions;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import org.jetbrains.annotations.Nullable;
 
-public class ComparativeConfigEntryMatcher<T extends Comparable<T>> extends ConfigEntryMatcher<T> {
+public class ComparativeMatcherCondition<T extends Comparable<T>> extends MatcherCondition<T> {
     
     private final ComparisonOperator operator;
     
-    public ComparativeConfigEntryMatcher(ConfigEntry<T> gui) {
+    public ComparativeMatcherCondition(ConfigEntry<T> gui) {
         this(gui, null);
     }
     
-    public ComparativeConfigEntryMatcher(ConfigEntry<T> gui, @Nullable ComparisonOperator operator) {
+    public ComparativeMatcherCondition(ConfigEntry<T> gui, @Nullable ComparisonOperator operator) {
         super(gui);
         this.operator = operator == null ? ComparisonOperator.EQUAL : operator;
     }

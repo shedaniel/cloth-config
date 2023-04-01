@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyBuilder;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ConfigEntryMatcher;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ComparatorDependencyBuilder<T> implements DependencyBuilder<ComparatorDependency<T>, ComparatorDependencyBuilder<T>> {
-    private final Set<ConfigEntryMatcher<T>> conditions = new HashSet<>();
+    private final Set<MatcherCondition<T>> conditions = new HashSet<>();
     private final ConfigEntry<T> gui;
     private boolean tooltip = true;
     
@@ -39,13 +39,13 @@ public class ComparatorDependencyBuilder<T> implements DependencyBuilder<Compara
     }
     
     public <E extends ConfigEntry<T>> ComparatorDependencyBuilder<T> matching(Collection<E> guis) {
-        conditions.addAll(guis.stream().map(gui -> new ConfigEntryMatcher<T>(gui))
+        conditions.addAll(guis.stream().map(gui -> new MatcherCondition<T>(gui))
                 .collect(Collectors.toUnmodifiableSet()));
         
         return this;
     }
     
-    public ComparatorDependencyBuilder<T> matching(ConfigEntryMatcher<T> condition) {
+    public ComparatorDependencyBuilder<T> matching(MatcherCondition<T> condition) {
         conditions.add(condition);
         return this;
     }

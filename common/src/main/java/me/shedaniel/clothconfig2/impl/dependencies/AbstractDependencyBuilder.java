@@ -4,7 +4,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ConfigEntryMatcher;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
 import org.jetbrains.annotations.Contract;
 
 /**
@@ -63,7 +63,7 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, D e
      * @return this instance, for chaining
      */
     public SELF matching(ConfigEntry<T> gui) {
-        return matching(new ConfigEntryMatcher<>(gui));
+        return matching(new MatcherCondition<>(gui));
     }
     
     @Override

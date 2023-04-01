@@ -5,11 +5,11 @@ import net.minecraft.network.chat.Component;
 
 import java.util.EnumSet;
 
-public class ConfigEntryMatcher<T> implements Condition<T> {
+public class MatcherCondition<T> implements Condition<T> {
     private final ConfigEntry<T> gui;
     private final EnumSet<ConditionFlag> flags = EnumSet.noneOf(ConditionFlag.class);
     
-    public <E extends ConfigEntry<T>> ConfigEntryMatcher(E gui) {
+    public <E extends ConfigEntry<T>> MatcherCondition(E gui) {
         this.gui = gui;
     }
     

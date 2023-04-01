@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.dependencies.conditions.BooleanCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ConfigEntryMatcher;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +21,7 @@ public class BooleanDependencyBuilder extends MultiConditionDependencyBuilder<Bo
     
     @Override
     public BooleanDependencyBuilder matching(Condition<Boolean> condition) {
-        if (condition instanceof ConfigEntryMatcher<Boolean> matcher) {
+        if (condition instanceof MatcherCondition<Boolean> matcher) {
             return super.matching(matcher);
         }
         

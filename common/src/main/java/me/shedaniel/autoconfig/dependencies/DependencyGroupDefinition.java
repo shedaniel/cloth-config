@@ -36,12 +36,20 @@ record DependencyGroupDefinition(GroupRequirement requirement, boolean inverted,
                         .collect(Collectors.toUnmodifiableSet()));
     }
     
-    Set<Dependency> buildChildren(Function<DependencyDefinition, Dependency> builder) {
+    /**
+     * Builds all children using the provided builder function
+     * 
+     * @param builder the function used to build each child,
+     *                should throw an {@link IllegalArgumentException} if the child cannot be built
+     * @return a set containing the resulting children
+     * @throws IllegalArgumentException if thrown by the builder
+     */
+    private Set<Dependency> buildChildren(Function<DependencyDefinition, Dependency> builder) {
         return this.children().stream().map(builder).collect(Collectors.toUnmodifiableSet());
     }
     
     /**
-     * Build a {@link DependencyGroup} as defined in the {@link DependencyGroupDefinition definition}.
+     * Build a {@link DependencyGroup} as defined in this definition.
      * <br><br>
      * If there is an issue building any child dependency, a {@link RuntimeException} will be thrown.
      *
