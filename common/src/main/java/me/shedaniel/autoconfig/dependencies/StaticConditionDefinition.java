@@ -73,4 +73,10 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
         condition.setFlags(this.flags());
         return condition;
     }
+    
+    public <T> GenericCondition<T> toGenericCondition(Class<T> type) {
+        GenericCondition<T> condition = new GenericCondition<>(type, this.condition());
+        condition.setFlags(this.flags());
+        return condition;
+    }
 }

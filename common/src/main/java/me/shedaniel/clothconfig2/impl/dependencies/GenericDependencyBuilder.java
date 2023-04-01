@@ -2,6 +2,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyBuilder;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
 
 import java.util.Collection;
@@ -9,9 +10,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+//FIXME can probably just extend MultiConditionDependencyBuilder?
 public class GenericDependencyBuilder<T> implements DependencyBuilder<GenericDependency<T>, GenericDependencyBuilder<T>> {
     // FIXME, until a GenericCondition exists, we can only support MatcherConditions
-    private final Set<MatcherCondition<T>> conditions = new HashSet<>();
+    private final Set<Condition<T>> conditions = new HashSet<>();
     private final ConfigEntry<T> gui;
     private boolean tooltip = true;
     
@@ -35,7 +37,8 @@ public class GenericDependencyBuilder<T> implements DependencyBuilder<GenericDep
         return this;
     }
     
-    public <E extends ConfigEntry<T>> GenericDependencyBuilder<T> matching(E... gui) {
+    @SafeVarargs
+    public final <E extends ConfigEntry<T>> GenericDependencyBuilder<T> matching(E... gui) {
         return matching(Set.of(gui));
     }
     
@@ -46,12 +49,12 @@ public class GenericDependencyBuilder<T> implements DependencyBuilder<GenericDep
         return this;
     }
     
-    public GenericDependencyBuilder<T> withCondition(MatcherCondition<T> condition) {
+    public GenericDependencyBuilder<T> matching(Condition<T> condition) {
         conditions.add(condition);
         return this;
     }
     
-    public GenericDependencyBuilder<T> withConditions(Collection<MatcherCondition<T>> conditions) {
+    public GenericDependencyBuilder<T> withConditions(Collection<? extends Condition<T>> conditions) {
         this.conditions.addAll(conditions);
         return this;
     }

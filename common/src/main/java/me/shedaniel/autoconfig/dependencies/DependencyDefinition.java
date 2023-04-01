@@ -9,10 +9,7 @@ import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.*;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
-import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependency;
-import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependencyBuilder;
-import me.shedaniel.clothconfig2.impl.dependencies.EnumDependency;
-import me.shedaniel.clothconfig2.impl.dependencies.NumberDependency;
+import me.shedaniel.clothconfig2.impl.dependencies.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -75,7 +72,8 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
      *     <li>{@link EnumDependency} from {@link EnumListEntry} entries</li>
      *     <li>{@link NumberDependency} from entries implementing {@link NumberConfigEntry}</li>
      * </ul>
-     * <p>Unsupported types can be used, but not with static conditions. Only dynamic "matcher" conditions are allowed.
+     * <p>Unsupported types can be used, but conditions will be checked using {@link String#valueOf(Object)}.
+     * No guarantees are made for how this will function in practice.
      *
      * @param manager a DependencyManager that has all config entries registered
      * @return The built {@link Dependency}
@@ -92,21 +90,6 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
             return this.build(manager, numberConfigEntry);
         else
             return this.buildGeneric(manager, gui);
-    }
-    
-    public <T> Dependency buildGeneric(DependencyManager manager, ConfigEntry<T> gui) {
-        // comparative dependency doesn't support static conditions
-        if (!this.conditions().isEmpty())
-            // FIXME implement a GenericCondition that can compare String.valueOf() for any type
-            throw new IllegalArgumentException("Dependencies on %s support dynamic matchers but not static conditions. Found %d"
-                    .formatted(gui.getClass().getSimpleName(), this.conditions().size()));
-    
-        Class<T> type = gui.getType();
-        Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
-        Dependency.genericBuilder(gui)
-                .withConditions(matchers)
-                .build();
-        return null;
     }
     
     /**
@@ -171,6 +154,29 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
                 .matching(conditions)
                 .matching(matchers)
                 .generateTooltip(this.tooltip())
+                .build();
+    }
+    
+    /**
+     * Builds a {@link GenericDependency} defined in this definition, depending on the given {@link ConfigEntry}.
+     * <p>
+     * If available, you should consider using a type-specific builder such as {@link #build(DependencyManager, BooleanListEntry)}.
+     * Generic dependencies are inherently limited because static conditions can only be checked using {@link String#valueOf(Object)}.
+     *
+     * @param manager a DependencyManager that has all config entries registered
+     * @param gui     the {@link ConfigEntry} to be depended on
+     * @return the generated dependency
+     */
+    public <T> Dependency buildGeneric(DependencyManager manager, ConfigEntry<T> gui) {
+        Class<T> type = gui.getType();
+        Set<GenericCondition<T>> conditions = this.conditions().stream()
+                .map(condition -> condition.toGenericCondition(type))
+                .collect(Collectors.toUnmodifiableSet());
+        Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
+        
+        return Dependency.genericBuilder(gui)
+                .withConditions(conditions)
+                .withConditions(matchers)
                 .build();
     }
 }
