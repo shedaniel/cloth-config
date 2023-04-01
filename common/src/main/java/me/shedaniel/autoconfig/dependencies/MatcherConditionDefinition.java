@@ -1,5 +1,6 @@
 package me.shedaniel.autoconfig.dependencies;
 
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnableIf;
 import me.shedaniel.autoconfig.util.RelativeI18n;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparativeConfigEntryMatcher;
@@ -16,7 +17,7 @@ record MatcherConditionDefinition(EnumSet<ConditionFlag> flags, @Nullable Compar
     
     /**
      * @see StaticConditionDefinition
-     * @see me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnableIf#matching() Public API documentation
+     * @see EnableIf#matching() Public API documentation
      */
     static MatcherConditionDefinition fromConditionString(String i18nBase, String condition) {
         // Parse any flags

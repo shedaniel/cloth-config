@@ -5,25 +5,18 @@ import org.jetbrains.annotations.Nullable;
 
 public class RelativeI18n {
     
-    private static final char STEP_UP_PREFIX = '.';
-    private static final char I18N_JOINER = '.';
+    private static final char RELATIVE_STEP_PREFIX = '.';
+    private static final char JOINER = '.';
     
-    public static String prefix(@Nullable String prefix, String i18n) throws IllegalArgumentException {
-        return prefix != null && i18n.startsWith(prefix) ?
-                i18n : prefix + I18N_JOINER + i18n;
-    }
-    
-    public static String parse(String prefix, String i18nBase, String i18nKey) {
-        if (prefix == null) {
-            return parse(i18nBase, i18nKey);
-        }
-        if (i18nBase == null) {
-            if (i18nKey.startsWith(String.valueOf(STEP_UP_PREFIX)))
-                throw new IllegalArgumentException();
-            return prefix(prefix, i18nKey);
-        }
-        
-        return parse(prefix(prefix, i18nBase), i18nKey);
+    /**
+     * Applies the given prefix to the i18n key. Effectively making i18n a child of the prefix.
+     * 
+     * @param prefix the parent part
+     * @param i18n the child part
+     * @return the resulting i18n key
+     */
+    public static String prefix(@Nullable String prefix, String i18n) {
+        return prefix == null || prefix.isEmpty() ? i18n : prefix + JOINER + i18n;
     }
     
     /**
@@ -38,7 +31,7 @@ public class RelativeI18n {
         // Count how many "steps up" are at the start of the key string,
         int steps = 0;
         for (char c : i18nKey.toCharArray()) {
-            if (STEP_UP_PREFIX == c) steps++;
+            if (RELATIVE_STEP_PREFIX == c) steps++;
             else break;
         }
         
@@ -61,7 +54,7 @@ public class RelativeI18n {
                 throw new IllegalArgumentException("Too many steps up (%d) relative to \"%s\"".formatted(steps, i18nBase));
         }
         
-        return base + I18N_JOINER + key;
+        return base + JOINER + key;
     }
     
     /**
@@ -70,7 +63,7 @@ public class RelativeI18n {
      * @return the parent of {@code i18n}
      */
     public static String parent(String i18n) {
-        int index = i18n.lastIndexOf(I18N_JOINER);
+        int index = i18n.lastIndexOf(JOINER);
         
         // No parent to be found
         if (index < 1)

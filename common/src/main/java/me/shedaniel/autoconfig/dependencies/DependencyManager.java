@@ -53,15 +53,24 @@ public class DependencyManager {
     
     /**
      * Get the config entry GUI associated with the given i18n key.
+     * <p>
+     * Will look for an entry exactly matching {@code i18n}, otherwise will look again, prefixing {@code i18n} with
+     * the prefix defined using {@link #setPrefix(String)}.
      *
      * @param i18n the i18n key 
      * @return The matching config entry
      * @throws IllegalArgumentException if a matching config entry is not found
      */
     public ConfigEntry<?> getEntry(String i18n) throws IllegalArgumentException {
-        return Optional.ofNullable(registry.get(i18n))
-                .map(EntryRecord::gui)
-                .orElseThrow(() -> new IllegalArgumentException("Specified config entry not found: \"%s\"".formatted(i18n)));
+        EntryRecord record = registry.get(i18n);
+        
+        if (record == null && prefix != null)
+            record = registry.get(RelativeI18n.prefix(prefix, i18n));
+        
+        if (record == null)
+            throw new IllegalArgumentException("Specified config entry not found: \"%s\"".formatted(i18n));
+        
+        return record.gui();
     }
     
     /**
@@ -166,22 +175,22 @@ public class DependencyManager {
         // Add the new dependencies to the appropriate sets
         enableIfs.addAll(Stream.ofNullable(enableIfAnnotations)
                 .flatMap(Collection::stream)
-                .map(single -> new DependencyDefinition(prefix, i18nBase, single))
+                .map(single -> new DependencyDefinition(i18nBase, single))
                 .collect(Collectors.toUnmodifiableSet()));
     
         enableIfGroups.addAll(Stream.ofNullable(enableIfGroupAnnotations)
                 .flatMap(Collection::stream)
-                .map(group -> new DependencyGroupDefinition(prefix, i18nBase, group))
+                .map(group -> new DependencyGroupDefinition(i18nBase, group))
                 .collect(Collectors.toUnmodifiableSet()));
         
         showIfs.addAll(Stream.ofNullable(showIfAnnotations)
                 .flatMap(Collection::stream)
-                .map(single -> new DependencyDefinition(prefix, i18nBase, single))
+                .map(single -> new DependencyDefinition(i18nBase, single))
                 .collect(Collectors.toUnmodifiableSet()));
     
         showIfGroups.addAll(Stream.ofNullable(showIfGroupAnnotations)
                 .flatMap(Collection::stream)
-                .map(group -> new DependencyGroupDefinition(prefix, i18nBase, group))
+                .map(group -> new DependencyGroupDefinition(i18nBase, group))
                 .collect(Collectors.toUnmodifiableSet()));
         
         registry.put(i18n, new EntryRecord(entry, enableIfs, enableIfGroups, showIfs, showIfGroups));
