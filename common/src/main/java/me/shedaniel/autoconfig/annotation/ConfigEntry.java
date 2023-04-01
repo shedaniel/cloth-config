@@ -76,85 +76,8 @@ public class ConfigEntry {
 //        double max();
 //    }
     
-    public static class Gui {
-        private Gui() {
-        }
-        
-        /**
-         * Removes the field from the config GUI.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
-        public @interface Excluded {
-        }
-        
-        /**
-         * Applies to objects.
-         * Adds GUI entries for the field's inner fields at the same level as this field.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
-        public @interface TransitiveObject {
-        }
-        
-        /**
-         * Applies to objects.
-         * Adds GUI entries for the field's inner fields in a collapsible section.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
-        public @interface CollapsibleObject {
-            boolean startExpanded() default false;
-        }
-        
-        /**
-         * Applies a tooltip to list entries that support it, defined in your lang file.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
-        public @interface Tooltip {
-            int count() default 1;
-        }
-        
-        /**
-         * Applies no tooltip to list entries that support it, defined in your lang file.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
-        public @interface NoTooltip {
-            
-        }
-        
-        /**
-         * Applies a section of text right before this entry, defined in your lang file.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
-        public @interface PrefixText {
-        }
-        
-        /**
-         * Requires restart if the field is modified.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
-        public @interface RequiresRestart {
-            boolean value() default true;
-        }
-        
-        /**
-         * Defines how an enum is handled
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
-        public @interface EnumHandler {
-            EnumDisplayOption option() default EnumDisplayOption.DROPDOWN;
-            
-            enum EnumDisplayOption {
-                DROPDOWN,
-                BUTTON
-            }
-        }
+    public static class Dependency {
+        private Dependency() {}
     
         /**
          * Depends on the referenced field.
@@ -379,5 +302,87 @@ public class ConfigEntry {
              */
             boolean tooltip() default true;
         }
+    }
+    
+    public static class Gui {
+        private Gui() {
+        }
+        
+        /**
+         * Removes the field from the config GUI.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface Excluded {
+        }
+        
+        /**
+         * Applies to objects.
+         * Adds GUI entries for the field's inner fields at the same level as this field.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface TransitiveObject {
+        }
+        
+        /**
+         * Applies to objects.
+         * Adds GUI entries for the field's inner fields in a collapsible section.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface CollapsibleObject {
+            boolean startExpanded() default false;
+        }
+        
+        /**
+         * Applies a tooltip to list entries that support it, defined in your lang file.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface Tooltip {
+            int count() default 1;
+        }
+        
+        /**
+         * Applies no tooltip to list entries that support it, defined in your lang file.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface NoTooltip {
+            
+        }
+        
+        /**
+         * Applies a section of text right before this entry, defined in your lang file.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface PrefixText {
+        }
+        
+        /**
+         * Requires restart if the field is modified.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface RequiresRestart {
+            boolean value() default true;
+        }
+        
+        /**
+         * Defines how an enum is handled
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface EnumHandler {
+            EnumDisplayOption option() default EnumDisplayOption.DROPDOWN;
+            
+            enum EnumDisplayOption {
+                DROPDOWN,
+                BUTTON
+            }
+        }
+    
     }
 }

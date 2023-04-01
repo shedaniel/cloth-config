@@ -122,44 +122,44 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
             @ConfigEntry.BoundedDiscrete(min = -100, max = 100)
             public int intSlider = 50;
     
-            @ConfigEntry.Gui.EnableIf(".coolToggle")
+            @ConfigEntry.Dependency.EnableIf(".coolToggle")
             public boolean dependsOnCoolToggle1 = false;
     
-            @ConfigEntry.Gui.ShowIf(value = ".coolToggle", conditions = {"{!}false"})
+            @ConfigEntry.Dependency.ShowIf(value = ".coolToggle", conditions = {"{!}false"})
             public boolean dependsOnCoolToggle2 = false;
     
-            @ConfigEntry.Gui.EnableIf(value = ".coolToggle", matching = {".lameToggle"})
+            @ConfigEntry.Dependency.EnableIf(value = ".coolToggle", matching = {".lameToggle"})
             public boolean dependsOnToggleMatch = false;
             
-            @ConfigEntry.Gui.EnableIf(value = ".intSlider", conditions = {"> 70", "< -70"})
+            @ConfigEntry.Dependency.EnableIf(value = ".intSlider", conditions = {"> 70", "< -70"})
             public boolean dependsOnIntSlider = true;
     
             @ConfigEntry.Gui.TransitiveObject
-            @ConfigEntry.Gui.EnableIf(".coolToggle")
-            @ConfigEntry.Gui.EnableIf(value = ".coolEnum", conditions = {"{i}good", "EXCELLENT"})
+            @ConfigEntry.Dependency.EnableIf(".coolToggle")
+            @ConfigEntry.Dependency.EnableIf(value = ".coolEnum", conditions = {"{i}good", "EXCELLENT"})
             public DependantObject dependantObject = new DependantObject();
             public static class DependantObject {
                 @ConfigEntry.Gui.PrefixText
                 public boolean toggle1 = false;
-                @ConfigEntry.Gui.EnableIf(value = "..intSlider", conditions = {"> 70", "< -70"})
+                @ConfigEntry.Dependency.EnableIf(value = "..intSlider", conditions = {"> 70", "< -70"})
                 
                 public boolean toggle2 = true;
             }
     
             @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
-            @ConfigEntry.Gui.EnableIf(".coolToggle")
+            @ConfigEntry.Dependency.EnableIf(".coolToggle")
             public DependantCollapsible dependantCollapsible = new DependantCollapsible();
             public static class DependantCollapsible {
                 public boolean toggle1 = false;
                 public boolean toggle2 = true;
             }
     
-            @ConfigEntry.Gui.EnableIf(value = ".coolToggle", conditions = {"true"})
+            @ConfigEntry.Dependency.EnableIf(value = ".coolToggle", conditions = {"true"})
             public List<Integer> list = Arrays.asList(1, 2, 3);
     
         }
     
-        @ConfigEntry.Gui.EnableIf(value = ".dependencySubCategory.coolToggle", conditions = {"true"})
+        @ConfigEntry.Dependency.EnableIf(value = ".dependencySubCategory.coolToggle", conditions = {"true"})
         public boolean dependsOnCoolToggleOutside = false;
         
     }

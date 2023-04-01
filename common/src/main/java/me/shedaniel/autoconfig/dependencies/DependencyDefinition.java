@@ -1,7 +1,9 @@
 package me.shedaniel.autoconfig.dependencies;
 
-import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.EnableIf;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.ShowIf;
 import me.shedaniel.autoconfig.util.RelativeI18n;
+import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.*;
@@ -22,7 +24,7 @@ import java.util.stream.Collectors;
 
 /**
  * A record defining a dependency to be built.
- * Can be declared using either an {@link ConfigEntry.Gui.EnableIf @EnableIf} or {@link ConfigEntry.Gui.ShowIf @ShowIf} annotation.
+ * Can be declared using either an {@link EnableIf @EnableIf} or {@link ShowIf @ShowIf} annotation.
  *
  * @param i18n the absolute i18n key of the depended-on config entry
  * @param tooltip whether the dependency should auto-generate tooltips
@@ -33,11 +35,11 @@ import java.util.stream.Collectors;
 @ApiStatus.Internal
 record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDefinition> conditions, Set<MatcherConditionDefinition> matching) {
     
-    DependencyDefinition(@Nullable String i18nBase, ConfigEntry.Gui.EnableIf annotation) {
+    DependencyDefinition(@Nullable String i18nBase, EnableIf annotation) {
         this(i18nBase, annotation.value(), annotation.tooltip(), annotation.conditions(), annotation.matching());
     }
     
-    DependencyDefinition(@Nullable String i18nBase, ConfigEntry.Gui.ShowIf annotation) {
+    DependencyDefinition(@Nullable String i18nBase, ShowIf annotation) {
         this(i18nBase, annotation.value(), annotation.tooltip(), annotation.conditions(), annotation.matching());
     }
     
@@ -55,13 +57,13 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
         return this.conditions().stream().map(mapper).collect(Collectors.toUnmodifiableSet());
     }
     
-    <T> Set<ConfigEntryMatcher<T>> buildMatchers(Class<T> type, BiFunction<Class<T>, String, ? extends me.shedaniel.clothconfig2.api.ConfigEntry<T>> getEntry) {
+    <T> Set<ConfigEntryMatcher<T>> buildMatchers(Class<T> type, BiFunction<Class<T>, String, ? extends ConfigEntry<T>> getEntry) {
         return this.matching().stream()
                 .map(def -> def.toMatcher(getEntry.apply(type, def.i18n())))
                 .collect(Collectors.toUnmodifiableSet());
     }
     
-    <T extends Comparable<T>> Set<ConfigEntryMatcher<T>> buildComparableMatchers(Class<T> type, BiFunction<Class<T>, String, ? extends me.shedaniel.clothconfig2.api.ConfigEntry<T>> getEntry) {
+    <T extends Comparable<T>> Set<ConfigEntryMatcher<T>> buildComparableMatchers(Class<T> type, BiFunction<Class<T>, String, ? extends ConfigEntry<T>> getEntry) {
         return this.matching().stream()
                 .map(def -> def.toComparableMatcher(getEntry.apply(type, def.i18n())))
                 .collect(Collectors.toUnmodifiableSet());

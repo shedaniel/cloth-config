@@ -1,6 +1,6 @@
 package me.shedaniel.autoconfig.util;
 
-import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.EnableIf;
 import org.jetbrains.annotations.Nullable;
 
 public class RelativeI18n {
@@ -25,7 +25,7 @@ public class RelativeI18n {
      * @param i18nBase an absolute i18n key, to be used as the base reference point of the relative key
      * @param i18nKey either a relative or absolute i18n key
      * @return the absolute i18n key
-     * @see ConfigEntry.Gui.EnableIf#value() Public API documentation
+     * @see EnableIf#value() Public API documentation
      */
     public static String parse(@Nullable String i18nBase, String i18nKey) {
         // Count how many "steps up" are at the start of the key string,

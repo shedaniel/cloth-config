@@ -1,6 +1,6 @@
 package me.shedaniel.autoconfig.dependencies;
 
-import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.EnableIf;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.*;
 
 import java.util.Arrays;
@@ -17,7 +17,7 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
      * @return a {@link StaticConditionDefinition record} containing the parsed {@link ConditionFlag flags}
      * and the remainder of the provided requirement string
      * @throws IllegalArgumentException if the requirement string begins a flags section without ending it
-     * @see ConfigEntry.Gui.EnableIf#conditions() Public API documentation
+     * @see EnableIf#conditions() Public API documentation
      */
     static StaticConditionDefinition fromConditionString(String condition) throws IllegalArgumentException {
         if (FLAG_PREFIX == condition.charAt(0)) {

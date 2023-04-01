@@ -1,7 +1,8 @@
 package me.shedaniel.autoconfig.dependencies;
 
 
-import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.EnableIfGroup;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.ShowIfGroup;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.GroupRequirement;
 import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 
 /**
  * A record defining a group dependency to be built.
- * Can be declared using either an {@link ConfigEntry.Gui.EnableIfGroup @EnableIfGroup} or {@link ConfigEntry.Gui.ShowIfGroup @ShowIfGroup} annotation.
+ * Can be declared using either an {@link EnableIfGroup @EnableIfGroup} or {@link ShowIfGroup @ShowIfGroup} annotation.
  *
  * @param requirement the {@link GroupRequirement requirement} defining how many children must be met
  * @param inverted whether the dependency group should be logically inverted
@@ -24,13 +25,13 @@ import java.util.stream.Collectors;
  */
 @ApiStatus.Internal
 record DependencyGroupDefinition(GroupRequirement requirement, boolean inverted, boolean tooltip, Set<DependencyDefinition> children) {
-    DependencyGroupDefinition(String i18nBase, ConfigEntry.Gui.EnableIfGroup annotation) {
+    DependencyGroupDefinition(String i18nBase, EnableIfGroup annotation) {
         this(annotation.condition(), annotation.inverted(), annotation.tooltip(),
                 Arrays.stream(annotation.value())
                         .map(child -> new DependencyDefinition(i18nBase, child))
                         .collect(Collectors.toUnmodifiableSet()));
     }
-    DependencyGroupDefinition(String i18nBase, ConfigEntry.Gui.ShowIfGroup annotation) {
+    DependencyGroupDefinition(String i18nBase, ShowIfGroup annotation) {
         this(annotation.condition(), annotation.inverted(), annotation.tooltip(),
                 Arrays.stream(annotation.value())
                         .map(child -> new DependencyDefinition(i18nBase, child))
