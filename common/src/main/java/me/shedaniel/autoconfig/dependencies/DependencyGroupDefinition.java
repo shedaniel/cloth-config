@@ -6,7 +6,6 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.ShowIfGroup;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.GroupRequirement;
 import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
  * @param children dependency definitions to be included in the group
  * @see DependencyDefinition
  */
-@ApiStatus.Internal
 record DependencyGroupDefinition(GroupRequirement requirement, boolean inverted, boolean tooltip, Set<DependencyDefinition> children) {
     DependencyGroupDefinition(String i18nBase, EnableIfGroup annotation) {
         this(annotation.condition(), annotation.inverted(), annotation.tooltip(),

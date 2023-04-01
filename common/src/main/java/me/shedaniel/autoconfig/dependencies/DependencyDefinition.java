@@ -13,7 +13,6 @@ import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependency;
 import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependencyBuilder;
 import me.shedaniel.clothconfig2.impl.dependencies.EnumDependency;
 import me.shedaniel.clothconfig2.impl.dependencies.NumberDependency;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
  * @param matching flagged strings to be parsed into dynamic dependency conditions
  * @see DependencyGroupDefinition
  */
-@ApiStatus.Internal
 record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDefinition> conditions, Set<MatcherConditionDefinition> matching) {
     
     DependencyDefinition(@Nullable String i18nBase, EnableIf annotation) {
