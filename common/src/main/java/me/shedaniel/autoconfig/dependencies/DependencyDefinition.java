@@ -3,6 +3,7 @@ package me.shedaniel.autoconfig.dependencies;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.EnableIf;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.ShowIf;
 import me.shedaniel.autoconfig.util.RelativeI18n;
+import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.*;
@@ -74,7 +75,7 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
      *     <li>{@link EnumDependency} from {@link EnumListEntry} entries</li>
      *     <li>{@link NumberDependency} from entries implementing {@link NumberConfigEntry}</li>
      * </ul>
-     * <p>If a different config entry type is depended-on, an {@link IllegalArgumentException} will be thrown.
+     * <p>Unsupported types can be used, but not with static conditions. Only dynamic "matcher" conditions are allowed.
      *
      * @param manager a DependencyManager that has all config entries registered
      * @return The built {@link Dependency}
@@ -90,7 +91,22 @@ record DependencyDefinition(String i18n, boolean tooltip, Set<StaticConditionDef
         else if (gui instanceof NumberConfigEntry<?> numberConfigEntry)
             return this.build(manager, numberConfigEntry);
         else
-            throw new IllegalArgumentException("Unsupported dependency type: %s".formatted(gui.getClass().getSimpleName()));
+            return this.buildGeneric(manager, gui);
+    }
+    
+    public <T> Dependency buildGeneric(DependencyManager manager, ConfigEntry<T> gui) {
+        // comparative dependency doesn't support static conditions
+        if (!this.conditions().isEmpty())
+            // FIXME implement a GenericCondition that can compare String.valueOf() for any type
+            throw new IllegalArgumentException("Dependencies on %s support dynamic matchers but not static conditions. Found %d"
+                    .formatted(gui.getClass().getSimpleName(), this.conditions().size()));
+    
+        Class<T> type = gui.getType();
+        Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
+        Dependency.genericBuilder(gui)
+                .withConditions(matchers)
+                .build();
+        return null;
     }
     
     /**

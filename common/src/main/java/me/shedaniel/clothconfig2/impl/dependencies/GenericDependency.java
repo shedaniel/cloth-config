@@ -10,8 +10,8 @@ import java.util.Optional;
  * 
  * @param <T> the type handled by the config entries 
  */
-public class ComparatorDependency<T> extends ConfigEntryDependency<T, ConfigEntry<T>> {
-    ComparatorDependency(ConfigEntry<T> entry) {
+public class GenericDependency<T> extends ConfigEntryDependency<T, ConfigEntry<T>> {
+    GenericDependency(ConfigEntry<T> entry) {
         super(entry);
         // TODO consider allowing multi-to-multi matching?
         // TODO consider using DependencyGroup.Condition to allow ALL/ANY/NONE etc?

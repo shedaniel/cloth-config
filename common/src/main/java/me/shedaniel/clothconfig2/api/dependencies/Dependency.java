@@ -27,8 +27,8 @@ public interface Dependency {
         return new NumberDependencyBuilder<>(gui);
     }
     
-    static <T, E extends ConfigEntry<T>> ComparatorDependencyBuilder<T> comparatorBuilder(E type) {
-        return new ComparatorDependencyBuilder<>(type);
+    static <T, E extends ConfigEntry<T>> GenericDependencyBuilder<T> genericBuilder(E type) {
+        return new GenericDependencyBuilder<>(type);
     }
     
     static DependencyGroupBuilder groupBuilder() {

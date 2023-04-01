@@ -171,7 +171,7 @@ public class ClothConfigDemo {
                 .setShownIf(Dependency.builder(dependency).build()).build());
         depends.addAll(toggles);
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool matches one of these toggles ^^"), true)
-                        .setEnabledIf(Dependency.comparatorBuilder(toggles.removeFirst())
+                        .setEnabledIf(Dependency.genericBuilder(toggles.removeFirst())
                                 .matching(toggles)
                                 .build())
                 .build());
