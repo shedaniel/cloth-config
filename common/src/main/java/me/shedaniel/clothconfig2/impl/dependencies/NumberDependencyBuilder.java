@@ -1,7 +1,8 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
+import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.*;
 
 public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends MultiConditionDependencyBuilder<T, NumberConfigEntry<T>, NumberDependency<T>, NumberDependencyBuilder<T>> {
     
@@ -12,6 +13,35 @@ public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends M
     @Override
     public NumberDependencyBuilder<T> matching(T value) {
         return matching(new NumberCondition<>(value));
+    }
+    
+    /**
+     * Generates a simple {@link Condition condition} that compares the given {@code value} against the depended-on
+     * config entry's value. The condition is checked using the {@code operator} provided, for example
+     * <em>{@code gui_value > value}</em>
+     * <br><br>
+     * The generated condition will be added to the dependency being built.
+     *
+     * @param operator an operator defining how the values should be compared
+     * @param value a condition value to be checked against the depended-on config entry
+     * @return this instance, for chaining
+     */
+    public NumberDependencyBuilder<T> matching(ComparisonOperator operator, T value) {
+        return matching(new NumberCondition<>(operator, value));
+    }
+    
+    /**
+     * Generates a simple {@link MatcherCondition} that compares the given {@code gui}'s value against the depended-on
+     * config entry's value. The condition is checked using the {@code operator} provided, for example
+     * <em>{@code gui_value > other_gui_value}</em>
+     * <br><br>
+     * The generated condition will be added to the dependency being built.
+     *
+     * @param gui the gui whose value should be compared with the depended-on gui's
+     * @return this instance, for chaining
+     */
+    public NumberDependencyBuilder<T> matching(ComparisonOperator operator, ConfigEntry<T> gui) {
+        return matching(new ComparativeMatcherCondition<>(operator, gui));
     }
     
     @Override

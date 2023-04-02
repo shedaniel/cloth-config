@@ -107,7 +107,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
         Set<MatcherCondition<Boolean>> matchers = this.buildMatchers(Boolean.class, manager);
         
         // Start building the dependency
-        BooleanDependencyBuilder builder = Dependency.builder(gui);
+        BooleanDependencyBuilder builder = Dependency.builder().dependingOn(gui);
         
         // BooleanDependencyBuilder supports zero or one requirement being set 
         if (!conditions.isEmpty()) {
@@ -134,7 +134,8 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
         Set<EnumCondition<T>> conditions = this.buildConditions(condition -> condition.toEnumCondition(type));
         Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
     
-        return Dependency.builder(gui)
+        return Dependency.builder()
+                .dependingOn(gui)
                 .matching(conditions)
                 .matching(matchers)
                 .generateTooltip(this.tooltip())
@@ -153,7 +154,8 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
         Set<NumberCondition<T>> conditions = this.buildConditions(condition -> condition.toNumberCondition(type));
         Set<ComparativeMatcherCondition<T>> matchers = this.buildComparableMatchers(type, manager);
         
-        return Dependency.builder(gui)
+        return Dependency.builder()
+                .dependingOn(gui)
                 .matching(conditions)
                 .matching(matchers)
                 .generateTooltip(this.tooltip())
@@ -177,7 +179,8 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
                 .collect(Collectors.toUnmodifiableSet());
         Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
         
-        return Dependency.genericBuilder(gui)
+        return Dependency.builder()
+                .dependingOn(gui)
                 .withConditions(conditions)
                 .withConditions(matchers)
                 .build();

@@ -26,7 +26,7 @@ public abstract class MultiConditionDependencyBuilder<T, E extends ConfigEntry<T
     
     /**
      * Finishes building the given {@code dependency} by applying anything defined in this abstract class, for example
-     * applying any conditions added using {@link #matching(Condition) withCondition()}.
+     * applying any conditions added using {@link #matching(Condition)}.
      * <br><br>
      * Should be used by implementations of {@link #build()}.
      * 

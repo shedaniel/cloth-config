@@ -8,10 +8,10 @@ public class ComparativeMatcherCondition<T extends Comparable<T>> extends Matche
     private final ComparisonOperator operator;
     
     public ComparativeMatcherCondition(ConfigEntry<T> gui) {
-        this(gui, null);
+        this(null, gui);
     }
     
-    public ComparativeMatcherCondition(ConfigEntry<T> gui, @Nullable ComparisonOperator operator) {
+    public ComparativeMatcherCondition(@Nullable ComparisonOperator operator, ConfigEntry<T> gui) {
         super(gui);
         this.operator = operator == null ? ComparisonOperator.EQUAL : operator;
     }

@@ -47,14 +47,13 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, D e
      */
     public abstract SELF matching(T value);
     
-    
     /**
      * Generates a simple {@link MatcherCondition} that compares the given {@code gui}'s value against the depended-on
      * config entry's value.
      * <br><br>
      * The generated condition will be added to the dependency being built.
      *
-     * @param gui a {@link Condition condition} to be added to the dependency being built
+     * @param gui the gui whose value should be compared with the depended-on gui's
      * @return this instance, for chaining
      */
     public SELF matching(ConfigEntry<T> gui) {

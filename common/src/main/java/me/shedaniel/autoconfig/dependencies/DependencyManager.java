@@ -245,7 +245,7 @@ public class DependencyManager {
         // Combine multiple dependencies if necessary,
         // add the result to the groups list
         if (!singles.isEmpty())
-            groups.add(singles.size() == 1 ? singles.get(0) : Dependency.groupBuilder().withChildren(singles).build());
+            groups.add(singles.size() == 1 ? singles.get(0) : Dependency.builder().startGroup().withChildren(singles).build());
     
         // Filter duplicates before checking quantities
         List<Dependency> children = groups.stream().distinct().toList();
@@ -258,7 +258,8 @@ public class DependencyManager {
         
         // Return a group that depends on all dependencies & groups
         // Filtered to remove any duplicates
-        return Dependency.groupBuilder()
+        return Dependency.builder()
+                .startGroup()
                 .withChildren(children)
                 .build();
     }

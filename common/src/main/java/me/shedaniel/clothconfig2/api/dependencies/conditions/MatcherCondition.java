@@ -9,7 +9,7 @@ public class MatcherCondition<T> implements Condition<T> {
     private final ConfigEntry<T> gui;
     private final EnumSet<ConditionFlag> flags = EnumSet.noneOf(ConditionFlag.class);
     
-    public <E extends ConfigEntry<T>> MatcherCondition(E gui) {
+    public MatcherCondition(ConfigEntry<T> gui) {
         this.gui = gui;
     }
     
