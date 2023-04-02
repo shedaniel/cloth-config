@@ -5,8 +5,10 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.StaticCondition;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Optional;
@@ -21,16 +23,19 @@ public class NumberCondition<T extends Number & Comparable<T>> extends StaticCon
     
     private int formatPrecision = -1;
     
-    public NumberCondition(T value) {
-        this(ComparisonOperator.EQUAL, value);
+    public NumberCondition(@NotNull T value) {
+        this(null, value);
     }
 
-    public NumberCondition(ComparisonOperator operator, T value) {
+    public NumberCondition(@Nullable ComparisonOperator operator, @NotNull T value) {
         super(value);
-        this.operator = operator;
+        this.operator = operator == null ? ComparisonOperator.EQUAL : operator;
         
         Class<? extends Number> type = value.getClass();
-        this.integer = type.isAssignableFrom(Long.class) || type.isAssignableFrom(Integer.class) || type.isAssignableFrom(Short.class);
+        this.integer = type.isAssignableFrom(Long.class)
+                    || type.isAssignableFrom(Integer.class)
+                    || type.isAssignableFrom(Short.class)
+                    || type.isAssignableFrom(BigInteger.class);
     }
     
     /**
