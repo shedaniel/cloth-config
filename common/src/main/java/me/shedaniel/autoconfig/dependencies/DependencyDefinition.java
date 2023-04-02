@@ -180,7 +180,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
         Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
         
         return Dependency.builder()
-                .dependingOn(gui)
+                .dependingOnGeneric(gui)
                 .matching(conditions)
                 .matching(matchers)
                 .build();

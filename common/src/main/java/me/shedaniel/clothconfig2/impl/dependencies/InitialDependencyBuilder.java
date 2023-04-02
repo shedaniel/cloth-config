@@ -4,6 +4,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.StartDependencyBuilder;
+import me.shedaniel.clothconfig2.gui.entries.BaseListEntry;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import org.jetbrains.annotations.ApiStatus;
@@ -51,7 +52,13 @@ public class InitialDependencyBuilder implements StartDependencyBuilder {
     }
     
     @Override
-    public <T, E extends ConfigEntry<T>> GenericDependencyBuilder<T> dependingOn(E type) {
+    public <T> ListEntryDependencyBuilder<T> dependingOn(BaseListEntry<T,?,?> type) {
+        return new ListEntryDependencyBuilder<>(type)
+                .generateTooltip(tooltip);
+    }
+    
+    @Override
+    public <T> GenericDependencyBuilder<T> dependingOnGeneric(ConfigEntry<T> type) {
         return new GenericDependencyBuilder<>(type)
                 .generateTooltip(tooltip);
     }

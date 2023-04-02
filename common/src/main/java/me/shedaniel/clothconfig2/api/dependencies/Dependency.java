@@ -133,7 +133,7 @@ public interface Dependency {
      */
     static <T> @NotNull Dependency matches(ConfigEntry<T> gui, ConfigEntry<T> otherGui) {
         return builder()
-                .dependingOn(gui)
+                .dependingOnGeneric(gui)
                 .matching(otherGui)
                 .build();
     }

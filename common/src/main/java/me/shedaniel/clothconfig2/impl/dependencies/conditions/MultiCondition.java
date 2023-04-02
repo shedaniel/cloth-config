@@ -4,24 +4,29 @@ import net.minecraft.network.chat.Component;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-public class ListCondition<T> extends FlaggedCondition<List<T>> {
+public class MultiCondition<T> extends FlaggedCondition<Collection<T>> {
     
-    private final ListRequirement requirement;
-    private final Collection<T> values;
+    private final Requirement requirement;
+    private final Set<T> values;
     
-    public ListCondition(ListRequirement requirement, T value){
-        this(requirement, Collections.singletonList(value));
+    public MultiCondition(Requirement requirement, T value){
+        this(requirement, Collections.singleton(value));
     }
     
-    public ListCondition(ListRequirement requirement, Collection<T> values){
+    public MultiCondition(Requirement requirement, Collection<T> values){
+        this(requirement, values.stream().collect(Collectors.toUnmodifiableSet()));
+    }
+    
+    public MultiCondition(Requirement requirement, Set<T> values){
         this.requirement = requirement;
         this.values = values;
     }
     
     @Override
-    public boolean check(List<T> values) {
+    public boolean check(Collection<T> values) {
         return inverted() != this.requirement.check(values, this.values);
     }
     
@@ -31,7 +36,8 @@ public class ListCondition<T> extends FlaggedCondition<List<T>> {
         return null;
     }
     
-    public enum ListRequirement {
+    public enum Requirement {
+        
         CONTAINS_ANY,
         NOT_CONTAINS_ANY,
         CONTAINS_ALL,
