@@ -1,21 +1,14 @@
 package me.shedaniel.clothconfig2.api.dependencies.conditions;
 
 import me.shedaniel.clothconfig2.api.ConfigEntry;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.FlaggedCondition;
 import net.minecraft.network.chat.Component;
 
-import java.util.EnumSet;
-
-public class MatcherCondition<T> implements Condition<T> {
+public class MatcherCondition<T> extends FlaggedCondition<T> {
     private final ConfigEntry<T> gui;
-    private final EnumSet<ConditionFlag> flags = EnumSet.noneOf(ConditionFlag.class);
     
     public MatcherCondition(ConfigEntry<T> gui) {
         this.gui = gui;
-    }
-    
-    @Override
-    public EnumSet<ConditionFlag> getFlags() {
-        return flags;
     }
     
     /**

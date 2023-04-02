@@ -1,13 +1,12 @@
 package me.shedaniel.clothconfig2.api.dependencies.conditions;
 
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.ConditionFlag;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.FlaggedCondition;
 import net.minecraft.network.chat.Component;
 
-import java.util.EnumSet;
-
-public abstract class StaticCondition<T> implements Condition<T> {
+public abstract class StaticCondition<T> extends FlaggedCondition<T> {
     
     private final T value;
-    private final EnumSet<ConditionFlag> flags = EnumSet.noneOf(ConditionFlag.class);
     
     protected StaticCondition(T value) {
         
@@ -38,11 +37,6 @@ public abstract class StaticCondition<T> implements Condition<T> {
     
     public T getValue() {
         return value;
-    }
-    
-    @Override
-    public EnumSet<ConditionFlag> getFlags() {
-        return flags;
     }
     
     protected abstract Component getTextInternal();

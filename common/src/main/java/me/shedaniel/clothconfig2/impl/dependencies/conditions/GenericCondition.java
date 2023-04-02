@@ -1,17 +1,13 @@
 package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
-import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ConditionFlag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
-import java.util.EnumSet;
 import java.util.function.BiPredicate;
 
 
-public class GenericCondition<T> implements Condition<T> {
+public class GenericCondition<T> extends FlaggedCondition<T> {
     
-    private final EnumSet<ConditionFlag> flags = EnumSet.noneOf(ConditionFlag.class);
     private final String value;
     
     public GenericCondition(T value) {
@@ -39,10 +35,5 @@ public class GenericCondition<T> implements Condition<T> {
                 Component.translatable("text.cloth-config.quoted", Component.literal(this.value)));
         
         return inverted() ? Component.translatable("text.cloth-config.dependencies.conditions.not", text) : text;
-    }
-    
-    @Override
-    public EnumSet<ConditionFlag> getFlags() {
-        return this.flags;
     }
 }

@@ -1,7 +1,6 @@
 package me.shedaniel.autoconfig.dependencies;
 
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.EnableIf;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ConditionFlag;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.*;
 
 import java.util.Arrays;
