@@ -7,7 +7,7 @@ import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 
 import java.util.Collection;
 
-public class BooleanDependencyBuilder extends MultiConditionDependencyBuilder<Boolean, BooleanListEntry, BooleanDependency, BooleanDependencyBuilder> {
+public class BooleanDependencyBuilder extends AbstractDependencyBuilder<Boolean, BooleanListEntry, BooleanDependency, BooleanDependencyBuilder> {
     
     private boolean hasStaticCondition = false;
     

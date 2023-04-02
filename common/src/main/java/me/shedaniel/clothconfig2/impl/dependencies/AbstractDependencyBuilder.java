@@ -5,7 +5,10 @@ import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.DependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
-import org.jetbrains.annotations.Contract;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @param <T> the type the dependency deals with
@@ -15,25 +18,15 @@ import org.jetbrains.annotations.Contract;
  */
 public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, D extends ConfigEntryDependency<T, E>, SELF extends AbstractDependencyBuilder<T, E, D, SELF>> implements DependencyBuilder<D, SELF> {
     
+    private static final int minConditions = 1;
+    
     protected final E gui;
+    protected final Set<Condition<T>> conditions = new HashSet<>();
+    
     private boolean tooltip = true;
     
     protected AbstractDependencyBuilder(E gui) {
         this.gui = gui;
-    }
-    
-    /**
-     * Finishes building the given {@link Dependency dependency} by applying anything defined in this abstract class.
-     * <br><br>
-     * Should be used by implementations of {@link #build()}.
-     * 
-     * @param dependency the dependency to finish building
-     * @return the finished dependency
-     */
-    @Contract(value = "_ -> param1", mutates = "param1")
-    protected D finishBuilding(D dependency) {
-        dependency.shouldGenerateTooltip(tooltip);
-        return dependency;
     }
     
     /**
@@ -61,17 +54,48 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, D e
     }
     
     /**
-     * Add a {@link Condition condition} to the dependency being built.
+     * Finishes building the given {@code dependency} by applying anything defined in this abstract class, for example
+     * applying any conditions added using {@link #matching(Condition)}.
+     * <br><br>
+     * Should be used by implementations of {@link #build()}.
      * 
-     * @param condition a {@link Condition condition} to be added to the dependency being built
-     * @return this instance, for chaining
+     * @param dependency the dependency to finish building
+     * @return the built dependency
      */
-    public abstract SELF matching(Condition<T> condition);
+    protected D finishBuilding(D dependency) {
+        if (conditions.size() < minConditions)
+            throw new IllegalArgumentException("%s requires at least %d condition%s.".formatted(dependency.getClass().getSimpleName(), minConditions, minConditions == 1 ? "" : "s"));
+        dependency.addConditions(this.conditions);
+        dependency.shouldGenerateTooltip(tooltip);
+        return dependency;
+    }
+    
+    public SELF matching(Condition<T> condition) {
+        @SuppressWarnings("unchecked") SELF self = (SELF) this;
+        
+        this.conditions.add(condition);
+        
+        return self;
+    }
     
     @Override
     public SELF generateTooltip(boolean shouldGenerate) {
         @SuppressWarnings("unchecked") SELF self = (SELF) this;
         this.tooltip = shouldGenerate;
+        return self;
+    }
+    
+    /**
+     * Add multiple {@link Condition conditions} to the dependency being built.
+     * 
+     * @param conditions a {@link Collection} containing {@link Condition conditions} to be added to the dependency being built
+     * @return this instance, for chaining
+     */
+    public SELF matching(Collection<? extends Condition<T>> conditions) {
+        @SuppressWarnings("unchecked") SELF self = (SELF) this;
+        
+        this.conditions.addAll(conditions);
+        
         return self;
     }
 }
