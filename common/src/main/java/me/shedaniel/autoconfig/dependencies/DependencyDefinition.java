@@ -181,8 +181,8 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
         
         return Dependency.builder()
                 .dependingOn(gui)
-                .withConditions(conditions)
-                .withConditions(matchers)
+                .matching(conditions)
+                .matching(matchers)
                 .build();
     }
 }
