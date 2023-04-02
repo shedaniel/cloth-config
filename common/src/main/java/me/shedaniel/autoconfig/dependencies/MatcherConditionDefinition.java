@@ -41,7 +41,7 @@ record MatcherConditionDefinition(EnumSet<ConditionFlag> flags, @Nullable Compar
         return matcher;
     }
     
-    <T extends Comparable<T>> ComparativeMatcherCondition<T> toComparableMatcher(ConfigEntry<T> gui) {
+    <T extends Comparable<T>> ComparativeMatcherCondition<T> toComparativeMatcher(ConfigEntry<T> gui) {
         ComparativeMatcherCondition<T> matcher = new ComparativeMatcherCondition<>(this.operator(), gui);
         matcher.setFlags(this.flags());
         return matcher;

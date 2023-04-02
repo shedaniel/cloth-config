@@ -6,8 +6,8 @@ import me.shedaniel.autoconfig.util.RelativeI18n;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.StaticCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.*;
@@ -50,7 +50,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
                         .collect(Collectors.toUnmodifiableSet()));
     }
     
-    private <T extends StaticCondition<?>> Set<T> buildConditions(Function<StaticConditionDefinition, T> builder) {
+    private <T extends Condition<?>> Set<T> buildConditions(Function<StaticConditionDefinition, T> builder) {
         return this.conditions().stream().map(builder).collect(Collectors.toUnmodifiableSet());
     }
     
@@ -60,9 +60,9 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
                 .collect(Collectors.toUnmodifiableSet());
     }
     
-    private <T extends Comparable<T>> Set<ComparativeMatcherCondition<T>> buildComparableMatchers(Class<T> type, DependencyManager manager) {
+    private <T extends Comparable<T>> Set<ComparativeMatcherCondition<T>> buildComparativeMatchers(Class<T> type, DependencyManager manager) {
         return this.matching().stream()
-                .map(definition -> definition.toComparableMatcher(manager.getEntry(type, definition.i18n())))
+                .map(definition -> definition.toComparativeMatcher(manager.getEntry(type, definition.i18n())))
                 .collect(Collectors.toUnmodifiableSet());
     }
     
@@ -154,7 +154,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
     public <T extends Number & Comparable<T>> NumberDependency<T> build(DependencyManager manager, NumberConfigEntry<T> gui) {
         Class<T> type = gui.getType();
         Set<NumberCondition<T>> conditions = this.buildConditions(condition -> condition.toNumberCondition(type));
-        Set<ComparativeMatcherCondition<T>> matchers = this.buildComparableMatchers(type, manager);
+        Set<ComparativeMatcherCondition<T>> matchers = this.buildComparativeMatchers(type, manager);
         
         return Dependency.builder()
                 .dependingOn(gui)
@@ -176,9 +176,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      */
     public <T> Dependency buildGeneric(DependencyManager manager, ConfigEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<GenericCondition<T>> conditions = this.conditions().stream()
-                .map(condition -> condition.toGenericCondition(type))
-                .collect(Collectors.toUnmodifiableSet());
+        Set<GenericCondition<T>> conditions = this.buildConditions(condition -> condition.toGenericCondition(type));
         Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
         
         return Dependency.builder()
