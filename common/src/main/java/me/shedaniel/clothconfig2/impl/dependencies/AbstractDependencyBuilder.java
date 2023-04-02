@@ -47,6 +47,20 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, D e
      */
     public abstract SELF matching(T value);
     
+    
+    /**
+     * Generates a simple {@link MatcherCondition} that compares the given {@code gui}'s value against the depended-on
+     * config entry's value.
+     * <br><br>
+     * The generated condition will be added to the dependency being built.
+     *
+     * @param gui a {@link Condition condition} to be added to the dependency being built
+     * @return this instance, for chaining
+     */
+    public SELF matching(ConfigEntry<T> gui) {
+        return matching(new MatcherCondition<>(gui));
+    }
+    
     /**
      * Add a {@link Condition condition} to the dependency being built.
      * 
@@ -54,17 +68,6 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, D e
      * @return this instance, for chaining
      */
     public abstract SELF matching(Condition<T> condition);
-    
-    
-    /**
-     * Add a {@link Condition condition} to the dependency being built.
-     *
-     * @param condition a {@link Condition condition} to be added to the dependency being built
-     * @return this instance, for chaining
-     */
-    public SELF matching(ConfigEntry<T> gui) {
-        return matching(new MatcherCondition<>(gui));
-    }
     
     @Override
     public SELF generateTooltip(boolean shouldGenerate) {
