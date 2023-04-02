@@ -1,4 +1,4 @@
-package me.shedaniel.clothconfig2.api.dependencies.conditions;
+package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
 public class StringCondition extends GenericCondition<String> {
     

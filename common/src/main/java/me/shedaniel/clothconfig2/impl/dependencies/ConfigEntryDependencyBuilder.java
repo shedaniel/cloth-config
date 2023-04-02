@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
-import me.shedaniel.clothconfig2.api.dependencies.DependencyBuilder;
+import me.shedaniel.clothconfig2.api.dependencies.FinishDependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
 
@@ -16,7 +16,7 @@ import java.util.Set;
  * @param <D> the {@link Dependency} type that will be built
  * @param <SELF> the type to be returned by chainable methods
  */
-public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, D extends ConfigEntryDependency<T, E>, SELF extends AbstractDependencyBuilder<T, E, D, SELF>> implements DependencyBuilder<D, SELF> {
+public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, D extends ConfigEntryDependency<T, E>, SELF extends ConfigEntryDependencyBuilder<T, E, D, SELF>> implements FinishDependencyBuilder<D, SELF> {
     
     private static final int minConditions = 1;
     
@@ -25,7 +25,7 @@ public abstract class AbstractDependencyBuilder<T, E extends ConfigEntry<T>, D e
     
     private boolean tooltip = true;
     
-    protected AbstractDependencyBuilder(E gui) {
+    protected ConfigEntryDependencyBuilder(E gui) {
         this.gui = gui;
     }
     

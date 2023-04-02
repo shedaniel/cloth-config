@@ -1,5 +1,7 @@
-package me.shedaniel.clothconfig2.api.dependencies.conditions;
+package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.StaticCondition;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;

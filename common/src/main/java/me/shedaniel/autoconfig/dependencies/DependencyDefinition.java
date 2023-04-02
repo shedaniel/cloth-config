@@ -6,10 +6,12 @@ import me.shedaniel.autoconfig.util.RelativeI18n;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.*;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.StaticCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.*;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;

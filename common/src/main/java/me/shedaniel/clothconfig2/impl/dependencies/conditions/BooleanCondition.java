@@ -1,5 +1,6 @@
-package me.shedaniel.clothconfig2.api.dependencies.conditions;
+package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
+import me.shedaniel.clothconfig2.api.dependencies.conditions.StaticCondition;
 import net.minecraft.network.chat.Component;
 
 public class BooleanCondition extends StaticCondition<Boolean> {

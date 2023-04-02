@@ -2,9 +2,13 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.*;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.ComparativeMatcherCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.NumberCondition;
 
-public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends AbstractDependencyBuilder<T, NumberConfigEntry<T>, NumberDependency<T>, NumberDependencyBuilder<T>> {
+public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends ConfigEntryDependencyBuilder<T, NumberConfigEntry<T>, NumberDependency<T>, NumberDependencyBuilder<T>> {
     
     public NumberDependencyBuilder(NumberConfigEntry<T> gui) {
         super(gui);

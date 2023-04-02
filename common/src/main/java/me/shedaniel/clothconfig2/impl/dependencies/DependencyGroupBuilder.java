@@ -1,7 +1,7 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
-import me.shedaniel.clothconfig2.api.dependencies.DependencyBuilder;
+import me.shedaniel.clothconfig2.api.dependencies.FinishDependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.GroupRequirement;
 
 import java.util.Collection;
@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DependencyGroupBuilder implements DependencyBuilder<DependencyGroup, DependencyGroupBuilder> {
+public class DependencyGroupBuilder implements FinishDependencyBuilder<DependencyGroup, DependencyGroupBuilder> {
     
     private final Set<Dependency> children = new HashSet<>();
     

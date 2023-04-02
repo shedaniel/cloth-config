@@ -3,11 +3,11 @@ package me.shedaniel.clothconfig2.api.dependencies;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.EnumCondition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.NumberCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.*;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.EnumCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.NumberCondition;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,8 @@ public interface Dependency {
     /**
      * Returns an object that can be used to build various dependencies.
      */
-    static @NotNull InitialDependencyBuilder builder() {
+    static @NotNull StartDependencyBuilder builder() {
+        //noinspection deprecation
         return InitialDependencyBuilder.getBuilder();
     }
     
