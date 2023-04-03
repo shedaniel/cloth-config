@@ -1,39 +1,57 @@
 package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
-import java.util.function.BiPredicate;
 
-
-public class GenericCondition<T> extends FlaggedCondition<T> {
+public class GenericCondition<T> extends AbstractStaticCondition<T> {
     
-    private final String value;
+    private static final List<String> SUPPORTED_PARSING_METHODS = List.of(
+            "valueOf", "parseString", "parse", "fromString", "ofString", "from", "of");
     
     public GenericCondition(T value) {
-        this.value = String.valueOf(value);
+        super(value);
     }
     
-    public GenericCondition(Class<T> type, String value) {
-        this.value = value;
+    public GenericCondition(Class<T> type, String value) throws NoStringParserAvailableException {
+        this(getStringParser(type).apply(value));
     }
     
-    @Override
-    public boolean check(T value) {
-        BiPredicate<String, String> equality = ignoreCase() ? String::equalsIgnoreCase : String::equals;
+    private static <T> Function<String, T> getStringParser(Class<T> type) throws NoStringParserAvailableException {
+        Method parser = SUPPORTED_PARSING_METHODS.stream()
+                .map(name -> getOptionalMethod(type, name, String.class))
+                .flatMap(Optional::stream)
+                .filter(method -> method.canAccess(null))
+                .filter(method -> type.isAssignableFrom(method.getReturnType()))
+                .findFirst()
+                .orElseThrow(() -> new NoStringParserAvailableException("%s must implement one of the following public static methods: %s"
+                        .formatted(type.getSimpleName(), SUPPORTED_PARSING_METHODS)));
+ 
+        // Return a function that calls the method and casts the result
+        return string -> {
+            try {
+                return type.cast(parser.invoke(null, string));
+            } catch (IllegalAccessException | InvocationTargetException | ClassCastException e) {
+                throw new IllegalStateException(e);
+            }
+        };
         
-        return inverted() != equality.test(this.value, String.valueOf(value));
     }
     
-    public final boolean ignoreCase() {
-        return getFlags().contains(ConditionFlag.IGNORE_CASE);
+    private static Optional<Method> getOptionalMethod(Class<?> type, String name, Class<?>... params) {
+        try {
+            return Optional.of(type.getMethod(name, params));
+        } catch (NoSuchMethodException e) {
+            return Optional.empty();
+        }
     }
     
-    @Override
-    public Component getText(boolean inverted) {
-        MutableComponent text = Component.translatable("text.cloth-config.dependencies.conditions.set_to",
-                Component.translatable("text.cloth-config.quoted", Component.literal(this.value)));
-        
-        return inverted() ? Component.translatable("text.cloth-config.dependencies.conditions.not", text) : text;
+    public static class NoStringParserAvailableException extends RuntimeException {
+        private NoStringParserAvailableException(String message) {
+            super(message);
+        }
     }
 }

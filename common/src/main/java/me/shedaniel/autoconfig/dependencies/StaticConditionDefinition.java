@@ -75,6 +75,7 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
     }
     
     public <T> GenericCondition<T> toGenericCondition(Class<T> type) {
+        // May throw NoStringParserAvailableException if a supported string parsing method isn't found on `type`
         GenericCondition<T> condition = new GenericCondition<>(type, this.condition());
         condition.setFlags(this.flags());
         return condition;
