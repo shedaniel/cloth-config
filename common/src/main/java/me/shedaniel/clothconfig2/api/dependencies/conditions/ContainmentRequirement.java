@@ -35,6 +35,15 @@ public enum ContainmentRequirement implements ConditionRequirement<ContainmentRe
         };
     }
     
+    public <T> boolean check(Collection<T> collection, Condition<T> condition) {
+        return switch (this) {
+            case CONTAINS_ANY -> collection.stream().anyMatch(condition::check);
+            case NOT_CONTAINS_ANY -> collection.stream().noneMatch(condition::check);
+            case CONTAINS_ALL, MATCHES -> collection.stream().allMatch(condition::check);
+            case NOT_CONTAINS_ALL, NOT_MATCHES -> collection.stream().anyMatch(value -> !condition.check(value));
+        };
+    }
+    
     @Override
     public ContainmentRequirement inverted(boolean inverted) {
         return switch (this) {
