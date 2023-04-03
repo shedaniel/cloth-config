@@ -1,6 +1,8 @@
 package me.shedaniel.autoconfig.dependencies;
 
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.EnableIf;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparativeCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ConditionFlag;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.*;
 
 import java.util.Arrays;
@@ -38,19 +40,19 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
         return new StaticConditionDefinition(this.flags(), mapper.apply(this.condition()));
     }
     
-    BooleanCondition toBooleanCondition() {
-        BooleanCondition condition = BooleanCondition.fromString(this.condition());
+    BooleanStaticCondition toBooleanCondition() {
+        BooleanStaticCondition condition = BooleanStaticCondition.fromString(this.condition());
         condition.setFlags(this.flags());
         return condition;
     }
     
-    StringCondition toStringCondition() {
-        StringCondition condition = new StringCondition(this.condition());
+    StringStaticCondition toStringCondition() {
+        StringStaticCondition condition = new StringStaticCondition(this.condition());
         condition.setFlags(this.flags());
         return condition;
     }
     
-    <T extends Enum<?>> EnumCondition<T> toEnumCondition(Class<T> type) {
+    <T extends Enum<?>> EnumStaticCondition<T> toEnumCondition(Class<T> type) {
         // Handle case-sensitivity
         boolean insensitive = this.flags().contains(ConditionFlag.IGNORE_CASE);
         String valueString = insensitive ? condition.strip().toLowerCase() : condition.strip();
@@ -63,20 +65,20 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
                 .findAny()
                 .orElseThrow(() -> new IllegalStateException("Invalid EnumCondition was defined: \"%s\"\nValid options: %s".formatted(this.condition(), Arrays.toString(possibleValues))));
     
-        EnumCondition<T> condition = new EnumCondition<>(value);
+        EnumStaticCondition<T> condition = new EnumStaticCondition<>(value);
         condition.setFlags(this.flags());
         return condition;
     }
     
-    <T extends Number & Comparable<T>> NumberCondition<T> toNumberCondition(Class<T> type) {
-        NumberCondition<T> condition = NumberCondition.fromString(type, this.condition());
+    <T extends Number & Comparable<T>> ComparativeCondition<T> toNumberCondition(Class<T> type) {
+        ComparativeCondition<T> condition = ComparativeStaticCondition.fromString(type, this.condition());
         condition.setFlags(this.flags());
         return condition;
     }
     
-    public <T> GenericCondition<T> toGenericCondition(Class<T> type) {
+    public <T> GenericStaticCondition<T> toGenericCondition(Class<T> type) {
         // May throw NoStringParserAvailableException if a supported string parsing method isn't found on `type`
-        GenericCondition<T> condition = new GenericCondition<>(type, this.condition());
+        GenericStaticCondition<T> condition = new GenericStaticCondition<>(type, this.condition());
         condition.setFlags(this.flags());
         return condition;
     }

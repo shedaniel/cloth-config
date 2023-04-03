@@ -1,6 +1,4 @@
-package me.shedaniel.clothconfig2.impl.dependencies.conditions;
-
-import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+package me.shedaniel.clothconfig2.api.dependencies.conditions;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -11,7 +9,7 @@ import java.util.stream.Collectors;
 public enum ConditionFlag {
     
     /**
-     * When set, the condition check is inverted. I.e. {@link Condition#matches(Object)} will return {@code true} if
+     * When set, the condition check is inverted. I.e. {@link Condition#check(Object)} should return {@code true} if
      * the check evaluated to {@code false} and vice-versa.
      */
     INVERTED('!'),
@@ -20,8 +18,6 @@ public enum ConditionFlag {
      * When set, text dependencies will ignore capitalization.
      */
     IGNORE_CASE('i');
-    
-    static final EnumSet<ConditionFlag> ALL = EnumSet.allOf(ConditionFlag.class);
     
     private static final String VALID_FLAGS = Arrays.stream(ConditionFlag.values())
             .map(flag -> flag.symbol)

@@ -1,18 +1,18 @@
 package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
-import me.shedaniel.clothconfig2.api.dependencies.conditions.StaticCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.EqualityCondition;
 import net.minecraft.network.chat.Component;
 
-public class BooleanCondition extends StaticCondition<Boolean> {
-    public BooleanCondition(Boolean value) {
+public class BooleanStaticCondition extends AbstractStaticCondition<Boolean> implements EqualityCondition<Boolean> {
+    public BooleanStaticCondition(Boolean value) {
         super(value);
     }
     
-    public static BooleanCondition fromString(String condition) throws IllegalArgumentException {
+    public static BooleanStaticCondition fromString(String condition) throws IllegalArgumentException {
         // The switch expression is functionally equivalent to Boolean::parseBoolean,
         // but allows us to throw a RuntimeException
         String string = condition.strip().toLowerCase();
-        return new BooleanCondition(switch (string) {
+        return new BooleanStaticCondition(switch (string) {
             case "true" -> true;
             case "false" -> false;
             default ->
@@ -27,10 +27,5 @@ public class BooleanCondition extends StaticCondition<Boolean> {
         boolean invert = inverted != inverted();
         return Component.translatable("text.cloth-config.dependencies.conditions.%s"
                 .formatted(invert != getValue() ? "enabled" : "disabled"));
-    }
-    
-    @Override
-    protected Component getTextInternal() {
-        return getText(false);
     }
 }

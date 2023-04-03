@@ -1,7 +1,7 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.EnumCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.EnumStaticCondition;
 
 public class EnumDependencyBuilder<T extends Enum<?>> extends ConfigEntryDependencyBuilder<T, EnumListEntry<T>, EnumDependency<T>, EnumDependencyBuilder<T>> {
     
@@ -11,7 +11,7 @@ public class EnumDependencyBuilder<T extends Enum<?>> extends ConfigEntryDepende
     
     @Override
     public EnumDependencyBuilder<T> matching(T condition) {
-        return matching(new EnumCondition<>(condition));
+        return matching(new EnumStaticCondition<>(condition));
     }
     
     @Override

@@ -6,12 +6,16 @@ import me.shedaniel.autoconfig.util.RelativeI18n;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparativeCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.*;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.*;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.BooleanStaticCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.EnumStaticCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.GenericStaticCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.ComparativeMatcherCondition;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -105,7 +109,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      * @return the generated dependency
      */
     public BooleanDependency build(DependencyManager manager, BooleanListEntry gui) {
-        Set<BooleanCondition> conditions = this.buildConditions(StaticConditionDefinition::toBooleanCondition);
+        Set<BooleanStaticCondition> conditions = this.buildConditions(StaticConditionDefinition::toBooleanCondition);
         Set<MatcherCondition<Boolean>> matchers = this.buildMatchers(Boolean.class, manager);
         
         // Start building the dependency
@@ -133,7 +137,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      */
     public <T extends Enum<?>> EnumDependency<T> build(DependencyManager manager, EnumListEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<EnumCondition<T>> conditions = this.buildConditions(condition -> condition.toEnumCondition(type));
+        Set<EnumStaticCondition<T>> conditions = this.buildConditions(condition -> condition.toEnumCondition(type));
         Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
     
         return Dependency.builder()
@@ -153,7 +157,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      */
     public <T extends Number & Comparable<T>> NumberDependency<T> build(DependencyManager manager, NumberConfigEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<NumberCondition<T>> conditions = this.buildConditions(condition -> condition.toNumberCondition(type));
+        Set<ComparativeCondition<T>> conditions = this.buildConditions(condition -> condition.toNumberCondition(type));
         Set<ComparativeMatcherCondition<T>> matchers = this.buildComparativeMatchers(type, manager);
         
         return Dependency.builder()
@@ -176,7 +180,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      */
     public <T> Dependency buildGeneric(DependencyManager manager, ConfigEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<GenericCondition<T>> conditions = this.buildConditions(condition -> condition.toGenericCondition(type));
+        Set<GenericStaticCondition<T>> conditions = this.buildConditions(condition -> condition.toGenericCondition(type));
         Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
         
         return Dependency.builder()

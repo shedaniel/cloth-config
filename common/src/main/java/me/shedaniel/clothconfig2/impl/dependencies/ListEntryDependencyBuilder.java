@@ -2,9 +2,10 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.dependencies.FinishDependencyBuilder;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ContainmentRequirement;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.MultiCondition;
 import me.shedaniel.clothconfig2.gui.entries.BaseListEntry;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.MultiCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.CollectionStaticCondition;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,31 +19,31 @@ public class ListEntryDependencyBuilder<T> implements FinishDependencyBuilder<Li
     private final BaseListEntry<T, ?, ?> gui;
     
     private boolean tooltip = true;
-    private final Set<Condition<Collection<T>>> conditions = new HashSet<>();
+    private final Set<MultiCondition<T>> conditions = new HashSet<>();
     
     public ListEntryDependencyBuilder(BaseListEntry<T, ?, ?> gui) {
         this.gui = gui;
     }
     
     @SafeVarargs
-    public final ListEntryDependencyBuilder<T> matching(MultiCondition.Requirement requirement, T value, T... values) {
+    public final ListEntryDependencyBuilder<T> matching(ContainmentRequirement requirement, T value, T... values) {
         Set<T> allValues = Streams.concat(Stream.of(value), Arrays.stream(values))
                 .collect(Collectors.toUnmodifiableSet());
         
         return matching(requirement, allValues);
     }
     
-    public ListEntryDependencyBuilder<T> matching(MultiCondition.Requirement requirement, Collection<T> values) {
-        this.conditions.add(new MultiCondition<>(requirement, values));
+    public ListEntryDependencyBuilder<T> matching(ContainmentRequirement requirement, Collection<T> values) {
+        this.conditions.add(new CollectionStaticCondition<>(requirement, values));
         return this;
     }
     
-    public ListEntryDependencyBuilder<T> matching(Condition<Collection<T>> condition) {
+    public ListEntryDependencyBuilder<T> matching(MultiCondition<T> condition) {
         this.conditions.add(condition);
         return this;
     }
     
-    public ListEntryDependencyBuilder<T> matching(Collection<Condition<Collection<T>>> conditions) {
+    public ListEntryDependencyBuilder<T> matching(Collection<MultiCondition<T>> conditions) {
         this.conditions.addAll(conditions);
         return this;
     }

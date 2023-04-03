@@ -4,7 +4,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.FinishDependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.GenericMatcherCondition;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -41,7 +41,7 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
     public abstract SELF matching(T value);
     
     /**
-     * Generates a simple {@link MatcherCondition} that compares the given {@code gui}'s value against the depended-on
+     * Generates a simple {@link GenericMatcherCondition} that compares the given {@code gui}'s value against the depended-on
      * config entry's value.
      * <br><br>
      * The generated condition will be added to the dependency being built.
@@ -50,7 +50,7 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
      * @return this instance, for chaining
      */
     public SELF matching(ConfigEntry<T> gui) {
-        return matching(new MatcherCondition<>(gui));
+        return matching(new GenericMatcherCondition<>(gui));
     }
     
     /**

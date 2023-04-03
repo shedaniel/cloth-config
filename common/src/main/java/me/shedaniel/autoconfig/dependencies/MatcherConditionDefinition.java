@@ -5,8 +5,9 @@ import me.shedaniel.autoconfig.util.RelativeI18n;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ConditionFlag;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.GenericMatcherCondition;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.ComparativeMatcherCondition;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.ConditionFlag;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -36,7 +37,7 @@ record MatcherConditionDefinition(EnumSet<ConditionFlag> flags, @Nullable Compar
     }
     
     <T> MatcherCondition<T> toMatcher(ConfigEntry<T> gui) {
-        MatcherCondition<T> matcher = new MatcherCondition<>(gui);
+        GenericMatcherCondition<T> matcher = new GenericMatcherCondition<>(gui);
         matcher.setFlags(this.flags());
         return matcher;
     }

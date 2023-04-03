@@ -1,6 +1,6 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
-import me.shedaniel.clothconfig2.api.dependencies.conditions.StaticCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.EqualityCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import net.minecraft.network.chat.Component;
 
@@ -13,7 +13,7 @@ public class BooleanDependency extends ConfigEntryDependency<Boolean, BooleanLis
     }
     
     @Override
-    protected Component getStaticConditionText(StaticCondition<Boolean> condition, boolean inverted) {
+    protected Component getStaticConditionText(EqualityCondition<Boolean> condition, boolean inverted) {
         if (this.useActualText)
             return Component.translatable("text.cloth-config.dependencies.conditions.set_to",
                         Component.translatable("text.cloth-config.quoted",

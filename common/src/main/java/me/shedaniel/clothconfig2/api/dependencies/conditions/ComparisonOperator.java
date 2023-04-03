@@ -7,7 +7,7 @@ import java.util.Arrays;
 /**
  * A mathematical comparison operator
  */
-public enum ComparisonOperator {
+public enum ComparisonOperator implements ConditionRequirement<ComparisonOperator> {
     EQUAL("=="),
     NOT_EQUAL("!="),
     GREATER(">"),
@@ -33,6 +33,19 @@ public enum ComparisonOperator {
         };
     }
     
+    @Override
+    public ComparisonOperator inverted(boolean inverted) {
+        return switch (this) {
+            case EQUAL -> NOT_EQUAL;
+            case NOT_EQUAL -> EQUAL;
+            case GREATER -> LESS_EQUAL;
+            case GREATER_EQUAL -> LESS;
+            case LESS -> GREATER_EQUAL;
+            case LESS_EQUAL -> GREATER;
+        };
+    }
+    
+    // TODO consider making this a ConditionRequirement method?
     public static @Nullable ComparisonOperator startsWith(String string) {
         return Arrays.stream(values())
                 .filter(value -> string.startsWith(value.symbol))

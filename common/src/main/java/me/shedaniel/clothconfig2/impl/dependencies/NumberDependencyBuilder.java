@@ -3,10 +3,8 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.ComparativeMatcherCondition;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.NumberCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.ComparativeStaticCondition;
 
 public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends ConfigEntryDependencyBuilder<T, NumberConfigEntry<T>, NumberDependency<T>, NumberDependencyBuilder<T>> {
     
@@ -16,11 +14,11 @@ public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends C
     
     @Override
     public NumberDependencyBuilder<T> matching(T value) {
-        return matching(new NumberCondition<>(value));
+        return matching(new ComparativeStaticCondition<>(value));
     }
     
     /**
-     * Generates a simple {@link Condition condition} that compares the given {@code value} against the depended-on
+     * Generates a simple {@link ComparativeStaticCondition condition} that compares the given {@code value} against the depended-on
      * config entry's value. The condition is checked using the {@code operator} provided, for example
      * <em>{@code gui_value > value}</em>
      * <br><br>
@@ -31,11 +29,11 @@ public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends C
      * @return this instance, for chaining
      */
     public NumberDependencyBuilder<T> matching(ComparisonOperator operator, T value) {
-        return matching(new NumberCondition<>(operator, value));
+        return matching(new ComparativeStaticCondition<>(operator, value));
     }
     
     /**
-     * Generates a simple {@link MatcherCondition} that compares the given {@code gui}'s value against the depended-on
+     * Generates a simple {@link ComparativeMatcherCondition} that compares the given {@code gui}'s value against the depended-on
      * config entry's value. The condition is checked using the {@code operator} provided, for example
      * <em>{@code gui_value > other_gui_value}</em>
      * <br><br>

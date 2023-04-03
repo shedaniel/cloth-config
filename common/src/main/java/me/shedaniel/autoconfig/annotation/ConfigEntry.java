@@ -22,7 +22,7 @@ package me.shedaniel.autoconfig.annotation;
 import me.shedaniel.clothconfig2.api.dependencies.GroupRequirement;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
 import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependency;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.ConditionFlag;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ConditionFlag;
 
 import java.lang.annotation.*;
 

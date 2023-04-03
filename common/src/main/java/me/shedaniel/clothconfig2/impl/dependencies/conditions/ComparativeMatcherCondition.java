@@ -1,11 +1,11 @@
 package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
 import me.shedaniel.clothconfig2.api.ConfigEntry;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparativeCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
 import org.jetbrains.annotations.Nullable;
 
-public class ComparativeMatcherCondition<T extends Comparable<T>> extends MatcherCondition<T> {
+public class ComparativeMatcherCondition<T extends Comparable<T>> extends AbstractMatcherCondition<T> implements ComparativeCondition<T> {
     
     private final ComparisonOperator operator;
     
@@ -19,7 +19,24 @@ public class ComparativeMatcherCondition<T extends Comparable<T>> extends Matche
     }
     
     @Override
-    public boolean matches(T value) {
-        return operator.compare(value, getElement().getValue());
+    public void setFormatPrecision(int places) {
+        // TODO
+    }
+    
+    @Override
+    public int formatPrecision() {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public ComparisonOperator getRequirement() {
+        return this.operator;
+    }
+    
+    @Override
+    public String getStringValue() {
+        // TODO we actually want to return a translatable Component here... Need to rework Comparativecondition#getText() and the lang file
+        return null;
     }
 }

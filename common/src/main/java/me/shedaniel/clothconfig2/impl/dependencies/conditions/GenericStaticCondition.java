@@ -1,5 +1,7 @@
 package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
+import me.shedaniel.clothconfig2.api.dependencies.conditions.EqualityCondition;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -7,16 +9,16 @@ import java.util.Optional;
 import java.util.function.Function;
 
 
-public class GenericCondition<T> extends AbstractStaticCondition<T> {
+public class GenericStaticCondition<T> extends AbstractStaticCondition<T> implements EqualityCondition<T> {
     
     private static final List<String> SUPPORTED_PARSING_METHODS = List.of(
             "valueOf", "parseString", "parse", "fromString", "ofString", "from", "of");
     
-    public GenericCondition(T value) {
+    public GenericStaticCondition(T value) {
         super(value);
     }
     
-    public GenericCondition(Class<T> type, String value) throws NoStringParserAvailableException {
+    public GenericStaticCondition(Class<T> type, String value) throws NoStringParserAvailableException {
         this(getStringParser(type).apply(value));
     }
     

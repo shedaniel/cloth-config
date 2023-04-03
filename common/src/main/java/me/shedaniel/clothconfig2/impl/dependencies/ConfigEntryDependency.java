@@ -3,7 +3,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.StaticCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.EqualityCondition;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -38,14 +38,14 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>> extends
     }
     
     protected Component getConditionText(Condition<T> condition, boolean inverted) {
-        if (condition instanceof StaticCondition<T> staticCondition)
-            return Component.translatable("text.cloth-config.dependencies.is", getStaticConditionText(staticCondition, inverted));
+        if (condition instanceof EqualityCondition<T> equalityCondition)
+            return Component.translatable("text.cloth-config.dependencies.is", getStaticConditionText(equalityCondition, inverted));
     
         Component text = MutableComponent.create(condition.getText(inverted).getContents()).withStyle(ChatFormatting.BOLD);
         return Component.translatable("text.cloth-config.dependencies.matches", text);
     }
     
-    protected Component getStaticConditionText(StaticCondition<T> condition, boolean inverted) {
+    protected Component getStaticConditionText(EqualityCondition<T> condition, boolean inverted) {
         return condition.getText(inverted);
     }
     
