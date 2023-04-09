@@ -7,7 +7,7 @@ public interface MetaMultiCondition<T extends Comparable<T>> extends MultiCondit
     default boolean check(Collection<T> values) {
         // FIXME does it make more sense to use GroupRequirement(ALL/ANY/NONE/ONE/ETC) than ContainmentRequirement
         //  since we're not really checking for containment, rather were checkin how many entries match the sub-condition.
-        return getRequirement().check(getValue(), getSubCondition());
+        return inverted() != getRequirement().check(getValue(), getSubCondition());
     }
     
     Condition<T> getSubCondition();

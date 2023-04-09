@@ -4,11 +4,12 @@ import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
 import net.minecraft.network.chat.Component;
 
-public abstract class AbstractMatcherCondition<T> extends FlaggedCondition<T> implements MatcherCondition<T> {
+public abstract class AbstractMatcherCondition<T> extends AbstractCondition<T> implements MatcherCondition<T> {
     
     private final ConfigEntry<T> gui;
     
-    protected AbstractMatcherCondition(ConfigEntry<T> gui) {
+    protected AbstractMatcherCondition(ConfigEntry<T> gui, boolean inverted) {
+        super(inverted);
         this.gui = gui;
     }
     

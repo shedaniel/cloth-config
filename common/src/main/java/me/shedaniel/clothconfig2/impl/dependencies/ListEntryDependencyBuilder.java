@@ -2,8 +2,8 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.dependencies.FinishDependencyBuilder;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ContainmentRequirement;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MultiCondition;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.ContainmentRequirement;
 import me.shedaniel.clothconfig2.gui.entries.BaseListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.CollectionStaticCondition;
 

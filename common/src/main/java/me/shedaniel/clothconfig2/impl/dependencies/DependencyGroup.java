@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
-import me.shedaniel.clothconfig2.api.dependencies.GroupRequirement;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import net.minecraft.network.chat.Component;
 
 import java.util.*;
@@ -15,7 +15,7 @@ public class DependencyGroup implements Dependency {
     private final boolean generateTooltip;
     
     DependencyGroup(GroupRequirement requirement, boolean inverted, boolean generateTooltip) {
-        this.requirement = requirement.invert(inverted);
+        this.requirement = requirement.inverted(inverted);
         this.generateTooltip = generateTooltip;
     }
     
@@ -52,7 +52,7 @@ public class DependencyGroup implements Dependency {
                     .getShortDescription(shouldInvertOnlyChild(inverted));
         
         return Component.translatable("text.cloth-config.dependency_groups.short_description.many",
-                    Component.translatable(requirement.invert(inverted).getI18n()), amount);
+                    Component.translatable(requirement.inverted(inverted).getI18n()), amount);
     }
     
     /**
@@ -74,7 +74,7 @@ public class DependencyGroup implements Dependency {
         if (flattened.isEmpty())
             return Optional.empty();
     
-        GroupRequirement.Simplified simple = this.requirement.invert(inverted).simplified();
+        GroupRequirement.Simplified simple = this.requirement.inverted(inverted).simplified();
     
         Component[] tooltip = Streams.concat(
                 // First line - "[enabled] when [all] of the following are [true]:"

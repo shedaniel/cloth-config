@@ -19,10 +19,10 @@
 
 package me.shedaniel.autoconfig.annotation;
 
-import me.shedaniel.clothconfig2.api.dependencies.GroupRequirement;
+import me.shedaniel.autoconfig.dependencies.ConditionFlag;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependency;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ConditionFlag;
 
 import java.lang.annotation.*;
 

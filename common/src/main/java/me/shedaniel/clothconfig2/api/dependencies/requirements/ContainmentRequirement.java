@@ -1,8 +1,10 @@
-package me.shedaniel.clothconfig2.api.dependencies.conditions;
+package me.shedaniel.clothconfig2.api.dependencies.requirements;
+
+import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 
 import java.util.Collection;
 
-public enum ContainmentRequirement implements ConditionRequirement<ContainmentRequirement> {
+public enum ContainmentRequirement implements Requirement<ContainmentRequirement> {
     
     CONTAINS_ANY,
     NOT_CONTAINS_ANY,

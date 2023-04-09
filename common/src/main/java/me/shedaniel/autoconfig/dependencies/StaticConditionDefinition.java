@@ -4,7 +4,6 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.EnableIf;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparativeCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ConditionFlag;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -50,31 +49,35 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
         return new StaticConditionDefinition(this.flags(), mapper.apply(this.condition()));
     }
     
+    private boolean inverted() {
+        return this.flags().contains(ConditionFlag.INVERTED);
+    }
+    
+    private boolean ignoreCase() {
+        return this.flags().contains(ConditionFlag.IGNORE_CASE);
+    }
+    
     Condition<Boolean> toBooleanCondition() {
         // The switch expression is functionally equivalent to Boolean::parseBoolean,
         // but allows us to throw a RuntimeException
         String string = this.condition().strip().toLowerCase();
-        BooleanStaticCondition condition = new BooleanStaticCondition(switch (string) {
+        boolean value = switch (string) {
             case "true" -> true;
             case "false" -> false;
             default ->
                     throw new IllegalStateException("Unexpected condition \"%s\" for Boolean dependency (expected \"true\" or \"false\").".formatted(string));
-        });
-        condition.setFlags(this.flags());
-        return condition;
+        };
+        return new BooleanStaticCondition(value, this.inverted());
     }
     
     Condition<String> toStringCondition() {
-        StringStaticCondition condition = new StringStaticCondition(this.condition());
-        condition.setFlags(this.flags());
-        return condition;
+        return new StringStaticCondition(this.condition(), this.ignoreCase(), this.inverted());
     }
     
     <T extends Enum<?>> Condition<T> toEnumCondition(Class<T> type) {
         // Handle case-sensitivity
-        boolean insensitive = this.flags().contains(ConditionFlag.IGNORE_CASE);
-        String valueString = insensitive ? this.condition().strip().toLowerCase() : this.condition().strip();
-        Function<T, String> toString = insensitive ? val -> val.toString().toLowerCase() : Object::toString;
+        String valueString = this.ignoreCase() ? this.condition().strip().toLowerCase() : this.condition().strip();
+        Function<T, String> toString = this.ignoreCase() ? val -> val.toString().toLowerCase() : Object::toString;
     
         // Find a matching value in the possible values array
         T[] possibleValues = type.getEnumConstants();
@@ -83,9 +86,7 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
                 .findAny()
                 .orElseThrow(() -> new IllegalStateException("Invalid EnumCondition was defined: \"%s\"\nValid options: %s".formatted(this.condition(), Arrays.toString(possibleValues))));
     
-        EnumStaticCondition<T> condition = new EnumStaticCondition<>(value);
-        condition.setFlags(this.flags());
-        return condition;
+        return new EnumStaticCondition<>(value, this.inverted());
     }
     
     /**
@@ -155,16 +156,12 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
         else
             throw new IllegalArgumentException("Unsupported Number type \"%s\"".formatted(type.getSimpleName()));
     
-        ComparativeCondition<T> condition = new ComparativeStaticCondition<>(operator, number);
-        condition.setFlags(this.flags());
-        return condition;
+        return new ComparativeStaticCondition<>(operator, number, this.inverted());
     }
     
     public <T> Condition<T> toGenericCondition(Class<T> type) {
         // May throw NoStringParserAvailableException if a supported string parsing method isn't found on `type`
-        GenericStaticCondition<T> condition = new GenericStaticCondition<>(getStringParser(type).apply(this.condition()));
-        condition.setFlags(this.flags());
-        return condition;
+        return new GenericStaticCondition<>(getStringParser(type).apply(this.condition()), this.inverted());
     }
     
     private static <T> Function<String, T> getStringParser(Class<T> type) throws NoStringParserAvailableException {

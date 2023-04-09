@@ -14,7 +14,10 @@ public class ComparativeMatcherCondition<T extends Comparable<T>> extends Abstra
     }
     
     public ComparativeMatcherCondition(@Nullable ComparisonOperator operator, ConfigEntry<T> gui) {
-        super(gui);
+        this(operator, gui, false);
+    }
+    public ComparativeMatcherCondition(@Nullable ComparisonOperator operator, ConfigEntry<T> gui, boolean inverted) {
+        super(gui, inverted);
         this.operator = operator == null ? ComparisonOperator.EQUAL : operator;
     }
     

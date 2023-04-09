@@ -6,8 +6,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
 public class EnumStaticCondition<T extends Enum<?>> extends AbstractStaticCondition<T> implements EqualityCondition<T> {
+    
     public EnumStaticCondition(T value) {
-        super(value);
+        this(value, false);
+    }
+    
+    public EnumStaticCondition(T value, boolean inverted) {
+        super(value, inverted);
     }
     
     /**

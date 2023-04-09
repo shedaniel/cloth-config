@@ -3,11 +3,18 @@ package me.shedaniel.clothconfig2.api.dependencies.conditions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
+import java.util.Objects;
+import java.util.function.BiPredicate;
+
 public interface EqualityCondition<T> extends Condition<T> {
+    
+    default BiPredicate<T, T> getPredicate() {
+        return Objects::equals;
+    }
     
     @Override
     default boolean check(T value) {
-        return getValue().equals(value);
+        return inverted() != getPredicate().test(getValue(), value);
     }
     
     @Override

@@ -1,5 +1,6 @@
 package me.shedaniel.clothconfig2.api.dependencies.conditions;
 
+import me.shedaniel.clothconfig2.api.dependencies.requirements.Requirement;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -7,7 +8,7 @@ import java.util.Arrays;
 /**
  * A mathematical comparison operator
  */
-public enum ComparisonOperator implements ConditionRequirement<ComparisonOperator> {
+public enum ComparisonOperator implements Requirement<ComparisonOperator> {
     EQUAL("=="),
     NOT_EQUAL("!="),
     GREATER(">"),

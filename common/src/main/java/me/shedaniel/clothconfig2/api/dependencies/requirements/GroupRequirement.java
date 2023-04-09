@@ -1,4 +1,4 @@
-package me.shedaniel.clothconfig2.api.dependencies;
+package me.shedaniel.clothconfig2.api.dependencies.requirements;
 
 import me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup;
 import net.minecraft.ChatFormatting;
@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 /**
  * Defines a condition for a {@link DependencyGroup} to be met.
  */
-public enum GroupRequirement {
+public enum GroupRequirement implements Requirement<GroupRequirement> {
     
     /**
      * This condition is true if all dependencies are met, i.e. none are unmet.
@@ -84,11 +84,11 @@ public enum GroupRequirement {
         };
     }
     
-    public GroupRequirement invert(boolean invert) {
-        return invert ? invert() : this;
-    }
-    
-    public GroupRequirement invert() {
+    @Override
+    public GroupRequirement inverted(boolean inverted) {
+        if (!inverted)
+            return this;
+        
         return switch (this) {
             case ALL -> NOT_ALL;
             case ANY -> NONE;

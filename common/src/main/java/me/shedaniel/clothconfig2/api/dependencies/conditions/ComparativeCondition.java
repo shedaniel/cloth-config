@@ -7,7 +7,7 @@ public interface ComparativeCondition<T extends Comparable<T>> extends Condition
     
     @Override
     default boolean check(T value) {
-        return getRequirement().compare(value, getValue());
+        return inverted() != getRequirement().compare(value, getValue());
     }
     
     @Override

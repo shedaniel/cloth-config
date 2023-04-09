@@ -1,4 +1,6 @@
-package me.shedaniel.clothconfig2.api.dependencies.conditions;
+package me.shedaniel.autoconfig.dependencies;
+
+import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 
 import java.util.Arrays;
 import java.util.EnumSet;

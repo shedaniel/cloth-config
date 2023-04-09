@@ -20,9 +20,13 @@ public class ComparativeStaticCondition<T extends Number & Comparable<T>> extend
     public ComparativeStaticCondition(@NotNull T value) {
         this(null, value);
     }
-
+    
     public ComparativeStaticCondition(@Nullable ComparisonOperator operator, @NotNull T value) {
-        super(value);
+        this(operator, value, false);
+    }
+    
+    public ComparativeStaticCondition(@Nullable ComparisonOperator operator, @NotNull T value, boolean inverted) {
+        super(value, inverted);
         this.operator = operator == null ? ComparisonOperator.EQUAL : operator;
         
         Class<? extends Number> type = value.getClass();

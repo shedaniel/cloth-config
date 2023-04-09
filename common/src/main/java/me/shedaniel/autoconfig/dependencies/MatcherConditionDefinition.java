@@ -5,9 +5,9 @@ import me.shedaniel.autoconfig.util.RelativeI18n;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ConditionFlag;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.GenericMatcherCondition;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.ComparativeMatcherCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.GenericMatcherCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.StringMatcherCondition;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -36,15 +36,23 @@ record MatcherConditionDefinition(EnumSet<ConditionFlag> flags, @Nullable Compar
         return new MatcherConditionDefinition(definition.flags(), operator, definition.condition());
     }
     
+    private boolean inverted() {
+        return this.flags().contains(ConditionFlag.INVERTED);
+    }
+    
+    private boolean ignoreCase() {
+        return this.flags().contains(ConditionFlag.IGNORE_CASE);
+    }
+    
+    MatcherCondition<String> toStringMatcher(ConfigEntry<String> gui) {
+        return new StringMatcherCondition(gui, this.ignoreCase(), this.inverted());
+    }
+    
     <T> MatcherCondition<T> toMatcher(ConfigEntry<T> gui) {
-        GenericMatcherCondition<T> matcher = new GenericMatcherCondition<>(gui);
-        matcher.setFlags(this.flags());
-        return matcher;
+        return new GenericMatcherCondition<>(gui, this.inverted());
     }
     
     <T extends Comparable<T>> ComparativeMatcherCondition<T> toComparativeMatcher(ConfigEntry<T> gui) {
-        ComparativeMatcherCondition<T> matcher = new ComparativeMatcherCondition<>(this.operator(), gui);
-        matcher.setFlags(this.flags());
-        return matcher;
+        return new ComparativeMatcherCondition<>(this.operator(), gui, this.inverted());
     }
 }

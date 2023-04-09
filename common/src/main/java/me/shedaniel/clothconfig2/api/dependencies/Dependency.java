@@ -6,8 +6,8 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.*;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.EnumStaticCondition;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.ComparativeStaticCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.EnumStaticCondition;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static me.shedaniel.clothconfig2.api.dependencies.GroupRequirement.*;
+import static me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement.*;
 
 public interface Dependency {
     

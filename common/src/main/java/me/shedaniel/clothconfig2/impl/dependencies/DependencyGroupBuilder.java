@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.FinishDependencyBuilder;
-import me.shedaniel.clothconfig2.api.dependencies.GroupRequirement;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 
 import java.util.Collection;
 import java.util.Collections;

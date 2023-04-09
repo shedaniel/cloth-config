@@ -4,8 +4,17 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.EqualityCondition;
 import net.minecraft.network.chat.Component;
 
 public class BooleanStaticCondition extends AbstractStaticCondition<Boolean> implements EqualityCondition<Boolean> {
+    
     public BooleanStaticCondition(Boolean value) {
-        super(value);
+        this(value, false);
+    }
+    
+    /**
+     * @deprecated there should be no need to invert a boolean condition
+     */
+    @Deprecated
+    public BooleanStaticCondition(Boolean value, boolean inverted) {
+        super(value, inverted);
     }
     
     @Override
