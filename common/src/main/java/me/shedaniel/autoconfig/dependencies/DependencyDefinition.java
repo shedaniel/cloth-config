@@ -9,6 +9,7 @@ import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparativeCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.*;
@@ -27,22 +28,23 @@ import java.util.stream.Collectors;
  * @param i18n the absolute i18n key of the depended-on config entry
  * @param tooltip whether the dependency should auto-generate tooltips
  * @param allowGeneric whether the dependency should still be built if a type-specific dependency is not supported
+ * @param requirement the number of conditions required for this dependency to be met
  * @param conditions flagged strings to be parsed into dependency conditions
  * @param matching flagged strings to be parsed into dynamic dependency conditions
  * @see DependencyGroupDefinition
  */
-record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, Set<StaticConditionDefinition> conditions, Set<MatcherConditionDefinition> matching) {
+record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, GroupRequirement requirement, Set<StaticConditionDefinition> conditions, Set<MatcherConditionDefinition> matching) {
     
     DependencyDefinition(@Nullable String i18nBase, EnableIf annotation) {
-        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.allowGeneric(), annotation.conditions(), annotation.matching());
+        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.allowGeneric(), annotation.requirement(), annotation.conditions(), annotation.matching());
     }
     
     DependencyDefinition(@Nullable String i18nBase, ShowIf annotation) {
-        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.allowGeneric(), annotation.conditions(), annotation.matching());
+        this(i18nBase, annotation.value(), annotation.tooltip(), annotation.allowGeneric(), annotation.requirement(), annotation.conditions(), annotation.matching());
     }
     
-    private DependencyDefinition(@Nullable String i18nBase, String i18nKey, boolean tooltip, boolean allowGeneric, String[] conditions, String[] matching) {
-        this(RelativeI18n.parse(i18nBase, i18nKey), tooltip, allowGeneric,
+    private DependencyDefinition(@Nullable String i18nBase, String i18nKey, boolean tooltip, boolean allowGeneric, GroupRequirement requirement, String[] conditions, String[] matching) {
+        this(RelativeI18n.parse(i18nBase, i18nKey), tooltip, allowGeneric, requirement,
                 Arrays.stream(conditions)
                         .map(StaticConditionDefinition::fromConditionString)
                         .collect(Collectors.toUnmodifiableSet()), 

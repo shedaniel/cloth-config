@@ -3,6 +3,7 @@ package me.shedaniel.clothconfig2.api.dependencies;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.*;
@@ -148,7 +149,7 @@ public interface Dependency {
     static @NotNull Dependency all(Dependency... dependencies) {
         return builder()
                 .startGroup()
-                .withCondition(ALL)
+                .withRequirement(ALL)
                 .withChildren(dependencies)
                 .build();
     }
@@ -164,7 +165,7 @@ public interface Dependency {
     static @NotNull Dependency none(Dependency... dependencies) {
         return builder()
                 .startGroup()
-                .withCondition(NONE)
+                .withRequirement(NONE)
                 .withChildren(dependencies)
                 .build();
     }
@@ -180,7 +181,7 @@ public interface Dependency {
     static @NotNull Dependency any(Dependency... dependencies) {
         return builder()
                 .startGroup()
-                .withCondition(ANY)
+                .withRequirement(ANY)
                 .withChildren(dependencies)
                 .build();
     }
@@ -197,7 +198,7 @@ public interface Dependency {
     static @NotNull Dependency one(Dependency... dependencies) {
         return builder()
                 .startGroup()
-                .withCondition(ONE)
+                .withRequirement(ONE)
                 .withChildren(dependencies)
                 .build();
     }
@@ -234,4 +235,8 @@ public interface Dependency {
     Optional<Component[]> getTooltip(boolean inverted, String effectKey);
     
     boolean hasTooltip();
+    
+    void setRequirement(GroupRequirement requirement);
+    
+    GroupRequirement getRequirement();
 }

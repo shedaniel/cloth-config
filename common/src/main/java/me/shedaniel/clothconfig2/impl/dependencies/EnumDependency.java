@@ -1,7 +1,7 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
-import me.shedaniel.clothconfig2.api.dependencies.conditions.EqualityCondition;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.AbstractStaticCondition;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -12,7 +12,7 @@ public class EnumDependency<T extends Enum<?>> extends ConfigEntryDependency<T, 
     }
     
     @Override
-    protected Component getStaticConditionText(EqualityCondition<T> condition, boolean inverted) {
+    protected Component getStaticConditionText(AbstractStaticCondition<T> condition, boolean inverted) {
         MutableComponent text = Component.translatable("text.cloth-config.quoted", getElement().getTextFor(condition.getValue()));
         if (condition.inverted())
             text = Component.translatable("text.cloth-config.dependencies.conditions.not", text);

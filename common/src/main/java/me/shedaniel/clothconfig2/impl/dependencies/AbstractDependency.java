@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -19,6 +20,7 @@ public abstract class AbstractDependency<C, E> implements Dependency {
     
     private final Set<C> conditions = new LinkedHashSet<>();
     private boolean generateTooltips = true;
+    private GroupRequirement requirement = GroupRequirement.ANY;
     
     protected AbstractDependency(E element) {this.element = element;}
     
@@ -48,6 +50,16 @@ public abstract class AbstractDependency<C, E> implements Dependency {
         this.conditions.addAll(conditions.stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableSet()));
+    }
+    
+    @Override
+    public void setRequirement(GroupRequirement requirement) {
+        this.requirement = requirement;
+    }
+    
+    @Override
+    public GroupRequirement getRequirement() {
+        return this.requirement;
     }
     
     public void shouldGenerateTooltip(boolean shouldGenerate) {

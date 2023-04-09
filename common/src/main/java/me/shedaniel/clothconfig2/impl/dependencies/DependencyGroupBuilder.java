@@ -13,7 +13,7 @@ public class DependencyGroupBuilder implements FinishDependencyBuilder<Dependenc
     
     private final Set<Dependency> children = new HashSet<>();
     
-    private GroupRequirement condition = GroupRequirement.ALL;
+    private GroupRequirement requirement = GroupRequirement.ALL;
     private boolean inverted = false;
     private boolean tooltip = true;
     
@@ -21,7 +21,8 @@ public class DependencyGroupBuilder implements FinishDependencyBuilder<Dependenc
     
     @Override
     public DependencyGroup build() {
-        DependencyGroup group = new DependencyGroup(this.condition, this.inverted, this.tooltip);
+        DependencyGroup group = new DependencyGroup(this.tooltip);
+        group.setRequirement(this.requirement.inverted(this.inverted));
         group.addChildren(this.children);
         return group;
     }
@@ -32,8 +33,9 @@ public class DependencyGroupBuilder implements FinishDependencyBuilder<Dependenc
         return this;
     }
     
-    public DependencyGroupBuilder withCondition(GroupRequirement condition) {
-        this.condition = condition;
+    @Override
+    public DependencyGroupBuilder withRequirement(GroupRequirement requirement) {
+        this.requirement = requirement;
         return this;
     }
     

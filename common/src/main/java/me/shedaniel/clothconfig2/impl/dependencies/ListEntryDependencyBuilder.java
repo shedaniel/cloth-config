@@ -4,6 +4,7 @@ import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.dependencies.FinishDependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MultiCondition;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.ContainmentRequirement;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.gui.entries.BaseListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.CollectionStaticCondition;
 
@@ -17,9 +18,10 @@ import java.util.stream.Stream;
 public class ListEntryDependencyBuilder<T> implements FinishDependencyBuilder<ListEntryDependency<T>, ListEntryDependencyBuilder<T>> {
     
     private final BaseListEntry<T, ?, ?> gui;
+    private final Set<MultiCondition<T>> conditions = new HashSet<>();
     
     private boolean tooltip = true;
-    private final Set<MultiCondition<T>> conditions = new HashSet<>();
+    private GroupRequirement requirement = GroupRequirement.ANY;
     
     public ListEntryDependencyBuilder(BaseListEntry<T, ?, ?> gui) {
         this.gui = gui;
@@ -53,9 +55,16 @@ public class ListEntryDependencyBuilder<T> implements FinishDependencyBuilder<Li
         if (conditions.isEmpty())
             throw new IllegalArgumentException();
         ListEntryDependency<T> dependency = new ListEntryDependency<>(gui);
+        dependency.setRequirement(requirement);
         dependency.shouldGenerateTooltip(tooltip);
         dependency.addConditions(conditions);
         return dependency;
+    }
+    
+    @Override
+    public ListEntryDependencyBuilder<T> withRequirement(GroupRequirement requirement) {
+        this.requirement = requirement;
+        return this;
     }
     
     @Override

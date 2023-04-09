@@ -17,7 +17,7 @@ public class ListEntryDependency<T> extends AbstractDependency<Condition<Collect
     @Override
     public boolean check() {
         List<T> values = getElement().getValue();
-        return getConditions().stream().anyMatch(condition -> condition.check(values));
+        return this.getRequirement().matches(getConditions(), condition -> condition.check(values));
     }
     
     @Override

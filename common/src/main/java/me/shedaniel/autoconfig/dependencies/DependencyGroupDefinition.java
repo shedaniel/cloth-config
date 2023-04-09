@@ -24,13 +24,13 @@ import java.util.stream.Collectors;
  */
 record DependencyGroupDefinition(GroupRequirement requirement, boolean inverted, boolean tooltip, Set<DependencyDefinition> children) {
     DependencyGroupDefinition(String i18nBase, EnableIfGroup annotation) {
-        this(annotation.condition(), annotation.inverted(), annotation.tooltip(),
+        this(annotation.requirement(), annotation.inverted(), annotation.tooltip(),
                 Arrays.stream(annotation.value())
                         .map(child -> new DependencyDefinition(i18nBase, child))
                         .collect(Collectors.toUnmodifiableSet()));
     }
     DependencyGroupDefinition(String i18nBase, ShowIfGroup annotation) {
-        this(annotation.condition(), annotation.inverted(), annotation.tooltip(),
+        this(annotation.requirement(), annotation.inverted(), annotation.tooltip(),
                 Arrays.stream(annotation.value())
                         .map(child -> new DependencyDefinition(i18nBase, child))
                         .collect(Collectors.toUnmodifiableSet()));
@@ -77,7 +77,7 @@ record DependencyGroupDefinition(GroupRequirement requirement, boolean inverted,
                 .startGroup()
                 .generateTooltip(this.tooltip())
                 .inverted(this.inverted())
-                .withCondition(this.requirement())
+                .withRequirement(this.requirement())
                 .withChildren(dependencies)
                 .build();
     }

@@ -4,6 +4,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.FinishDependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.GenericMatcherCondition;
 
 import java.util.Collection;
@@ -23,7 +24,8 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
     protected final E gui;
     protected final Set<Condition<T>> conditions = new HashSet<>();
     
-    private boolean tooltip = true;
+    protected GroupRequirement requirement = GroupRequirement.ANY;
+    protected boolean tooltip = true;
     
     protected ConfigEntryDependencyBuilder(E gui) {
         this.gui = gui;
@@ -67,7 +69,15 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
             throw new IllegalArgumentException("%s requires at least %d condition%s.".formatted(dependency.getClass().getSimpleName(), minConditions, minConditions == 1 ? "" : "s"));
         dependency.addConditions(this.conditions);
         dependency.shouldGenerateTooltip(tooltip);
+        dependency.setRequirement(requirement);
         return dependency;
+    }
+    
+    @Override
+    public SELF withRequirement(GroupRequirement requirement) {
+        @SuppressWarnings("unchecked") SELF self = (SELF) this;
+        this.requirement = requirement;
+        return self;
     }
     
     public SELF matching(Condition<T> condition) {

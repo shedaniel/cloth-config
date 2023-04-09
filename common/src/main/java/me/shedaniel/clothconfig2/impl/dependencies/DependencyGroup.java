@@ -10,12 +10,11 @@ import java.util.stream.Stream;
 
 public class DependencyGroup implements Dependency {
     
-    private final GroupRequirement requirement;
+    private GroupRequirement requirement = GroupRequirement.ANY;
     private final Set<Dependency> children = new LinkedHashSet<>();
     private final boolean generateTooltip;
     
-    DependencyGroup(GroupRequirement requirement, boolean inverted, boolean generateTooltip) {
-        this.requirement = requirement.inverted(inverted);
+    DependencyGroup(boolean generateTooltip) {
         this.generateTooltip = generateTooltip;
     }
     
@@ -91,6 +90,16 @@ public class DependencyGroup implements Dependency {
     @Override
     public boolean hasTooltip() {
         return generateTooltip;
+    }
+    
+    @Override
+    public void setRequirement(GroupRequirement requirement) {
+        this.requirement = requirement;
+    }
+    
+    @Override
+    public GroupRequirement getRequirement() {
+        return this.requirement;
     }
     
     private List<Dependency> processChildrenForTooltip() {

@@ -3,7 +3,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.EqualityCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.AbstractStaticCondition;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -34,18 +34,18 @@ public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>> extends
     @Override
     public boolean check() {
         T value = getElement().getValue();
-        return getConditions().stream().anyMatch(condition -> condition.check(value));
+        return this.getRequirement().matches(getConditions(), condition -> condition.check(value));
     }
     
     protected Component getConditionText(Condition<T> condition, boolean inverted) {
-        if (condition instanceof EqualityCondition<T> equalityCondition)
-            return Component.translatable("text.cloth-config.dependencies.is", getStaticConditionText(equalityCondition, inverted));
+        if (condition instanceof AbstractStaticCondition<T> staticCondition)
+            return Component.translatable("text.cloth-config.dependencies.is", getStaticConditionText(staticCondition, inverted));
     
         Component text = MutableComponent.create(condition.getText(inverted).getContents()).withStyle(ChatFormatting.BOLD);
         return Component.translatable("text.cloth-config.dependencies.matches", text);
     }
     
-    protected Component getStaticConditionText(EqualityCondition<T> condition, boolean inverted) {
+    protected Component getStaticConditionText(AbstractStaticCondition<T> condition, boolean inverted) {
         return condition.getText(inverted);
     }
     
