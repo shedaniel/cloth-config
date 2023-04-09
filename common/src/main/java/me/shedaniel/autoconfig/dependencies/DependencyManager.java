@@ -92,8 +92,8 @@ public class DependencyManager {
                     .formatted(entry.getType().getSimpleName(), type.getSimpleName(), i18n));
     
         // If type is assignable, we can safely cast to <T>
-        @SuppressWarnings("unchecked") ConfigEntry<T> tEntry = (ConfigEntry<T>) entry;
-        return tEntry;
+        //noinspection unchecked
+        return (ConfigEntry<T>) entry;
     }
     
     /**

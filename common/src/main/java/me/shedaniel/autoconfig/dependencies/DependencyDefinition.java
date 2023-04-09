@@ -12,9 +12,6 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.MatcherCondition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.*;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.BooleanStaticCondition;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.EnumStaticCondition;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.GenericStaticCondition;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.ComparativeMatcherCondition;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,7 +106,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      * @return the generated dependency
      */
     public BooleanDependency build(DependencyManager manager, BooleanListEntry gui) {
-        Set<BooleanStaticCondition> conditions = this.buildConditions(StaticConditionDefinition::toBooleanCondition);
+        Set<Condition<Boolean>> conditions = this.buildConditions(StaticConditionDefinition::toBooleanCondition);
         Set<MatcherCondition<Boolean>> matchers = this.buildMatchers(Boolean.class, manager);
         
         // Start building the dependency
@@ -137,7 +134,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      */
     public <T extends Enum<?>> EnumDependency<T> build(DependencyManager manager, EnumListEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<EnumStaticCondition<T>> conditions = this.buildConditions(condition -> condition.toEnumCondition(type));
+        Set<Condition<T>> conditions = this.buildConditions(condition -> condition.toEnumCondition(type));
         Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
     
         return Dependency.builder()
@@ -172,7 +169,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      * Builds a {@link GenericDependency} defined in this definition, depending on the given {@link ConfigEntry}.
      * <p>
      * If available, you should consider using a type-specific builder such as {@link #build(DependencyManager, BooleanListEntry)}.
-     * Generic dependencies are inherently limited because static conditions can only be checked using {@link String#valueOf(Object)}.
+     * Generic dependencies are inherently limited because static conditions can only be checked using {@link Object#equals(Object)}.
      *
      * @param manager a DependencyManager that has all config entries registered
      * @param gui     the {@link ConfigEntry} to be depended on
@@ -180,7 +177,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      */
     public <T> Dependency buildGeneric(DependencyManager manager, ConfigEntry<T> gui) {
         Class<T> type = gui.getType();
-        Set<GenericStaticCondition<T>> conditions = this.buildConditions(condition -> condition.toGenericCondition(type));
+        Set<Condition<T>> conditions = this.buildConditions(condition -> condition.toGenericCondition(type));
         Set<MatcherCondition<T>> matchers = this.buildMatchers(type, manager);
         
         return Dependency.builder()
