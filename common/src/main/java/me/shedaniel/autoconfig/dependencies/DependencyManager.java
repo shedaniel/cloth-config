@@ -99,7 +99,7 @@ public class DependencyManager {
     /**
      * Register a new or transformed config entry for later use by {@link #build()}.
      *
-     * @param entry     the {@link me.shedaniel.autoconfig.annotation.ConfigEntry config entry} GUI to be registered
+     * @param entry     the {@link ConfigEntry config entry} GUI to be registered
      * @param field     a {@link Field} which may have dependency annotations present
      * @param fieldI18n the i18n key of the field (not necessarily the GUI)
      * @see #build()
