@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparativeCondition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.ComparisonOperator;
 import org.jetbrains.annotations.Nullable;
 
 public class ComparativeMatcherCondition<T extends Comparable<T>> extends AbstractMatcherCondition<T> implements ComparativeCondition<T> {

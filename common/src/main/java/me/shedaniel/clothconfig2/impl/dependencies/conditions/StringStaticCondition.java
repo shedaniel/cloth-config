@@ -22,7 +22,7 @@ public class StringStaticCondition extends AbstractStaticCondition<String> imple
     }
     
     @Override
-    public BiPredicate<String, String> getPredicate() {
-        return this.predicate;
+    public boolean predicate(String conditionValue, String testValue) {
+        return predicate.test(conditionValue, testValue);
     }
 }

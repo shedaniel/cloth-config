@@ -2,8 +2,8 @@ package me.shedaniel.autoconfig.dependencies;
 
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.EnableIf;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparativeCondition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.ComparisonOperator;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.*;
 
 import java.lang.reflect.InvocationTargetException;

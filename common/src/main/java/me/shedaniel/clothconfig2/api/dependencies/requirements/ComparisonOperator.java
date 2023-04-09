@@ -1,6 +1,5 @@
-package me.shedaniel.clothconfig2.api.dependencies.conditions;
+package me.shedaniel.clothconfig2.api.dependencies.requirements;
 
-import me.shedaniel.clothconfig2.api.dependencies.requirements.Requirement;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;

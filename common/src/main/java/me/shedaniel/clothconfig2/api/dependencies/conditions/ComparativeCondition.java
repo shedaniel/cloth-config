@@ -1,13 +1,14 @@
 package me.shedaniel.clothconfig2.api.dependencies.conditions;
 
+import me.shedaniel.clothconfig2.api.dependencies.requirements.ComparisonOperator;
 import net.minecraft.network.chat.Component;
 
 
-public interface ComparativeCondition<T extends Comparable<T>> extends Condition<T> {
+public interface ComparativeCondition<T extends Comparable<T>> extends PredicateCondition<T, T> {
     
     @Override
-    default boolean check(T value) {
-        return inverted() != getRequirement().compare(value, getValue());
+    default boolean predicate(T conditionValue, T testValue) {
+        return getRequirement().compare(testValue, conditionValue);
     }
     
     @Override
@@ -25,5 +26,4 @@ public interface ComparativeCondition<T extends Comparable<T>> extends Condition
     void setFormatPrecision(int places);
     
     int formatPrecision();
-    
 }

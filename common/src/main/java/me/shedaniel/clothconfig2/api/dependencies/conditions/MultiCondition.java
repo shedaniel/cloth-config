@@ -4,13 +4,12 @@ import me.shedaniel.clothconfig2.api.dependencies.requirements.ContainmentRequir
 
 import java.util.Collection;
 
-public interface MultiCondition<T> extends Condition<Collection<T>> {
+public interface MultiCondition<T> extends PredicateCondition<Collection<T>, Collection<T>> {
     
     @Override
-    default boolean check(Collection<T> values) {
-        return inverted() != getRequirement().check(getValue(), values);
+    default boolean predicate(Collection<T> conditionValues, Collection<T> testValues) {
+        return getRequirement().check(conditionValues, testValues);
     }
     
     ContainmentRequirement getRequirement();
-    
 }

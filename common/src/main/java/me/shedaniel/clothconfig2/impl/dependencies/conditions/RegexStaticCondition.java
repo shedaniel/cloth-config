@@ -1,10 +1,11 @@
 package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
+import me.shedaniel.clothconfig2.api.dependencies.conditions.RegexCondition;
 import net.minecraft.network.chat.Component;
 
 import java.util.regex.Pattern;
 
-public class RegexStaticCondition extends AbstractCondition<String> {
+public class RegexStaticCondition extends AbstractCondition<String> implements RegexCondition {
     
     private final Pattern pattern;
     
@@ -21,14 +22,8 @@ public class RegexStaticCondition extends AbstractCondition<String> {
     }
     
     @Override
-    public boolean check(String value) {
-        return inverted() != pattern.matcher(value).matches();
-    }
-    
-    @Override
-    public String getValue() {
-        // FIXME this doesn't make sense for a regex matcher
-        return pattern.pattern();
+    public Pattern getValue() {
+        return pattern;
     }
     
     @Override

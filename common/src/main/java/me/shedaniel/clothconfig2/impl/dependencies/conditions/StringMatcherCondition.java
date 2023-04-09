@@ -22,7 +22,7 @@ public class StringMatcherCondition extends AbstractMatcherCondition<String> imp
     }
     
     @Override
-    public BiPredicate<String, String> getPredicate() {
-        return this.predicate;
+    public boolean predicate(String conditionValue, String testValue) {
+        return predicate.test(conditionValue, testValue);
     }
 }

@@ -1,7 +1,7 @@
 package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparativeCondition;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparisonOperator;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.ComparisonOperator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
