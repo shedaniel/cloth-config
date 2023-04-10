@@ -56,7 +56,7 @@ public class ListEntryDependencyBuilder<T> implements FinishDependencyBuilder<Li
             throw new IllegalArgumentException();
         ListEntryDependency<T> dependency = new ListEntryDependency<>(gui);
         dependency.setRequirement(requirement);
-        dependency.shouldGenerateTooltip(tooltip);
+        dependency.displayTooltips(tooltip);
         dependency.addConditions(conditions);
         return dependency;
     }

@@ -68,7 +68,7 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
         if (conditions.size() < minConditions)
             throw new IllegalArgumentException("%s requires at least %d condition%s.".formatted(dependency.getClass().getSimpleName(), minConditions, minConditions == 1 ? "" : "s"));
         dependency.addConditions(this.conditions);
-        dependency.shouldGenerateTooltip(tooltip);
+        dependency.displayTooltips(tooltip);
         dependency.setRequirement(requirement);
         return dependency;
     }

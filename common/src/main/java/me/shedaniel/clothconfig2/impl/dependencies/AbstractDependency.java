@@ -2,17 +2,24 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
+import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class AbstractDependency<C> implements Dependency {
     private final Set<C> conditions = new LinkedHashSet<>();
-    private boolean generateTooltips = true;
     private GroupRequirement requirement = GroupRequirement.ANY;
+    private boolean showTooltips = true;
+    private Supplier<Component> describer = null;
+    
+    private Function<String, Component[]> tooltipProvider = null;
     
     /**
      * Get the dependency's conditions.
@@ -45,12 +52,32 @@ public abstract class AbstractDependency<C> implements Dependency {
         return this.requirement;
     }
     
-    public void shouldGenerateTooltip(boolean shouldGenerate) {
-        this.generateTooltips = shouldGenerate;
+    public void displayTooltips(boolean shouldDisplay) {
+        this.showTooltips = shouldDisplay;
     }
     
     @Override
     public boolean hasTooltip() {
-        return this.generateTooltips;
+        return this.showTooltips && tooltipProvider != null;
+    }
+    
+    @Override
+    public void setDescriber(Supplier<Component> describer) {
+        this.describer = describer;
+    }
+    
+    @Override
+    public void setTooltipProvider(Function<String, Component[]> tooltipProvider) {
+        this.tooltipProvider = tooltipProvider;
+    }
+    
+    @Override
+    public @Nullable Component[] getTooltip(String effectKey) {
+        return hasTooltip() && tooltipProvider != null ? tooltipProvider.apply(effectKey) : null;
+    }
+    
+    @Override
+    public @Nullable Component getShortDescription() {
+        return hasTooltip() && describer != null ? describer.get() : null;
     }
 }

@@ -12,9 +12,12 @@ import me.shedaniel.clothconfig2.impl.dependencies.conditions.EnumStaticConditio
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement.*;
 
@@ -212,24 +215,20 @@ public interface Dependency {
     
     /**
      * Get a short description of this dependency. For use by GUIs, e.g. {@link DependencyGroup} tooltips.
-     * 
+     *
      * @return a {@link Component} containing the description
      */
-    default Component getShortDescription() {
-        return getShortDescription(false);
-    }
+    @Nullable Component getShortDescription();
     
     @ApiStatus.Internal
     Component getShortDescription(boolean inverted);
     
     /**
      * Generates a tooltip for this dependency.
-     * 
+     *
      * @return an {@link Optional} containing the tooltip, otherwise {@code Optional.empty()}.
      */
-    default Optional<Component[]> getTooltip(String effectKey) {
-        return getTooltip(false, effectKey);
-    }
+    @Nullable Component[] getTooltip(String effectKey);
     
     @ApiStatus.Internal
     Optional<Component[]> getTooltip(boolean inverted, String effectKey);
@@ -239,4 +238,8 @@ public interface Dependency {
     void setRequirement(GroupRequirement requirement);
     
     GroupRequirement getRequirement();
+    
+    void setDescriber(Supplier<Component> describer);
+    
+    void setTooltipProvider(Function<String, Component[]> tooltipProvider);
 }
