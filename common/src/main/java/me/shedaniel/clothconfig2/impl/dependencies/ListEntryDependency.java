@@ -1,16 +1,20 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
+import me.shedaniel.clothconfig2.api.ListConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-import me.shedaniel.clothconfig2.gui.entries.BaseListEntry;
 import net.minecraft.network.chat.Component;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public class ListEntryDependency<T> extends AbstractElementDependency<Condition<Collection<T>>, BaseListEntry<T, ?, ?>> {
+/**
+ * Represents a dependency on a {@link ListConfigEntry}
+ * @param <T> 
+ */
+public class ListEntryDependency<T> extends AbstractElementDependency<Condition<Collection<T>>, ListConfigEntry<T>> {
     
-    ListEntryDependency(BaseListEntry<T, ?, ?> entry) {
+    ListEntryDependency(ListConfigEntry<T> entry) {
         super(entry);
     }
     

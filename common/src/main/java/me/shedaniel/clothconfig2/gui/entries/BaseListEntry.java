@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.Expandable;
+import me.shedaniel.clothconfig2.api.ListConfigEntry;
 import me.shedaniel.clothconfig2.api.ReferenceProvider;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
@@ -56,7 +57,7 @@ import java.util.stream.Collectors;
  * @implNote See <a href="https://stackoverflow.com/questions/7354740/is-there-a-way-to-refer-to-the-current-type-with-a-type-variable">Is there a way to refer to the current type with a type variable?</href> on Stack Overflow.
  */
 @Environment(EnvType.CLIENT)
-public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends BaseListEntry<T, C, SELF>> extends TooltipListEntry<List<T>> implements Expandable {
+public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends BaseListEntry<T, C, SELF>> extends TooltipListEntry<List<T>> implements Expandable, ListConfigEntry<T> {
     
     protected static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
     @NotNull protected final List<C> cells;
