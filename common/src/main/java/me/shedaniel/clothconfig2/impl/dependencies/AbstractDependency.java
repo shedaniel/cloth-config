@@ -9,27 +9,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Represents an abstract dependency.
- * 
- * @param <C> The type used for the condition
- * @param <E> The depended-on element type
- */
-public abstract class AbstractDependency<C, E> implements Dependency {
-    private final E element;
-    
+public abstract class AbstractDependency<C> implements Dependency {
     private final Set<C> conditions = new LinkedHashSet<>();
     private boolean generateTooltips = true;
     private GroupRequirement requirement = GroupRequirement.ANY;
-    
-    protected AbstractDependency(E element) {this.element = element;}
-    
-    /**
-     * @return the element that is depended on
-     */
-    public final E getElement() {
-        return element;
-    }
     
     /**
      * Get the dependency's conditions.

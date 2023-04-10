@@ -21,9 +21,10 @@ public class DependencyGroupBuilder implements FinishDependencyBuilder<Dependenc
     
     @Override
     public DependencyGroup build() {
-        DependencyGroup group = new DependencyGroup(this.tooltip);
+        DependencyGroup group = new DependencyGroup();
+        group.shouldGenerateTooltip(this.tooltip);
         group.setRequirement(this.requirement.inverted(this.inverted));
-        group.addChildren(this.children);
+        group.addConditions(this.children);
         return group;
     }
     

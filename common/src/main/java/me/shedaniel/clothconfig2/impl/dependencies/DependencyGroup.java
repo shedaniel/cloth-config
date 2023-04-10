@@ -5,40 +5,18 @@ import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import net.minecraft.network.chat.Component;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-public class DependencyGroup implements Dependency {
+public class DependencyGroup extends AbstractDependency<Dependency> {
     
-    private GroupRequirement requirement = GroupRequirement.ANY;
-    private final Set<Dependency> children = new LinkedHashSet<>();
-    private final boolean generateTooltip;
-    
-    DependencyGroup(boolean generateTooltip) {
-        this.generateTooltip = generateTooltip;
-    }
+    DependencyGroup() {}
     
     @Override
     public boolean check() {
-        return this.requirement.matches(this.children, Dependency::check);
-    }
-    
-    /**
-     * Adds one or more children to the dependency.
-     *
-     * @param children a {@link Collection} of child dependencies to be added
-     */
-    public final void addChildren(Collection<Dependency> children) {
-        this.children.addAll(children);
-    }
-    
-    /**
-     * Adds one or more children to the dependency.
-     *
-     * @param children one or more child dependencies to be added
-     */
-    public final void addChildren(Dependency... children) {
-        Collections.addAll(this.children, children);
+        return this.getRequirement().matches(this.getConditions(), Dependency::check);
     }
     
     @Override
@@ -51,7 +29,7 @@ public class DependencyGroup implements Dependency {
                     .getShortDescription(shouldInvertOnlyChild(inverted));
         
         return Component.translatable("text.cloth-config.dependency_groups.short_description.many",
-                    Component.translatable(requirement.inverted(inverted).getI18n()), amount);
+                    Component.translatable(getRequirement().inverted(inverted).getI18n()), amount);
     }
     
     /**
@@ -61,19 +39,19 @@ public class DependencyGroup implements Dependency {
      * <br><em>- "A cool enum" being one of 3 values</em>
      */
     public Optional<Component[]> getTooltip(boolean inverted, String effectKey) {
-        if (!generateTooltip)
+        if (!this.hasTooltip())
             return Optional.empty();
     
         // If only one child, return its tooltip
-        if (children.size() == 1)
-            return children.iterator().next().getTooltip(shouldInvertOnlyChild(inverted), effectKey);
+        if (getConditions().size() == 1)
+            return getConditions().iterator().next().getTooltip(shouldInvertOnlyChild(inverted), effectKey);
         
         // Filter non-tooltip children and flatten same-requirement children
         List<Dependency> flattened = processChildrenForTooltip();
         if (flattened.isEmpty())
             return Optional.empty();
     
-        GroupRequirement.Simplified simple = this.requirement.inverted(inverted).simplified();
+        GroupRequirement.Simplified simple = this.getRequirement().inverted(inverted).simplified();
     
         Component[] tooltip = Streams.concat(
                 // First line - "[enabled] when [all] of the following are [true]:"
@@ -87,32 +65,17 @@ public class DependencyGroup implements Dependency {
         return Optional.of(tooltip);
     }
     
-    @Override
-    public boolean hasTooltip() {
-        return generateTooltip;
-    }
-    
-    @Override
-    public void setRequirement(GroupRequirement requirement) {
-        this.requirement = requirement;
-    }
-    
-    @Override
-    public GroupRequirement getRequirement() {
-        return this.requirement;
-    }
-    
     private List<Dependency> processChildrenForTooltip() {
         // It doesn't make sense to flatten groups with condition "exactly one"
-        if (requirement == GroupRequirement.ONE)
-            return children.stream().toList();
+        if (getRequirement() == GroupRequirement.ONE)
+            return getConditions().stream().toList();
         
         List<Dependency> flattened = new LinkedList<>();
-        children.stream()
+        getConditions().stream()
                 .filter(Dependency::hasTooltip)
                 .forEach(child -> {
             if (child instanceof DependencyGroup group) {
-                if (requirement == group.requirement) {
+                if (getRequirement() == group.getRequirement()) {
                     flattened.addAll(group.processChildrenForTooltip());
                     return;
                 }
@@ -125,7 +88,7 @@ public class DependencyGroup implements Dependency {
     
     private boolean shouldInvertOnlyChild(boolean inverted) {
         // Check if the condition is effectively inversion when dealing with only one child
-        return switch (requirement) {
+        return switch (getRequirement()) {
             case ALL, ANY, ONE -> inverted;           // met if only child is true
             case NONE, NOT_ALL, NOT_ONE -> !inverted; // met if only child is false
         };

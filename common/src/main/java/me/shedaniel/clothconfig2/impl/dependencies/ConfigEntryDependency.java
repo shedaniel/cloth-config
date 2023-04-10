@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  * @param <T> the type this dependency deals with
  * @param <E> the {@link ConfigEntry} type
  */
-public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>> extends AbstractDependency<Condition<T>, E> {
+public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>> extends AbstractElementDependency<Condition<T>, E> {
     
     protected ConfigEntryDependency(E entry) {
         super(entry);

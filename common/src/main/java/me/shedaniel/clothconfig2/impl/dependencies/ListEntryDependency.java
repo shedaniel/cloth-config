@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public class ListEntryDependency<T> extends AbstractDependency<Condition<Collection<T>>, BaseListEntry<T, ?, ?>> {
+public class ListEntryDependency<T> extends AbstractElementDependency<Condition<Collection<T>>, BaseListEntry<T, ?, ?>> {
     
     ListEntryDependency(BaseListEntry<T, ?, ?> entry) {
         super(entry);
