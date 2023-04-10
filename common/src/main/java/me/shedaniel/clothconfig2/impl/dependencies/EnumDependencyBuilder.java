@@ -11,6 +11,7 @@ public class EnumDependencyBuilder<T extends Enum<?>> extends ConfigEntryDepende
     
     @Override
     public EnumDependencyBuilder<T> matching(T condition) {
+        // TODO use NewCondition and `describeUsing(gui)`
         return matching(new EnumStaticCondition<>(condition));
     }
     

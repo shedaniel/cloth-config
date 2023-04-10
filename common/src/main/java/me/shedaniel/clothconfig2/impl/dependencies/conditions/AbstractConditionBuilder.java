@@ -1,5 +1,6 @@
 package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
+import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.ConditionBuilder;
 import net.minecraft.network.chat.Component;
 
@@ -35,5 +36,9 @@ public abstract class AbstractConditionBuilder<T, SELF extends AbstractCondition
         @SuppressWarnings("unchecked") SELF self = (SELF) this;
         this.describer = describer;
         return self;
+    }
+    
+    public SELF describeUsing(ConfigEntry<T> gui) {
+        throw new IllegalArgumentException("Unsupported operation");
     }
 }

@@ -77,7 +77,6 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
                                 .map(dependency -> dependency.getTooltip(enable)),
                         Stream.ofNullable(getShowIfDependency())
                                 .map(dependency -> dependency.getTooltip(show)))
-                .flatMap(Optional::stream)
                 .flatMap(Arrays::stream)
                 .toArray(Component[]::new);
         

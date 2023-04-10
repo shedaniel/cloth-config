@@ -123,7 +123,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
         }
         
         builder.matching(matchers);
-        builder.generateTooltip(this.tooltip());
+        builder.displayTooltips(this.tooltip());
         return builder.build();
     }
     
@@ -143,7 +143,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
                 .dependingOn(gui)
                 .matching(conditions)
                 .matching(matchers)
-                .generateTooltip(this.tooltip())
+                .displayTooltips(this.tooltip())
                 .build();
     }
     
@@ -163,7 +163,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
                 .dependingOn(gui)
                 .matching(conditions)
                 .matching(matchers)
-                .generateTooltip(this.tooltip())
+                .displayTooltips(this.tooltip())
                 .build();
     }
     

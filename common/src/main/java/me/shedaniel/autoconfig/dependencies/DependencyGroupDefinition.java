@@ -75,7 +75,7 @@ record DependencyGroupDefinition(GroupRequirement requirement, boolean inverted,
         // Build and return the DependencyGroup
         return Dependency.builder()
                 .startGroup()
-                .generateTooltip(this.tooltip())
+                .displayTooltips(this.tooltip())
                 .inverted(this.inverted())
                 .withRequirement(this.requirement())
                 .withChildren(dependencies)

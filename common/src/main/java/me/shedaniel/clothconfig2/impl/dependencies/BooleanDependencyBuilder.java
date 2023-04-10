@@ -4,11 +4,15 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.AbstractStaticCondition;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.BooleanStaticCondition;
+import net.minecraft.network.chat.Component;
 
 import java.util.Collection;
+import java.util.Objects;
+import java.util.function.Function;
 
 public class BooleanDependencyBuilder extends ConfigEntryDependencyBuilder<Boolean, BooleanListEntry, BooleanDependency, BooleanDependencyBuilder> {
     
+    private boolean useActualText = false;
     private boolean hasStaticCondition = false;
     
     public BooleanDependencyBuilder(BooleanListEntry gui) {
@@ -17,6 +21,7 @@ public class BooleanDependencyBuilder extends ConfigEntryDependencyBuilder<Boole
     
     @Override
     public BooleanDependencyBuilder matching(Boolean value) {
+        // TODO use NewCondition and handle `useActualText` with `describeUsing(gui)`
         return matching(new BooleanStaticCondition(value));
     }
     
@@ -58,6 +63,26 @@ public class BooleanDependencyBuilder extends ConfigEntryDependencyBuilder<Boole
             hasStaticCondition = true;
         }
         return super.matching(conditions);
+    }
+    
+    public BooleanDependencyBuilder useActualText(boolean useActualText) {
+        this.useActualText = useActualText;
+        return this;
+    }
+    
+    @Override
+    protected Component generateDescription() {
+        Component conditionText = this.conditions.stream()
+                .map(condition -> condition.getText(inverted))// TODO move to NewCondition.getDescription()
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("BooleanDependency requires exactly one condition"));
+        return Component.translatable("text.cloth-config.dependencies.short_description.single", this.gui.getFieldName(), conditionText);
+    }
+    
+    @Override
+    protected Function<String, Component[]> generateTooltipProvider() {
+        return super.generateTooltipProvider();
     }
     
     @Override

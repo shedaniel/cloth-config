@@ -1,5 +1,8 @@
 package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
+import me.shedaniel.clothconfig2.api.ConfigEntry;
+import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
+import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import net.minecraft.network.chat.Component;
 
 import java.util.function.Predicate;
@@ -18,6 +21,29 @@ public class StaticConditionBuilder<T> extends SimpleConditionBuilder<T, StaticC
     }
     
     @Override
+    public StaticConditionBuilder<T> describeUsing(ConfigEntry<T> gui) {
+        if (gui instanceof BooleanListEntry booleanListEntry) {
+            this.description = buildDescription(booleanListEntry);
+            return this;
+        }
+        if (gui instanceof EnumListEntry<?> enumListEntry) {
+            this.description = buildDescription(enumListEntry);
+            return this;
+        }
+        return super.describeUsing(gui);
+    }
+    
+    private <E extends Enum<?>> Component buildDescription(EnumListEntry<E> gui) {
+        @SuppressWarnings("unchecked") E value = (E) this.staticValue;
+        return setTo(gui.getTextFor(value));
+    }
+    
+    private Component buildDescription(BooleanListEntry gui) {
+        Boolean value = (Boolean) this.staticValue;
+        return setTo(gui.getYesNoText(inverted != value));
+    }
+    
+    @Override
     protected Component buildDescription() {
         if (this.staticValue instanceof Boolean bool)
             return buildDescription(bool);
@@ -30,10 +56,13 @@ public class StaticConditionBuilder<T> extends SimpleConditionBuilder<T, StaticC
     }
     
     private Component buildDescription(T value) {
-        Component description = Component.translatable("text.cloth-config.dependencies.conditions.set_to", 
-                Component.translatable("text.cloth-config.quoted", Component.literal(String.valueOf(value))));
+        return setTo(Component.literal(String.valueOf(value)));
+    }
+    
+    private Component setTo(Component value) {
+        Component description = Component.translatable("text.cloth-config.dependencies.conditions.set_to",
+                Component.translatable("text.cloth-config.quoted", value));
     
         return this.inverted ? Component.translatable("text.cloth-config.dependencies.conditions.not", description) : description;
-    
     }
 }

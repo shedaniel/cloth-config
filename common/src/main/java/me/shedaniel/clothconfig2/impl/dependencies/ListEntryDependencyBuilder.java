@@ -1,21 +1,22 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
 import com.google.common.collect.Streams;
-import me.shedaniel.clothconfig2.api.dependencies.FinishDependencyBuilder;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.MultiCondition;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.ContainmentRequirement;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.gui.entries.BaseListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.CollectionStaticCondition;
+import net.minecraft.network.chat.Component;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ListEntryDependencyBuilder<T> implements FinishDependencyBuilder<ListEntryDependency<T>, ListEntryDependencyBuilder<T>> {
+public class ListEntryDependencyBuilder<T> extends AbstractDependencyBuilder<MultiCondition<T>, ListEntryDependency<T>, ListEntryDependencyBuilder<T>> {
     
     private final BaseListEntry<T, ?, ?> gui;
     private final Set<MultiCondition<T>> conditions = new HashSet<>();
@@ -68,8 +69,19 @@ public class ListEntryDependencyBuilder<T> implements FinishDependencyBuilder<Li
     }
     
     @Override
-    public ListEntryDependencyBuilder<T> generateTooltip(boolean shouldGenerate) {
-        this.tooltip = shouldGenerate;
+    public ListEntryDependencyBuilder<T> displayTooltips(boolean showTooltips) {
+        this.tooltip = showTooltips;
         return this;
+    }
+    
+    @Override
+    protected Component generateDescription() {
+        // TODO
+        return null;
+    }
+    
+    @Override
+    protected Function<String, Component[]> generateTooltipProvider() {
+        return null;
     }
 }

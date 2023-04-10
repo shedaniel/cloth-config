@@ -10,14 +10,13 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class AbstractDependency<C> implements Dependency {
     private final Set<C> conditions = new LinkedHashSet<>();
     private GroupRequirement requirement = GroupRequirement.ANY;
     private boolean showTooltips = true;
-    private Supplier<Component> describer = null;
+    private Component description = null;
     
     private Function<String, Component[]> tooltipProvider = null;
     
@@ -52,32 +51,32 @@ public abstract class AbstractDependency<C> implements Dependency {
         return this.requirement;
     }
     
-    public void displayTooltips(boolean shouldDisplay) {
+    public final void displayTooltips(boolean shouldDisplay) {
         this.showTooltips = shouldDisplay;
     }
     
     @Override
-    public boolean hasTooltip() {
+    public final boolean hasTooltip() {
         return this.showTooltips && tooltipProvider != null;
     }
     
     @Override
-    public void setDescriber(Supplier<Component> describer) {
-        this.describer = describer;
+    public final void setDescription(Component description) {
+        this.description = description;
     }
     
     @Override
-    public void setTooltipProvider(Function<String, Component[]> tooltipProvider) {
+    public final void setTooltipProvider(Function<String, Component[]> tooltipProvider) {
         this.tooltipProvider = tooltipProvider;
     }
     
     @Override
-    public @Nullable Component[] getTooltip(String effectKey) {
+    public final @Nullable Component[] getTooltip(String effectKey) {
         return hasTooltip() && tooltipProvider != null ? tooltipProvider.apply(effectKey) : null;
     }
     
     @Override
-    public @Nullable Component getShortDescription() {
-        return hasTooltip() && describer != null ? describer.get() : null;
+    public final @Nullable Component getShortDescription() {
+        return hasTooltip() && description != null ? description : null;
     }
 }
