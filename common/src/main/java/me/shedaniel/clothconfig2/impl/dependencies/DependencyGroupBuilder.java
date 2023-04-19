@@ -100,10 +100,10 @@ public class DependencyGroupBuilder extends AbstractDependencyBuilder<Dependency
         GroupRequirement requirement = this.requirement.inverted(inverted);
         // It doesn't make sense to flatten groups with condition "exactly one"
         if (requirement == GroupRequirement.ONE || requirement == GroupRequirement.NOT_ONE)
-            return conditions.stream().toList();
+            return this.conditions.stream().toList();
         
         List<Dependency> flattened = new LinkedList<>();
-        conditions.stream()
+        this.conditions.stream()
                 .filter(Dependency::hasTooltip)
                 .forEach(child -> {
                     if (child instanceof DependencyGroup group) {

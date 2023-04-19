@@ -43,9 +43,9 @@ public abstract class AbstractDependencyBuilder<C, D extends AbstractDependency<
         if (description == null)
             description = generateDescription();
     
-        dependency.setRequirement(requirement.inverted(inverted));
+        dependency.setRequirement(this.requirement.inverted(inverted));
         dependency.addConditions(this.conditions);
-        dependency.displayTooltips(displayTooltips);
+        dependency.displayTooltips(this.displayTooltips);
         dependency.setDescription(this.description);
         dependency.setTooltipProvider(this.tooltipProvider);
         return dependency;
