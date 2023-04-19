@@ -14,8 +14,6 @@ public class InitialDependencyBuilder implements StartDependencyBuilder {
     
     private static final InitialDependencyBuilder INSTANCE = new InitialDependencyBuilder();
     
-    private boolean tooltip = true;
-    
     private InitialDependencyBuilder() {}
     
     /**
@@ -35,37 +33,26 @@ public class InitialDependencyBuilder implements StartDependencyBuilder {
     
     @Override
     public BooleanDependencyBuilder dependingOn(BooleanListEntry gui) {
-        return new BooleanDependencyBuilder(gui)
-                .displayTooltips(tooltip);
+        return new BooleanDependencyBuilder(gui);
     }
     
     @Override
     public <T extends Enum<?>> EnumDependencyBuilder<T> dependingOn(EnumListEntry<T> gui) {
-        return new EnumDependencyBuilder<>(gui)
-                .displayTooltips(tooltip);
+        return new EnumDependencyBuilder<>(gui);
     }
     
     @Override
     public <T extends Number & Comparable<T>> NumberDependencyBuilder<T> dependingOn(NumberConfigEntry<T> gui) {
-        return new NumberDependencyBuilder<>(gui)
-                .displayTooltips(tooltip);
+        return new NumberDependencyBuilder<>(gui);
     }
     
     @Override
     public <T> ListEntryDependencyBuilder<T> dependingOn(BaseListEntry<T,?,?> type) {
-        return new ListEntryDependencyBuilder<>(type)
-                .displayTooltips(tooltip);
+        return new ListEntryDependencyBuilder<>(type);
     }
     
     @Override
     public <T> GenericDependencyBuilder<T> dependingOnGeneric(ConfigEntry<T> type) {
-        return new GenericDependencyBuilder<>(type)
-                .displayTooltips(tooltip);
-    }
-    
-    @Override
-    public StartDependencyBuilder displayTooltips(boolean shouldGenerate) {
-        this.tooltip = shouldGenerate;
-        return this;
+        return new GenericDependencyBuilder<>(type);
     }
 }
