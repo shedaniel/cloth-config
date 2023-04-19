@@ -11,6 +11,8 @@ public class MatcherConditionBuilder<T> extends SimpleConditionBuilder<T, Matche
     
     public MatcherConditionBuilder(ConfigEntry<T> gui) {
         this.otherGui = gui;
+        this.adjectiveKey = "text.cloth-config.dependencies.matches";
+        this.negativeAdjectiveKey = "text.cloth-config.dependencies.not_matches";
     }
     
     @Override
@@ -20,6 +22,6 @@ public class MatcherConditionBuilder<T> extends SimpleConditionBuilder<T, Matche
     
     @Override
     protected Component buildDescription() {
-        return Component.translatable("text.cloth-config.dependencies.matches", this.otherGui.getFieldName());
+        return Component.translatable("text.cloth-config.quoted", this.otherGui.getFieldName());
     }
 }

@@ -112,39 +112,35 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
             throw new IllegalStateException("Expected at least one condition to be defined");
     
         // Get the text for each condition, styled bold.
-        List<Component> conditionTexts = conditions.stream()
+        List<Condition<T>> conditions = this.conditions.stream()
                 .distinct()
-                .map(Condition::description)
                 .toList();
     
         // Build the main line of the tooltip
         Component gui = MutableComponent.create(this.gui.getFieldName().getContents())
                 .withStyle(ChatFormatting.BOLD);
-        Component condition = switch (conditionTexts.size()) {
-            case 1 -> describeCondition(requirement.effectivelyInvertsSingleton(), Component.translatable("text.cloth-config.dependencies.one_condition", conditionTexts.get(0)));
+        Component condition = switch (conditions.size()) {
+            case 1 -> Component.translatable("text.cloth-config.dependencies.one_condition", conditions.get(0).fullDescription(requirement.effectivelyInvertsSingleton()));
             case 2 -> Component.translatable("text.cloth-config.dependencies.two_conditions",
-                    describeCondition(conditionTexts.get(0)), requirement.getJoiningText(), describeCondition(conditionTexts.get(1)));
+                    conditions.get(0).fullDescription(false), requirement.getJoiningText(), conditions.get(1).fullDescription(false));
             default -> Component.translatable("text.cloth-config.dependencies.many_conditions", requirement.getText());
         };
     
-        if (conditionTexts.size() > 2)
-            return effectKey -> 
-                    Streams.concat(
-                                Stream.of(Component.translatable("text.cloth-config.dependencies.tooltip", Component.translatable(effectKey), gui, condition)),
-                                conditionTexts.stream().map(text -> Component.translatable("text.cloth-config.dependencies.list_entry", text)))
-                        .toArray(Component[]::new);
+        if (conditions.size() > 2)  {
+            List<MutableComponent> conditionLines = conditions.stream()
+                    .map(Condition::description)
+                    .map(description -> Component.translatable("text.cloth-config.dependencies.list_entry", description))
+                    .toList();
+            
+            return effectKey -> {
+                Component firstLine = Component.translatable("text.cloth-config.dependencies.tooltip", Component.translatable(effectKey), gui, condition);
+                return Streams.concat(Stream.of(firstLine), conditionLines.stream()).toArray(Component[]::new);
+            };
+        }
         
-        return effectKey -> 
-                Stream.of(Component.translatable("text.cloth-config.dependencies.tooltip", Component.translatable(effectKey), gui, condition))
-                        .toArray(Component[]::new);
-    }
-    
-    // TODO move this to a shared util class?
-    private Component describeCondition(Component condition) {
-        return describeCondition(false, condition);
-    }
-    private Component describeCondition(boolean invert, Component condition) {
-        Component text = invert ? Component.translatable("text.cloth-config.dependencies.conditions.not", condition) : condition;
-        return Component.translatable("text.cloth-config.dependencies.is", text);
+        return effectKey -> {
+            MutableComponent tooltip = Component.translatable("text.cloth-config.dependencies.tooltip", Component.translatable(effectKey), gui, condition);
+            return Stream.of(tooltip).toArray(Component[]::new);
+        };
     }
 }

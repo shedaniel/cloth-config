@@ -179,6 +179,8 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
         
         return new PredicateConditionBuilder<>(predicate)
                 .setDescription(operator.description(number))
+                .setAdjectiveKey("text.cloth-config.dependencies.is")
+                .setNegativeAdjectiveKey("text.cloth-config.dependencies.not_is")
                 .build();
     }
     

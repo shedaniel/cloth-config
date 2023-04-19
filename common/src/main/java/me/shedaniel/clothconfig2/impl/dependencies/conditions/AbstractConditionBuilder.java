@@ -11,6 +11,8 @@ public abstract class AbstractConditionBuilder<T, SELF extends AbstractCondition
     protected boolean inverted = false;
     protected Component description = null;
     protected Supplier<Component> describer = null;
+    protected String adjectiveKey;
+    protected String negativeAdjectiveKey;
     
     @Override
     public SELF setInverted() {
@@ -21,6 +23,20 @@ public abstract class AbstractConditionBuilder<T, SELF extends AbstractCondition
     public SELF setInverted(boolean inverted) {
         @SuppressWarnings("unchecked") SELF self = (SELF) this;
         this.inverted = inverted;
+        return self;
+    }
+    
+    @Override
+    public SELF setAdjectiveKey(String key) {
+        @SuppressWarnings("unchecked") SELF self = (SELF) this;
+        this.adjectiveKey = key;
+        return self;
+    }
+    
+    @Override
+    public SELF setNegativeAdjectiveKey(String key) {
+        @SuppressWarnings("unchecked") SELF self = (SELF) this;
+        this.negativeAdjectiveKey = key;
         return self;
     }
     

@@ -1,5 +1,6 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
+import com.google.common.base.Predicate;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
@@ -30,9 +31,12 @@ public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends C
      * @return this instance, for chaining
      */
     public NumberDependencyBuilder<T> matching(ComparisonOperator operator, T value) {
-        PredicateConditionBuilder<T> builder = new PredicateConditionBuilder<>(guiValue -> operator.compare(guiValue, value));
-        builder.setDescription(operator.description(value));
-        return matching(builder.build());
+        Predicate<T> predicate = guiValue -> operator.compare(guiValue, value);
+        return matching(new PredicateConditionBuilder<>(predicate)
+                .setDescription(operator.description(value))
+                .setAdjectiveKey("text.cloth-config.dependencies.is")
+                .setNegativeAdjectiveKey("text.cloth-config.dependencies.not_is")
+                .build());
     }
     
     /**
@@ -46,9 +50,12 @@ public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends C
      * @return this instance, for chaining
      */
     public NumberDependencyBuilder<T> matching(ComparisonOperator operator, ConfigEntry<T> otherGui) {
-        PredicateConditionBuilder<T> builder = new PredicateConditionBuilder<>(guiValue -> operator.compare(guiValue, otherGui.getValue()));
-        builder.setDescription(operator.description(otherGui));
-        return matching(builder.build());
+        Predicate<T> predicate = guiValue -> operator.compare(guiValue, otherGui.getValue());
+        return matching(new PredicateConditionBuilder<>(predicate)
+                .setDescription(operator.description(otherGui))
+                .setAdjectiveKey("text.cloth-config.dependencies.is")
+                .setNegativeAdjectiveKey("text.cloth-config.dependencies.not_is")
+                .build());
     }
     
     @Override

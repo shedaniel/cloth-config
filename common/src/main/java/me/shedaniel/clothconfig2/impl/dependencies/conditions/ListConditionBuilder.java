@@ -10,5 +10,7 @@ public abstract class ListConditionBuilder<T> extends SimpleConditionBuilder<Col
     
     public ListConditionBuilder(ContainmentRequirement requirement) {
         this.requirement = requirement;
+        this.adjectiveKey = "text.cloth-config.dependencies.is";
+        this.negativeAdjectiveKey = "text.cloth-config.dependencies.not_is";
     }
 }

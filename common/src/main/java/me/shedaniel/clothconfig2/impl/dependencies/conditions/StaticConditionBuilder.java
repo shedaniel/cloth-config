@@ -13,6 +13,8 @@ public class StaticConditionBuilder<T> extends SimpleConditionBuilder<T, StaticC
     
     public StaticConditionBuilder(T value) {
         this.staticValue = value;
+        this.adjectiveKey = "text.cloth-config.dependencies.is";
+        this.negativeAdjectiveKey = "text.cloth-config.dependencies.not_is";
     }
     
     @Override

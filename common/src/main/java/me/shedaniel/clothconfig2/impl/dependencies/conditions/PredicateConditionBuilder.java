@@ -19,7 +19,7 @@ public class PredicateConditionBuilder<T> extends AbstractConditionBuilder<T, Pr
         
         Predicate<T> predicate = this.inverted ? value -> !this.predicate.test(value) : this.predicate;
         return this.description == null ?
-                new PredicateCondition<>(predicate, this.describer)
-              : new PredicateCondition<>(predicate, this.description);
+                new PredicateCondition<>(predicate, this.describer, adjectiveKey, negativeAdjectiveKey)
+              : new PredicateCondition<>(predicate, this.description, adjectiveKey, negativeAdjectiveKey);
     }
 }

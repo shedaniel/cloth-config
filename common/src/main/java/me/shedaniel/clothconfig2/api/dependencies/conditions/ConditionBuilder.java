@@ -12,6 +12,10 @@ public interface ConditionBuilder<T, SELF> {
     
     SELF setInverted(boolean inverted);
     
+    SELF setAdjectiveKey(String key);
+    
+    SELF setNegativeAdjectiveKey(String key);
+    
     SELF setDescription(Component description);
     
     SELF setDescriber(Supplier<Component> describer);

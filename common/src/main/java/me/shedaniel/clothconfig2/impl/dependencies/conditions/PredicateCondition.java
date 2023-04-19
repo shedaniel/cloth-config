@@ -12,24 +12,27 @@ public class PredicateCondition<T> implements Condition<T> {
     private final Predicate<T> predicate;
     private final Component description;
     private final Supplier<Component> describer;
+    private final String adjectiveKey;
+    private final String negativeAdjectiveKey;
     
     
-    PredicateCondition(Predicate<T> predicate, Component description) {
-        this(predicate, description, null);
+    PredicateCondition(Predicate<T> predicate, Component description, String adjectiveKey, String negativeAdjectiveKey) {
+        this(predicate, description, null, adjectiveKey, negativeAdjectiveKey);
     }
     
-    PredicateCondition(Predicate<T> predicate, Supplier<Component> describer) {
-        this(predicate, null, describer);
+    PredicateCondition(Predicate<T> predicate, Supplier<Component> describer, String adjectiveKey, String negativeAdjectiveKey) {
+        this(predicate, null, describer, adjectiveKey, negativeAdjectiveKey);
     }
     
-    private PredicateCondition(Predicate<T> predicate, @Nullable Component description, @Nullable Supplier<Component> describer) {
+    private PredicateCondition(Predicate<T> predicate, @Nullable Component description, @Nullable Supplier<Component> describer, String adjectiveKey, String negativeAdjectiveKey) {
         if (description == null && describer == null)
             throw new IllegalArgumentException("description and describer cannot both be null");
         
         this.predicate = predicate;
         this.description = description;
         this.describer = describer;
-        
+        this.adjectiveKey = adjectiveKey;
+        this.negativeAdjectiveKey = negativeAdjectiveKey;
     }
     
     @Override
@@ -44,5 +47,11 @@ public class PredicateCondition<T> implements Condition<T> {
         if (describer != null)
             return describer.get();
         throw new IllegalStateException("description and describer cannot both be null");
+    }
+    
+    @Override
+    public Component fullDescription(boolean inverted) {
+        String adjectiveKey = inverted ? negativeAdjectiveKey : this.adjectiveKey;
+        return Component.translatable(adjectiveKey, description());
     }
 }

@@ -16,6 +16,8 @@ public abstract class SimpleConditionBuilder<T, SELF extends SimpleConditionBuil
                 .setInverted(this.inverted)
                 .setDescription(this.description)
                 .setDescriber(this.describer)
+                .setAdjectiveKey(this.adjectiveKey)
+                .setNegativeAdjectiveKey(this.negativeAdjectiveKey)
                 .build();
     }
     
