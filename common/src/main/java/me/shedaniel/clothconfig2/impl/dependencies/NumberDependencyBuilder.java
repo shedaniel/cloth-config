@@ -3,13 +3,12 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 import com.google.common.base.Predicate;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
-import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.ComparisonOperator;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.PredicateConditionBuilder;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.StaticConditionBuilder;
 
-public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends ConfigEntryDependencyBuilder<T, NumberConfigEntry<T>, NumberDependencyBuilder<T>> {
+public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends ConfigEntryDependencyBuilder<T, NumberDependencyBuilder<T>> {
     
     public NumberDependencyBuilder(NumberConfigEntry<T> gui) {
         super(gui);
@@ -32,6 +31,7 @@ public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends C
      * @return this instance, for chaining
      */
     public NumberDependencyBuilder<T> matching(ComparisonOperator operator, T value) {
+        // TODO set condition's formatPrecision to something sensible for the gui's range
         Predicate<T> predicate = guiValue -> operator.compare(guiValue, value);
         return matching(new PredicateConditionBuilder<>(predicate)
                 .setDescription(operator.description(value))
@@ -57,13 +57,5 @@ public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends C
                 .setAdjectiveKey("text.cloth-config.dependencies.is")
                 .setNegativeAdjectiveKey("text.cloth-config.dependencies.not_is")
                 .build());
-    }
-    
-    @Override
-    public Dependency build() {
-        
-        // TODO set each condition's formatPrecision to something sensible for the gui's range
-        
-        return finishBuilding(new NumberDependency<>(this.gui));
     }
 }

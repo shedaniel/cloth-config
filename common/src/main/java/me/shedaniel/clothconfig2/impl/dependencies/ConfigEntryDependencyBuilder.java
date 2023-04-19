@@ -2,6 +2,7 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 
 import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.MatcherConditionBuilder;
@@ -17,15 +18,19 @@ import java.util.stream.Stream;
 
 /**
  * @param <T> the type the dependency deals with
- * @param <E> the {@link ConfigEntry} type depended-on
  * @param <SELF> the type to be returned by chainable methods
  */
-public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, SELF extends ConfigEntryDependencyBuilder<T, E, SELF>> extends AbstractDependencyBuilder<Condition<T>, SELF> {
+public abstract class ConfigEntryDependencyBuilder<T, SELF extends ConfigEntryDependencyBuilder<T, SELF>> extends AbstractDependencyBuilder<Condition<T>, SELF> {
     
-    protected final E gui;
+    protected final ConfigEntry<T> gui;
     
-    protected ConfigEntryDependencyBuilder(E gui) {
+    protected ConfigEntryDependencyBuilder(ConfigEntry<T> gui) {
         this.gui = gui;
+    }
+    
+    @Override
+    public Dependency build() {
+        return finishBuilding(new ConfigEntryDependency<>(this.gui));
     }
     
     /**

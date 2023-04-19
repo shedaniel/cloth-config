@@ -10,7 +10,7 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
-import me.shedaniel.clothconfig2.impl.dependencies.*;
+import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependencyBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -71,9 +71,9 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      * <br><br>
      * <p>Currently, supports depending on the following:
      * <ul>
-     *     <li>{@link BooleanDependency} from {@link BooleanListEntry} entries</li>
-     *     <li>{@link EnumDependency} from {@link EnumListEntry} entries</li>
-     *     <li>{@link NumberDependency} from entries implementing {@link NumberConfigEntry}</li>
+     *     <li>{@link BooleanListEntry} entries</li>
+     *     <li>{@link EnumListEntry} entries</li>
+     *     <li>Entries implementing {@link NumberConfigEntry}</li>
      * </ul>
      * <p>Unsupported types can be used, but conditions will be checked using {@link String#valueOf(Object)}.
      * No guarantees are made for how this will function in practice.
@@ -98,7 +98,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
     }
     
     /**
-     * Builds a {@link BooleanDependency} defined in this definition, depending on the given {@link BooleanListEntry}.
+     * Builds the {@link Dependency defined in this definition, depending on the given {@link BooleanListEntry}.
      *
      * @param manager a DependencyManager that has all config entries registered
      * @param gui     the {@link BooleanListEntry} to be depended on
@@ -125,7 +125,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
     }
     
     /**
-     * Builds a {@link EnumDependency} defined in this definition, depending on the given {@link EnumListEntry}.
+     * Builds the {@link Dependency} defined in this definition, depending on the given {@link EnumListEntry}.
      *
      * @param manager a DependencyManager that has all config entries registered
      * @param gui     the {@link EnumListEntry} to be depended on
@@ -145,7 +145,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
     }
     
     /**
-     * Builds a {@link NumberDependency} defined in this definition, depending on the given {@link NumberConfigEntry}.
+     * Builds the {@link Dependency} defined in this definition, depending on the given {@link NumberConfigEntry}.
      *
      * @param manager a DependencyManager that has all config entries registered
      * @param gui     the {@link NumberConfigEntry} to be depended on
@@ -165,7 +165,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
     }
     
     /**
-     * Builds a {@link GenericDependency} defined in this definition, depending on the given {@link ConfigEntry}.
+     * Builds the {@link Dependency} defined in this definition, depending on the given {@link ConfigEntry}.
      * <p>
      * If available, you should consider using a type-specific builder such as {@link #build(DependencyManager, BooleanListEntry)}.
      * Generic dependencies are inherently limited because static conditions can only be checked using {@link Object#equals(Object)}.

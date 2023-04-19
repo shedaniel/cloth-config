@@ -6,7 +6,7 @@ import me.shedaniel.clothconfig2.api.dependencies.requirements.ComparisonOperato
 import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
-import me.shedaniel.clothconfig2.impl.dependencies.*;
+import me.shedaniel.clothconfig2.impl.dependencies.InitialDependencyBuilder;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.StaticConditionBuilder;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link BooleanDependency} that checks if the {@code gui}'s value is {@code true}.
+     * Generates a {@link Dependency} that checks if the {@code gui}'s value is {@code true}.
      */
     static @NotNull Dependency isTrue(BooleanListEntry gui) {
         return builder()
@@ -39,7 +39,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link BooleanDependency} that checks if the {@code gui}'s value is {@code false}.
+     * Generates a {@link Dependency} that checks if the {@code gui}'s value is {@code false}.
      */
     static @NotNull Dependency isFalse(BooleanListEntry gui) {
         return builder()
@@ -49,7 +49,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link EnumDependency} that checks if the {@code gui}'s value is one of the values provided.
+     * Generates a {@link Dependency} that checks if the {@code gui}'s value is one of the values provided.
      */
     @SafeVarargs
     static <T extends Enum<?>> @NotNull Dependency isValue(EnumListEntry<T> gui, T firstValue, T... otherValues) {
@@ -63,7 +63,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link NumberDependency} that checks if the {@code gui}'s value is one of the values provided.
+     * Generates a {@link Dependency} that checks if the {@code gui}'s value is one of the values provided.
      */
     @SafeVarargs
     static <T extends Number & Comparable<T>> @NotNull Dependency isValue(NumberConfigEntry<T> gui, T firstValue, T... otherValues) {
@@ -77,7 +77,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link NumberDependency} that compares the {@code gui}'s value to the given {@code value}, using the
+     * Generates a {@link Dependency} that compares the {@code gui}'s value to the given {@code value}, using the
      * provided {@code operator}. For example, <em>{@code gui_value > value}</em>.
      */
     // FIXME isValue is a horrible name here... useOperatorToCompareGuiValueToValue is a bit verbose though...
@@ -89,7 +89,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link BooleanListEntry} that compares the {@code gui}'s value to the given {@code otherGui}'s value.
+     * Generates a {@link Dependency} that compares the {@code gui}'s value to the given {@code otherGui}'s value.
      */
     static @NotNull Dependency matches(BooleanListEntry gui, BooleanListEntry otherGui) {
         return builder()
@@ -99,7 +99,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates an {@link EnumDependency} that compares the {@code gui}'s value to the given {@code otherGui}'s value.
+     * Generates an {@link Dependency} that compares the {@code gui}'s value to the given {@code otherGui}'s value.
      */
     static <T extends Enum<?>> @NotNull Dependency matches(EnumListEntry<T> gui, EnumListEntry<T> otherGui) {
         return builder()
@@ -109,7 +109,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link NumberDependency} that compares the {@code gui}'s value to the given {@code otherGui}'s value.
+     * Generates a {@link Dependency} that compares the {@code gui}'s value to the given {@code otherGui}'s value.
      */
     static <T extends Number & Comparable<T>> @NotNull Dependency matches(NumberConfigEntry<T> gui, NumberConfigEntry<T> otherGui) {
         return builder()
@@ -119,7 +119,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link NumberDependency} that compares the {@code gui}'s value to the given {@code otherGui}'s value, using the
+     * Generates a {@link Dependency} that compares the {@code gui}'s value to the given {@code otherGui}'s value, using the
      * provided {@code operator}. For example, <em>{@code gui_value > other_gui_value}</em>.
      */
     static <T extends Number & Comparable<T>> @NotNull Dependency matches(NumberConfigEntry<T> gui, ComparisonOperator operator, NumberConfigEntry<T> otherGui) {
@@ -130,7 +130,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link GenericDependency} that compares the {@code gui}'s value to the given {@code otherGui}'s value.
+     * Generates a {@link Dependency} that compares the {@code gui}'s value to the given {@code otherGui}'s value.
      */
     static <T> @NotNull Dependency matches(ConfigEntry<T> gui, ConfigEntry<T> otherGui) {
         return builder()
@@ -140,7 +140,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link DependencyGroup} that depends on all of its dependencies being met.
+     * Generates a {@link Dependency} that depends on all of its dependencies being met.
      * <br>
      * 
      * @param dependencies the dependencies to be included in the group 
@@ -155,7 +155,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link DependencyGroup} that depends on none of its dependencies being met.
+     * Generates a {@link Dependency} that depends on none of its dependencies being met.
      * <br>
      * I.e. the group is unmet if any of its dependencies are met.
      *
@@ -171,7 +171,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link DependencyGroup} that depends on any of its dependencies being met.
+     * Generates a {@link Dependency} that depends on any of its dependencies being met.
      * <br>
      * I.e. the group is met if one or more of its dependencies are met. 
      *
@@ -187,7 +187,7 @@ public interface Dependency {
     }
     
     /**
-     * Generates a {@link DependencyGroup} that depends on exactly one of its dependencies being met.
+     * Generates a {@link Dependency} that depends on exactly one of its dependencies being met.
      * <br>
      * I.e. the group is met if precisely one dependency is met, however the group is unmet if more than one
      * (or less than one) are met.
@@ -211,7 +211,7 @@ public interface Dependency {
     boolean check();
     
     /**
-     * Get a short description of this dependency. For use by GUIs, e.g. {@link DependencyGroup} tooltips.
+     * Get a short description of this dependency. For use by GUIs, e.g. {@link Dependency} tooltips.
      *
      * @return a {@link Component} containing the description
      */

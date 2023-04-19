@@ -22,7 +22,6 @@ package me.shedaniel.autoconfig.annotation;
 import me.shedaniel.autoconfig.dependencies.ConditionFlag;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.ComparisonOperator;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
-import me.shedaniel.clothconfig2.impl.dependencies.BooleanDependency;
 
 import java.lang.annotation.*;
 
@@ -134,7 +133,7 @@ public class ConfigEntry {
              * <h2>Quantity
              * <ul>
              *     <li>
-             *         {@link BooleanDependency Boolean} dependencies require zero or one conditions.
+             *         Boolean dependencies require zero or one conditions.
              *         If no conditions are defined, <em>{@code "true"}</em> is assumed.
              *         If multiple conditions are defined, an {@link IllegalArgumentException} will be thrown.
              *     </li>

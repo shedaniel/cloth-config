@@ -7,11 +7,10 @@ import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
  * Represents a dependency on a {@link ConfigEntry}
  *
  * @param <T> the type this dependency deals with
- * @param <E> the {@link ConfigEntry} type
  */
-public abstract class ConfigEntryDependency<T, E extends ConfigEntry<T>> extends AbstractElementDependency<Condition<T>, E> {
+public class ConfigEntryDependency<T> extends AbstractElementDependency<Condition<T>, ConfigEntry<T>> {
     
-    protected ConfigEntryDependency(E entry) {
+    protected ConfigEntryDependency(ConfigEntry<T> entry) {
         super(entry);
     }
     
