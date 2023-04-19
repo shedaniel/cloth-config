@@ -72,6 +72,14 @@ public enum GroupRequirement implements Requirement<GroupRequirement> {
         };
     }
     
+    public Component getText() {
+        return Component.translatable(getI18n());
+    }
+    
+    public Component getJoiningText() {
+        return Component.translatable(getJoiningI18n());
+    }
+    
     public <T> boolean matches(Collection<T> collection, Predicate<? super T> predicate) {
         Stream<T> stream = collection.stream();
         return switch (this) {
@@ -81,6 +89,13 @@ public enum GroupRequirement implements Requirement<GroupRequirement> {
             case ANY -> stream.anyMatch(predicate);
             case ONE -> stream.filter(predicate).count() == 1;
             case NOT_ONE -> stream.filter(predicate).count() != 1;
+        };
+    }
+    
+    public boolean effectivelyInvertsSingleton() {
+        return switch (this) {
+            case ALL, ANY, ONE -> false;           // met if only child is true
+            case NONE, NOT_ALL, NOT_ONE -> true; // met if only child is false
         };
     }
     

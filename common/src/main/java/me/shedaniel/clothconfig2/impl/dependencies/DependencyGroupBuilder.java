@@ -46,10 +46,10 @@ public class DependencyGroupBuilder extends AbstractDependencyBuilder<Dependency
      */
     @Override
     protected Function<String, Component[]> generateTooltipProvider() {
-        // TODO
+        GroupRequirement requirement = this.requirement.inverted(inverted);
     
         // If only one child, return its tooltip
-        if (conditions.size() == 1 && !invertsOnlyChild()) {
+        if (conditions.size() == 1 && !requirement.effectivelyInvertsSingleton()) {
             Dependency child = conditions.iterator().next();
             return child::getTooltip;
         }
@@ -60,7 +60,7 @@ public class DependencyGroupBuilder extends AbstractDependencyBuilder<Dependency
         if (flattened.isEmpty())
             return null;
     
-        GroupRequirement.Simplified simple = this.requirement.inverted(inverted).simplified();
+        GroupRequirement.Simplified simple = requirement.simplified();
     
         return effectKey -> Streams.concat(
                 // First line - "[enabled] when [all] of the following are [true]:"
@@ -86,14 +86,6 @@ public class DependencyGroupBuilder extends AbstractDependencyBuilder<Dependency
     public DependencyGroupBuilder withChildren(Collection<Dependency> dependencies) {
         this.conditions.addAll(dependencies);
         return this;
-    }
-    
-    private boolean invertsOnlyChild() {
-        // Check if the condition is effectively inversion when dealing with only one child
-        return switch (requirement) {
-            case ALL, ANY, ONE -> inverted;           // met if only child is true
-            case NONE, NOT_ALL, NOT_ONE -> !inverted; // met if only child is false
-        };
     }
     
     private List<Dependency> flattenChildren() {

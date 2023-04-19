@@ -96,10 +96,11 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
                     .filter(Objects::nonNull)
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Expected exactly one condition")));
-            return Component.translatable("text.cloth-config.dependencies.short_description.single", this.gui.getFieldName(), conditionText);
+            return Component.translatable("text.cloth-config.dependencies.short_description.%s".formatted(this.requirement.effectivelyInvertsSingleton() ? "not_single" : "single"),
+                    this.gui.getFieldName(), conditionText);
         }
     
-        return Component.translatable("text.cloth-config.dependencies.short_description.many", this.gui.getFieldName(), conditions);
+        return Component.translatable("text.cloth-config.dependencies.short_description.many", this.gui.getFieldName(), this.requirement.getText(), String.valueOf(conditions));
     }
     
     /**
@@ -120,10 +121,10 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
         Component gui = MutableComponent.create(this.gui.getFieldName().getContents())
                 .withStyle(ChatFormatting.BOLD);
         Component condition = switch (conditionTexts.size()) {
-            // FIXME support condition GroupRequirement
-            case 1 -> Component.translatable("text.cloth-config.dependencies.one_condition", conditionTexts.get(0));
-            case 2 -> Component.translatable("text.cloth-config.dependencies.two_conditions", conditionTexts.get(0), conditionTexts.get(1));
-            default -> Component.translatable("text.cloth-config.dependencies.many_conditions");
+            case 1 -> describeCondition(requirement.effectivelyInvertsSingleton(), Component.translatable("text.cloth-config.dependencies.one_condition", conditionTexts.get(0)));
+            case 2 -> Component.translatable("text.cloth-config.dependencies.two_conditions",
+                    describeCondition(conditionTexts.get(0)), requirement.getJoiningText(), describeCondition(conditionTexts.get(1)));
+            default -> Component.translatable("text.cloth-config.dependencies.many_conditions", requirement.getText());
         };
     
         if (conditionTexts.size() > 2)
@@ -136,5 +137,14 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
         return effectKey -> 
                 Stream.of(Component.translatable("text.cloth-config.dependencies.tooltip", Component.translatable(effectKey), gui, condition))
                         .toArray(Component[]::new);
+    }
+    
+    // TODO move this to a shared util class?
+    private Component describeCondition(Component condition) {
+        return describeCondition(false, condition);
+    }
+    private Component describeCondition(boolean invert, Component condition) {
+        Component text = invert ? Component.translatable("text.cloth-config.dependencies.conditions.not", condition) : condition;
+        return Component.translatable("text.cloth-config.dependencies.is", text);
     }
 }
