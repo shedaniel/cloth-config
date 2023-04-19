@@ -37,6 +37,9 @@ public enum ComparisonOperator implements Requirement<ComparisonOperator> {
     
     @Override
     public ComparisonOperator inverted(boolean inverted) {
+        if (!inverted)
+            return this;
+        
         return switch (this) {
             case EQUAL -> NOT_EQUAL;
             case NOT_EQUAL -> EQUAL;

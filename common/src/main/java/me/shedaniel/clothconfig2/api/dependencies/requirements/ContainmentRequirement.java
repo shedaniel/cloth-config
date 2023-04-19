@@ -48,6 +48,9 @@ public enum ContainmentRequirement implements Requirement<ContainmentRequirement
     
     @Override
     public ContainmentRequirement inverted(boolean inverted) {
+        if (!inverted)
+            return this;
+        
         return switch (this) {
             case CONTAINS_ANY -> NOT_CONTAINS_ANY;
             case NOT_CONTAINS_ANY -> CONTAINS_ANY;
