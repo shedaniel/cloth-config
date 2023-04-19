@@ -5,7 +5,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.GenericMatcherCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.MatcherConditionBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -42,7 +42,7 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
     public abstract SELF matching(T value);
     
     /**
-     * Generates a simple {@link GenericMatcherCondition} that compares the given {@code gui}'s value against the depended-on
+     * Generates a simple {@link Condition matcher condition} that compares the given {@code gui}'s value against the depended-on
      * config entry's value.
      * <br><br>
      * The generated condition will be added to the dependency being built.
@@ -51,7 +51,7 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
      * @return this instance, for chaining
      */
     public SELF matching(ConfigEntry<T> gui) {
-        return matching(new GenericMatcherCondition<>(gui));
+        return matching(new MatcherConditionBuilder<>(gui).build());
     }
     
     public SELF matching(Condition<T> condition) {
@@ -92,7 +92,7 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
     
         if (conditions == 1) {
             Component conditionText = (this.conditions.stream()
-                    .map(condition -> condition.getText(inverted))
+                    .map(Condition::description)
                     .filter(Objects::nonNull)
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Expected exactly one condition")));
@@ -113,7 +113,7 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
         // Get the text for each condition, styled bold.
         List<Component> conditionTexts = conditions.stream()
                 .distinct()
-                .map(condition -> condition.getText(inverted))// TODO use NewCondition.getDescription()
+                .map(Condition::description)
                 .toList();
     
         // Build the main line of the tooltip

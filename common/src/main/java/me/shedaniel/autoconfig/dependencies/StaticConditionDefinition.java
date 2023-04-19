@@ -1,10 +1,11 @@
 package me.shedaniel.autoconfig.dependencies;
 
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Dependency.EnableIf;
-import me.shedaniel.clothconfig2.api.dependencies.conditions.ComparativeCondition;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.ComparisonOperator;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.*;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.PredicateConditionBuilder;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.StaticConditionBuilder;
+import net.minecraft.network.chat.Component;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -13,6 +14,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition) {
@@ -67,11 +69,23 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
             default ->
                     throw new IllegalStateException("Unexpected condition \"%s\" for Boolean dependency (expected \"true\" or \"false\").".formatted(string));
         };
-        return new BooleanStaticCondition(value, this.inverted());
+        return new StaticConditionBuilder<>(value)
+                // TODO set describeUsing(gui)
+                .setInverted(this.inverted())
+                .build();
     }
     
     Condition<String> toStringCondition() {
-        return new StringStaticCondition(this.condition(), this.ignoreCase(), this.inverted());
+        Predicate<String> basePredicate = this.ignoreCase() ? this.condition()::equalsIgnoreCase : this.condition()::equals;
+        Predicate<String> predicate = this.inverted() ? value -> !basePredicate.test(value) : basePredicate;
+    
+        Component description = Component.translatable("text.cloth-config.dependencies.matches", this.condition());
+        if (this.inverted())
+            description = Component.translatable("text.cloth-config.dependencies.conditions.not", description);
+        
+        return new PredicateConditionBuilder<>(predicate)
+                .setDescription(description)
+                .build();
     }
     
     <T extends Enum<?>> Condition<T> toEnumCondition(Class<T> type) {
@@ -85,8 +99,13 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
                 .filter(val -> valueString.equals(toString.apply(val)))
                 .findAny()
                 .orElseThrow(() -> new IllegalStateException("Invalid EnumCondition was defined: \"%s\"\nValid options: %s".formatted(this.condition(), Arrays.toString(possibleValues))));
-    
-        return new EnumStaticCondition<>(value, this.inverted());
+        
+        // TODO describeUsing(gui)
+        
+        return new StaticConditionBuilder<>(value)
+//                .describeUsing(gui)
+                .setDescription(Component.literal(value.toString()))
+                .build();
     }
     
     /**
@@ -128,17 +147,17 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
      * @throws IllegalArgumentException if the given {@code type} ({@code T}) is not supported
      * @see ComparisonOperator
      */
-    <T extends Number & Comparable<T>> ComparativeCondition<T> toNumberCondition(Class<T> type) {
+    <T extends Number & Comparable<T>> Condition<T> toNumberCondition(Class<T> type) {
         String stripped = WHITESPACE.matcher(this.condition()).replaceAll("");
         Optional<ComparisonOperator> optional = Optional.ofNullable(ComparisonOperator.startsWith(stripped));
     
         ComparisonOperator operator;
         String numberPart;
         if (optional.isPresent()) {
-            operator = optional.get();
+            operator = optional.get().inverted(this.inverted());
             numberPart = stripped.substring(operator.toString().length());
         } else {
-            operator = ComparisonOperator.EQUAL;
+            operator = ComparisonOperator.EQUAL.inverted(this.inverted());
             numberPart = stripped;
         }
     
@@ -155,13 +174,20 @@ record StaticConditionDefinition(EnumSet<ConditionFlag> flags, String condition)
             number = type.cast(Float.parseFloat(numberPart));
         else
             throw new IllegalArgumentException("Unsupported Number type \"%s\"".formatted(type.getSimpleName()));
-    
-        return new ComparativeStaticCondition<>(operator, number, this.inverted());
+        
+        Predicate<T> predicate = value -> operator.compare(value, number);
+        
+        return new PredicateConditionBuilder<>(predicate)
+                .setDescription(operator.description(number))
+                .build();
     }
     
     public <T> Condition<T> toGenericCondition(Class<T> type) {
         // May throw NoStringParserAvailableException if a supported string parsing method isn't found on `type`
-        return new GenericStaticCondition<>(getStringParser(type).apply(this.condition()), this.inverted());
+        T condition = getStringParser(type).apply(this.condition());
+        return new StaticConditionBuilder<>(condition)
+                .setInverted(this.inverted())
+                .build();
     }
     
     private static <T> Function<String, T> getStringParser(Class<T> type) throws NoStringParserAvailableException {

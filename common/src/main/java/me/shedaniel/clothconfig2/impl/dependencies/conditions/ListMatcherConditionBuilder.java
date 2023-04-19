@@ -4,6 +4,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.ContainmentRequirement;
 import net.minecraft.network.chat.Component;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -19,8 +20,8 @@ public class ListMatcherConditionBuilder<T> extends ListConditionBuilder<T> {
     }
     
     @Override
-    protected Predicate<List<T>> buildPredicate() {
-        return list -> this.requirement.check(list, this.otherGui.getValue());
+    protected Predicate<Collection<T>> buildPredicate() {
+        return collection -> this.requirement.check(collection, this.otherGui.getValue());
     }
     
     @Override

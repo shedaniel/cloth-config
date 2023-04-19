@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 public interface ConditionBuilder<T, SELF> {
     
-    NewCondition<T> build();
+    Condition<T> build();
     
     SELF setInverted();
     

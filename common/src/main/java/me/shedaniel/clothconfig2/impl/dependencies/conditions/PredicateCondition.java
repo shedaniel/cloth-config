@@ -1,13 +1,13 @@
 package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
-import me.shedaniel.clothconfig2.api.dependencies.conditions.NewCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class PredicateCondition<T> implements NewCondition<T> {
+public class PredicateCondition<T> implements Condition<T> {
     
     private final Predicate<T> predicate;
     private final Component description;

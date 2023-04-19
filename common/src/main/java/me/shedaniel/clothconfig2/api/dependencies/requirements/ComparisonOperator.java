@@ -1,5 +1,7 @@
 package me.shedaniel.clothconfig2.api.dependencies.requirements;
 
+import me.shedaniel.clothconfig2.api.ConfigEntry;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -56,5 +58,17 @@ public enum ComparisonOperator implements Requirement<ComparisonOperator> {
     @Override
     public String toString() {
         return this.symbol;
+    }
+    
+    public <T extends Comparable<T>> Component description(T value) {
+        return description(Component.literal(String.valueOf(value)));
+    }
+    
+    public <T extends Comparable<T>> Component description(ConfigEntry<T> gui) {
+        return description(gui.getFieldName());
+    }
+    
+    public Component description(Component text) {
+        return Component.translatable("text.cloth-config.dependencies.conditions.%s".formatted(this.name().toLowerCase()), text);
     }
 }

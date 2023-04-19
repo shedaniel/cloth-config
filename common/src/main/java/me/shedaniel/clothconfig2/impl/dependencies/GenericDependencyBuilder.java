@@ -1,7 +1,7 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
 import me.shedaniel.clothconfig2.api.ConfigEntry;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.GenericStaticCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.StaticConditionBuilder;
 
 public class GenericDependencyBuilder<T> extends ConfigEntryDependencyBuilder<T, ConfigEntry<T>, GenericDependency<T>, GenericDependencyBuilder<T>> {
     
@@ -16,6 +16,6 @@ public class GenericDependencyBuilder<T> extends ConfigEntryDependencyBuilder<T,
     
     @Override
     public GenericDependencyBuilder<T> matching(T value) {
-        return matching(new GenericStaticCondition<>(value));
+        return matching(new StaticConditionBuilder<>(value).build());
     }
 }

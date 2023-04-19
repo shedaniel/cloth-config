@@ -7,8 +7,7 @@ import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.EnumListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.*;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.ComparativeStaticCondition;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.EnumStaticCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.StaticConditionBuilder;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +57,7 @@ public interface Dependency {
                 .dependingOn(gui)
                 .matching(firstValue)
                 .matching(Arrays.stream(otherValues)
-                        .map(EnumStaticCondition::new)
+                        .map(value -> new StaticConditionBuilder<>(value).describeUsing(gui).build())
                         .toList())
                 .build();
     }
@@ -72,7 +71,7 @@ public interface Dependency {
                 .dependingOn(gui)
                 .matching(firstValue)
                 .matching(Arrays.stream(otherValues)
-                        .map(ComparativeStaticCondition::new)
+                        .map(value -> new StaticConditionBuilder<>(value).build())
                         .toList())
                 .build();
     }

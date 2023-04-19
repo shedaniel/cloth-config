@@ -28,7 +28,7 @@ import me.shedaniel.clothconfig2.api.dependencies.requirements.ComparisonOperato
 import me.shedaniel.clothconfig2.gui.entries.*;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
-import me.shedaniel.clothconfig2.impl.dependencies.conditions.GenericMatcherCondition;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.MatcherConditionBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
@@ -173,7 +173,9 @@ public class ClothConfigDemo {
         depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool matches one of these toggles ^^"), true)
                         .setEnabledIf(Dependency.builder()
                                 .dependingOn(toggles.removeFirst())
-                                .matching(toggles.stream().map(GenericMatcherCondition::new).toList())
+                                .matching(toggles.stream()
+                                        .map(gui -> new MatcherConditionBuilder<>(gui).build())
+                                        .toList())
                                 .build())
                 .build());
         SubCategoryBuilder dependantSub = entryBuilder.startSubCategory(Component.literal("How do deps work with sub-categories?"))

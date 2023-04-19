@@ -1,6 +1,6 @@
 package me.shedaniel.clothconfig2.impl.dependencies.conditions;
 
-import me.shedaniel.clothconfig2.api.dependencies.conditions.NewCondition;
+import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 
 import java.util.function.Predicate;
 
@@ -13,7 +13,7 @@ public class PredicateConditionBuilder<T> extends AbstractConditionBuilder<T, Pr
     }
     
     @Override
-    public NewCondition<T> build() {
+    public Condition<T> build() {
         if (this.describer == null && this.description == null)
             throw new IllegalArgumentException("Either a description or a describer function must be defined");
         
