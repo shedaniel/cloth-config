@@ -92,11 +92,11 @@ public abstract class ConfigEntryDependencyBuilder<T, E extends ConfigEntry<T>, 
     
         if (conditions == 1) {
             Component conditionText = (this.conditions.stream()
-                    .map(Condition::description)
+                    .map(condition -> condition.fullDescription(this.requirement.effectivelyInvertsSingleton()))
                     .filter(Objects::nonNull)
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Expected exactly one condition")));
-            return Component.translatable("text.cloth-config.dependencies.short_description.%s".formatted(this.requirement.effectivelyInvertsSingleton() ? "not_single" : "single"),
+            return Component.translatable("text.cloth-config.dependencies.short_description.single",
                     this.gui.getFieldName(), conditionText);
         }
     

@@ -4,6 +4,7 @@ import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -32,10 +33,10 @@ public class DependencyGroupBuilder extends AbstractDependencyBuilder<Dependency
         List<Dependency> dependencies = conditions.stream()
                 .filter(Dependency::hasTooltip)
                 .toList();
-        int amount = dependencies.size();
+        String amount = String.valueOf(dependencies.size());
+        Component requirementText = requirement.inverted(inverted).getText();
     
-        return Component.translatable("text.cloth-config.dependency_groups.short_description.many",
-                Component.translatable(requirement.inverted(inverted).getI18n()), amount);
+        return Component.translatable("text.cloth-config.dependency_groups.short_description", requirementText, amount);
     }
     
     /**
@@ -60,16 +61,18 @@ public class DependencyGroupBuilder extends AbstractDependencyBuilder<Dependency
         if (flattened.isEmpty())
             return null;
     
-        GroupRequirement.Simplified simple = requirement.simplified();
+        List<MutableComponent> childLines = flattened.stream()
+                .map(Dependency::getShortDescription)
+                .map(description -> Component.translatable("text.cloth-config.dependencies.list_entry", description))
+                .toList();
     
-        return effectKey -> Streams.concat(
-                // First line - "[enabled] when [all] of the following are [true]:"
-                Stream.of(simple.describe(effectKey)),
-                // Additional lines
-                flattened.stream()
-                        .map(Dependency::getShortDescription)
-                        .map(description -> Component.translatable("text.cloth-config.dependencies.list_entry", description))
-        ).toArray(Component[]::new);
+        GroupRequirement.Simplified simplified = requirement.simplified();
+    
+        return effectKey -> {
+            // First line - "[enabled] when [all] of the following are [true]:"
+            Component firstLine = simplified.describe(effectKey);
+            return Streams.concat(Stream.of(firstLine), childLines.stream()).toArray(Component[]::new);
+        };
     }
     
     @Override
