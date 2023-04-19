@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
-public abstract class AbstractDependencyBuilder<C, D extends AbstractDependency<? super C>, SELF extends AbstractDependencyBuilder<C, D, SELF>> implements FinishDependencyBuilder<D, SELF> {
+public abstract class AbstractDependencyBuilder<C, SELF extends AbstractDependencyBuilder<C, SELF>> implements FinishDependencyBuilder<SELF> {
     protected static final int minConditions = 1;
     protected final Set<C> conditions = new HashSet<>();
     protected GroupRequirement requirement = GroupRequirement.ANY;
@@ -34,7 +34,7 @@ public abstract class AbstractDependencyBuilder<C, D extends AbstractDependency<
      * @param dependency the dependency to finish building
      * @return the built dependency
      */
-    protected D finishBuilding(D dependency) {
+    protected AbstractDependency<? super C> finishBuilding(AbstractDependency<? super C> dependency) {
         if (conditions.size() < minConditions)
             throw new IllegalArgumentException("%s requires at least %d condition%s.".formatted(dependency.getClass().getSimpleName(), minConditions, minConditions == 1 ? "" : "s"));
         

@@ -104,7 +104,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      * @param gui     the {@link BooleanListEntry} to be depended on
      * @return the generated dependency
      */
-    public BooleanDependency build(DependencyManager manager, BooleanListEntry gui) {
+    public Dependency build(DependencyManager manager, BooleanListEntry gui) {
         Set<Condition<Boolean>> conditions = this.buildConditions(StaticConditionDefinition::toBooleanCondition);
         Set<Condition<Boolean>> matchers = this.buildMatchers(Boolean.class, manager);
         
@@ -131,7 +131,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      * @param gui     the {@link EnumListEntry} to be depended on
      * @return the generated dependency
      */
-    public <T extends Enum<?>> EnumDependency<T> build(DependencyManager manager, EnumListEntry<T> gui) {
+    public <T extends Enum<?>> Dependency build(DependencyManager manager, EnumListEntry<T> gui) {
         Class<T> type = gui.getType();
         Set<Condition<T>> conditions = this.buildConditions(condition -> condition.toEnumCondition(type));
         Set<Condition<T>> matchers = this.buildMatchers(type, manager);
@@ -151,7 +151,7 @@ record DependencyDefinition(String i18n, boolean tooltip, boolean allowGeneric, 
      * @param gui     the {@link NumberConfigEntry} to be depended on
      * @return the generated dependency
      */
-    public <T extends Number & Comparable<T>> NumberDependency<T> build(DependencyManager manager, NumberConfigEntry<T> gui) {
+    public <T extends Number & Comparable<T>> Dependency build(DependencyManager manager, NumberConfigEntry<T> gui) {
         Class<T> type = gui.getType();
         Set<Condition<T>> conditions = this.buildConditions(condition -> condition.toNumberCondition(type));
         Set<Condition<T>> matchers = this.buildComparativeMatchers(type, manager);

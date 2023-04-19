@@ -3,12 +3,13 @@ package me.shedaniel.clothconfig2.impl.dependencies;
 import com.google.common.base.Predicate;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.NumberConfigEntry;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.ComparisonOperator;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.PredicateConditionBuilder;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.StaticConditionBuilder;
 
-public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends ConfigEntryDependencyBuilder<T, NumberConfigEntry<T>, NumberDependency<T>, NumberDependencyBuilder<T>> {
+public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends ConfigEntryDependencyBuilder<T, NumberConfigEntry<T>, NumberDependencyBuilder<T>> {
     
     public NumberDependencyBuilder(NumberConfigEntry<T> gui) {
         super(gui);
@@ -59,7 +60,7 @@ public class NumberDependencyBuilder<T extends Number & Comparable<T>> extends C
     }
     
     @Override
-    public NumberDependency<T> build() {
+    public Dependency build() {
         
         // TODO set each condition's formatPrecision to something sensible for the gui's range
         

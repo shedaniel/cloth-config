@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
 import com.google.common.collect.Streams;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.ContainmentRequirement;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
@@ -16,7 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ListEntryDependencyBuilder<T> extends AbstractDependencyBuilder<Condition<Collection<T>>, ListEntryDependency<T>, ListEntryDependencyBuilder<T>> {
+public class ListEntryDependencyBuilder<T> extends AbstractDependencyBuilder<Condition<Collection<T>>, ListEntryDependencyBuilder<T>> {
     
     private final BaseListEntry<T, ?, ?> gui;
     private final Set<Condition<Collection<T>>> conditions = new HashSet<>();
@@ -51,7 +52,7 @@ public class ListEntryDependencyBuilder<T> extends AbstractDependencyBuilder<Con
     }
     
     @Override
-    public ListEntryDependency<T> build() {
+    public Dependency build() {
         if (conditions.isEmpty())
             throw new IllegalArgumentException();
         ListEntryDependency<T> dependency = new ListEntryDependency<>(gui);

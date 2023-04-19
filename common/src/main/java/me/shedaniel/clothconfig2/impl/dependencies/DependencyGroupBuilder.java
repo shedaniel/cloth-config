@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class DependencyGroupBuilder extends AbstractDependencyBuilder<Dependency, DependencyGroup, DependencyGroupBuilder> {
+public class DependencyGroupBuilder extends AbstractDependencyBuilder<Dependency, DependencyGroupBuilder> {
     
     public DependencyGroupBuilder() {}
     
     @Override
-    public DependencyGroup build() {
+    public Dependency build() {
         return finishBuilding(new DependencyGroup());
     }
     

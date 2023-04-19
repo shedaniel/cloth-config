@@ -1,9 +1,10 @@
 package me.shedaniel.clothconfig2.impl.dependencies;
 
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.StaticConditionBuilder;
 
-public class BooleanDependencyBuilder extends ConfigEntryDependencyBuilder<Boolean, BooleanListEntry, BooleanDependency, BooleanDependencyBuilder> {
+public class BooleanDependencyBuilder extends ConfigEntryDependencyBuilder<Boolean, BooleanListEntry, BooleanDependencyBuilder> {
     
     private boolean useActualText = false;
     
@@ -25,7 +26,7 @@ public class BooleanDependencyBuilder extends ConfigEntryDependencyBuilder<Boole
     }
     
     @Override
-    public BooleanDependency build() {
+    public Dependency build() {
         // Default condition is "true"
         if (conditions.isEmpty())
             this.matching(true);
