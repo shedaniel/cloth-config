@@ -1,6 +1,7 @@
 package me.shedaniel.clothconfig2.api.dependencies.requirements;
 
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
+import net.minecraft.network.chat.Component;
 
 import java.util.Collection;
 
@@ -37,6 +38,9 @@ public enum ContainmentRequirement implements Requirement<ContainmentRequirement
         };
     }
     
+    /**
+     * Checks whether {@code collection} meets this requirement when tested using {@code condition}
+     */
     public <T> boolean check(Collection<T> collection, Condition<T> condition) {
         return switch (this) {
             case CONTAINS_ANY -> collection.stream().anyMatch(condition::check);
@@ -59,5 +63,32 @@ public enum ContainmentRequirement implements Requirement<ContainmentRequirement
             case MATCHES -> NOT_MATCHES;
             case NOT_MATCHES -> MATCHES;
         };
+    }
+    
+    public Simplified simplified() {
+        return switch (this) {
+            case CONTAINS_ANY -> new Simplified(CONTAINS_ANY, true);
+            case NOT_CONTAINS_ANY -> new Simplified(CONTAINS_ANY, false);
+            case CONTAINS_ALL -> new Simplified(CONTAINS_ALL, true);
+            case NOT_CONTAINS_ALL -> new Simplified(CONTAINS_ALL, false);
+            case MATCHES -> new Simplified(MATCHES, true);
+            case NOT_MATCHES -> new Simplified(MATCHES, false);
+        };
+    }
+    
+    public Component getText() {
+        return Component.translatable("text.cloth-config.containment_requirement.%s".formatted(this.name().toLowerCase()));
+    }
+    
+    public record Simplified(ContainmentRequirement requirement, boolean condition) {
+        
+        // TODO move to static/matcher builder
+        public Component describe() {
+            // [has|doesn't have] [any|all|exactly] of the following: __
+            Component adjective = Component.translatable("text.cloth-config.containment_requirement.%s".formatted(this.condition() ? "has" : "not_has"));
+            Component quantity = this.requirement().getText();
+            
+            return Component.translatable("text.cloth-config.containment_requirement.description", adjective, quantity);
+        }
     }
 }

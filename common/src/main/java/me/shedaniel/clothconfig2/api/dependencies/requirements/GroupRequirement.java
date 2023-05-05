@@ -127,6 +127,7 @@ public enum GroupRequirement implements Requirement<GroupRequirement> {
     
     public record Simplified(GroupRequirement requirement, boolean condition) {
         
+        // FIXME move to DependencyGroup
         public Component describe(String prefixKey) {
             Component prefix = Component.translatable(prefixKey);
             Component conditionText = Component.translatable(requirement().getI18n())

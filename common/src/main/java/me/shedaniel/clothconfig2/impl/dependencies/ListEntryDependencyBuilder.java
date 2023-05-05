@@ -4,14 +4,12 @@ import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
 import me.shedaniel.clothconfig2.api.dependencies.requirements.ContainmentRequirement;
-import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.gui.entries.BaseListEntry;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.ListStaticConditionBuilder;
 import net.minecraft.network.chat.Component;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,10 +18,6 @@ import java.util.stream.Stream;
 public class ListEntryDependencyBuilder<T> extends AbstractDependencyBuilder<Condition<Collection<T>>, ListEntryDependencyBuilder<T>> {
     
     private final BaseListEntry<T, ?, ?> gui;
-    private final Set<Condition<Collection<T>>> conditions = new HashSet<>();
-    
-    private boolean tooltip = true;
-    private GroupRequirement requirement = GroupRequirement.ANY;
     
     public ListEntryDependencyBuilder(BaseListEntry<T, ?, ?> gui) {
         this.gui = gui;
@@ -53,25 +47,7 @@ public class ListEntryDependencyBuilder<T> extends AbstractDependencyBuilder<Con
     
     @Override
     public Dependency build() {
-        if (conditions.isEmpty())
-            throw new IllegalArgumentException();
-        ListEntryDependency<T> dependency = new ListEntryDependency<>(gui);
-        dependency.setRequirement(requirement);
-        dependency.displayTooltips(tooltip);
-        dependency.addConditions(conditions);
-        return dependency;
-    }
-    
-    @Override
-    public ListEntryDependencyBuilder<T> withRequirement(GroupRequirement requirement) {
-        this.requirement = requirement;
-        return this;
-    }
-    
-    @Override
-    public ListEntryDependencyBuilder<T> displayTooltips(boolean showTooltips) {
-        this.tooltip = showTooltips;
-        return this;
+        return finishBuilding(new ListEntryDependency<>(gui));
     }
     
     @Override
@@ -82,6 +58,9 @@ public class ListEntryDependencyBuilder<T> extends AbstractDependencyBuilder<Con
     
     @Override
     protected Function<String, Component[]> generateTooltipProvider() {
+        // TODO
+        // [has] [any] of the following:
+        // [matches] [all] of the following:
         return null;
     }
 }

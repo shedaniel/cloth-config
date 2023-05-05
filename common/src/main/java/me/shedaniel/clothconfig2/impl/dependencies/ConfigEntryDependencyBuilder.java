@@ -4,7 +4,6 @@ import com.google.common.collect.Streams;
 import me.shedaniel.clothconfig2.api.ConfigEntry;
 import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.api.dependencies.conditions.Condition;
-import me.shedaniel.clothconfig2.api.dependencies.requirements.GroupRequirement;
 import me.shedaniel.clothconfig2.impl.dependencies.conditions.MatcherConditionBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -76,13 +75,6 @@ public abstract class ConfigEntryDependencyBuilder<T, SELF extends ConfigEntryDe
         
         this.conditions.addAll(conditions);
         
-        return self;
-    }
-    
-    @Override
-    public SELF withRequirement(GroupRequirement requirement) {
-        @SuppressWarnings("unchecked") SELF self = (SELF) this;
-        this.requirement = requirement;
         return self;
     }
     

@@ -28,6 +28,11 @@ public class ListStaticConditionBuilder<T> extends ListConditionBuilder<T> {
     @Override
     protected Component buildDescription() {
         // TODO "Contains [any] of the following: [values]
+        // [has] [any] of the following:
+        // [matches] [all] of the following:
+        ContainmentRequirement.Simplified simpleRequirement = this.requirement.simplified();
+        Component adjective = Component.translatable("text.cloth-config.dependencies.list_req." + (simpleRequirement.condition() ? "has" : "not_has"));
+        Component quantity = simpleRequirement.requirement().getText();
         return null;
     }
 }

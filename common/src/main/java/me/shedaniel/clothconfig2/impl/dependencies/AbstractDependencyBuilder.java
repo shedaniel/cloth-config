@@ -59,6 +59,13 @@ public abstract class AbstractDependencyBuilder<C, SELF extends AbstractDependen
     }
     
     @Override
+    public SELF withRequirement(GroupRequirement requirement) {
+        @SuppressWarnings("unchecked") SELF self = (SELF) this;
+        this.requirement = requirement;
+        return self;
+    }
+    
+    @Override
     public SELF setTooltipProvider(Function<String, Component[]> tooltipProvider) {
         @SuppressWarnings("unchecked") SELF self = (SELF) this;
         this.tooltipProvider = tooltipProvider;
