@@ -93,7 +93,7 @@ public class IntListBuilder extends AbstractRangeListBuilder<Integer, IntegerLis
     
     @Override
     public IntListBuilder setSaveConsumer(Consumer<List<Integer>> saveConsumer) {
-        return (IntListBuilder) super.setSaveConsumer(saveConsumer);
+        return super.setSaveConsumer(saveConsumer);
     }
     
     @Override
@@ -163,7 +163,7 @@ public class IntListBuilder extends AbstractRangeListBuilder<Integer, IntegerLis
         entry.setRemoveTooltip(getRemoveTooltip());
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
-        return entry;
+        return finishBuilding(entry);
     }
     
 }

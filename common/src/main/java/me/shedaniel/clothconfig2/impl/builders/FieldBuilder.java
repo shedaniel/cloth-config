@@ -20,9 +20,11 @@
 package me.shedaniel.clothconfig2.impl.builders;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,6 +40,8 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
     protected boolean requireRestart = false;
     @Nullable protected Supplier<T> defaultValue = null;
     @Nullable protected Function<T, Optional<Component>> errorSupplier;
+    @Nullable protected Dependency enableIfDependency = null;
+    @Nullable protected Dependency showIfDependency = null;
     
     protected FieldBuilder(Component resetButtonKey, Component fieldNameKey) {
         this.resetButtonKey = Objects.requireNonNull(resetButtonKey);
@@ -58,6 +62,25 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
     @NotNull
     public abstract A build();
     
+    /**
+     * Finishes building the given {@link AbstractConfigListEntry config entry} by applying anything defined in this abstract class.
+     * <br><br>
+     * Should be used by implementations of {@link #build()}.
+     *
+     * @param field the config entry to finish building
+     * @return the finished config entry
+     */
+    @Contract(value = "_ -> param1", mutates = "param1")
+    protected A finishBuilding(A field) {
+        if (field == null)
+            return null;
+        if (enableIfDependency != null)
+            field.setEnableIfDependency(enableIfDependency);
+        if (showIfDependency != null)
+            field.setShowIfDependency(showIfDependency);
+        return field;
+    }
+    
     @NotNull
     public final Component getFieldNameKey() {
         return fieldNameKey;
@@ -74,5 +97,39 @@ public abstract class FieldBuilder<T, A extends AbstractConfigListEntry, SELF ex
     
     public void requireRestart(boolean requireRestart) {
         this.requireRestart = requireRestart;
+    }
+    
+    /**
+     * Sets a dependency that when unmet will disable the built config entry.
+     * <br><br>
+     * If an "enable if" dependency is already set, it will be overwritten. If you wish for the config entry to have multiple
+     * dependencies, you can pass this method a {@link me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup DependencyGroup}.
+     *
+     * @param dependency the {@link Dependency dependency} required to enable the config entry
+     * @return this instance, for chaining
+     * @see Dependency 
+     */
+    @Contract(mutates = "this")
+    @SuppressWarnings("unchecked")
+    public final SELF setEnabledIf(Dependency dependency) {
+        this.enableIfDependency = dependency;
+        return (SELF) this;
+    }
+    
+    /**
+     * Sets a dependency that when unmet will cause the built config entry to be hidden from menus.
+     * <br><br>
+     * If a "show if" dependency is already set, it will be overwritten. If you wish for the config entry to have multiple
+     * dependencies, you can pass this method a {@link me.shedaniel.clothconfig2.impl.dependencies.DependencyGroup DependencyGroup}.
+     * 
+     * @param dependency the {@link Dependency dependency} required to show the config entry in menus
+     * @return this instance, for chaining
+      @see Dependency 
+     */
+    @Contract(mutates = "this")
+    @SuppressWarnings("unchecked")
+    public final SELF setShownIf(Dependency dependency) {
+        this.showIfDependency = dependency;
+        return (SELF) this;
     }
 }

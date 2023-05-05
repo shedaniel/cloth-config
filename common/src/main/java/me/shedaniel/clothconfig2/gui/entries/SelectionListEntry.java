@@ -106,6 +106,10 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
         return this.values.get(this.index.get());
     }
     
+    public @NotNull List<T> getValues() {
+        return this.values;
+    }
+    
     @Override
     public Optional<T> getDefaultValue() {
         return defaultValue == null ? Optional.empty() : Optional.ofNullable(defaultValue.get());
@@ -147,6 +151,16 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     @Override
     public List<? extends NarratableEntry> narratables() {
         return widgets;
+    }
+    
+    /**
+     * Gets the text used to represent the given {@code value}.
+     * 
+     * @param value the value to get the text for.
+     * @return the text representing the {@code value}.
+     */
+    public Component getTextFor(T value) {
+        return nameProvider.apply(value);
     }
     
     public interface Translatable {

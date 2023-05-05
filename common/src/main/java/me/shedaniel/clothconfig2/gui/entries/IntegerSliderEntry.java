@@ -22,6 +22,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -42,7 +43,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class IntegerSliderEntry extends TooltipListEntry<Integer> {
+public class IntegerSliderEntry extends TooltipListEntry<Integer> implements NumberConfigEntry<Integer> {
     
     protected Slider sliderWidget;
     protected Button resetButton;

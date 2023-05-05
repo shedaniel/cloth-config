@@ -27,7 +27,8 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 
-public class DefaultGuiRegistryAccess implements GuiRegistryAccess {
+public class DefaultGuiRegistryAccess extends AbstractGuiRegistry {
+    
     @Override
     public List<AbstractConfigListEntry> get(
             String i18n,

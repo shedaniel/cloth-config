@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
 public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
@@ -63,14 +64,35 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     }
     
     private FormattedCharSequence[] postProcessTooltip(Component[] tooltip) {
-        return Arrays.stream(tooltip).flatMap(component -> Minecraft.getInstance().font.split(component, getConfigScreen().width).stream())
+        return Arrays.stream(tooltip)
+                .flatMap(component -> Minecraft.getInstance().font.split(component, getConfigScreen().width).stream())
                 .toArray(FormattedCharSequence[]::new);
     }
     
+    private Optional<Component[]> getDependencyTooltip() {
+        final String enable = "text.cloth-config.dependencies.enabled";
+        final String show = "text.cloth-config.dependencies.shown";
+        Component[] tooltip = Stream.concat(
+                        Stream.ofNullable(getEnableIfDependency())
+                                .map(dependency -> dependency.getTooltip(enable)),
+                        Stream.ofNullable(getShowIfDependency())
+                                .map(dependency -> dependency.getTooltip(show)))
+                .flatMap(Arrays::stream)
+                .toArray(Component[]::new);
+        
+        return tooltip.length > 0 ? Optional.of(tooltip) : Optional.empty();
+    }
+    
     public Optional<Component[]> getTooltip() {
-        if (tooltipSupplier != null)
-            return tooltipSupplier.get();
-        return Optional.empty();
+        Optional<Component[]> tooltip = tooltipSupplier == null ? Optional.empty() : tooltipSupplier.get();
+        Optional<Component[]> dependencyTooltip = getDependencyTooltip();
+    
+        // Concatenate the two optional tooltips
+        Component[] lines = Stream.concat(tooltip.stream(), dependencyTooltip.stream())
+                .flatMap(Arrays::stream)
+                .toArray(Component[]::new);
+        
+        return lines.length > 0 ? Optional.of(lines) : Optional.empty();
     }
     
     public Optional<Component[]> getTooltip(int mouseX, int mouseY) {
@@ -85,5 +107,4 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     public void setTooltipSupplier(@Nullable Supplier<Optional<Component[]>> tooltipSupplier) {
         this.tooltipSupplier = tooltipSupplier;
     }
-    
 }

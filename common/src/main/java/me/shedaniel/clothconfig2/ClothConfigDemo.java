@@ -23,10 +23,12 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.autoconfig.util.Utils;
 import me.shedaniel.clothconfig2.api.*;
-import me.shedaniel.clothconfig2.gui.entries.MultiElementListEntry;
-import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
+import me.shedaniel.clothconfig2.api.dependencies.requirements.ComparisonOperator;
+import me.shedaniel.clothconfig2.gui.entries.*;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
+import me.shedaniel.clothconfig2.impl.dependencies.conditions.MatcherConditionBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
@@ -78,6 +80,10 @@ public class ClothConfigDemo {
                 result = 31 * result + (r != null ? r.hashCode() : 0);
                 return result;
             }
+        }
+    
+        enum DependencyDemoEnum {
+            EXCELLENT, GOOD, OKAY, BAD, HORRIBLE
         }
         
         ConfigBuilder builder = ConfigBuilder.create().setTitle(Component.translatable("title.cloth-config.config"));
@@ -154,6 +160,63 @@ public class ClothConfigDemo {
                     }
                 }
         ));
+        
+        SubCategoryBuilder depends = entryBuilder.startSubCategory(Component.literal("Dependencies")).setExpanded(true);
+        LinkedList<BooleanListEntry> toggles = new LinkedList<>();
+        BooleanListEntry dependency = entryBuilder.startBooleanToggle(Component.literal("A cool toggle"), false).setTooltip(Component.literal("Toggle me...")).build();
+        toggles.add(dependency);
+        toggles.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool is toggled..."), true)
+                .setEnabledIf(Dependency.isTrue(dependency)).build());
+        toggles.add(entryBuilder.startBooleanToggle(Component.literal("I only appear when cool is toggled..."), true)
+                .setShownIf(Dependency.isTrue(dependency)).build());
+        depends.addAll(toggles);
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when cool matches one of these toggles ^^"), true)
+                        .setEnabledIf(Dependency.builder()
+                                .dependingOn(toggles.removeFirst())
+                                .matching(toggles.stream()
+                                        .map(gui -> new MatcherConditionBuilder<>(gui).build())
+                                        .toList())
+                                .build())
+                .build());
+        SubCategoryBuilder dependantSub = entryBuilder.startSubCategory(Component.literal("How do deps work with sub-categories?"))
+                .setEnabledIf(Dependency.isTrue(dependency));
+        dependantSub.add(entryBuilder.startTextDescription(Component.literal("This sub category depends on Cool being toggled")).build());
+        dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Example entry"), true).build());
+        dependantSub.add(entryBuilder.startBooleanToggle(Component.literal("Another example..."), true).build());
+        depends.add(dependantSub.build());
+        depends.add(entryBuilder.startLongList(Component.literal("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L))
+                .setEnabledIf(Dependency.isTrue(dependency)).build());
+        EnumListEntry<DependencyDemoEnum> enumDependency = entryBuilder.startEnumSelector(Component.literal("Select a good or bad option"), DependencyDemoEnum.class, DependencyDemoEnum.OKAY).build();
+        depends.add(enumDependency);
+        IntegerSliderEntry intDependency = entryBuilder.startIntSlider(Component.literal("Select something big or small"), 50, -100, 100).build();
+        depends.add(intDependency);
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when a good option is chosen..."), true).setTooltip(Component.literal("Select good or better above"))
+                .setEnabledIf(Dependency.isValue(enumDependency, DependencyDemoEnum.EXCELLENT, DependencyDemoEnum.GOOD))
+                .build());
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I need a good option AND a cool toggle!"), true).setTooltip(Component.literal("Select good or better and also toggle cool"))
+                .setEnabledIf(Dependency.all(
+                        Dependency.isTrue(dependency),
+                        Dependency.isValue(enumDependency, DependencyDemoEnum.EXCELLENT, DependencyDemoEnum.GOOD)))
+                .build());
+        depends.add(entryBuilder.startBooleanToggle(Component.literal("I only work when numbers are awesome!"), true)
+                .setTooltip(Component.literal("Move the slider above..."))
+                .setEnabledIf(Dependency.builder()
+                                .dependingOn(intDependency)
+                                .matching(ComparisonOperator.LESS, -70)
+                                .matching(ComparisonOperator.GREATER, 70)
+                                .build())
+                .build());
+    
+        testing.addEntry(depends.build());
+        testing.addEntry(entryBuilder.startBooleanToggle(Component.literal("I appear when bad option is chosen..."), true)
+                .setShownIf(Dependency.builder()
+                        .dependingOn(enumDependency)
+                        .matching(DependencyDemoEnum.HORRIBLE)
+                        .matching(DependencyDemoEnum.BAD)
+                        .build())
+                .setTooltip(Component.literal("Hopefully I keep my index"))
+                .build());
+        
         testing.addEntry(entryBuilder.startTextDescription(
                 Component.translatable("text.cloth-config.testing.1",
                         Component.literal("ClothConfig").withStyle(s -> s.withBold(true).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(Util.make(new ItemStack(Items.PINK_WOOL), stack -> stack.setHoverName(Component.literal("(\u30FB\u2200\u30FB)")).enchant(Enchantments.BLOCK_EFFICIENCY, 10)))))),

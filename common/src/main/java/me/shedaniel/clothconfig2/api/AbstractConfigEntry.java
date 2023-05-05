@@ -24,6 +24,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.shedaniel.clothconfig2.api.dependencies.Dependency;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import net.fabricmc.api.EnvType;
@@ -43,7 +44,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> implements ReferenceProvider<T> {
+public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> implements ConfigEntry<T>, ReferenceProvider<T> {
     private AbstractConfigScreen screen;
     private Supplier<Optional<Component>> errorSupplier;
     @Nullable
@@ -53,6 +54,10 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     private int cacheFieldNameHash = -1;
     private List<String> cachedTags = null;
     private Iterable<String> additionalSearchTags = null;
+    
+    @Nullable
+    private Dependency enableIfDependency = null;
+    private Dependency showIfDependency = null;
     
     public final void setReferenceProviderEntries(@Nullable List<ReferenceProvider<?>> referencableEntries) {
         this.referencableEntries = referencableEntries;
@@ -80,8 +85,6 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     
     public abstract void setRequiresRestart(boolean requiresRestart);
     
-    public abstract Component getFieldName();
-    
     public Component getDisplayedFieldName() {
         MutableComponent text = getFieldName().copy();
         boolean hasError = getConfigError().isPresent();
@@ -92,7 +95,49 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
             text = text.withStyle(ChatFormatting.ITALIC);
         if (!hasError && !isEdited)
             text = text.withStyle(ChatFormatting.GRAY);
+        if (!isEnabled())
+            text = text.withStyle(ChatFormatting.DARK_GRAY);
         return text;
+    }
+    
+    /**
+     * True if no "enable if" dependency is set, otherwise true if the dependency conditions are currently met.
+     * <p>
+     * Never true if {@link #isShown()} is false.
+     * 
+     * @return whether the config entry is enabled
+     * @see #isShown() 
+     */
+    public boolean isEnabled() {
+        return isShown() && (enableIfDependency == null || enableIfDependency.check());
+    }
+    
+    /**
+     * True if no "show if" dependency is set, otherwise true if the dependency conditions are currently met.
+     *
+     * @return whether the config entry is shown in menus
+     * @see #isEnabled()
+     */
+    public boolean isShown() {
+        return showIfDependency == null || showIfDependency.check();
+    }
+    
+    @Override
+    public void setEnableIfDependency(@Nullable Dependency dependency) {
+        this.enableIfDependency = dependency;
+    }
+    
+    public @Nullable Dependency getEnableIfDependency() {
+        return enableIfDependency;
+    }
+    
+    @Override
+    public void setShowIfDependency(@Nullable Dependency dependency) {
+        this.showIfDependency = dependency;
+    }
+    
+    public @Nullable Dependency getShowIfDependency() {
+        return showIfDependency;
     }
     
     public Iterator<String> getSearchTags() {

@@ -19,6 +19,7 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
+import me.shedaniel.clothconfig2.api.NumberConfigEntry;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -27,7 +28,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class AbstractNumberListEntry<T> extends TextFieldListEntry<T> {
+public abstract class AbstractNumberListEntry<T extends Number & Comparable<T>> extends TextFieldListEntry<T> implements NumberConfigEntry<T> {
     private static final Function<String, String> stripCharacters = s -> {
         StringBuilder builder = new StringBuilder();
         char[] chars = s.toCharArray();

@@ -19,6 +19,7 @@
 
 package me.shedaniel.autoconfig.gui.registry;
 
+import me.shedaniel.autoconfig.dependencies.DependencyManager;
 import me.shedaniel.autoconfig.gui.registry.api.GuiProvider;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.autoconfig.gui.registry.api.GuiTransformer;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
-public final class GuiRegistry implements GuiRegistryAccess {
+public final class GuiRegistry extends AbstractGuiRegistry {
     
     private Map<Priority, List<ProviderEntry>> providers = new HashMap<>();
     private List<TransformerEntry> transformers = new ArrayList<>();
@@ -62,7 +63,7 @@ public final class GuiRegistry implements GuiRegistryAccess {
             Object defaults,
             GuiRegistryAccess registry
     ) {
-        return firstPresent(
+        List<AbstractConfigListEntry> guis = firstPresent(
                 Arrays.stream(Priority.values())
                         .map(priority ->
                                 (Supplier<Optional<ProviderEntry>>) () ->
@@ -73,6 +74,13 @@ public final class GuiRegistry implements GuiRegistryAccess {
         )
                 .map(entry -> entry.provider.get(i18n, field, config, defaults, registry))
                 .orElse(null);
+        
+        if (guis != null) {
+            DependencyManager dependencies = registry.getDependencyManager();
+            guis.forEach(gui -> dependencies.register(gui, field, i18n));
+        }
+        
+        return guis;
     }
     
     @Override
@@ -91,6 +99,11 @@ public final class GuiRegistry implements GuiRegistryAccess {
         
         for (GuiTransformer transformer : matchedTransformers) {
             guis = transformer.transform(guis, i18n, field, config, defaults, registry);
+        }
+    
+        if (guis != null) {
+            DependencyManager dependencies = registry.getDependencyManager();
+            guis.forEach(gui -> dependencies.register(gui, field, i18n));
         }
         
         return guis;

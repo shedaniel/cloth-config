@@ -21,6 +21,7 @@ package me.shedaniel.autoconfig.gui;
 
 import com.google.common.collect.Lists;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.dependencies.DependencyManager;
 import me.shedaniel.autoconfig.gui.registry.GuiRegistry;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.autoconfig.util.Utils;
@@ -129,7 +130,17 @@ public class DefaultGuiProviders {
         );
         
         registry.registerAnnotationProvider(
-                DefaultGuiProviders::getChildren,
+                (i18n, field, config, defaults, guiProvider) -> {
+                    List<AbstractConfigListEntry> children = getChildren(i18n, field, config, defaults, guiProvider);
+    
+                    // Apply the field's dependency to its children
+                    if (!children.isEmpty() && DependencyManager.hasDependencyAnnotation(field)) {
+                        DependencyManager dependencies = guiProvider.getDependencyManager();
+                        children.forEach(gui -> dependencies.register(gui, field, i18n));
+                    }
+                    
+                    return children;
+                },
                 field -> !field.getType().isPrimitive(),
                 ConfigEntry.Gui.TransitiveObject.class
         );
@@ -146,25 +157,18 @@ public class DefaultGuiProviders {
                 field -> !field.getType().isPrimitive(),
                 ConfigEntry.Gui.CollapsibleObject.class
         );
-        
+    
+        //noinspection unchecked
         registry.registerPredicateProvider(
-                (i18n, field, config, defaults, guiProvider) -> {
-                    Object[] enumConstants = field.getType().getEnumConstants();
-                    Enum[] enums = new Enum[enumConstants.length];
-                    for (int i = 0; i < enumConstants.length; i++) {
-                        enums[i] = (Enum) enumConstants[i];
-                    }
-                    return Collections.singletonList(
-                            ENTRY_BUILDER.startSelector(
-                                            Component.translatable(i18n),
-                                            enums,
-                                            getUnsafely(field, config, getUnsafely(field, defaults))
-                                    )
-                                    .setDefaultValue(() -> getUnsafely(field, defaults))
-                                    .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
-                                    .build()
-                    );
-                },
+                (i18n, field, config, defaults, guiProvider) -> Collections.singletonList(
+                    ENTRY_BUILDER.startEnumSelector(
+                                    Component.translatable(i18n),
+                                    (Class<? extends Enum<?>>) field.getType(),
+                                    getUnsafely(field, config, getUnsafely(field, defaults)))
+                            .setDefaultValue(() -> getUnsafely(field, defaults))
+                            .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                            .build()
+                ),
                 field -> field.getType().isEnum() && field.isAnnotationPresent(ConfigEntry.Gui.EnumHandler.class) && field.getAnnotation(ConfigEntry.Gui.EnumHandler.class).option() == ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON
         );
         

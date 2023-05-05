@@ -23,6 +23,7 @@ import blue.endless.jankson.Comment;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnumHandler.EnumDisplayOption;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -47,6 +48,10 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     @ConfigEntry.Gui.TransitiveObject
     public ModuleB moduleB = new ModuleB();
     
+    @ConfigEntry.Category("c")
+    @ConfigEntry.Gui.TransitiveObject
+    public ModuleC moduleC = new ModuleC();
+    
     enum ExampleEnum {
         FOO,
         BAR,
@@ -62,7 +67,7 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
         public ExampleEnum anEnum = ExampleEnum.FOO;
         
         @ConfigEntry.Gui.Tooltip(count = 2)
-        @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+        @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
         public ExampleEnum anEnumWithButton = ExampleEnum.FOO;
         
         @Comment("This tooltip was automatically applied from a Jankson @Comment")
@@ -96,6 +101,67 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
         
         @ConfigEntry.ColorPicker
         public int color = 0xFFFFFF;
+    }
+    
+    @Config(name = "module_c")
+    public static class ModuleC implements ConfigData {
+        
+        @ConfigEntry.Gui.PrefixText
+        @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+        public DependencySubCategory dependencySubCategory = new DependencySubCategory();
+        public static class DependencySubCategory {
+    
+            @ConfigEntry.Gui.Tooltip
+            public boolean coolToggle = false;
+    
+            public boolean lameToggle = true;
+            
+            @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
+            public DependencyDemoEnum coolEnum = DependencyDemoEnum.OKAY;
+            
+            @ConfigEntry.BoundedDiscrete(min = -100, max = 100)
+            public int intSlider = 50;
+    
+            @ConfigEntry.Dependency.EnableIf(".coolToggle")
+            public boolean dependsOnCoolToggle1 = false;
+    
+            @ConfigEntry.Dependency.ShowIf(value = ".coolToggle", conditions = {"{!}false"})
+            public boolean dependsOnCoolToggle2 = false;
+    
+            @ConfigEntry.Dependency.EnableIf(value = ".coolToggle", matching = {".lameToggle"})
+            public boolean dependsOnToggleMatch = false;
+            
+            @ConfigEntry.Dependency.EnableIf(value = ".intSlider", conditions = {"> 70", "< -70"})
+            public boolean dependsOnIntSlider = true;
+    
+            @ConfigEntry.Gui.TransitiveObject
+            @ConfigEntry.Dependency.EnableIf(".coolToggle")
+            @ConfigEntry.Dependency.EnableIf(value = ".coolEnum", conditions = {"{i}good", "EXCELLENT"})
+            public DependantObject dependantObject = new DependantObject();
+            public static class DependantObject {
+                @ConfigEntry.Gui.PrefixText
+                public boolean toggle1 = false;
+                @ConfigEntry.Dependency.EnableIf(value = "..intSlider", conditions = {"> 70", "< -70"})
+                
+                public boolean toggle2 = true;
+            }
+    
+            @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+            @ConfigEntry.Dependency.EnableIf(".coolToggle")
+            public DependantCollapsible dependantCollapsible = new DependantCollapsible();
+            public static class DependantCollapsible {
+                public boolean toggle1 = false;
+                public boolean toggle2 = true;
+            }
+    
+            @ConfigEntry.Dependency.EnableIf(value = ".coolToggle", conditions = {"true"})
+            public List<Integer> list = Arrays.asList(1, 2, 3);
+    
+        }
+    
+        @ConfigEntry.Dependency.EnableIf(value = ".dependencySubCategory.coolToggle", conditions = {"true"})
+        public boolean dependsOnCoolToggleOutside = false;
+        
     }
     
     @Config(name = "empty")
@@ -132,5 +198,9 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
             this.first = first;
             this.second = second;
         }
+    }
+    
+    enum DependencyDemoEnum {
+        EXCELLENT, GOOD, OKAY, BAD, HORRIBLE
     }
 }

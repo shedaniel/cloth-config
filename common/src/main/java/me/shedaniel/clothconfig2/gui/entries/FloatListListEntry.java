@@ -19,6 +19,7 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
+import me.shedaniel.clothconfig2.api.NumberListConfigEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
@@ -32,7 +33,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class FloatListListEntry extends AbstractTextFieldListListEntry<Float, FloatListListEntry.FloatListCell, FloatListListEntry> {
+public class FloatListListEntry extends AbstractTextFieldListListEntry<Float, FloatListListEntry.FloatListCell, FloatListListEntry> implements NumberListConfigEntry<Float> {
     
     private float minimum, maximum;
     

@@ -143,7 +143,7 @@ public class KeyCodeBuilder extends FieldBuilder<ModifierKeyCode, KeyCodeEntry, 
         entry.setAllowKey(allowKey);
         entry.setAllowMouse(allowMouse);
         entry.setAllowModifiers(allowModifiers);
-        return entry;
+        return finishBuilding(entry);
     }
     
 }
