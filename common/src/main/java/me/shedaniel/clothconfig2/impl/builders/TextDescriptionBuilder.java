@@ -69,7 +69,7 @@ public class TextDescriptionBuilder extends FieldBuilder<Component, TextListEntr
     @NotNull
     @Override
     public TextListEntry build() {
-        return new TextListEntry(getFieldNameKey(), value, color, tooltipSupplier);
+        return finishBuilding(new TextListEntry(getFieldNameKey(), value, color, tooltipSupplier));
     }
     
 }
