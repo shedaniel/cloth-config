@@ -33,7 +33,7 @@ import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -132,7 +132,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         addRenderableWidget(Button.builder(isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()).bounds(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20).build());
         addRenderableWidget(new Button(width / 2 + 3, height - 26, buttonWidths, 20, Component.empty(), button -> saveAll(true), Supplier::get) {
             @Override
-            public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
+            public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
                 for (List<AbstractConfigEntry<?>> entries : Lists.newArrayList(categorizedEntries.values())) {
                     for (AbstractConfigEntry<?> entry : entries)
@@ -145,7 +145,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 }
                 active = isEdited() && !hasErrors;
                 setMessage(hasErrors ? Component.translatable("text.cloth-config.error_cannot_save") : Component.translatable("text.cloth-config.save_and_done"));
-                super.render(matrices, mouseX, mouseY, delta);
+                super.render(graphics, mouseX, mouseY, delta);
             }
         });
         if (isShowingTabs()) {
@@ -154,14 +154,14 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             tabsRightBounds = new Rectangle(width - 18, 41, 18, 24);
             childrenL().add(buttonLeftTab = new Button(4, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(0, true), Supplier::get) {
                 @Override
-                public void renderWidget(PoseStack matrices, int mouseX, int mouseY, float delta) {
+                public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);
                     RenderSystem.setShaderTexture(0, CONFIG_TEX);
                     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
-                    this.blit(matrices, getX(), getY(), 12, 18 * (!this.isActive() ? 0 : this.isHoveredOrFocused() ? 2 : 1), width, height);
+                    graphics.blit(CONFIG_TEX, getX(), getY(), 12, 18 * (!this.isActive() ? 0 : this.isHoveredOrFocused() ? 2 : 1), width, height);
                 }
             });
             int j = 0;
@@ -172,14 +172,14 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             childrenL().addAll(tabButtons);
             childrenL().add(buttonRightTab = new Button(width - 16, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true), Supplier::get) {
                 @Override
-                public void renderWidget(PoseStack matrices, int mouseX, int mouseY, float delta) {
+                public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);
                     RenderSystem.setShaderTexture(0, CONFIG_TEX);
                     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(770, 771, 0, 1);
                     RenderSystem.blendFunc(770, 771);
-                    this.blit(matrices, getX(), getY(), 0, 18 * (!this.isActive() ? 0 : this.isHoveredOrFocused() ? 2 : 1), width, height);
+                    graphics.blit(CONFIG_TEX, getX(), getY(), 0, 18 * (!this.isActive() ? 0 : this.isHoveredOrFocused() ? 2 : 1), width, height);
                 }
             });
         } else {
@@ -216,7 +216,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     }
     
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         if (isShowingTabs()) {
             tabsScroller.updatePosition(delta * 3);
             int xx = 24 - (int) tabsScroller.scrollAmount;
@@ -228,30 +228,30 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             buttonRightTab.active = tabsScroller.scrollAmount < getTabsMaximumScrolled() - width + 40;
         }
         if (isTransparentBackground()) {
-            fillGradient(matrices, 0, 0, this.width, this.height, -1072689136, -804253680);
+            graphics.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
         } else {
-            renderDirtBackground(matrices);
+            renderDirtBackground(graphics);
         }
-        listWidget.render(matrices, mouseX, mouseY, delta);
+        listWidget.render(graphics, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
         for (AbstractConfigEntry child : listWidget.children())
-            child.lateRender(matrices, mouseX, mouseY, delta);
+            child.lateRender(graphics, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
         if (isShowingTabs()) {
-            drawCenteredString(matrices, minecraft.font, title, width / 2, 18, -1);
+            graphics.drawCenteredString(minecraft.font, title, width / 2, 18, -1);
             Rectangle onlyInnerTabBounds = new Rectangle(tabsBounds.x + 20, tabsBounds.y, tabsBounds.width - 40, tabsBounds.height);
             ScissorsHandler.INSTANCE.scissor(onlyInnerTabBounds);
             if (isTransparentBackground())
-                fillGradient(matrices, onlyInnerTabBounds.x, onlyInnerTabBounds.y, onlyInnerTabBounds.getMaxX(), onlyInnerTabBounds.getMaxY(), 0x68000000, 0x68000000);
+                graphics.fillGradient(onlyInnerTabBounds.x, onlyInnerTabBounds.y, onlyInnerTabBounds.getMaxX(), onlyInnerTabBounds.getMaxY(), 0x68000000, 0x68000000);
             else
-                overlayBackground(matrices, onlyInnerTabBounds, 32, 32, 32, 255, 255);
-            tabButtons.forEach(widget -> widget.render(matrices, mouseX, mouseY, delta));
-            drawTabsShades(matrices, 0, isTransparentBackground() ? 120 : 255);
+                overlayBackground(graphics, onlyInnerTabBounds, 32, 32, 32, 255, 255);
+            tabButtons.forEach(widget -> widget.render(graphics, mouseX, mouseY, delta));
+            drawTabsShades(graphics, 0, isTransparentBackground() ? 120 : 255);
             ScissorsHandler.INSTANCE.removeLastScissor();
-            buttonLeftTab.render(matrices, mouseX, mouseY, delta);
-            buttonRightTab.render(matrices, mouseX, mouseY, delta);
+            buttonLeftTab.render(graphics, mouseX, mouseY, delta);
+            buttonRightTab.render(graphics, mouseX, mouseY, delta);
         } else
-            drawCenteredString(matrices, minecraft.font, title, width / 2, 12, -1);
+            graphics.drawCenteredString(minecraft.font, title, width / 2, 12, -1);
         
         if (isEditable()) {
             List<Component> errors = Lists.newArrayList();
@@ -266,10 +266,10 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 String text = "§c" + (errors.size() == 1 ? errors.get(0).plainCopy().getString() : I18n.get("text.cloth-config.multi_error"));
                 if (isTransparentBackground()) {
                     int stringWidth = minecraft.font.width(text);
-                    fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + minecraft.font.lineHeight, 0x68000000, 0x68000000);
+                    graphics.fillGradient(8, 9, 20 + stringWidth, 14 + minecraft.font.lineHeight, 0x68000000, 0x68000000);
                 }
-                blit(matrices, 10, 10, 0, 54, 3, 11);
-                drawString(matrices, minecraft.font, text, 18, 12, -1);
+                graphics.blit(CONFIG_TEX, 10, 10, 0, 54, 3, 11);
+                graphics.drawString(minecraft.font, text, 18, 12, -1);
                 if (errors.size() > 1) {
                     int stringWidth = minecraft.font.width(text);
                     if (mouseX >= 10 && mouseY >= 10 && mouseX <= 18 + stringWidth && mouseY <= 14 + minecraft.font.lineHeight)
@@ -283,12 +283,16 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             String text = "§c" + I18n.get("text.cloth-config.not_editable");
             if (isTransparentBackground()) {
                 int stringWidth = minecraft.font.width(text);
-                fillGradient(matrices, 8, 9, 20 + stringWidth, 14 + minecraft.font.lineHeight, 0x68000000, 0x68000000);
+                graphics.fillGradient(8, 9, 20 + stringWidth, 14 + minecraft.font.lineHeight, 0x68000000, 0x68000000);
             }
-            blit(matrices, 10, 10, 0, 54, 3, 11);
-            drawString(matrices, minecraft.font, text, 18, 12, -1);
+            graphics.blit(CONFIG_TEX, 10, 10, 0, 54, 3, 11);
+            graphics.drawString(minecraft.font, text, 18, 12, -1);
         }
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(graphics, mouseX, mouseY, delta);
+    }
+    
+    private void drawTabsShades(GuiGraphics graphics, int lightColor, int darkColor) {
+        drawTabsShades(graphics.pose(), lightColor, darkColor);
     }
     
     private void drawTabsShades(PoseStack matrices, int lightColor, int darkColor) {
@@ -348,23 +352,23 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
         
         @Override
-        protected void renderItem(PoseStack matrices, R item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        protected void renderItem(GuiGraphics graphics, R item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             if (item instanceof AbstractConfigEntry)
                 ((AbstractConfigEntry) item).updateSelected(getFocused() == item);
-            super.renderItem(matrices, item, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+            super.renderItem(graphics, item, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
         }
         
         @Override
-        protected void renderList(PoseStack matrices, int startX, int startY, int int_3, int int_4, float delta) {
+        protected void renderList(GuiGraphics graphics, int startX, int startY, int int_3, int int_4, float delta) {
             thisTimeTarget = null;
             Rectangle hoverBounds = currentBounds.value();
             if (!hoverBounds.isEmpty()) {
                 long timePast = System.currentTimeMillis() - lastTouch;
                 int alpha = timePast <= 200 ? 255 : Mth.ceil(255 - Math.min(timePast - 200, 500F) / 500F * 255.0);
                 alpha = (alpha * 36 / 255) << 24;
-                GuiComponent.fillGradient(matrices, hoverBounds.x, hoverBounds.y - (int) scroll, hoverBounds.getMaxX(), hoverBounds.getMaxY() - (int) scroll, 0xFFFFFF | alpha, 0xFFFFFF | alpha);
+                graphics.fillGradient(hoverBounds.x, hoverBounds.y - (int) scroll, hoverBounds.getMaxX(), hoverBounds.getMaxY() - (int) scroll, 0xFFFFFF | alpha, 0xFFFFFF | alpha);
             }
-            super.renderList(matrices, startX, startY, int_3, int_4, delta);
+            super.renderList(graphics, startX, startY, int_3, int_4, delta);
             if (thisTimeTarget != null && isMouseOver(int_3, int_4)) {
                 lastTouch = System.currentTimeMillis();
             }
@@ -413,18 +417,18 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
         
         @Override
-        protected void renderBackBackground(PoseStack matrices, BufferBuilder buffer, Tesselator tessellator) {
+        protected void renderBackBackground(GuiGraphics graphics, BufferBuilder buffer, Tesselator tessellator) {
             if (!screen.isTransparentBackground())
-                super.renderBackBackground(matrices, buffer, tessellator);
+                super.renderBackBackground(graphics, buffer, tessellator);
             else {
-                fillGradient(matrices, left, top, right, bottom, 0x68000000, 0x68000000);
+                graphics.fillGradient(left, top, right, bottom, 0x68000000, 0x68000000);
             }
         }
         
         @Override
-        protected void renderHoleBackground(PoseStack matrices, int y1, int y2, int alpha1, int alpha2) {
+        protected void renderHoleBackground(GuiGraphics graphics, int y1, int y2, int alpha1, int alpha2) {
             if (!screen.isTransparentBackground())
-                super.renderHoleBackground(matrices, y1, y2, alpha1, alpha2);
+                super.renderHoleBackground(graphics, y1, y2, alpha1, alpha2);
         }
         
         @Override

@@ -27,12 +27,15 @@
     ],
     "depends": {
         "fabricloader": ">=0.14.0",
-        "minecraft": ">=1.19.4-"
+        "minecraft": ">=1.20-"
     },
     "accessWidener": "cloth-config.accessWidener",
     "custom": {
         "modmenu": {
             "badges": [ "library" ]
+        },
+        "catalogue": {
+            "configFactory": "me.shedaniel.clothconfig2.fabric.ClothConfigCatalogueDemo"
         }
     }
 }

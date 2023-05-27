@@ -21,10 +21,10 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -136,8 +136,8 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     }
     
     @Override
-    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+        super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         Window window = Minecraft.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && defaultValue.get() != value.get();
         this.resetButton.setY(y);
@@ -145,17 +145,17 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
         this.sliderWidget.setY(y);
         Component displayedFieldName = getDisplayedFieldName();
         if (Minecraft.getInstance().font.isBidirectional()) {
-            Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, getPreferredTextColor());
+            graphics.drawString(Minecraft.getInstance().font, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, getPreferredTextColor());
             this.resetButton.setX(x);
             this.sliderWidget.setX(x + resetButton.getWidth() + 1);
         } else {
-            Minecraft.getInstance().font.drawShadow(matrices, displayedFieldName.getVisualOrderText(), x, y + 6, getPreferredTextColor());
+            graphics.drawString(Minecraft.getInstance().font, displayedFieldName.getVisualOrderText(), x, y + 6, getPreferredTextColor());
             this.resetButton.setX(x + entryWidth - resetButton.getWidth());
             this.sliderWidget.setX(x + entryWidth - 150);
         }
         this.sliderWidget.setWidth(150 - resetButton.getWidth() - 2);
-        resetButton.render(matrices, mouseX, mouseY, delta);
-        sliderWidget.render(matrices, mouseX, mouseY, delta);
+        resetButton.render(graphics, mouseX, mouseY, delta);
+        sliderWidget.render(graphics, mouseX, mouseY, delta);
     }
     
     private class Slider extends AbstractSliderButton {

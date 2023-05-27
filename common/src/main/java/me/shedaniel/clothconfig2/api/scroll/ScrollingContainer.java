@@ -24,16 +24,13 @@
  */
 package me.shedaniel.clothconfig2.api.scroll;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.animator.NumberAnimator;
 import me.shedaniel.clothconfig2.api.animator.ValueAnimator;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 
@@ -139,11 +136,11 @@ public abstract class ScrollingContainer {
         return Mth.clamp(v, -clampExtension, maxScroll + clampExtension);
     }
     
-    public void renderScrollBar() {
-        renderScrollBar(0, 1, 1);
+    public void renderScrollBar(GuiGraphics graphics) {
+        renderScrollBar(graphics, 0, 1, 1);
     }
     
-    public void renderScrollBar(int background, float alpha, float scrollBarAlphaOffset) {
+    public void renderScrollBar(GuiGraphics graphics, int background, float alpha, float scrollBarAlphaOffset) {
         if (hasScrollBar()) {
             Rectangle bounds = getBounds();
             int maxScroll = getMaxScroll();
@@ -159,10 +156,10 @@ public abstract class ScrollingContainer {
             float bottomC = (hovered ? .67f : .5f) * scrollBarAlphaOffset;
             float topC = (hovered ? .87f : .67f) * scrollBarAlphaOffset;
             
-            GuiComponent.fill(new PoseStack(), scrollbarPositionMinX, bounds.y, scrollbarPositionMaxX, bounds.getMaxY(), background);
-            GuiComponent.fill(new PoseStack(), scrollbarPositionMinX, minY, scrollbarPositionMaxX, minY + height,
+            graphics.fill(scrollbarPositionMinX, bounds.y, scrollbarPositionMaxX, bounds.getMaxY(), background);
+            graphics.fill(scrollbarPositionMinX, minY, scrollbarPositionMaxX, minY + height,
                     FastColor.ARGB32.color(Math.round(alpha * 255.0F), Math.round(bottomC * 255.0F), Math.round(bottomC * 255.0F), Math.round(bottomC * 255.0F)));
-            GuiComponent.fill(new PoseStack(), scrollbarPositionMinX, minY, scrollbarPositionMaxX - 1, minY + height - 1,
+            graphics.fill(scrollbarPositionMinX, minY, scrollbarPositionMaxX - 1, minY + height - 1,
                     FastColor.ARGB32.color(Math.round(alpha * 255.0F), Math.round(topC * 255.0F), Math.round(topC * 255.0F), Math.round(topC * 255.0F)));
         }
     }

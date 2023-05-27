@@ -30,6 +30,7 @@ import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -355,10 +356,10 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     }
     
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.render(graphics, mouseX, mouseY, delta);
         for (Tooltip tooltip : tooltips) {
-            renderTooltip(matrices, tooltip.getText(), tooltip.getX(), tooltip.getY());
+            graphics.renderTooltip(Minecraft.getInstance().font, tooltip.getText(), tooltip.getX(), tooltip.getY());
         }
         this.tooltips.clear();
     }
@@ -366,6 +367,10 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     @Override
     public void addTooltip(Tooltip tooltip) {
         this.tooltips.add(tooltip);
+    }
+    
+    protected void overlayBackground(GuiGraphics graphics, Rectangle rect, int red, int green, int blue, int startAlpha, int endAlpha) {
+        overlayBackground(graphics.pose(), rect, red, green, blue, startAlpha, endAlpha);
     }
     
     protected void overlayBackground(PoseStack matrices, Rectangle rect, int red, int green, int blue, int startAlpha, int endAlpha) {
@@ -386,11 +391,6 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         buffer.vertex(matrix, rect.getMaxX(), rect.getMinY(), 0.0F).uv(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).endVertex();
         buffer.vertex(matrix, rect.getMinX(), rect.getMinY(), 0.0F).uv(rect.getMinX() / 32.0F, rect.getMinY() / 32.0F).color(red, green, blue, startAlpha).endVertex();
         tesselator.end();
-    }
-    
-    @Override   // override to expose this protected method to config entries
-    public void renderComponentHoverEffect(PoseStack matrices, Style style, int x, int y) {
-        super.renderComponentHoverEffect(matrices, style, x, y);
     }
     
     @Override

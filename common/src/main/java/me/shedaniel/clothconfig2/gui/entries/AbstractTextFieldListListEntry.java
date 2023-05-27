@@ -19,10 +19,10 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -75,9 +75,9 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             
             widget = new EditBox(Minecraft.getInstance().font, 0, 0, 100, 18, Component.empty()) {
                 @Override
-                public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
+                public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
                     setFocused(isSelected);
-                    super.render(matrices, mouseX, mouseY, delta);
+                    super.render(graphics, mouseX, mouseY, delta);
                 }
             };
             widget.setFilter(this::isValidText);
@@ -118,15 +118,15 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         }
         
         @Override
-        public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
             widget.setWidth(entryWidth - 12);
             widget.setX(x);
             widget.setY(y + 1);
             widget.setEditable(listListEntry.isEditable());
-            widget.render(matrices, mouseX, mouseY, delta);
+            widget.render(graphics, mouseX, mouseY, delta);
             isHovered = widget.isMouseOver(mouseX, mouseY);
             if (isSelected && listListEntry.isEditable())
-                fill(matrices, x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
+                graphics.fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
         }
         
         @Override

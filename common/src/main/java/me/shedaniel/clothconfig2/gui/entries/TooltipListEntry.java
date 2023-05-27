@@ -19,13 +19,13 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.Tooltip;
 import me.shedaniel.math.Point;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.ApiStatus;
@@ -53,8 +53,8 @@ public abstract class TooltipListEntry<T> extends AbstractConfigListEntry<T> {
     }
     
     @Override
-    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+        super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         if (isMouseInside(mouseX, mouseY, x, y, entryWidth, entryHeight)) {
             Optional<Component[]> tooltip = getTooltip(mouseX, mouseY);
             if (tooltip.isPresent() && tooltip.get().length > 0)

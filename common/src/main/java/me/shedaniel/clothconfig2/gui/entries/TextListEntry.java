@@ -19,12 +19,12 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
@@ -72,8 +72,8 @@ public class TextListEntry extends TooltipListEntry<Object> {
     }
     
     @Override
-    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+        super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         if (this.savedWidth != entryWidth || this.savedX != x || this.savedY != y) {
             this.wrappedLines = this.textRenderer.split(this.text, entryWidth);
             this.savedWidth = entryWidth;
@@ -82,7 +82,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
         }
         int yy = y + 7;
         for (FormattedCharSequence string : wrappedLines) {
-            Minecraft.getInstance().font.drawShadow(matrices, string, x, yy, color);
+            graphics.drawString(Minecraft.getInstance().font, string, x, yy, color);
             yy += Minecraft.getInstance().font.lineHeight + 3;
         }
         
@@ -90,7 +90,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
         AbstractConfigScreen configScreen = this.getConfigScreen();
         
         if (style != null && configScreen != null) {
-            configScreen.renderComponentHoverEffect(matrices, style, mouseX, mouseY);
+            graphics.renderComponentHoverEffect(Minecraft.getInstance().font, style, mouseX, mouseY);
         }
     }
     

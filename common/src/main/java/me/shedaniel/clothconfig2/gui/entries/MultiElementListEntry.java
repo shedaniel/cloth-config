@@ -22,13 +22,13 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.Expandable;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -112,12 +112,12 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     }
     
     @Override
-    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+        super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         RenderSystem.setShaderTexture(0, CONFIG_TEX);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        blit(matrices, x - 15, y + 5, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        Minecraft.getInstance().font.drawShadow(matrices, getDisplayedFieldName().getVisualOrderText(), x, y + 6, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        graphics.blit(CONFIG_TEX, x - 15, y + 5, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
+        graphics.drawString(Minecraft.getInstance().font, getDisplayedFieldName().getVisualOrderText(), x, y + 6, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry entry : entries) {
             entry.setParent(getParent());
             entry.setScreen(getConfigScreen());
@@ -125,7 +125,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         if (expanded) {
             int yy = y + 24;
             for (AbstractConfigListEntry<?> entry : entries) {
-                entry.render(matrices, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered, delta);
+                entry.render(graphics, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered, delta);
                 yy += entry.getItemHeight();
                 yy += Math.max(0, entry.getMorePossibleHeight());
             }
@@ -165,10 +165,10 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     }
     
     @Override
-    public void lateRender(PoseStack matrices, int mouseX, int mouseY, float delta) {
+    public void lateRender(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         if (expanded) {
             for (AbstractConfigListEntry<?> entry : entries) {
-                entry.lateRender(matrices, mouseX, mouseY, delta);
+                entry.lateRender(graphics, mouseX, mouseY, delta);
             }
         }
     }

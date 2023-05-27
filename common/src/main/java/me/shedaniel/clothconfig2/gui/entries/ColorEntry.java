@@ -19,9 +19,9 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.widget.ColorDisplayWidget;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
@@ -62,8 +62,8 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
     }
     
     @Override
-    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+        super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         this.colorDisplayWidget.setY(y);
         ColorValue value = getColorValue(textFieldWidget.getValue());
         if (!value.hasError())
@@ -73,7 +73,7 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
         } else {
             this.colorDisplayWidget.setX(textFieldWidget.getX() - 23);
         }
-        colorDisplayWidget.render(matrices, mouseX, mouseY, delta);
+        colorDisplayWidget.render(graphics, mouseX, mouseY, delta);
     }
     
     @Override

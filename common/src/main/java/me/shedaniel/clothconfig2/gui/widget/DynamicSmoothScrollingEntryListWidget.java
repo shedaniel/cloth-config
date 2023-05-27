@@ -20,7 +20,6 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.animator.NumberAnimator;
@@ -30,6 +29,7 @@ import me.shedaniel.math.impl.PointHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
@@ -121,17 +121,17 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
     }
     
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         scrollAnimator.setTarget(handleBounceBack(this.scrollAnimator.target(), this.getMaxScroll(), delta));
         this.scrollAnimator.update(delta);
         this.scroll = scrollAnimator.value();
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(graphics, mouseX, mouseY, delta);
     }
     
     @Override
-    protected void renderScrollBar(PoseStack matrices, Tesselator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
+    protected void renderScrollBar(GuiGraphics graphics, Tesselator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
         if (!smoothScrolling)
-            super.renderScrollBar(matrices, tessellator, buffer, maxScroll, scrollbarPositionMinX, scrollbarPositionMaxX);
+            super.renderScrollBar(graphics, tessellator, buffer, maxScroll, scrollbarPositionMinX, scrollbarPositionMaxX);
         else if (maxScroll > 0) {
             int height = ((this.bottom - this.top) * (this.bottom - this.top)) / this.getMaxScrollPosition();
             height = Mth.clamp(height, 32, this.bottom - this.top - 8);
@@ -142,10 +142,10 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
             int bottomc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 168 : 128;
             int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 222 : 172;
             
-            fill(matrices, scrollbarPositionMinX, this.top, scrollbarPositionMaxX, this.bottom, 0xff000000);
-            fill(matrices, scrollbarPositionMinX, minY, scrollbarPositionMaxX, minY + height,
+            graphics.fill(scrollbarPositionMinX, this.top, scrollbarPositionMaxX, this.bottom, 0xff000000);
+            graphics.fill(scrollbarPositionMinX, minY, scrollbarPositionMaxX, minY + height,
                     FastColor.ARGB32.color(255, bottomc, bottomc, bottomc));
-            fill(matrices, scrollbarPositionMinX, minY, scrollbarPositionMaxX - 1, minY + height - 1,
+            graphics.fill(scrollbarPositionMinX, minY, scrollbarPositionMaxX - 1, minY + height - 1,
                     FastColor.ARGB32.color(255, topc, topc, topc));
         }
     }

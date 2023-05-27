@@ -20,12 +20,12 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
 import com.google.common.collect.Iterators;
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigScreen;
 import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -107,17 +107,17 @@ public class SearchFieldEntry extends AbstractConfigListEntry<Object> {
     }
     
     @Override
-    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+    public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         this.editBox.setWidth(Mth.clamp(entryWidth - 10, 0, 500));
         this.editBox.setX(x + entryWidth / 2 - this.editBox.getWidth() / 2);
         this.editBox.setY(y + entryHeight / 2 - 9);
-        this.editBox.render(matrices, mouseX, mouseY, delta);
+        this.editBox.render(graphics, mouseX, mouseY, delta);
         if (this.editBox.getValue().isEmpty()) {
             this.editBox.setSuggestion("Search...");
         } else {
             this.editBox.setSuggestion(null);
         }
-        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+        super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
     }
     
     @Override

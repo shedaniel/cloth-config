@@ -19,11 +19,11 @@
 
 package me.shedaniel.clothconfig2.api;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 @Environment(EnvType.CLIENT)
@@ -68,7 +68,7 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
     }
     
     @Override
-    public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+    public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         if (isMouseInside(mouseX, mouseY, x, y, entryWidth, entryHeight)) {
             Rectangle area = getEntryArea(x, y, entryWidth, entryHeight);
             if (getParent() instanceof ClothConfigScreen.ListWidget)

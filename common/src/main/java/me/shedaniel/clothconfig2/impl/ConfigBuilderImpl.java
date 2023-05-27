@@ -28,7 +28,6 @@ import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
 import me.shedaniel.clothconfig2.gui.GlobalizedClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -51,7 +50,7 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean listSmoothScroll = true;
     private boolean doesConfirmSave = true;
     private boolean transparentBackground = false;
-    private ResourceLocation defaultBackground = GuiComponent.BACKGROUND_LOCATION;
+    private ResourceLocation defaultBackground = Screen.BACKGROUND_LOCATION;
     private Consumer<Screen> afterInitConsumer = screen -> {};
     private final Map<String, ConfigCategory> categoryMap = Maps.newLinkedHashMap();
     private String fallbackCategory = null;

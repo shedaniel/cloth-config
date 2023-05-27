@@ -23,12 +23,12 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.ApiStatus;
@@ -125,7 +125,7 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
         return getError();
     }
     
-    public void lateRender(PoseStack matrices, int mouseX, int mouseY, float delta) {}
+    public void lateRender(GuiGraphics graphics, int mouseX, int mouseY, float delta) {}
     
     public void setErrorSupplier(Supplier<Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;

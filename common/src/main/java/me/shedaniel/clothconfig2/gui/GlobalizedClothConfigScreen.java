@@ -22,7 +22,10 @@ package me.shedaniel.clothconfig2.gui;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.api.scroll.ScrollingContainer;
@@ -33,6 +36,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -158,7 +162,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         addRenderableWidget(cancelButton = Button.builder(isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()).bounds(0, height - 26, buttonWidths, 20).build());
         addRenderableWidget(exitButton = new Button(0, height - 26, buttonWidths, 20, Component.empty(), button -> saveAll(true), Supplier::get) {
             @Override
-            public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
+            public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
                 label:
                 for (List<AbstractConfigEntry<?>> entries : categorizedEntries.values()) {
@@ -171,7 +175,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
                 }
                 active = isEdited() && !hasErrors;
                 setMessage(hasErrors ? Component.translatable("text.cloth-config.error_cannot_save") : Component.translatable("text.cloth-config.save_and_done"));
-                super.render(matrices, mouseX, mouseY, delta);
+                super.render(graphics, mouseX, mouseY, delta);
             }
         });
         Optional.ofNullable(this.afterInitConsumer).ifPresent(consumer -> consumer.accept(this));
@@ -201,7 +205,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     
     @SuppressWarnings("deprecation")
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         this.lastHoveredReference = null;
         if (requestingReferenceRebuilding) {
             this.references.clear();
@@ -211,28 +215,28 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         int sliderPosition = getSideSliderPosition();
         ScissorsHandler.INSTANCE.scissor(new Rectangle(sliderPosition, 0, width - sliderPosition, height));
         if (isTransparentBackground()) {
-            fillGradient(matrices, 14, 0, width, height, -1072689136, -804253680);
+            graphics.fillGradient(14, 0, width, height, -1072689136, -804253680);
         } else {
-            renderDirtBackground(matrices);
-            overlayBackground(matrices, new Rectangle(14, 0, width, height), 64, 64, 64, 255, 255);
+            renderDirtBackground(graphics);
+            overlayBackground(graphics, new Rectangle(14, 0, width, height), 64, 64, 64, 255, 255);
         }
         listWidget.width = width - sliderPosition;
         listWidget.setLeftPos(sliderPosition);
-        listWidget.render(matrices, mouseX, mouseY, delta);
+        listWidget.render(graphics, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
         for (AbstractConfigEntry<?> child : listWidget.children())
-            child.lateRender(matrices, mouseX, mouseY, delta);
+            child.lateRender(graphics, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
-        font.drawShadow(matrices, title.getVisualOrderText(), sliderPosition + (width - sliderPosition) / 2f - font.width(title) / 2f, 12, -1);
+        graphics.drawString(font, title.getVisualOrderText(), (int) (sliderPosition + (width - sliderPosition) / 2f - font.width(title) / 2f), 12, -1);
         ScissorsHandler.INSTANCE.removeLastScissor();
         cancelButton.setX(sliderPosition + (width - sliderPosition) / 2 - cancelButton.getWidth() - 3);
         exitButton.setX(sliderPosition + (width - sliderPosition) / 2 + 3);
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(graphics, mouseX, mouseY, delta);
         sideSlider.updatePosition(delta);
         sideScroller.updatePosition(delta);
         if (isTransparentBackground()) {
-            fillGradient(matrices, 0, 0, sliderPosition, height, -1240461296, -972025840);
-            fillGradient(matrices, 0, 0, sliderPosition - 14, height, 1744830464, 1744830464);
+            graphics.fillGradient(0, 0, sliderPosition, height, -1240461296, -972025840);
+            graphics.fillGradient(0, 0, sliderPosition - 14, height, 1744830464, 1744830464);
         } else {
             Tesselator tesselator = Tesselator.getInstance();
             BufferBuilder buffer = tesselator.getBuilder();
@@ -253,7 +257,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             tesselator.end();
         }
         {
-            Matrix4f matrix = matrices.last().pose();
+            Matrix4f matrix = graphics.pose().last().pose();
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
@@ -278,8 +282,8 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         Rectangle slideArrowBounds = new Rectangle(sliderPosition - 14, 0, 14, height);
         {
             MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-            font.renderText(">", sliderPosition - 7 - font.width(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil((1 - sideSlider.scrollAmount()) * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
-            font.renderText("<", sliderPosition - 7 - font.width("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil(sideSlider.scrollAmount() * 255.0F), 0, 255) << 24, false, matrices.last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
+            font.renderText(">", sliderPosition - 7 - font.width(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil((1 - sideSlider.scrollAmount()) * 255.0F), 0, 255) << 24, false, graphics.pose().last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
+            font.renderText("<", sliderPosition - 7 - font.width("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil(sideSlider.scrollAmount() * 255.0F), 0, 255) << 24, false, graphics.pose().last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
             immediate.endBatch();
             
             Rectangle scrollerBounds = sideScroller.getBounds();
@@ -287,17 +291,17 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
                 ScissorsHandler.INSTANCE.scissor(new Rectangle(0, 0, sliderPosition - 14, height));
                 int scrollOffset = scrollerBounds.y - sideScroller.scrollAmountInt();
                 for (Reference reference : references) {
-                    matrices.pushPose();
-                    matrices.scale(reference.getScale(), reference.getScale(), reference.getScale());
+                    graphics.pose().pushPose();
+                    graphics.pose().scale(reference.getScale(), reference.getScale(), reference.getScale());
                     MutableComponent text = Component.literal(StringUtils.repeat("  ", reference.getIndent()) + "- ").append(reference.getText());
                     if (lastHoveredReference == null && new Rectangle(scrollerBounds.x, (int) (scrollOffset - 4 * reference.getScale()), (int) (font.width(text) * reference.getScale()), (int) ((font.lineHeight + 4) * reference.getScale())).contains(mouseX, mouseY))
                         lastHoveredReference = reference;
-                    font.draw(matrices, text.getVisualOrderText(), scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215);
-                    matrices.popPose();
+                    graphics.drawString(font, text.getVisualOrderText(), scrollerBounds.x, scrollOffset, lastHoveredReference == reference ? 16769544 : 16777215, false);
+                    graphics.pose().popPose();
                     scrollOffset += (font.lineHeight + 3) * reference.getScale();
                 }
                 ScissorsHandler.INSTANCE.removeLastScissor();
-                sideScroller.renderScrollBar();
+                sideScroller.renderScrollBar(graphics);
             }
         }
     }
@@ -381,12 +385,12 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         }
         
         @Override
-        public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-            super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+        public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+            super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
             int yy = y + 2;
             List<FormattedCharSequence> texts = Minecraft.getInstance().font.split(this.text, getParent().getItemWidth());
             for (FormattedCharSequence text : texts) {
-                Minecraft.getInstance().font.drawShadow(matrices, text, x - 4 + entryWidth / 2 - Minecraft.getInstance().font.width(text) / 2, yy, -1);
+                graphics.drawString(Minecraft.getInstance().font, text, x - 4 + entryWidth / 2 - Minecraft.getInstance().font.width(text) / 2, yy, -1);
                 yy += 10;
             }
         }

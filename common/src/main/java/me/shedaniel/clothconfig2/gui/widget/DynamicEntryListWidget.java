@@ -21,14 +21,16 @@ package me.shedaniel.clothconfig2.gui.widget;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -42,7 +44,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -220,21 +221,21 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected void clickedHeader(int int_1, int int_2) {
     }
     
-    protected void renderHeader(PoseStack matrices, int rowLeft, int startY, Tesselator tessellator) {
+    protected void renderHeader(GuiGraphics graphics, int rowLeft, int startY, Tesselator tessellator) {
     }
     
     protected void drawBackground() {
     }
     
-    protected void renderDecorations(PoseStack matrices, int mouseX, int mouseY) {
+    protected void renderDecorations(GuiGraphics graphics, int mouseX, int mouseY) {
     }
     
     @Deprecated
-    protected void renderBackBackground(PoseStack matrices, BufferBuilder buffer, Tesselator tessellator) {
+    protected void renderBackBackground(GuiGraphics graphics, BufferBuilder buffer, Tesselator tessellator) {
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.setShaderTexture(0, backgroundLocation);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        Matrix4f matrix = matrices.last().pose();
+        Matrix4f matrix = graphics.pose().last().pose();
         float float_2 = 32.0F;
         buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         buffer.vertex(matrix, this.left, this.bottom, 0.0F).uv(this.left / 32.0F, ((this.bottom + (int) this.getScroll()) / 32.0F)).color(32, 32, 32, 255).endVertex();
@@ -245,35 +246,35 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         this.drawBackground();
         int scrollbarPosition = this.getScrollbarPosition();
         int int_4 = scrollbarPosition + 6;
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.getBuilder();
-        renderBackBackground(matrices, buffer, tesselator);
+        renderBackBackground(graphics, buffer, tesselator);
         int rowLeft = this.getRowLeft();
         int startY = this.top + 4 - (int) this.getScroll();
         if (this.renderSelection)
-            this.renderHeader(matrices, rowLeft, startY, tesselator);
+            this.renderHeader(graphics, rowLeft, startY, tesselator);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(left, top, width, bottom - top));
-        this.renderList(matrices, rowLeft, startY, mouseX, mouseY, delta);
+        this.renderList(graphics, rowLeft, startY, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.removeLastScissor();
         RenderSystem.disableDepthTest();
-        this.renderHoleBackground(matrices, 0, this.top, 255, 255);
-        this.renderHoleBackground(matrices, this.bottom, this.height, 255, 255);
+        this.renderHoleBackground(graphics, 0, this.top, 255, 255);
+        this.renderHoleBackground(graphics, this.bottom, this.height, 255, 255);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        fillGradient(matrices, this.left, this.top, this.right, this.top + 4, 0xff000000, 0);
-        fillGradient(matrices, this.left, this.bottom - 4, this.right, this.bottom, 0, 0xff000000);
+        graphics.fillGradient(this.left, this.top, this.right, this.top + 4, 0xff000000, 0);
+        graphics.fillGradient(this.left, this.bottom - 4, this.right, this.bottom, 0, 0xff000000);
         
         int maxScroll = this.getMaxScroll();
-        renderScrollBar(matrices, tesselator, buffer, maxScroll, scrollbarPosition, int_4);
+        renderScrollBar(graphics, tesselator, buffer, maxScroll, scrollbarPosition, int_4);
         
-        this.renderDecorations(matrices, mouseX, mouseY);
+        this.renderDecorations(graphics, mouseX, mouseY);
         RenderSystem.disableBlend();
     }
     
-    protected void renderScrollBar(PoseStack matrices, Tesselator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
+    protected void renderScrollBar(GuiGraphics graphics, Tesselator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
         if (maxScroll > 0) {
             int int_9 = ((this.bottom - this.top) * (this.bottom - this.top)) / this.getMaxScrollPosition();
             int_9 = Mth.clamp(int_9, 32, this.bottom - this.top - 8);
@@ -282,9 +283,9 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                 int_10 = this.top;
             }
             
-            fill(matrices, scrollbarPositionMinX, this.top, scrollbarPositionMaxX, this.bottom, 0xff000000);
-            fill(matrices, scrollbarPositionMinX, int_10, scrollbarPositionMaxX, int_10 + int_9, 0xff808080);
-            fill(matrices, scrollbarPositionMinX, int_10, scrollbarPositionMaxX - 1, int_10 + int_9 - 1, 0xffc0c0c0);
+            graphics.fill(scrollbarPositionMinX, this.top, scrollbarPositionMaxX, this.bottom, 0xff000000);
+            graphics.fill(scrollbarPositionMinX, int_10, scrollbarPositionMaxX, int_10 + int_9, 0xff808080);
+            graphics.fill(scrollbarPositionMinX, int_10, scrollbarPositionMaxX - 1, int_10 + int_9 - 1, 0xffc0c0c0);
         }
     }
     
@@ -484,7 +485,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return double_2 >= (double) this.top && double_2 <= (double) this.bottom && double_1 >= (double) this.left && double_1 <= (double) this.right;
     }
     
-    protected void renderList(PoseStack matrices, int startX, int startY, int int_3, int int_4, float float_1) {
+    protected void renderList(GuiGraphics graphics, int startX, int startY, int int_3, int int_4, float float_1) {
         hoveredItem = this.isMouseOver(int_3, int_4) ? this.getItemAtPosition(int_3, int_4) : null;
         int itemCount = this.getItemCount();
         Tesselator tesselator = Tesselator.getInstance();
@@ -500,18 +501,18 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             if (this.selectionVisible && this.isSelected(renderIndex)) {
                 int itemMinX = this.left + (this.width - itemWidth) / 2;
                 int itemMaxX = this.left + (this.width + itemWidth) / 2;
-                fill(matrices, itemMinX, itemY - 2, itemMaxX, itemY + itemHeight + 2, this.isFocused() ? 0xffffffff : 0xff808080);
-                fill(matrices, itemMinX + 1, itemY - 1, itemMaxX - 1, itemY + itemHeight + 1, 0xff000000);
+                graphics.fill(itemMinX, itemY - 2, itemMaxX, itemY + itemHeight + 2, this.isFocused() ? 0xffffffff : 0xff808080);
+                graphics.fill(itemMinX + 1, itemY - 1, itemMaxX - 1, itemY + itemHeight + 1, 0xff000000);
             }
             
             int y = this.getRowTop(renderIndex);
             int x = this.getRowLeft();
-            renderItem(matrices, item, renderIndex, y, x, itemWidth, itemHeight, int_3, int_4, Objects.equals(hoveredItem, item), float_1);
+            renderItem(graphics, item, renderIndex, y, x, itemWidth, itemHeight, int_3, int_4, Objects.equals(hoveredItem, item), float_1);
         }
     }
     
-    protected void renderItem(PoseStack matrices, E item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-        item.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+    protected void renderItem(GuiGraphics graphics, E item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        item.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
     }
     
     protected int getRowLeft() {
@@ -530,10 +531,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return false;
     }
     
-    protected void renderHoleBackground(PoseStack matrices, int y1, int y2, int alpha1, int alpha2) {
+    protected void renderHoleBackground(GuiGraphics graphics, int y1, int y2, int alpha1, int alpha2) {
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.getBuilder();
-        Matrix4f matrix = matrices.last().pose();
+        Matrix4f matrix = graphics.pose().last().pose();
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.setShaderTexture(0, backgroundLocation);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -566,7 +567,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract static class Entry<E extends Entry<E>> extends GuiComponent implements GuiEventListener {
+    public abstract static class Entry<E extends Entry<E>> implements GuiEventListener {
         @Deprecated DynamicEntryListWidget<E> parent;
         @Nullable
         private NarratableEntry lastNarratable;
@@ -574,7 +575,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         public Entry() {
         }
         
-        public abstract void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta);
+        public abstract void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta);
         
         public boolean isMouseOver(double double_1, double double_2) {
             return Objects.equals(this.parent.getItemAtPosition(double_1, double_2), this);

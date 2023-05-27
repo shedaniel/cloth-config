@@ -19,12 +19,12 @@
 
 package me.shedaniel.clothconfig2.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.Tooltip;
 import me.shedaniel.math.Point;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
@@ -61,14 +61,14 @@ public class ClothConfigTabButton extends AbstractButton {
     }
     
     @Override
-    public void render(PoseStack matrices, int int_1, int int_2, float float_1) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         active = index != screen.selectedCategoryIndex;
-        super.render(matrices, int_1, int_2, float_1);
+        super.render(graphics, mouseX, mouseY, delta);
         
-        if (isMouseOver(int_1, int_2)) {
-            Optional<FormattedText[]> tooltip = getTooltip();
+        if (isMouseOver(mouseX, mouseY)) {
+            Optional<FormattedText[]> tooltip = getDescription();
             if (tooltip.isPresent() && tooltip.get().length > 0)
-                screen.addTooltip(Tooltip.of(new Point(int_1, int_2), tooltip.get()));
+                screen.addTooltip(Tooltip.of(new Point(mouseX, mouseY), tooltip.get()));
         }
     }
     
@@ -82,7 +82,7 @@ public class ClothConfigTabButton extends AbstractButton {
         return this.visible && double_1 >= this.getX() && double_2 >= this.getY() && double_1 < this.getX() + this.width && double_2 < this.getY() + this.height && double_1 >= 20 && double_1 < screen.width - 20;
     }
     
-    public Optional<FormattedText[]> getTooltip() {
+    public Optional<FormattedText[]> getDescription() {
         if (descriptionSupplier != null)
             return descriptionSupplier.get();
         return Optional.empty();
