@@ -23,11 +23,9 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.autoconfig.util.Utils;
 import me.shedaniel.clothconfig2.api.*;
-import me.shedaniel.clothconfig2.gui.entries.MultiElementListEntry;
-import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
+import me.shedaniel.clothconfig2.gui.entries.*;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
@@ -80,6 +78,10 @@ public class ClothConfigDemo {
                 result = 31 * result + (r != null ? r.hashCode() : 0);
                 return result;
             }
+        }
+    
+        enum DependencyDemoEnum {
+            EXCELLENT, GOOD, OKAY, BAD, HORRIBLE
         }
         
         ConfigBuilder builder = ConfigBuilder.create().setTitle(new TranslatableComponent("title.cloth-config.config"));
@@ -156,6 +158,51 @@ public class ClothConfigDemo {
                     }
                 }
         ));
+        
+        SubCategoryBuilder depends = entryBuilder.startSubCategory(new TextComponent("Dependencies")).setExpanded(true);
+        BooleanListEntry dependency = entryBuilder.startBooleanToggle(new TextComponent("A cool toggle"), false).setTooltip(new TextComponent("Toggle me...")).build();
+        depends.add(dependency);
+        Collection<BooleanListEntry> toggles = new LinkedList<>();
+        toggles.add(entryBuilder.startBooleanToggle(new TextComponent("I only work when cool is toggled..."), true)
+                .setRequirement(Requirement.isTrue(dependency)).build());
+        toggles.add(entryBuilder.startBooleanToggle(new TextComponent("I only appear when cool is toggled..."), true)
+                .setDisplayRequirement(Requirement.isTrue(dependency)).build());
+        depends.addAll(toggles);
+        depends.add(entryBuilder.startBooleanToggle(new TextComponent("I only work when cool matches both of these toggles ^^"), true)
+                .setRequirement(Requirement.all(
+                        toggles.stream()
+                                .map(toggle -> Requirement.matches(dependency, toggle))
+                                .toArray(Requirement[]::new)))
+                .build());
+        SubCategoryBuilder dependantSub = entryBuilder.startSubCategory(new TextComponent("Sub-categories can have requirements too..."))
+                .setRequirement(Requirement.isTrue(dependency));
+        dependantSub.add(entryBuilder.startTextDescription(new TextComponent("This sub category depends on Cool being toggled")).build());
+        dependantSub.add(entryBuilder.startBooleanToggle(new TextComponent("Example entry"), true).build());
+        dependantSub.add(entryBuilder.startBooleanToggle(new TextComponent("Another example..."), true).build());
+        depends.add(dependantSub.build());
+        depends.add(entryBuilder.startLongList(new TextComponent("Even lists!"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L))
+                .setRequirement(Requirement.isTrue(dependency)).build());
+        EnumListEntry<DependencyDemoEnum> enumDependency = entryBuilder.startEnumSelector(new TextComponent("Select a good or bad option"), DependencyDemoEnum.class, DependencyDemoEnum.OKAY).build();
+        depends.add(enumDependency);
+        IntegerSliderEntry intDependency = entryBuilder.startIntSlider(new TextComponent("Select something big or small"), 50, -100, 100).build();
+        depends.add(intDependency);
+        depends.add(entryBuilder.startBooleanToggle(new TextComponent("I only work when a good option is chosen..."), true).setTooltip(new TextComponent("Select good or better above"))
+                .setRequirement(Requirement.isValue(enumDependency, DependencyDemoEnum.EXCELLENT, DependencyDemoEnum.GOOD))
+                .build());
+        depends.add(entryBuilder.startBooleanToggle(new TextComponent("I need a good option AND a cool toggle!"), true).setTooltip(new TextComponent("Select good or better and also toggle cool"))
+                .setRequirement(Requirement.all(
+                        Requirement.isTrue(dependency),
+                        Requirement.isValue(enumDependency, DependencyDemoEnum.EXCELLENT, DependencyDemoEnum.GOOD)))
+                .build());
+        depends.add(entryBuilder.startBooleanToggle(new TextComponent("I only work when numbers are extreme!"), true)
+                .setTooltip(new TextComponent("Move the slider..."))
+                .setRequirement(Requirement.any(
+                        () -> intDependency.getValue() < -70,
+                        () -> intDependency.getValue() > 70))
+                .build());
+    
+        testing.addEntry(depends.build());
+       
         testing.addEntry(entryBuilder.startTextDescription(
                 new TranslatableComponent("text.cloth-config.testing.1",
                         new TextComponent("ClothConfig").withStyle(s -> s.withBold(true).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(Util.make(new ItemStack(Items.PINK_WOOL), stack -> stack.setHoverName(new TextComponent("(\u30FB\u2200\u30FB)")).enchant(Enchantments.BLOCK_EFFICIENCY, 10)))))),

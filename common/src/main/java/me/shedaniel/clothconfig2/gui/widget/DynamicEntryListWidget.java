@@ -24,7 +24,7 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
-import me.shedaniel.clothconfig2.api.ScissorsHandler;
+import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.math.Rectangle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -43,18 +43,17 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Environment(EnvType.CLIENT)
-public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends AbstractContainerEventHandler implements Widget, NarratableEntry {
+public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends AbstractContainerEventHandler implements TickableWidget, Widget, NarratableEntry {
     protected static final int DRAG_OUTSIDE = -2;
     protected final Minecraft client;
     private final List<E> entries = new Entries();
+    private List<E> visibleEntries = Collections.emptyList();
     public int width;
     public int height;
     public int top;
@@ -82,6 +81,25 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         this.left = 0;
         this.right = width;
         this.backgroundLocation = backgroundLocation;
+    }
+    
+    /**
+     * Get all visible children. I.e. hidden config entries are filtered out.
+     * 
+     * <p> Note: this isn't thread safe, since the visible children list is
+     * updated when calling {@link #tick()}.
+     * 
+     * @return an unmodifiable {@link List} of visible entries
+     */
+    @ApiStatus.Experimental
+    public List<E> visibleChildren() {
+        return this.visibleEntries;
+    }
+    
+    private void updateVisibleChildren() {
+        this.visibleEntries = this.children().stream()
+                .filter(HideableWidget::isDisplayed)
+                .toList();
     }
     
     public void setRenderSelection(boolean boolean_1) {
@@ -120,7 +138,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected void narrateListElementPosition(NarrationElementOutput narrationElementOutput, E entry) {
-        List<E> list = this.children();
+        List<E> list = this.visibleChildren();
         if (list.size() > 1) {
             int i = list.indexOf(entry);
             if (i != -1) {
@@ -154,7 +172,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected E getItem(int index) {
-        return this.children().get(index);
+        return this.visibleChildren().get(index);
     }
     
     protected int addItem(E item) {
@@ -163,11 +181,11 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected int getItemCount() {
-        return this.children().size();
+        return this.visibleChildren().size();
     }
     
     protected boolean isSelected(int index) {
-        return Objects.equals(this.getSelectedItem(), this.children().get(index));
+        return Objects.equals(this.getSelectedItem(), this.getItem(index));
     }
     
     protected final E getItemAtPosition(double mouseX, double mouseY) {
@@ -175,17 +193,29 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         int minX = listMiddleX - this.getItemWidth() / 2;
         int maxX = listMiddleX + this.getItemWidth() / 2;
         int currentY = Mth.floor(mouseY - (double) this.top) - this.headerHeight + (int) this.getScroll() - 4;
+        
+        // Check if we can return early
+        if ((double) this.getScrollbarPosition() <= mouseX) {
+            return null;
+        } else if (mouseX < minX) {
+            return null;
+        } else if (mouseX > maxX) {
+            return null;
+        } else if (currentY < 0) {
+            return null;
+        }
+        
+        // Otherwise look for the selected item
+        E itemAtPosition = null;
         int itemY = 0;
-        int itemIndex = -1;
-        for (int i = 0; i < children().size(); i++) {
-            E item = getItem(i);
+        for (E item : visibleChildren()) {
             itemY += item.getItemHeight();
             if (itemY > currentY) {
-                itemIndex = i;
+                itemAtPosition = item;
                 break;
             }
         }
-        return mouseX < (double) this.getScrollbarPosition() && mouseX >= minX && mouseX <= maxX && itemIndex >= 0 && currentY >= 0 && itemIndex < this.getItemCount() ? this.children().get(itemIndex) : null;
+        return itemAtPosition;
     }
     
     public void updateSize(int width, int height, int top, int bottom) {
@@ -205,7 +235,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected int getMaxScrollPosition() {
         List<Integer> list = new ArrayList<>();
         int i = headerHeight;
-        for (E entry : children()) {
+        for (E entry : visibleChildren()) {
             i += entry.getItemHeight();
             if (entry.getMorePossibleHeight() >= 0) {
                 list.add(i + entry.getMorePossibleHeight());
@@ -216,6 +246,14 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected void clickedHeader(int int_1, int int_2) {
+    }
+    
+    @Override
+    public void tick() {
+        this.updateVisibleChildren();
+        for (E child : this.children()) {
+           child.tick();
+        }
     }
     
     protected void renderHeader(PoseStack matrices, int rowLeft, int startY, Tesselator tessellator) {
@@ -315,14 +353,21 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected void centerScrollOn(E item) {
-        double d = (this.bottom - this.top) / -2d;
-        for (int i = 0; i < this.children().indexOf(item) && i < this.getItemCount(); i++)
-            d += getItem(i).getItemHeight();
-        this.capYPosition(d);
+        List<E> children = this.visibleChildren();
+        double halfway = (this.bottom - this.top) / -2d;
+        int itemIndex = children.indexOf(item);
+        int i = 0;
+        for (E elm : children) {
+            if (i++ >= itemIndex) {
+                break;
+            }
+            halfway += elm.getItemHeight();
+        }
+        this.capYPosition(halfway);
     }
     
     protected void ensureVisible(E item) {
-        int rowTop = this.getRowTop(this.children().indexOf(item));
+        int rowTop = this.getRowTop(this.visibleChildren().indexOf(item));
         int int_2 = rowTop - this.top - 4 - item.getItemHeight();
         if (int_2 < 0)
             this.scroll(int_2);
@@ -412,7 +457,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     public boolean mouseScrolled(double double_1, double double_2, double double_3) {
-        for (E entry : children()) {
+        for (E entry : visibleChildren()) {
             if (entry.mouseScrolled(double_1, double_2, double_3)) {
                 return true;
             }
@@ -435,36 +480,39 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         }
     }
     
-    protected void moveSelection(int int_1) {
-        if (!this.children().isEmpty()) {
-            int int_2 = this.children().indexOf(this.getSelectedItem());
-            int int_3 = Mth.clamp(int_2 + int_1, 0, this.getItemCount() - 1);
-            E itemListWidget$Item_1 = this.children().get(int_3);
-            this.selectItem(itemListWidget$Item_1);
-            this.ensureVisible(itemListWidget$Item_1);
+    protected void moveSelection(int shift) {
+        List<E> children = this.visibleChildren();
+        if (children.isEmpty()) {
+            return;
         }
-        
+        int selected = children.indexOf(this.getSelectedItem());
+        int index = Mth.clamp(selected + shift, 0, this.getItemCount() - 1);
+        E item = this.getItem(index);
+        this.selectItem(item);
+        this.ensureVisible(item);
     }
     
     public boolean isMouseOver(double double_1, double double_2) {
         return double_2 >= (double) this.top && double_2 <= (double) this.bottom && double_1 >= (double) this.left && double_1 <= (double) this.right;
     }
     
-    protected void renderList(PoseStack matrices, int startX, int startY, int int_3, int int_4, float float_1) {
-        hoveredItem = this.isMouseOver(int_3, int_4) ? this.getItemAtPosition(int_3, int_4) : null;
-        int itemCount = this.getItemCount();
+    protected void renderList(PoseStack matrices, int startX, int startY, int mouseX, int mouseY, float delta) {
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.getBuilder();
         
-        for (int renderIndex = 0; renderIndex < itemCount; ++renderIndex) {
-            E item = this.getItem(renderIndex);
-            int itemY = startY + headerHeight;
-            for (int i = 0; i < children().size() && i < renderIndex; i++)
-                itemY += children().get(i).getItemHeight();
+        hoveredItem = this.isMouseOver(mouseX, mouseY) ? this.getItemAtPosition(mouseX, mouseY) : null;
+        
+        int heights = 0; // itemHeight accumulator
+        int renderIndex = 0; // index is passed to render methods
+        for (E item : visibleChildren()) {
+            int itemY = startY + headerHeight + heights;
             int itemHeight = item.getItemHeight() - 4;
             int itemWidth = this.getItemWidth();
             int itemMinX, itemMaxX;
-            if (this.selectionVisible && this.isSelected(renderIndex)) {
+            boolean itemHovered = Objects.equals(this.hoveredItem, item);
+            
+            // if item is selected
+            if (this.selectionVisible && Objects.equals(this.selectedItem, item)) {
                 itemMinX = this.left + this.width / 2 - itemWidth / 2;
                 itemMaxX = itemMinX + itemWidth;
                 RenderSystem.disableTexture();
@@ -484,9 +532,14 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                 RenderSystem.enableTexture();
             }
             
+            // Finally, call render
             int y = this.getRowTop(renderIndex);
             int x = this.getRowLeft();
-            renderItem(matrices, item, renderIndex, y, x, itemWidth, itemHeight, int_3, int_4, Objects.equals(hoveredItem, item), float_1);
+            renderItem(matrices, item, renderIndex, y, x, itemWidth, itemHeight, mouseX, mouseY, itemHovered, delta);
+            
+            // Update counter and accumulator
+            heights += item.getItemHeight();
+            renderIndex++;
         }
     }
     
@@ -499,10 +552,15 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected int getRowTop(int index) {
-        int integer = top + 4 - (int) this.getScroll() + headerHeight;
-        for (int i = 0; i < children().size() && i < index; i++)
-            integer += children().get(i).getItemHeight();
-        return integer;
+        int top = this.top + 4 - (int) this.getScroll() + headerHeight;
+        int i = 0;
+        for (E item : visibleChildren()) {
+            if (index <= i++) {
+                break;
+            }
+            top += item.getItemHeight(); 
+        }
+        return top;
     }
     
     protected boolean isFocused() {
@@ -524,18 +582,18 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         tesselator.end();
     }
     
-    protected E remove(int int_1) {
-        E itemListWidget$Item_1 = this.children().get(int_1);
-        return this.removeEntry(this.children().get(int_1)) ? itemListWidget$Item_1 : null;
+    protected E remove(int index) {
+        E item = this.getItem(index);
+        return this.removeEntry(item) ? item : null;
     }
     
-    protected boolean removeEntry(E itemListWidget$Item_1) {
-        boolean boolean_1 = this.children().remove(itemListWidget$Item_1);
-        if (boolean_1 && itemListWidget$Item_1 == this.getSelectedItem()) {
+    protected boolean removeEntry(E entry) {
+        boolean removed = this.children().remove(entry);
+        if (removed && entry == this.getSelectedItem()) {
             this.selectItem(null);
         }
         
-        return boolean_1;
+        return removed;
     }
     
     public static final class SmoothScrollingSettings {
@@ -545,10 +603,16 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract static class Entry<E extends Entry<E>> extends GuiComponent implements GuiEventListener {
+    public abstract static class Entry<E extends Entry<E>> extends GuiComponent implements GuiEventListener, TickableWidget, HideableWidget, DisableableWidget {
         @Deprecated DynamicEntryListWidget<E> parent;
         @Nullable
         private NarratableEntry lastNarratable;
+        @Nullable
+        protected Requirement enableRequirement = null;
+        @Nullable
+        protected Requirement displayRequirement = null;
+        protected boolean enabled = true;
+        protected boolean displayed = true;
         
         public Entry() {
         }
@@ -567,6 +631,36 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             this.parent = parent;
         }
         
+        @Override
+        public boolean isEnabled() {
+            return isDisplayed() && enabled;
+        }
+        
+        @Override
+        public boolean isDisplayed() {
+            return displayed;
+        }
+        
+        @Override
+        public void setRequirement(@Nullable Requirement requirement) {
+            this.enableRequirement = requirement;
+        }
+        
+        @Override
+        public @Nullable Requirement getRequirement() {
+            return enableRequirement;
+        }
+        
+        @Override
+        public void setDisplayRequirement(@Nullable Requirement requirement) {
+            this.displayRequirement = requirement;
+        }
+        
+        @Override
+        public @Nullable Requirement getDisplayRequirement() {
+            return displayRequirement;
+        }
+        
         public abstract int getItemHeight();
         
         @Deprecated
@@ -575,6 +669,13 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         }
         
         public abstract List<? extends NarratableEntry> narratables();
+        
+        @Override
+        public void tick() {
+            // Check requirements
+            enabled = getRequirement() == null || getRequirement().check();
+            displayed = getDisplayRequirement() == null || getDisplayRequirement().check();
+        }
         
         void updateNarration(NarrationElementOutput narrationElementOutput) {
             List<? extends NarratableEntry> list = this.narratables();

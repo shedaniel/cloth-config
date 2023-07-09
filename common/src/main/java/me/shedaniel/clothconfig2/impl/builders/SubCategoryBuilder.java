@@ -79,7 +79,7 @@ public class SubCategoryBuilder extends FieldBuilder<List<AbstractConfigListEntr
     public SubCategoryListEntry build() {
         SubCategoryListEntry entry = new SubCategoryListEntry(getFieldNameKey(), entries, expanded);
         entry.setTooltipSupplier(() -> tooltipSupplier.apply(entry.getValue()));
-        return entry;
+        return finishBuilding(entry);
     }
     
     @Override
