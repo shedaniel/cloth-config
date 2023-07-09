@@ -66,6 +66,62 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         public void setFocused(GuiEventListener element_1) {
             this.focused = element_1;
         }
+        
+        @Override
+        public boolean mouseClicked(double d, double e, int i) {
+            if (!isEnabled()) {
+                return false;
+            }
+            return ContainerEventHandler.super.mouseClicked(d, e, i);
+        }
+        
+        @Override
+        public boolean mouseReleased(double d, double e, int i) {
+            if (!isEnabled()) {
+                return false;
+            }
+            return ContainerEventHandler.super.mouseReleased(d, e, i);
+        }
+        
+        @Override
+        public boolean mouseDragged(double d, double e, int i, double f, double g) {
+            if (!isEnabled()) {
+                return false;
+            }
+            return ContainerEventHandler.super.mouseDragged(d, e, i, f, g);
+        }
+        
+        @Override
+        public boolean mouseScrolled(double d, double e, double f) {
+            if (!isEnabled()) {
+                return false;
+            }
+            return ContainerEventHandler.super.mouseScrolled(d, e, f);
+        }
+        
+        @Override
+        public boolean keyPressed(int i, int j, int k) {
+            if (!isEnabled()) {
+                return false;
+            }
+            return ContainerEventHandler.super.keyPressed(i, j, k);
+        }
+        
+        @Override
+        public boolean keyReleased(int i, int j, int k) {
+            if (!isEnabled()) {
+                return false;
+            }
+            return ContainerEventHandler.super.keyReleased(i, j, k);
+        }
+        
+        @Override
+        public boolean charTyped(char c, int i) {
+            if (!isEnabled()) {
+                return false;
+            }
+            return ContainerEventHandler.super.charTyped(c, i);
+        }
     }
 }
 

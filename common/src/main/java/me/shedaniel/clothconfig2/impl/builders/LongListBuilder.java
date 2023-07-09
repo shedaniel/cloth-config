@@ -162,7 +162,7 @@ public class LongListBuilder extends AbstractRangeListBuilder<Long, LongListList
         entry.setRemoveTooltip(getRemoveTooltip());
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
-        return entry;
+        return finishBuilding(entry);
     }
     
 }

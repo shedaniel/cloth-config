@@ -90,7 +90,7 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
     
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        for (E entry : children()) {
+        for (E entry : visibleChildren()) {
             if (entry.mouseScrolled(mouseX, mouseY, amount)) {
                 return true;
             }
