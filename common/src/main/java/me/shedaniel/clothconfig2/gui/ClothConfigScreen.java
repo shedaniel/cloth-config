@@ -395,7 +395,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
         
         @Override
-        protected void renderList(PoseStack matrices, int startX, int startY, int int_3, int int_4, float delta) {
+        protected void renderList(PoseStack matrices, int startX, int startY, int mouseX, int mouseY, float delta) {
             thisTimeTarget = null;
             Rectangle hoverBounds = currentBounds.value();
             if (!hoverBounds.isEmpty()) {
@@ -404,8 +404,8 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 alpha = (alpha * 36 / 255) << 24;
                 fillGradient(matrices, hoverBounds.x, hoverBounds.y - scroll, hoverBounds.getMaxX(), hoverBounds.getMaxY() - scroll, 0xFFFFFF | alpha, 0xFFFFFF | alpha);
             }
-            super.renderList(matrices, startX, startY, int_3, int_4, delta);
-            if (thisTimeTarget != null && isMouseOver(int_3, int_4)) {
+            super.renderList(matrices, startX, startY, mouseX, mouseY, delta);
+            if (thisTimeTarget != null && isMouseOver(mouseX, mouseY)) {
                 lastTouch = System.currentTimeMillis();
             }
             if (thisTimeTarget != null && !thisTimeTarget.equals(currentBounds.target())) {

@@ -30,22 +30,22 @@ import me.shedaniel.clothconfig2.gui.widget.DynamicElementListWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
-public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> implements ReferenceProvider<T> {
+public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.ElementEntry<AbstractConfigEntry<T>> implements ReferenceProvider<T>, ValueHolder<T> {
     private AbstractConfigScreen screen;
     private Supplier<Optional<Component>> errorSupplier;
     @Nullable
@@ -108,6 +108,8 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
             text = text.withStyle(ChatFormatting.ITALIC);
         if (!hasError && !isEdited)
             text = text.withStyle(ChatFormatting.GRAY);
+        if (!isEnabled())
+            text = text.withStyle(ChatFormatting.DARK_GRAY);
         return text;
     }
     
@@ -132,8 +134,6 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
             this.additionalSearchTags = Iterables.concat(this.additionalSearchTags, tags);
         }
     }
-    
-    public abstract T getValue();
     
     public final Optional<Component> getConfigError() {
         if (errorSupplier != null && errorSupplier.get().isPresent())
@@ -169,6 +169,19 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
     
     public final void addTooltip(@NotNull Tooltip tooltip) {
         screen.addTooltip(tooltip);
+    }
+    
+    protected FormattedCharSequence[] wrapLinesToScreen(Component[] lines) {
+        return wrapLines(lines, screen.width);
+    }
+    
+    protected FormattedCharSequence[] wrapLines(Component[] lines, int width) {
+        final Font font = Minecraft.getInstance().font;
+        
+        return Arrays.stream(lines)
+                .map(line -> font.split(line, width))
+                .flatMap(List::stream)
+                .toArray(FormattedCharSequence[]::new);
     }
     
     public void updateSelected(boolean isSelected) {}

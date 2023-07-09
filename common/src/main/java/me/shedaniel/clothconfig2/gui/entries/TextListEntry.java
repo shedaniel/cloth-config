@@ -23,6 +23,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -35,12 +36,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public class TextListEntry extends TooltipListEntry<Object> {
     public static final int LINE_HEIGHT = 12;
+    public static final int DISABLED_COLOR = Objects.requireNonNull(ChatFormatting.DARK_GRAY.getColor());
     private final Font textRenderer = Minecraft.getInstance().font;
     private final int color;
     private final Component text;
@@ -80,8 +83,9 @@ public class TextListEntry extends TooltipListEntry<Object> {
             this.savedY = y;
         }
         int yy = y + 7;
+        int textColor = isEnabled() ? color : DISABLED_COLOR;
         for (FormattedCharSequence string : wrappedLines) {
-            Minecraft.getInstance().font.drawShadow(matrices, string, x, yy, color);
+            Minecraft.getInstance().font.drawShadow(matrices, string, x, yy, textColor);
             yy += Minecraft.getInstance().font.lineHeight + 3;
         }
     

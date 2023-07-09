@@ -33,6 +33,7 @@
     "text.cloth-config.boolean.value.true": "§aYes",
     "text.cloth-config.boolean.value.false": "§cNo",
     "text.cloth-config.dropdown.value.unknown": "§cNo suggestions",
+    "text.cloth-config.disabled_tooltip": "Disabled (requirements not met)",
     "modifier.cloth-config.alt": "Alt + %s",
     "modifier.cloth-config.ctrl": "Ctrl + %s",
     "modifier.cloth-config.shift": "Shift + %s",

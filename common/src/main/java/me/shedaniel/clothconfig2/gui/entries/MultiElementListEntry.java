@@ -113,16 +113,17 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     @Override
     public void render(PoseStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
         super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+        boolean insideWidget = widget.rectangle.contains(mouseX, mouseY);
         Minecraft.getInstance().getTextureManager().bind(CONFIG_TEX);
         Lighting.turnOff();
         RenderSystem.color4f(1, 1, 1, 1);
-        blit(matrices, x - 15, y + 5, 24, (widget.rectangle.contains(mouseX, mouseY) ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
-        Minecraft.getInstance().font.drawShadow(matrices, getDisplayedFieldName().getVisualOrderText(), x, y + 6, widget.rectangle.contains(mouseX, mouseY) ? 0xffe6fe16 : -1);
+        blit(matrices, x - 15, y + 5, 24, (isEnabled() ? (insideWidget ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9);
+        Minecraft.getInstance().font.drawShadow(matrices, getDisplayedFieldName().getVisualOrderText(), x, y + 6, insideWidget ? 0xffe6fe16 : -1);
         for (AbstractConfigListEntry entry : entries) {
             entry.setParent(getParent());
             entry.setScreen(getConfigScreen());
         }
-        if (expanded) {
+        if (isExpanded()) {
             int yy = y + 24;
             for (AbstractConfigListEntry<?> entry : entries) {
                 entry.render(matrices, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered, delta);
@@ -143,7 +144,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     
     @Override
     public int getItemHeight() {
-        if (expanded) {
+        if (isExpanded()) {
             int i = 24;
             for (AbstractConfigListEntry<?> entry : entries)
                 i += entry.getItemHeight();
@@ -155,7 +156,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     @Override
     public void updateSelected(boolean isSelected) {
         for (AbstractConfigListEntry<?> entry : entries) {
-            entry.updateSelected(expanded && isSelected && getFocused() == entry);
+            entry.updateSelected(isExpanded() && isSelected && getFocused() == entry);
         }
     }
     
@@ -166,7 +167,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     
     @Override
     public void lateRender(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        if (expanded) {
+        if (isExpanded()) {
             for (AbstractConfigListEntry<?> entry : entries) {
                 entry.lateRender(matrices, mouseX, mouseY, delta);
             }
@@ -176,7 +177,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     @SuppressWarnings("deprecation")
     @Override
     public int getMorePossibleHeight() {
-        if (!expanded) return -1;
+        if (!isExpanded()) return -1;
         List<Integer> list = new ArrayList<>();
         int i = 24;
         for (AbstractConfigListEntry<?> entry : entries) {
@@ -191,7 +192,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     
     @Override
     public List<? extends GuiEventListener> children() {
-        return expanded ? children : Collections.singletonList(widget);
+        return isExpanded() ? children : Collections.singletonList(widget);
     }
     
     @Override
@@ -211,7 +212,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     
     @Override
     public boolean isExpanded() {
-        return this.expanded;
+        return this.expanded && isEnabled();
     }
     
     @Override
@@ -223,9 +224,9 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         private final Rectangle rectangle = new Rectangle();
         
         @Override
-        public boolean mouseClicked(double double_1, double double_2, int int_1) {
-            if (rectangle.contains(double_1, double_2)) {
-                expanded = !expanded;
+        public boolean mouseClicked(double mouseX, double mouseY, int int_1) {
+            if (isEnabled() && rectangle.contains(mouseX, mouseY)) {
+                setExpanded(!expanded);
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             }
