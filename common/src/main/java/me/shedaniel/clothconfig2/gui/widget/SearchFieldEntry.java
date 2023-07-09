@@ -52,7 +52,7 @@ public class SearchFieldEntry extends AbstractConfigListEntry<Object> {
                     if (editBox.getValue().isEmpty())
                         return entries.iterator();
                     return Iterators.filter(entries.iterator(), entry -> {
-                        return screen.matchesSearch(entry.getSearchTags());
+                        return entry.isDisplayed() && screen.matchesSearch(entry.getSearchTags());
                     });
                 }
                 
