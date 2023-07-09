@@ -115,7 +115,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     
     @Override
     public boolean isExpanded() {
-        return expanded;
+        return expanded && isEnabled();
     }
     
     @Override
@@ -156,11 +156,11 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     public abstract SELF self();
     
     public boolean isDeleteButtonEnabled() {
-        return deleteButtonEnabled;
+        return deleteButtonEnabled && isEnabled();
     }
     
     public boolean isInsertButtonEnabled() {
-        return insertButtonEnabled;
+        return insertButtonEnabled && isEnabled();
     }
     
     public void setDeleteButtonEnabled(boolean deleteButtonEnabled) {
@@ -211,7 +211,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     
     @Override
     public int getItemHeight() {
-        if (expanded) {
+        if (isExpanded()) {
             int i = 24;
             for (BaseListCell entry : cells)
                 i += entry.getCellHeight();
@@ -222,7 +222,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     
     @Override
     public List<? extends GuiEventListener> children() {
-        if (!expanded) {
+        if (!isExpanded()) {
             List<GuiEventListener> elements = new ArrayList<>(widgets);
             elements.removeAll(cells);
             return elements;
@@ -278,9 +278,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
             return Optional.of(new Component[]{addTooltip});
         if (removeTooltip != null && isInsideDelete(mouseX, mouseY))
             return Optional.of(new Component[]{removeTooltip});
-        if (getTooltipSupplier() != null)
-            return getTooltipSupplier().get();
-        return Optional.empty();
+        return super.getTooltip(mouseX, mouseY);
     }
     
     @Override
@@ -288,10 +286,11 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         RenderSystem.setShaderTexture(0, CONFIG_TEX);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        BaseListCell focused = !expanded || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
+        BaseListCell focused = !isExpanded() || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
+        boolean insideLabel = labelWidget.rectangle.contains(mouseX, mouseY);
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);
-        graphics.blit(CONFIG_TEX, x - 15, y + 5, 24 + 9, (labelWidget.rectangle.contains(mouseX, mouseY) && !insideCreateNew && !insideDelete ? 18 : 0) + (expanded ? 9 : 0), 9, 9);
+        graphics.blit(CONFIG_TEX, x - 15, y + 5, 24 + 9, (isEnabled() ? (insideLabel && !insideCreateNew && !insideDelete ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9);
         if (isInsertButtonEnabled())
             graphics.blit(CONFIG_TEX, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
         if (isDeleteButtonEnabled())
@@ -300,8 +299,9 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         resetWidget.setY(y);
         resetWidget.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault();
         resetWidget.render(graphics, mouseX, mouseY, delta);
-        graphics.drawString(Minecraft.getInstance().font, getDisplayedFieldName().getVisualOrderText(), isDeleteButtonEnabled() ? x + 24 : x + 24 - 9, y + 6, labelWidget.rectangle.contains(mouseX, mouseY) && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
-        if (expanded) {
+        int offset = (isInsertButtonEnabled() || isDeleteButtonEnabled() ? 6 : 0) + (isInsertButtonEnabled() ? 9 : 0) + (isDeleteButtonEnabled() ? 9 : 0);
+        graphics.drawString(Minecraft.getInstance().font, getDisplayedFieldName().getVisualOrderText(), x + offset, y + 6, insideLabel && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
+        if (isExpanded()) {
             int yy = y + 24;
             for (BaseListCell cell : cells) {
                 cell.render(graphics, -1, yy, x + 14, entryWidth - 14, cell.getCellHeight(), mouseX, mouseY, getParent().getFocused() != null && getParent().getFocused().equals(this) && getFocused() != null && getFocused().equals(cell), delta);
@@ -313,7 +313,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     @Override
     public void updateSelected(boolean isSelected) {
         for (C cell : cells) {
-            cell.updateSelected(isSelected && getFocused() == cell && expanded);
+            cell.updateSelected(isSelected && getFocused() == cell && isExpanded());
         }
     }
     
@@ -330,11 +330,13 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         protected Rectangle rectangle = new Rectangle();
         
         @Override
-        public boolean mouseClicked(double double_1, double double_2, int int_1) {
-            if (resetWidget.isMouseOver(double_1, double_2)) {
+        public boolean mouseClicked(double mouseX, double mouseY, int int_1) {
+            if (!isEnabled())
                 return false;
-            } else if (isInsideCreateNew(double_1, double_2)) {
-                expanded = true;
+            if (resetWidget.isMouseOver(mouseX, mouseY)) {
+                return false;
+            } else if (isInsideCreateNew(mouseX, mouseY)) {
+                setExpanded(true);
                 C cell;
                 if (insertInFront()) {
                     cells.add(0, cell = createNewInstance.apply(BaseListEntry.this.self()));
@@ -346,9 +348,9 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                 cell.onAdd();
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
-            } else if (isDeleteButtonEnabled() && isInsideDelete(double_1, double_2)) {
+            } else if (isDeleteButtonEnabled() && isInsideDelete(mouseX, mouseY)) {
                 GuiEventListener focused = getFocused();
-                if (expanded && focused instanceof BaseListCell) {
+                if (isExpanded() && focused instanceof BaseListCell) {
                     ((BaseListCell) focused).onDelete();
                     //noinspection SuspiciousMethodCalls
                     cells.remove(focused);
@@ -356,8 +358,8 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                     Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 }
                 return true;
-            } else if (rectangle.contains(double_1, double_2)) {
-                expanded = !expanded;
+            } else if (rectangle.contains(mouseX, mouseY)) {
+                setExpanded(!expanded);
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             }

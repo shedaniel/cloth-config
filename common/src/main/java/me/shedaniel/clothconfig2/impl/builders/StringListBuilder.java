@@ -138,7 +138,7 @@ public class StringListBuilder extends AbstractListBuilder<String, StringListLis
         entry.setRemoveTooltip(getRemoveTooltip());
         if (errorSupplier != null)
             entry.setErrorSupplier(() -> errorSupplier.apply(entry.getValue()));
-        return entry;
+        return finishBuilding(entry);
     }
     
 }
