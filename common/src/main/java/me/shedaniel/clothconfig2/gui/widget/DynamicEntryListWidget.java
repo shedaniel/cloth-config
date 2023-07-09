@@ -46,10 +46,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 @Environment(EnvType.CLIENT)
-public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends AbstractContainerEventHandler implements TickableWidget, Widget, NarratableEntry {
+public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends AbstractContainerEventHandler implements Widget, NarratableEntry {
     protected static final int DRAG_OUTSIDE = -2;
     protected final Minecraft client;
     private final List<E> entries = new Entries();
+    private float totalTicks = 1.0f;
     private List<E> visibleEntries = Collections.emptyList();
     public int width;
     public int height;
@@ -84,7 +85,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
      * Get all visible children. I.e. hidden config entries are filtered out.
      * 
      * <p> Note: this isn't thread safe, since the visible children list is
-     * updated when calling {@link #tick()}.
+     * updated when calling {@link #tickList()}.
      * 
      * @return an unmodifiable {@link List} of visible entries
      */
@@ -245,8 +246,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     protected void clickedHeader(int int_1, int int_2) {
     }
     
-    @Override
-    public void tick() {
+    public void tickList() {
         this.updateVisibleChildren();
         for (E child : this.children()) {
            child.tick();
@@ -279,6 +279,12 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     
     @Override
     public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
+        this.totalTicks += delta;
+        if (this.totalTicks >= 1.0f) {
+            this.totalTicks = this.totalTicks % 1.0f;
+            this.tickList();
+        }
+        
         this.drawBackground();
         int scrollbarPosition = this.getScrollbarPosition();
         int int_4 = scrollbarPosition + 6;
