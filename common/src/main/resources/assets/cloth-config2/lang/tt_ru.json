@@ -2,7 +2,7 @@
     "modmenu.descriptionTranslation.cloth-config": "Көйләүләр экраннары өчен API.",
     "text.cloth-config.save_and_done": "Саклау һәм чыгу",
     "text.cloth-config.apply": "Үзгәрешләр куллану",
-    "text.cloth-config.quit_config": "Үзгәрешләр сакламады",
+    "text.cloth-config.quit_config": "Үзгәрешләр сакланмады",
     "text.cloth-config.quit_config_sure": "Көйләүне үзгәртүдән чыгарга телисезме? Үзгәрешләр сакламаячак!",
     "text.cloth-config.cancel_discard": "Үзгәрешләрне баш тарту",
     "text.cloth-config.quit_discard": "Чыгу һәм үзгәрешләрне баш тарту",
