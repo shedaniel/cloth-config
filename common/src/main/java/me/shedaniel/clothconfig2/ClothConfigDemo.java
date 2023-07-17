@@ -200,9 +200,9 @@ public class ClothConfigDemo {
                         () -> intDependency.getValue() > 70))
                 .build());
         
-        FloatSliderEntry floatSlider = entryBuilder.startFloatSlider(Component.literal("Select a float"), 10, 0, 10, 1).setSaveConsumer(number -> System.out.println("Float value set to " + number)).build();
+        FloatSliderEntry floatSlider = entryBuilder.startFloatSlider(Component.literal("Select a float"), 4.2f, 0, 10, 1).setSaveConsumer(number -> System.out.println("Float value set to " + number)).build();
         depends.add(floatSlider);
-        DoubleSliderEntry doubleSlider = entryBuilder.startDoubleSlider(Component.literal("Select a double"), 10, 0, 10, 10).setSaveConsumer(number -> System.out.println("Double value set to " + number)).build();
+        DoubleSliderEntry doubleSlider = entryBuilder.startDoubleSlider(Component.literal("Select a double"), 3.1415926535, 0, 10, 10).setSaveConsumer(number -> System.out.println("Double value set to " + number)).build();
         depends.add(doubleSlider);
     
         testing.addEntry(depends.build());
