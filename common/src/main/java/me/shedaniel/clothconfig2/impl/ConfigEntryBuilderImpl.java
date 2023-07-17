@@ -172,6 +172,11 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     }
     
     @Override
+    public DoubleSliderBuilder startDoubleSlider(Component fieldNameKey, double value, double min, double max, int precision) {
+        return new DoubleSliderBuilder(resetButtonKey, fieldNameKey, value, min, max, precision);
+    }
+    
+    @Override
     public KeyCodeBuilder startModifierKeyCodeField(Component fieldNameKey, ModifierKeyCode value) {
         return new KeyCodeBuilder(resetButtonKey, fieldNameKey, value);
     }

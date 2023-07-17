@@ -41,33 +41,33 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
-public class FloatSliderEntry extends TooltipListEntry<Float> {
+public class DoubleSliderEntry extends TooltipListEntry<Double> {
     
     protected Slider sliderWidget;
     protected Button resetButton;
-    protected Float value;
-    protected final Float orginial;
-    private float minimum, maximum;
+    protected Double value;
+    protected final Double orginial;
+    private Double minimum, maximum;
     private int precision;
-    private final Supplier<Float> defaultValue;
-    private Function<Float, Component> textGetter = value -> Component.literal(String.format("Value: %." + precision + "f", value));
+    private final Supplier<Double> defaultValue;
+    private Function<Double, Component> textGetter = value -> Component.literal(String.format("Value: %." + precision + "f", value));
     private final List<AbstractWidget> widgets;
     
     @ApiStatus.Internal
     @Deprecated
-    public FloatSliderEntry(Component fieldName, float minimum, float maximum, float value, int precision, Component resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer) {
+    public DoubleSliderEntry(Component fieldName, double minimum, double maximum, double value, int precision, Component resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer) {
         this(fieldName, minimum, maximum, value, precision, resetButtonKey, defaultValue, saveConsumer, null);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public FloatSliderEntry(Component fieldName, float minimum, float maximum, float value, int precision, Component resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier) {
+    public DoubleSliderEntry(Component fieldName, double minimum, double maximum, double value, int precision, Component resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier) {
         this(fieldName, minimum, maximum, value, precision, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
     }
     
     @ApiStatus.Internal
     @Deprecated
-    public FloatSliderEntry(Component fieldName, float minimum, float maximum, float value, int precision, Component resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart) {
+    public DoubleSliderEntry(Component fieldName, double minimum, double maximum, double value, int precision, Component resetButtonKey, Supplier<Double> defaultValue, Consumer<Double> saveConsumer, Supplier<Optional<Component[]>> tooltipSupplier, boolean requiresRestart) {
         super(fieldName, tooltipSupplier, requiresRestart);
         this.orginial = value;
         this.defaultValue = defaultValue;
@@ -80,34 +80,34 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
         this.resetButton = new Button(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20, resetButtonKey, widget -> {
             setValue(defaultValue.get());
         });
-        this.sliderWidget.setMessage(textGetter.apply(FloatSliderEntry.this.value));
+        this.sliderWidget.setMessage(textGetter.apply(DoubleSliderEntry.this.value));
         this.widgets = Lists.newArrayList(sliderWidget, resetButton);
     }
     
-    public Function<Float, Component> getTextGetter() {
+    public Function<Double, Component> getTextGetter() {
         return textGetter;
     }
     
-    public FloatSliderEntry setTextGetter(Function<Float, Component> textGetter) {
+    public DoubleSliderEntry setTextGetter(Function<Double, Component> textGetter) {
         this.textGetter = textGetter;
-        this.sliderWidget.setMessage(textGetter.apply(FloatSliderEntry.this.value));
+        this.sliderWidget.setMessage(textGetter.apply(DoubleSliderEntry.this.value));
         return this;
     }
     
     @Override
-    public Float getValue() {
+    public Double getValue() {
         return value;
     }
     
     @Deprecated
-    public void setValue(float value) {
+    public void setValue(double value) {
         sliderWidget.setValue((Mth.clamp(value, minimum, maximum) - minimum) / (double) Math.abs(maximum - minimum));
         this.value = roundNumber(Math.min(Math.max(value, minimum), maximum));
         sliderWidget.updateMessage();
     }
     
-    private float roundNumber(double value) {
-        return (float) (Math.round(value * Math.pow(10, this.precision)) / Math.pow(10, this.precision));
+    private double roundNumber(double value) {
+        return (Math.round(value * Math.pow(10, this.precision)) / Math.pow(10, this.precision));
     }
     
     @Override
@@ -116,7 +116,7 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
     }
     
     @Override
-    public Optional<Float> getDefaultValue() {
+    public Optional<Double> getDefaultValue() {
         return defaultValue == null ? Optional.empty() : Optional.ofNullable(defaultValue.get());
     }
     
@@ -130,17 +130,17 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
         return widgets;
     }
     
-    public FloatSliderEntry setMaximum(float maximum) {
+    public DoubleSliderEntry setMaximum(double maximum) {
         this.maximum = maximum;
         return this;
     }
     
-    public FloatSliderEntry setMinimum(float minimum) {
+    public DoubleSliderEntry setMinimum(double minimum) {
         this.minimum = minimum;
         return this;
     }
     
-    public FloatSliderEntry setPrecision(int precision) {
+    public DoubleSliderEntry setPrecision(int precision) {
         this.precision = precision;
         return this;
     }
@@ -175,12 +175,12 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
         
         @Override
         public void updateMessage() {
-            setMessage(textGetter.apply(FloatSliderEntry.this.value));
+            setMessage(textGetter.apply(DoubleSliderEntry.this.value));
         }
         
         @Override
         protected void applyValue() {
-            FloatSliderEntry.this.value = roundNumber((minimum + Math.abs(maximum - minimum) * value));
+            DoubleSliderEntry.this.value = roundNumber((minimum + Math.abs(maximum - minimum) * value));
         }
         
         @Override
