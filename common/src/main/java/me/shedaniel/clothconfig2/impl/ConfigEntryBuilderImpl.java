@@ -167,6 +167,11 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
     }
     
     @Override
+    public FloatSliderBuilder startFloatSlider(Component fieldNameKey, float value, float min, float max, int precision) {
+        return new FloatSliderBuilder(resetButtonKey, fieldNameKey, value, min, max, precision);
+    }
+    
+    @Override
     public KeyCodeBuilder startModifierKeyCodeField(Component fieldNameKey, ModifierKeyCode value) {
         return new KeyCodeBuilder(resetButtonKey, fieldNameKey, value);
     }

@@ -52,6 +52,20 @@ public class ConfigEntry {
     }
     
     /**
+     * Applies to float and double fields.
+     * In a future version it will enforce bounds at deserialization.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface BoundedFloating {
+        double min() default 0;
+
+        double max();
+        
+        int precision() default 2;
+    }
+    
+    /**
      * Applies to int fields.
      * Sets the GUI to a color picker.
      * In a future version it will enforce bounds at deserialization.
@@ -61,18 +75,6 @@ public class ConfigEntry {
     public @interface ColorPicker {
         boolean allowAlpha() default false;
     }
-
-//    /**
-//     * Applies to float and double fields.
-//     * In a future version it will enforce bounds at deserialization.
-//     */
-//    @Retention(RetentionPolicy.RUNTIME)
-//    @Target(ElementType.FIELD)
-//    public @interface BoundedFloating {
-//        double min() default 0;
-//
-//        double max();
-//    }
     
     public static class Gui {
         private Gui() {

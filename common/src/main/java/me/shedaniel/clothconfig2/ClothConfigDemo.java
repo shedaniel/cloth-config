@@ -199,6 +199,9 @@ public class ClothConfigDemo {
                         () -> intDependency.getValue() < -70,
                         () -> intDependency.getValue() > 70))
                 .build());
+        
+        FloatSliderEntry floatSlider = entryBuilder.startFloatSlider(Component.literal("Select a float"), 10, 0, 10, 4).setSaveConsumer(number -> System.out.println("floating value set to " + number)).build();
+        depends.add(floatSlider);
     
         testing.addEntry(depends.build());
        
