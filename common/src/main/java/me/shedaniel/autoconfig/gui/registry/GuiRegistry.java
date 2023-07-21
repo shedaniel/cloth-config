@@ -21,21 +21,25 @@ package me.shedaniel.autoconfig.gui.registry;
 
 import me.shedaniel.autoconfig.gui.registry.api.GuiProvider;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
+import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryHook;
 import me.shedaniel.autoconfig.gui.registry.api.GuiTransformer;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
 public final class GuiRegistry implements GuiRegistryAccess {
     
     private final Map<Priority, List<ProviderEntry>> providers = new EnumMap<>(Priority.class);
     private final List<TransformerEntry> transformers = new ArrayList<>();
+    private final Map<HookEvent, List<GuiRegistryHook>> hooks = new EnumMap<>(HookEvent.class);
     
     public GuiRegistry() {}
     
@@ -76,6 +80,21 @@ public final class GuiRegistry implements GuiRegistryAccess {
                 .reduce(guis,
                         (prevResult, transformer) -> transformer.transform(prevResult, i18n, field, config, defaults, registry),
                         (a, b) -> { throw new UnsupportedOperationException("Cannot transform GUIs in parallel!"); });
+    }
+    
+    @Override
+    public void runPreHook(String i18n, Field field, Object config, Object defaults, GuiRegistryAccess registry) {
+        Stream.ofNullable(hooks.get(HookEvent.PRE))
+                .flatMap(List::stream)
+                .forEach(hook -> hook.run(Collections.emptyList(), i18n, field, config, defaults, registry));
+    }
+    
+    @Override
+    public void runPostHook(List<AbstractConfigListEntry> guis, String i18n, Field field, Object config, Object defaults, GuiRegistryAccess registry) {
+        var constGuis = Collections.unmodifiableList(guis);
+        Stream.ofNullable(hooks.get(HookEvent.POST))
+                .flatMap(List::stream)
+                .forEach(hook -> hook.run(constGuis, i18n, field, config, defaults, registry));
     }
     
     private void registerProvider(Priority priority, GuiProvider provider, Predicate<Field> predicate) {
@@ -128,11 +147,30 @@ public final class GuiRegistry implements GuiRegistryAccess {
         }
     }
     
+    private void registerHook(HookEvent event, GuiRegistryHook hook) {
+        hooks.computeIfAbsent(event, e -> new ArrayList<>()).add(hook);
+    }
+    
+    @ApiStatus.Experimental
+    public final void registerPreHook(GuiRegistryHook hook) {
+        registerHook(HookEvent.PRE, hook);
+    }
+    
+    @ApiStatus.Experimental
+    public final void registerPostHook(GuiRegistryHook hook) {
+        registerHook(HookEvent.POST, hook);
+    }
+    
     private enum Priority {
         // Ordering is important: highest priority first
         FIRST,
         NORMAL,
         LAST
+    }
+    
+    private enum HookEvent {
+        PRE,
+        POST
     }
     
     private record ProviderEntry(Predicate<Field> predicate, GuiProvider provider) {}

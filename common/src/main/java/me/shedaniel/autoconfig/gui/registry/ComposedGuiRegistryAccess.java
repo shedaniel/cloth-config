@@ -66,4 +66,14 @@ public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
                         (prevResult, child) -> child.transform(prevResult, i18n, field, config, defaults, registry),
                         (a, b) -> { throw new UnsupportedOperationException("Cannot transform GUIs in parallel!"); });
     }
+    
+    @Override
+    public void runPreHook(String i18n, Field field, Object config, Object defaults, GuiRegistryAccess registry) {
+        children.forEach(child -> child.runPreHook(i18n, field, config, defaults, registry));
+    }
+    
+    @Override
+    public void runPostHook(List<AbstractConfigListEntry> guis, String i18n, Field field, Object config, Object defaults, GuiRegistryAccess registry) {
+        children.forEach(child -> child.runPostHook(guis, i18n, field, config, defaults, registry));
+    }
 }
