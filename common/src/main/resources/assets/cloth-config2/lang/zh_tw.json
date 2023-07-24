@@ -1,4 +1,4 @@
-  {
+{
   "text.cloth-config.save_and_done": "儲存並退出",
   "text.cloth-config.apply": "套用變更",
   "text.cloth-config.quit_config": "變更尚未儲存",
@@ -12,7 +12,7 @@
   "text.cloth-config.error.not_valid_number_long": "不是有效的數字！（長整數）",
   "text.cloth-config.error.not_valid_number_float": "不是有效的數字！（浮點數）",
   "text.cloth-config.error.not_valid_number_double": "不是有效的數字！（雙精度浮點數）",
-  "text.cloth-config.error.too_large": "太大了！（最大：%d）",
+  "text.cloth-config.error.too_large": "太大了！（最大值：%d）",
   "text.cloth-config.error.too_small": "太小了！（最小值：%d）",
   "text.cloth-config.error.color.no_alpha_allowed": "不允許透明度！",
   "text.cloth-config.error.color.invalid_alpha": "不是有效的值！（透明度）",
