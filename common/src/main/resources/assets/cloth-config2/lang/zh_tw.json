@@ -39,7 +39,7 @@
   "modifier.cloth-config.shift": "Shift + %s",
   "title.cloth-config.config": "Cloth Mod Config 設定",
   "category.cloth-config.scrolling": "捲動",
-  "category.cloth-config.testing": "設定試用",
+  "category.cloth-config.testing": "預覽設定",
   "option.cloth-config.scrollDuration": "滾動時間",
   "option.cloth-config.scrollStep": "滾動距離",
   "option.cloth-config.bounceBackMultiplier": "反彈倍率",
