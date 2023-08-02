@@ -24,6 +24,8 @@ import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnumHandler.EnumDisplayOption;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Ref;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Requirements.Requirement;
 import me.shedaniel.autoconfig.requirements.DefaultRequirements;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
 import org.jetbrains.annotations.ApiStatus;
@@ -108,34 +110,11 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     public static class ModuleC implements ConfigData {
         
         public static class Handlers {
-            
             @ConfigEntry.Requirements.ConstParams(
-                    @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "coolToggle")
+                    @Ref(cls = DependencySubCategory.class, value = "intSlider")
             )
-            private static boolean coolToggleIsEnabled(boolean coolToggle) {
-                return coolToggle;
-            }
-            
-            @ConfigEntry.Requirements.ConstParams({
-                    @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "coolToggle"),
-                    @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "lameToggle")
-            })
-            private static Boolean coolToggleMatchesLameToggle(boolean coolToggle, Boolean lameToggle) {
-                return coolToggle == lameToggle;
-            }
-            
-            @ConfigEntry.Requirements.ConstParams(
-                    @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "intSlider")
-            )
-            private static boolean intSliderIsBigOrSmall(int intSlider) {
-                return intSlider > 70 || intSlider < -70;
-            }
-            
-            @ConfigEntry.Requirements.ConstParams(
-                    @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "coolEnum")
-            )
-            private static boolean coolEnumIsGoodOrBetter(DependencyDemoEnum coolEnum) {
-                return coolEnum == DependencyDemoEnum.GOOD || coolEnum == DependencyDemoEnum.EXCELLENT;
+            private static boolean intSliderIsBigOrSmall(int value) {
+                return value > 70 || value < -70;
             }
         }
         
@@ -155,42 +134,33 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
             @ConfigEntry.BoundedDiscrete(min = -100, max = 100)
             public int intSlider = 50;
     
-            @ConfigEntry.Requirements.EnableIf(@ConfigEntry.Requirements.Requirement(
-                    value = "isTrue",
-                    refArgs = @ConfigEntry.Ref("coolToggle")
-            ))
+            @ConfigEntry.Requirements.EnableIf(
+                    @Requirement(@Ref("coolToggle"))
+            )
             public boolean dependsOnCoolToggle1 = false;
     
-            @ConfigEntry.Requirements.DisplayIf(@ConfigEntry.Requirements.Requirement(
-                    value = "coolToggleIsEnabled",
-                    cls = Handlers.class
-            ))
+            @ConfigEntry.Requirements.DisplayIf(
+                    @Requirement(@Ref("coolToggle"))
+            )
                     
             public boolean dependsOnCoolToggle2 = false;
     
-            @ConfigEntry.Requirements.EnableIf(@ConfigEntry.Requirements.Requirement(
-                    value = DefaultRequirements.IS,
-                    refArgs = {
-                            @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "coolToggle"),
-                            @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "lameToggle")
-                    }
+            @ConfigEntry.Requirements.EnableIf(@Requirement(
+                    value = @Ref(cls = DefaultRequirements.class, value = DefaultRequirements.IS),
+                    refArgs = { @Ref("coolToggle"), @Ref("lameToggle") }
             ))
             public boolean dependsOnToggleMatch = false;
             
-            @ConfigEntry.Requirements.EnableIf(@ConfigEntry.Requirements.Requirement(cls = Handlers.class, value = "intSliderIsBigOrSmall"))
+            @ConfigEntry.Requirements.EnableIf(@Requirement(@Ref(cls = Handlers.class, value = "intSliderIsBigOrSmall")))
             public boolean dependsOnIntSlider = true;
     
             @ConfigEntry.Gui.TransitiveObject
             @ConfigEntry.Requirements.EnableIf(
                     value = {
-                            @ConfigEntry.Requirements.Requirement(
-                                    value = DefaultRequirements.TRUE,
-                                    refArgs = @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "coolToggle")
-                            ),
-                            @ConfigEntry.Requirements.Requirement(
-                                    value = DefaultRequirements.ANY_MATCH,
-                                    refArgs = @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "coolEnum"),
-                                    staticArgs = { "GOOD", "EXCELLENT" }
+                            @Requirement(@Ref("coolToggle")),
+                            @Requirement(
+                                    value = @Ref("coolEnum"),
+                                    conditions = { "GOOD", "EXCELLENT" }
                             )
                     },
                     quantifier = ConfigEntry.Quantifier.ALL
@@ -201,9 +171,9 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
                 public boolean toggle1 = false;
                 
                 @ConfigEntry.Requirements.EnableIf(
-                        @ConfigEntry.Requirements.Requirement(
-                                value = DefaultRequirements.ANY_MATCH,
-                                refArgs = @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "intSlider"),
+                        @Requirement(
+                                value = @Ref(cls = DefaultRequirements.class, value = DefaultRequirements.ANY_MATCH),
+                                refArgs = @Ref(cls = DependencySubCategory.class, value = "intSlider"),
                                 staticArgs = { "50", "100" }
                         )
                 )
@@ -212,10 +182,7 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     
             @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
             @ConfigEntry.Requirements.EnableIf(
-                    @ConfigEntry.Requirements.Requirement(
-                            value = DefaultRequirements.TRUE,
-                            refArgs = @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "coolToggle")
-                    )
+                    @Requirement(@Ref("coolToggle"))
             )
             public DependantCollapsible dependantCollapsible = new DependantCollapsible();
             public static class DependantCollapsible {
@@ -224,20 +191,14 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
             }
     
             @ConfigEntry.Requirements.EnableIf(
-                    @ConfigEntry.Requirements.Requirement(
-                            value = DefaultRequirements.TRUE,
-                            refArgs = @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "coolToggle")
-                    )
+                    @Requirement(@Ref(cls = DependencySubCategory.class, value = "coolToggle"))
             )
             public List<Integer> list = Arrays.asList(1, 2, 3);
     
         }
     
         @ConfigEntry.Requirements.EnableIf(
-                @ConfigEntry.Requirements.Requirement(
-                        value = DefaultRequirements.TRUE,
-                        refArgs = @ConfigEntry.Ref(cls = DependencySubCategory.class, value = "coolToggle")
-                )
+                @Requirement(@Ref(cls = DependencySubCategory.class, value = "coolToggle"))
         )
         public boolean dependsOnCoolToggleOutside = false;
         

@@ -193,25 +193,41 @@ public class ConfigEntry {
         /**
          * Defines a Requirement, which is a reference to a method handler
          * along with a set of arguments to be passed to the Handler.
+         * 
+         * <p>
+         *     If a handler method is referenced, it will be passed {@link #refArgs()} and {@link #staticArgs()}.
+         * </p>
+         *
+         * <p>
+         *     If a Config Entry is referenced, its value will be compared against {@link #conditions()}.
+         * </p>
+         *
+         * <p>
+         *     If a Config Entry is referenced and {@link #conditions()} is empty, an exception will be thrown.
+         *     However if the referenced Config Entry has a <strong>boolean value</strong>, a default condition
+         *     of {@code "true"} will be assumed.
+         * </p>
          */
         @Retention(RetentionPolicy.RUNTIME)
         public @interface Requirement {
-            /**
-             * The name of the Handler method to be used.
-             */
-            String value();
             
             /**
-             * The class in which to look for the Handler method. Defaults to {@link DefaultRequirements}.
+             * A {@link Ref reference} to a Handler method or a Config Entry.
              * 
              * @see DefaultRequirements
              */
-            Class<?> cls() default DefaultRequirements.class;
+            Ref value();
             
             /**
-             * Zero or more {@link ConfigEntry.Ref references} to Config Entries, whose value should be passed to the handler method.
+             * One or more conditions to be compared with the depended-on Config Entry's value.
+             * Will be parsed in the same way as {@link Requirement#staticArgs()}.
              */
-            ConfigEntry.Ref[] refArgs() default {};
+            String[] conditions() default {};
+            
+            /**
+             * Zero or more {@link Ref references} to Config Entries, whose value should be passed to the handler method.
+             */
+            Ref[] refArgs() default {};
             
             /**
              * Zero or more static values to be passed to the handler method.
@@ -273,4 +289,6 @@ public class ConfigEntry {
     private static class None {
         private None() {}
     }
+    
+    private static final String FOO = "FOO";
 }
