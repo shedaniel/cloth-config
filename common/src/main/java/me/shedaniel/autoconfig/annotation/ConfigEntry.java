@@ -23,10 +23,7 @@ import me.shedaniel.autoconfig.requirements.DefaultRequirements;
 import me.shedaniel.clothconfig2.api.DisableableWidget;
 import me.shedaniel.clothconfig2.api.HideableWidget;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 public class ConfigEntry {
     
@@ -163,37 +160,12 @@ public class ConfigEntry {
         private Requirements() {}
         
         /**
-         * Defines zero or more {@link Requirement} definitions that will control whether this Config Entry GUI is
-         * enabled or disabled.
-         * 
-         * @see Requirement
-         * @see DisableableWidget
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
-        public @interface EnableIf {
-            Requirement[] value();
-            Quantifier quantifier() default Quantifier.ALL;
-        }
-        
-        /**
-         * Defines zero or more {@link Requirement} definitions that will control whether this Config Entry GUI is
-         * displayed on the screen.
+         * Defines a requirement that will control whether this Config Entry GUI is enabled or disabled.
          *
-         * @see Requirement
-         * @see HideableWidget
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
-        public @interface DisplayIf {
-            Requirement[] value();
-            Quantifier quantifier() default Quantifier.ALL;
-        }
-        
-        /**
-         * Defines a Requirement, which is a reference to a method handler
-         * along with a set of arguments to be passed to the Handler.
-         * 
+         * <p>
+         *     The requirement either references a handler method or another Config Entry GUI.
+         * </p>
+         *
          * <p>
          *     If a handler method is referenced, it will be passed {@link #refArgs()} and {@link #staticArgs()}.
          * </p>
@@ -207,20 +179,24 @@ public class ConfigEntry {
          *     However if the referenced Config Entry has a <strong>boolean value</strong>, a default condition
          *     of {@code "true"} will be assumed.
          * </p>
+         *
+         * @see DisableableWidget
          */
         @Retention(RetentionPolicy.RUNTIME)
-        public @interface Requirement {
+        @Target(ElementType.FIELD)
+        @Repeatable(EnableIfGroup.class)
+        public @interface EnableIf {
             
             /**
              * A {@link Ref reference} to a Handler method or a Config Entry.
-             * 
+             *
              * @see DefaultRequirements
              */
             Ref value();
             
             /**
              * One or more conditions to be compared with the depended-on Config Entry's value.
-             * Will be parsed in the same way as {@link Requirement#staticArgs()}.
+             * Will be parsed in the same way as {@link #staticArgs()}.
              */
             String[] conditions() default {};
             
@@ -231,7 +207,7 @@ public class ConfigEntry {
             
             /**
              * Zero or more static values to be passed to the handler method.
-             * 
+             *
              * <p>The following parameter types are supported:
              * <ul>
              *     <li>{@link String}: The arg will be used as-is.
@@ -252,6 +228,43 @@ public class ConfigEntry {
         }
         
         /**
+         * Defines a requirement that will control whether this Config Entry GUI is displayed on the screen.
+         * 
+         * <p>
+         *     Otherwise identical to {@link EnableIf}
+         * </p>
+         *
+         * @see EnableIf
+         * @see HideableWidget
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        @Repeatable(DisplayIfGroup.class)
+        public @interface DisplayIf {
+            
+            /**
+             * @see EnableIf#value()
+             */
+            Ref value();
+            
+            /**
+             * @see EnableIf#conditions()
+             */
+            String[] conditions() default {};
+            
+            /**
+             * @see EnableIf#refArgs()
+             */
+            Ref[] refArgs() default {};
+            
+            /**
+             * @see EnableIf#staticArgs()
+             */
+            String[] staticArgs() default {};
+        }
+        
+        
+        /**
          * Can be applied to a handler method to declare a list of {@link Ref refs} that should be passed to the handler
          * as its initial arguments.
          */
@@ -259,6 +272,20 @@ public class ConfigEntry {
         @Target(ElementType.METHOD)
         public @interface ConstParams {
             Ref[] value();
+        }
+        
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface EnableIfGroup {
+            EnableIf[] value();
+            Quantifier quantifier() default Quantifier.ALL;
+        }
+        
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface DisplayIfGroup {
+            DisplayIf[] value();
+            Quantifier quantifier() default Quantifier.ALL;
         }
     }
     
