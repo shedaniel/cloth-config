@@ -84,7 +84,7 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             widget.setMaxLength(Integer.MAX_VALUE);
             widget.setBordered(false);
             widget.setValue(Objects.toString(finalValue));
-            widget.moveCursorToStart();
+            widget.moveCursorToStart(false);
             widget.setResponder(s -> {
                 widget.setTextColor(getPreferredTextColor());
             });

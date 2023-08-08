@@ -32,7 +32,6 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -343,8 +342,6 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         boolean edited = isEdited();
         Optional.ofNullable(getQuitButton()).ifPresent(button -> button.setMessage(edited ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel")));
         for (GuiEventListener child : children()) {
-            if (child instanceof EditBox box)
-                box.tick();
             if (child instanceof TickableWidget widget)
                 widget.tick();
         }

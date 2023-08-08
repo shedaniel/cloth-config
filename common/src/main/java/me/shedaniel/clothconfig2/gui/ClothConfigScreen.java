@@ -194,12 +194,12 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     }
     
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        if (tabsBounds.contains(mouseX, mouseY) && !tabsLeftBounds.contains(mouseX, mouseY) && !tabsRightBounds.contains(mouseX, mouseY) && amount != 0d) {
-            tabsScroller.offset(-amount * 16, true);
+    public boolean mouseScrolled(double mouseX, double mouseY, double amountX, double amountY) {
+        if (tabsBounds.contains(mouseX, mouseY) && !tabsLeftBounds.contains(mouseX, mouseY) && !tabsRightBounds.contains(mouseX, mouseY) && amountY != 0d) {
+            tabsScroller.offset(-amountY * 16, true);
             return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, amount);
+        return super.mouseScrolled(mouseX, mouseY, amountX, amountY);
     }
     
     public double getTabsMaximumScrolled() {
@@ -289,6 +289,10 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             graphics.drawString(minecraft.font, text, 18, 12, -1);
         }
         super.render(graphics, mouseX, mouseY, delta);
+    }
+    
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
     }
     
     private void drawTabsShades(GuiGraphics graphics, int lightColor, int darkColor) {

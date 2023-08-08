@@ -264,11 +264,11 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         }
         
         @Override
-        public boolean mouseScrolled(double d, double e, double f) {
+        public boolean mouseScrolled(double d, double e, double amountX, double amountY) {
             if (!isEnabled()) {
                 return false;
             }
-            return ContainerEventHandler.super.mouseScrolled(d, e, f);
+            return ContainerEventHandler.super.mouseScrolled(d, e, amountX, amountY);
         }
         
         @Override

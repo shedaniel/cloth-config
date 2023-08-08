@@ -497,14 +497,14 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         }
     }
     
-    public boolean mouseScrolled(double double_1, double double_2, double double_3) {
+    public boolean mouseScrolled(double double_1, double double_2, double amountX, double amountY) {
         for (E entry : visibleChildren()) {
-            if (entry.mouseScrolled(double_1, double_2, double_3)) {
+            if (entry.mouseScrolled(double_1, double_2, amountX, amountY)) {
                 return true;
             }
         }
-        this.capYPosition(this.getScroll() - double_3 * (double) (getMaxScroll() / getItemCount()) / 2.0D);
-        return true;
+        this.capYPosition(this.getScroll() - amountY * (double) (getMaxScroll() / getItemCount()) / 2.0D);
+        return amountY != 0;
     }
     
     public boolean keyPressed(int int_1, int int_2, int int_3) {

@@ -167,8 +167,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public boolean mouseScrolled(double double_1, double double_2, double double_3) {
-        return selectionElement.mouseScrolled(double_1, double_2, double_3);
+    public boolean mouseScrolled(double double_1, double double_2, double amountX, double amountY) {
+        return selectionElement.mouseScrolled(double_1, double_2, amountX, amountY);
     }
     
     public static class SelectionElement<R> extends AbstractContainerEventHandler implements Renderable {
@@ -205,9 +205,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean mouseScrolled(double double_1, double double_2, double double_3) {
+        public boolean mouseScrolled(double double_1, double double_2, double amountX, double amountY) {
             if (menu.isExpanded())
-                return menu.mouseScrolled(double_1, double_2, double_3);
+                return menu.mouseScrolled(double_1, double_2, amountX, amountY);
             return false;
         }
         
@@ -497,9 +497,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public boolean mouseScrolled(double mouseX, double mouseY, double double_3) {
-            if (isMouseOver(mouseX, mouseY)) {
-                offset(ClothConfigInitializer.getScrollStep() * -double_3, true);
+        public boolean mouseScrolled(double mouseX, double mouseY, double amountX, double amountY) {
+            if (isMouseOver(mouseX, mouseY) && amountY != 0) {
+                offset(ClothConfigInitializer.getScrollStep() * -amountY, true);
                 return true;
             }
             return false;
@@ -778,7 +778,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         @Override
         public void setValue(R value) {
             textFieldWidget.setValue(toTextFunction.apply(value).getString());
-            textFieldWidget.moveCursorTo(0);
+            textFieldWidget.moveCursorTo(0, false);
         }
         
         @Override

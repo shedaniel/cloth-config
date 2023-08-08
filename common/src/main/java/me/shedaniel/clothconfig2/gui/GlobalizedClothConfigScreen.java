@@ -307,6 +307,10 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     }
     
     @Override
+    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    }
+    
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         Rectangle slideBounds = new Rectangle(0, 0, getSideSliderPosition() - 14, height);
         if (button == 0 && slideBounds.contains(mouseX, mouseY) && lastHoveredReference != null) {
@@ -334,13 +338,13 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     }
     
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double amountX, double amountY) {
         Rectangle slideBounds = new Rectangle(0, 0, getSideSliderPosition() - 14, height);
-        if (slideBounds.contains(mouseX, mouseY)) {
-            sideScroller.offset(ClothConfigInitializer.getScrollStep() * -amount, true);
+        if (amountY != 0 && slideBounds.contains(mouseX, mouseY)) {
+            sideScroller.offset(ClothConfigInitializer.getScrollStep() * -amountY, true);
             return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, amount);
+        return super.mouseScrolled(mouseX, mouseY, amountX, amountY);
     }
     
     private int getSideSliderPosition() {

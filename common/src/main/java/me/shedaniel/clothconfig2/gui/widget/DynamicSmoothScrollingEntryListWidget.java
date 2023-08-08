@@ -89,18 +89,19 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
     }
     
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double amountX, double amountY) {
         for (E entry : visibleChildren()) {
-            if (entry.mouseScrolled(mouseX, mouseY, amount)) {
+            if (entry.mouseScrolled(mouseX, mouseY, amountX, amountY)) {
                 return true;
             }
         }
+        if (amountY == 0) return false;
         if (!smoothScrolling) {
-            scroll += 16 * -amount;
-            this.scroll = Mth.clamp(amount, 0.0D, this.getMaxScroll());
+            scroll += 16 * -amountY;
+            this.scroll = Mth.clamp(amountY, 0.0D, this.getMaxScroll());
             return true;
         }
-        offset(ClothConfigInitializer.getScrollStep() * -amount, true);
+        offset(ClothConfigInitializer.getScrollStep() * -amountY, true);
         return true;
     }
     
