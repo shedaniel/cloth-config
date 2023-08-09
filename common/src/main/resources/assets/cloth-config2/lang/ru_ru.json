@@ -44,7 +44,7 @@
     "option.cloth-config.scrollStep": "Шаг прокрутки",
     "option.cloth-config.bounceBackMultiplier": "Множитель отскока",
     "option.cloth-config.setDefaultSmoothScroll": "Установить плавную прокрутку по умолчанию",
-    "option.cloth-config.disableSmoothScroll": "Отключить плавную прокрутку"
+    "option.cloth-config.disableSmoothScroll": "Отключить плавную прокрутку",
     "text.cloth-config.testing.1": "Вы разработчик модов и вы хотите использовать %1$s? Откройте %2$s чтобы приступить. А ещё вы можете %3$s.",
     "text.cloth-config.testing.2": "Вики Cloth Config",
     "text.cloth-config.testing.3": "кликнуть сюда чтобы открыть файл настроек Minecraft просто так"
