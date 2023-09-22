@@ -9,7 +9,7 @@ license = "GNU LGPLv3"
 [[mods]]
 modId = "cloth_config"
 version = "${version}"
-displayName = "Cloth Config v10 API"
+displayName = "Cloth Config v12 API"
 description = '''
 An API for config screens.
 '''
