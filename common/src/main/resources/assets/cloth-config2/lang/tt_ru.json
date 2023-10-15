@@ -8,7 +8,7 @@
     "text.cloth-config.quit_discard": "Чыгу һәм үзгәреш баш тарту",
     "text.cloth-config.config": "Көйләү",
     "text.cloth-config.multi_error": "Күплек мәсьәләләр!",
-    "text.cloth-config.not_editable": "Үзгәртелмәүчән!",
+    "text.cloth-config.not_editable": "Үзгәртмәүче!",
     "text.cloth-config.error.not_valid_number_int": "Яраксыз сан! (Бөтен сан)",
     "text.cloth-config.error.not_valid_number_long": "Яраксыз сан! (Озын бөтен сан)",
     "text.cloth-config.error.not_valid_number_float": "Яраксыз сан! (Чын сан)",
