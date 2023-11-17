@@ -73,7 +73,7 @@ shadowJar {
     relocate "org.yaml.snakeyaml", "${rootProject.maven_group}.clothconfig.shadowed.org.yaml.snakeyaml"
     
     configurations = [project.configurations.shadowCommon]
-    classifier "shadow"
+    archiveClassifier = "shadow"
 }
 
 remapJar {
@@ -88,10 +88,7 @@ publishing {
     publications {
         mavenFabric(MavenPublication) {
             artifactId = rootProject.archives_base_name + "-fabric"
-            artifact(remapJar.archivePath) {
-                builtBy build
-                classifier null
-            }
+            from components.java
         }
     }
 

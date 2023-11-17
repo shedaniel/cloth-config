@@ -31,11 +31,11 @@ dependencies {
 }
 
 architectury {
-    common("fabric", "forge")
+    common("fabric", "forge", "neoforge")
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = "sources"
+    archiveClassifier = "sources"
     from sourceSets.main.allSource
 }
 
@@ -60,10 +60,7 @@ publishing {
     publications {
         mavenCommon(MavenPublication) {
             artifactId = rootProject.archives_base_name
-            artifact(remapJar)
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
+            from components.java
         }
     }
 

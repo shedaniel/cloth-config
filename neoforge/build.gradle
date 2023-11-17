@@ -15,7 +15,7 @@ artifacts {
 
 architectury {
     platformSetupLoomIde()
-    forge()
+    neoForge()
 }
 
 configurations {
@@ -23,30 +23,29 @@ configurations {
     shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
-    developmentForge.extendsFrom common
+    developmentNeoForge.extendsFrom common
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
     mappings loom.officialMojangMappings()
 
-    forge "net.minecraftforge:forge:${rootProject.architectury.minecraft}-${rootProject.forge_version}"
+    neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
 
     modLocalRuntime("me.shedaniel.cloth:basic-math:0.6.1")
-    forgeDependencies(shadowCommon("me.shedaniel.cloth:basic-math:0.6.1"))
+    forgeRuntimeLibrary(shadowCommon("me.shedaniel.cloth:basic-math:0.6.1"))
 
-    forgeDependencies("cpw.mods:securejarhandler:0.9.48")
     implementation("blue.endless:jankson:${rootProject.jankson_version}")
     implementation("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
     implementation("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
-    forgeDependencies(shadowCommon("blue.endless:jankson:${rootProject.jankson_version}"))
-    forgeDependencies(shadowCommon("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}") {
+    forgeRuntimeLibrary(shadowCommon("blue.endless:jankson:${rootProject.jankson_version}"))
+    forgeRuntimeLibrary(shadowCommon("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}") {
         exclude(module: "gson")
     })
-    forgeDependencies(shadowCommon("org.yaml:snakeyaml:${rootProject.snakeyaml_version}"))
+    forgeRuntimeLibrary(shadowCommon("org.yaml:snakeyaml:${rootProject.snakeyaml_version}"))
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive false }
 }
 
 processResources {
@@ -70,15 +69,15 @@ shadowJar {
 remapJar {
     input.set(shadowJar.archiveFile)
     dependsOn(shadowJar)
-    archiveClassifier = "forge"
+    archiveClassifier = "neoforge"
 
     from rootProject.file("LICENSE.md")
 }
 
 publishing {
     publications {
-        mavenForge(MavenPublication) {
-            artifactId = rootProject.archives_base_name + "-forge"
+        mavenNeoForge(MavenPublication) {
+            artifactId = rootProject.archives_base_name + "-neoforge"
             from components.java
         }
     }
@@ -98,10 +97,10 @@ publishing {
 
 unifiedPublishing {
     project {
-        displayName = "[MinecraftForge $rootProject.supported_version] v$project.version"
+        displayName = "[NeoForge $rootProject.supported_version] v$project.version"
         releaseType = "release"
         gameVersions = ["1.20.2"]
-        gameLoaders = ["forge"]
+        gameLoaders = ["neoforge"]
 
         mainPublication remapJar
 
