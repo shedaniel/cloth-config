@@ -31,6 +31,7 @@ import net.minecraft.network.chat.Component;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 @Environment(EnvType.CLIENT)
 public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
@@ -176,4 +177,8 @@ public class ConfigEntryBuilderImpl implements ConfigEntryBuilder {
         return new DropdownMenuBuilder<>(resetButtonKey, fieldNameKey, topCellElement, cellCreator);
     }
     
+    @Override
+    public <T> DropdownListBuilder<T> startDropdownList(Component fieldNameKey, List<T> value, Function<T, SelectionTopCellElement<T>> topCellCreator, SelectionCellCreator<T> cellCreator) {
+        return new DropdownListBuilder<>(resetButtonKey, fieldNameKey, value, topCellCreator, cellCreator);
+    }
 }
