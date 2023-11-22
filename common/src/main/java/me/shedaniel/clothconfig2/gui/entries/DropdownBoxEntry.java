@@ -66,6 +66,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     protected SelectionElement<T> selectionElement;
     @NotNull private final Supplier<T> defaultValue;
     private boolean suggestionMode = true;
+    protected boolean dontReFocus = false;
     
     @ApiStatus.Internal
     @Deprecated
@@ -172,13 +173,22 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         return selectionElement.mouseScrolled(double_1, double_2, amountX, amountY);
     }
     
+    @Override
+    public boolean mouseClicked(double double_1, double double_2, int int_1) {
+        boolean b = super.mouseClicked(double_1, double_2, int_1);
+        if (dontReFocus) {
+            setFocused(null);
+            dontReFocus = false;
+        }
+        return b;
+    }
+    
     public static class SelectionElement<R> extends AbstractContainerEventHandler implements Renderable {
         protected Rectangle bounds;
         protected boolean active;
         protected SelectionTopCellElement<R> topRenderer;
         protected DropdownBoxEntry<R> entry;
         protected DropdownMenuElement<R> menu;
-        protected boolean dontReFocus = false;
         
         public SelectionElement(DropdownBoxEntry<R> entry, Rectangle bounds, DropdownMenuElement<R> menu, SelectionTopCellElement<R> topRenderer, SelectionCellCreator<R> cellCreator) {
             this.bounds = bounds;
@@ -230,17 +240,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         @Override
         public List<? extends GuiEventListener> children() {
             return Lists.newArrayList(topRenderer, menu);
-        }
-        
-        @Override
-        public boolean mouseClicked(double double_1, double double_2, int int_1) {
-            dontReFocus = false;
-            boolean b = super.mouseClicked(double_1, double_2, int_1);
-            if (dontReFocus) {
-                setFocused(null);
-                dontReFocus = false;
-            }
-            return b;
         }
     }
     
@@ -421,7 +420,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             graphics.pose().translate(0, 0, 300f);
             
             ScissorsHandler.INSTANCE.scissor(new Rectangle(lastRectangle.x, lastRectangle.y + lastRectangle.height + 1, cWidth - 6, last10Height - 1));
-            double yy = lastRectangle.y + lastRectangle.height - scroll;
+            double yy = lastRectangle.y + lastRectangle.height - scroll + 1;
             for (SelectionCellElement<R> cell : currentElements) {
                 if (yy + getCellCreator().getCellHeight() >= lastRectangle.y + lastRectangle.height && yy <= lastRectangle.y + lastRectangle.height + last10Height + 1) {
                     graphics.fill(lastRectangle.x + 1, (int) yy, lastRectangle.x + cWidth, (int) yy + getCellCreator().getCellHeight(), 0xFF000000);
@@ -519,7 +518,19 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             if (!isExpanded())
                 return false;
             updateScrollingState(double_1, double_2, int_1);
-            return super.mouseClicked(double_1, double_2, int_1) || scrolling;
+            
+            if(!isMouseOver(double_1, double_2)) {
+            	getEntry().dontReFocus = true;
+            	getEntry().setFocused(null);
+            	return true;
+            } else {
+                boolean elementClicked = super.mouseClicked(double_1, double_2, int_1);
+                if(elementClicked) {
+                	getEntry().dontReFocus = true;
+                	getEntry().setFocused(null);
+                }
+                return elementClicked || scrolling;
+            }
         }
         
         public void offset(double value, boolean animated) {
@@ -658,8 +669,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             boolean b = rendering && mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
             if (b) {
                 getEntry().selectionElement.topRenderer.setValue(r);
-                getEntry().selectionElement.setFocused(null);
-                getEntry().selectionElement.dontReFocus = true;
+                getEntry().setFocused(null);
+                getEntry().dontReFocus = true;
                 return true;
             }
             return false;
