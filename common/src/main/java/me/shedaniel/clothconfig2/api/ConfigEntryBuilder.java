@@ -31,8 +31,12 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 import java.util.List;
 import java.util.function.Function;
@@ -154,5 +158,31 @@ public interface ConfigEntryBuilder {
     
     default DropdownMenuBuilder<String> startStringDropdownMenu(Component fieldNameKey, String value, Function<String, Component> toTextFunction) {
         return startDropdownMenu(fieldNameKey, TopCellElementBuilder.of(value, s -> s, toTextFunction), new DefaultSelectionCellCreator<>());
+    }
+    
+    <T> DropdownListBuilder<T> startDropdownList(Component fieldNameKey, List<T> value, Function<T, SelectionTopCellElement<T>> topCellCreator, SelectionCellCreator<T> cellCreator);
+    
+    default DropdownListBuilder<ResourceLocation> startItemIdentifierList(Component fieldNameKey, List<ResourceLocation> value) {
+    	DropdownListBuilder<ResourceLocation> entry = startDropdownList(fieldNameKey, value, element -> DropdownMenuBuilder.TopCellElementBuilder.ofItemIdentifier(BuiltInRegistries.ITEM.get(element)), DropdownMenuBuilder.CellCreatorBuilder.ofItemIdentifier());
+    	entry.setSelections(BuiltInRegistries.ITEM.keySet());
+    	return entry;
+    }
+    
+    default DropdownListBuilder<ResourceLocation> startBlockIdentifierList(Component fieldNameKey, List<ResourceLocation> value) {
+    	DropdownListBuilder<ResourceLocation> entry = startDropdownList(fieldNameKey, value, element -> DropdownMenuBuilder.TopCellElementBuilder.ofBlockIdentifier(BuiltInRegistries.BLOCK.get(element)), DropdownMenuBuilder.CellCreatorBuilder.ofBlockIdentifier());
+    	entry.setSelections(BuiltInRegistries.BLOCK.keySet());
+    	return entry;
+    }
+    
+    default DropdownListBuilder<Item> startItemObjectList(Component fieldNameKey, List<Item> value) {
+    	DropdownListBuilder<Item> entry = startDropdownList(fieldNameKey, value, element -> DropdownMenuBuilder.TopCellElementBuilder.ofItemObject(element), DropdownMenuBuilder.CellCreatorBuilder.ofItemObject());
+    	entry.setSelections(BuiltInRegistries.ITEM);
+    	return entry;
+    }
+    
+    default DropdownListBuilder<Block> startBlockObjectList(Component fieldNameKey, List<Block> value) {
+    	DropdownListBuilder<Block> entry = startDropdownList(fieldNameKey, value, element -> DropdownMenuBuilder.TopCellElementBuilder.ofBlockObject(element), DropdownMenuBuilder.CellCreatorBuilder.ofBlockObject());
+    	entry.setSelections(BuiltInRegistries.BLOCK);
+    	return entry;
     }
 }
