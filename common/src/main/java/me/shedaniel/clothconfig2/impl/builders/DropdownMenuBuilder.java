@@ -361,11 +361,11 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         }
         
         public static SelectionCellCreator<ResourceLocation> ofItemIdentifier() {
-            return ofItemIdentifier(20, 146, 7);
+            return ofItemIdentifier(20, -1, 7);
         }
         
         public static SelectionCellCreator<ResourceLocation> ofItemIdentifier(int maxItems) {
-            return ofItemIdentifier(20, 146, maxItems);
+            return ofItemIdentifier(20, -1, maxItems);
         }
         
         public static SelectionCellCreator<ResourceLocation> ofItemIdentifier(int cellHeight, int cellWidth, int maxItems) {
@@ -410,11 +410,11 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         
         
         public static SelectionCellCreator<ResourceLocation> ofBlockIdentifier() {
-            return ofBlockIdentifier(20, 146, 7);
+            return ofBlockIdentifier(20, -1, 7);
         }
         
         public static SelectionCellCreator<ResourceLocation> ofBlockIdentifier(int maxItems) {
-            return ofBlockIdentifier(20, 146, maxItems);
+            return ofBlockIdentifier(20, -1, maxItems);
         }
         
         public static SelectionCellCreator<ResourceLocation> ofBlockIdentifier(int cellHeight, int cellWidth, int maxItems) {
@@ -458,11 +458,11 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         }
         
         public static SelectionCellCreator<Item> ofItemObject() {
-            return ofItemObject(20, 146, 7);
+            return ofItemObject(20, -1, 7);
         }
         
         public static SelectionCellCreator<Item> ofItemObject(int maxItems) {
-            return ofItemObject(20, 146, maxItems);
+            return ofItemObject(20, -1, maxItems);
         }
         
         public static SelectionCellCreator<Item> ofItemObject(int cellHeight, int cellWidth, int maxItems) {
@@ -506,11 +506,11 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         }
         
         public static SelectionCellCreator<Block> ofBlockObject() {
-            return ofBlockObject(20, 146, 7);
+            return ofBlockObject(20, -1, 7);
         }
         
         public static SelectionCellCreator<Block> ofBlockObject(int maxItems) {
-            return ofBlockObject(20, 146, maxItems);
+            return ofBlockObject(20, -1, maxItems);
         }
         
         public static SelectionCellCreator<Block> ofBlockObject(int cellHeight, int cellWidth, int maxItems) {
