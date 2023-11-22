@@ -58,7 +58,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         this.object = object;
         this.entries = entries;
         this.expanded = defaultExpanded;
-        this.widget = new MultiElementListEntry<T>.CategoryLabelWidget();
+        this.widget = new MultiElementListEntry.CategoryLabelWidget();
         this.children = Lists.newArrayList(widget);
         this.children.addAll(entries);
         this.setReferenceProviderEntries((List) entries);

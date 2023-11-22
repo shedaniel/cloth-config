@@ -76,7 +76,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         this.resetButton = Button.builder(resetButtonKey, widget -> {
             selectionElement.topRenderer.setValue(defaultValue.get());
         }).bounds(0, 0, Minecraft.getInstance().font.width(resetButtonKey) + 6, 20).build();
-        this.selectionElement = new SelectionElement<>(this, new Rectangle(0, 0, 150, 20), new DefaultDropdownMenuElement<>(selections == null ? ImmutableList.of() : ImmutableList.copyOf(selections)), topRenderer, cellCreator);
+        this.selectionElement = new SelectionElement<>(this, new Rectangle(0, 0, fieldName.getString().isBlank() ? 300 : 150, 20), new DefaultDropdownMenuElement<>(selections == null ? ImmutableList.of() : ImmutableList.copyOf(selections)), topRenderer, cellCreator);
     }
     
     @Override
@@ -88,6 +88,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         this.selectionElement.active = isEditable();
         this.selectionElement.bounds.y = y;
         Component displayedFieldName = getDisplayedFieldName();
+        boolean hasName = !displayedFieldName.getString().isBlank();
         if (Minecraft.getInstance().font.isBidirectional()) {
             graphics.drawString(Minecraft.getInstance().font, displayedFieldName.getVisualOrderText(), window.getGuiScaledWidth() - x - Minecraft.getInstance().font.width(displayedFieldName), y + 6, getPreferredTextColor());
             this.resetButton.setX(x);
@@ -95,9 +96,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         } else {
             graphics.drawString(Minecraft.getInstance().font, displayedFieldName.getVisualOrderText(), x, y + 6, getPreferredTextColor());
             this.resetButton.setX(x + entryWidth - resetButton.getWidth());
-            this.selectionElement.bounds.x = x + entryWidth - 150 + 1;
+            this.selectionElement.bounds.x = x + (hasName ? entryWidth - 150 : 0) + 1;
         }
-        this.selectionElement.bounds.width = 150 - resetButton.getWidth() - 4;
+        this.selectionElement.bounds.width = (hasName ? 150 : entryWidth) - resetButton.getWidth() - 4;
         resetButton.render(graphics, mouseX, mouseY, delta);
         selectionElement.render(graphics, mouseX, mouseY, delta);
     }
@@ -251,6 +252,10 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         @NotNull
         public SelectionCellCreator<R> getCellCreator() {
             return cellCreator;
+        }
+        
+        public int getCellWidth() {
+        	return getCellCreator().getCellWidth() > 0 ? getCellCreator().getCellWidth() : getEntry().selectionElement.bounds.width;
         }
         
         @NotNull
@@ -408,18 +413,19 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         @Override
         public void lateRender(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
             int last10Height = getHeight();
-            int cWidth = getCellCreator().getCellWidth();
-            graphics.fill(lastRectangle.x, lastRectangle.y + lastRectangle.height, lastRectangle.x + cWidth, lastRectangle.y + lastRectangle.height + last10Height + 1, isExpanded() ? -1 : -6250336);
-            graphics.fill(lastRectangle.x + 1, lastRectangle.y + lastRectangle.height + 1, lastRectangle.x + cWidth - 1, lastRectangle.y + lastRectangle.height + last10Height, -16777216);
+            int cWidth = getCellWidth();
             graphics.pose().pushPose();
+            graphics.pose().translate(0, 0, 300f);
+            graphics.fill(lastRectangle.x, lastRectangle.y + lastRectangle.height, lastRectangle.x + cWidth, lastRectangle.y + lastRectangle.height + last10Height + 1, isExpanded() ? 0xFFFFFFFF : -6250336);
+            graphics.fill(lastRectangle.x + 1, lastRectangle.y + lastRectangle.height + 1, lastRectangle.x + cWidth - 1, lastRectangle.y + lastRectangle.height + last10Height, 0xFF000000);
             graphics.pose().translate(0, 0, 300f);
             
             ScissorsHandler.INSTANCE.scissor(new Rectangle(lastRectangle.x, lastRectangle.y + lastRectangle.height + 1, cWidth - 6, last10Height - 1));
             double yy = lastRectangle.y + lastRectangle.height - scroll;
             for (SelectionCellElement<R> cell : currentElements) {
                 if (yy + getCellCreator().getCellHeight() >= lastRectangle.y + lastRectangle.height && yy <= lastRectangle.y + lastRectangle.height + last10Height + 1) {
-                    graphics.fill(lastRectangle.x + 1, (int) yy, lastRectangle.x + getCellCreator().getCellWidth(), (int) yy + getCellCreator().getCellHeight(), 0xFF000000);
-                    cell.render(graphics, mouseX, mouseY, lastRectangle.x, (int) yy, getMaxScrollPosition() > 6 ? getCellCreator().getCellWidth() - 6 : getCellCreator().getCellWidth(), getCellCreator().getCellHeight(), delta);
+                    graphics.fill(lastRectangle.x + 1, (int) yy, lastRectangle.x + cWidth, (int) yy + getCellCreator().getCellHeight(), 0xFF000000);
+                    cell.render(graphics, mouseX, mouseY, lastRectangle.x, (int) yy, getMaxScrollPosition() > 6 ? cWidth - 6 : cWidth, getCellCreator().getCellHeight(), delta);
                 } else
                     cell.dontRender(graphics, delta);
                 yy += getCellCreator().getCellHeight();
@@ -429,12 +435,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             if (currentElements.isEmpty()) {
                 Font textRenderer = Minecraft.getInstance().font;
                 Component text = Component.translatable("text.cloth-config.dropdown.value.unknown");
-                graphics.drawString(textRenderer, text.getVisualOrderText(), (int) (lastRectangle.x + getCellCreator().getCellWidth() / 2f - textRenderer.width(text) / 2f), lastRectangle.y + lastRectangle.height + 3, -1);
+                graphics.drawString(textRenderer, text.getVisualOrderText(), (int) (lastRectangle.x + cWidth / 2f - textRenderer.width(text) / 2f), lastRectangle.y + lastRectangle.height + 3, -1);
             }
             
             if (getMaxScrollPosition() > 6) {
                 RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-                int scrollbarPositionMinX = lastRectangle.x + getCellCreator().getCellWidth() - 6;
+                int scrollbarPositionMinX = lastRectangle.x + cWidth - 6;
                 int scrollbarPositionMaxX = scrollbarPositionMinX + 6;
                 int height = (int) (((last10Height) * (last10Height)) / this.getMaxScrollPosition());
                 height = Mth.clamp(height, 32, last10Height - 8);
@@ -470,7 +476,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         @Override
         public boolean isMouseOver(double mouseX, double mouseY) {
-            return isExpanded() && mouseX >= lastRectangle.x && mouseX <= lastRectangle.x + getCellCreator().getCellWidth() && mouseY >= lastRectangle.y + lastRectangle.height && mouseY <= lastRectangle.y + lastRectangle.height + getHeight() + 1;
+            return isExpanded() && mouseX >= lastRectangle.x && mouseX <= lastRectangle.x + getCellWidth() && mouseY >= lastRectangle.y + lastRectangle.height && mouseY <= lastRectangle.y + lastRectangle.height + getHeight() + 1;
         }
         
         @Override
@@ -505,7 +511,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         protected void updateScrollingState(double double_1, double double_2, int int_1) {
-            this.scrolling = isExpanded() && lastRectangle != null && int_1 == 0 && double_1 >= (double) lastRectangle.x + getCellCreator().getCellWidth() - 6 && double_1 < (double) (lastRectangle.x + getCellCreator().getCellWidth());
+            this.scrolling = isExpanded() && lastRectangle != null && int_1 == 0 && double_1 >= (double) lastRectangle.x + getCellWidth() - 6 && double_1 < (double) (lastRectangle.x + getCellWidth());
         }
         
         @Override
@@ -548,7 +554,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public abstract int getDropBoxMaxHeight();
         
         public int getCellWidth() {
-            return 132;
+            return -1;
         }
     }
     
