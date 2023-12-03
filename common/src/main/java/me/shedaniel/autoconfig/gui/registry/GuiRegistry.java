@@ -30,9 +30,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
 public final class GuiRegistry implements GuiRegistryAccess {
@@ -40,19 +38,7 @@ public final class GuiRegistry implements GuiRegistryAccess {
     private final Map<Priority, List<ProviderEntry>> providers = new EnumMap<>(Priority.class);
     private final List<TransformerEntry> transformers = new ArrayList<>();
     
-    public GuiRegistry() {
-        for (Priority priority : Priority.values()) {
-            providers.put(priority, new ArrayList<>());
-        }
-    }
-    
-    private static <T> Optional<T> firstPresent(Stream<Supplier<Optional<T>>> optionals) {
-        return optionals
-                .map(Supplier::get)
-                .filter(Optional::isPresent)
-                .findFirst()
-                .orElse(Optional.empty());
-    }
+    public GuiRegistry() {}
     
     @Override
     public List<AbstractConfigListEntry> get(
@@ -62,16 +48,16 @@ public final class GuiRegistry implements GuiRegistryAccess {
             Object defaults,
             GuiRegistryAccess registry
     ) {
-        return firstPresent(
-                Arrays.stream(Priority.values())
-                        .map(priority ->
-                                (Supplier<Optional<ProviderEntry>>) () ->
-                                        providers.get(priority).stream()
-                                                .filter(entry -> entry.predicate.test(field))
-                                                .findFirst()
-                        )
-        )
-                .map(entry -> entry.provider.get(i18n, field, config, defaults, registry))
+        // EnumMap is ordered, so we can use providers.values() reliably.
+        //
+        // Reduce to the highest priority matching GuiProvider,
+        // then use the provider to compute the return value.
+        return providers.values().stream()
+                .flatMap(List::stream)
+                .filter(entry -> entry.predicate.test(field))
+                .map(ProviderEntry::provider)
+                .map(provider -> provider.get(i18n, field, config, defaults, registry))
+                .findFirst()
                 .orElse(null);
     }
     
@@ -147,6 +133,7 @@ public final class GuiRegistry implements GuiRegistryAccess {
     }
     
     private enum Priority {
+        // Ordering is important: highest priority first
         FIRST,
         NORMAL,
         LAST
