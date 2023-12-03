@@ -61,9 +61,9 @@ public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
             Object defaults,
             GuiRegistryAccess registry
     ) {
-        for (GuiRegistryAccess child : children) {
-            guis = child.transform(guis, i18n, field, config, defaults, registry);
-        }
-        return guis;
+        return children.stream()
+                .reduce(guis,
+                        (prevResult, child) -> child.transform(prevResult, i18n, field, config, defaults, registry),
+                        (a, b) -> { throw new UnsupportedOperationException("Cannot transform GUIs in parallel!"); });
     }
 }

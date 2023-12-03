@@ -30,7 +30,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
 public final class GuiRegistry implements GuiRegistryAccess {
@@ -70,16 +69,13 @@ public final class GuiRegistry implements GuiRegistryAccess {
             Object defaults,
             GuiRegistryAccess registry
     ) {
-        List<GuiTransformer> matchedTransformers = this.transformers.stream()
+        // Use each GuiTransformer to reduce the guis
+        return this.transformers.stream()
                 .filter(entry -> entry.predicate.test(field))
-                .map(entry -> entry.transformer)
-                .collect(Collectors.toList());
-        
-        for (GuiTransformer transformer : matchedTransformers) {
-            guis = transformer.transform(guis, i18n, field, config, defaults, registry);
-        }
-        
-        return guis;
+                .map(TransformerEntry::transformer)
+                .reduce(guis,
+                        (prevResult, transformer) -> transformer.transform(prevResult, i18n, field, config, defaults, registry),
+                        (a, b) -> { throw new UnsupportedOperationException("Cannot transform GUIs in parallel!"); });
     }
     
     private void registerProvider(Priority priority, GuiProvider provider, Predicate<Field> predicate) {
