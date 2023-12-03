@@ -152,23 +152,6 @@ public final class GuiRegistry implements GuiRegistryAccess {
         LAST
     }
     
-    private static class ProviderEntry {
-        final Predicate<Field> predicate;
-        final GuiProvider provider;
-        
-        ProviderEntry(Predicate<Field> predicate, GuiProvider provider) {
-            this.predicate = predicate;
-            this.provider = provider;
-        }
-    }
-    
-    private static class TransformerEntry {
-        final Predicate<Field> predicate;
-        final GuiTransformer transformer;
-        
-        TransformerEntry(Predicate<Field> predicate, GuiTransformer transformer) {
-            this.predicate = predicate;
-            this.transformer = transformer;
-        }
-    }
+    private record ProviderEntry(Predicate<Field> predicate, GuiProvider provider) {}
+    private record TransformerEntry(Predicate<Field> predicate, GuiTransformer transformer) {}
 }
