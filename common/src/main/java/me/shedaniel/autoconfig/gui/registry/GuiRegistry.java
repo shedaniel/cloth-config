@@ -39,7 +39,7 @@ public final class GuiRegistry implements GuiRegistryAccess {
     
     private final Map<Priority, List<ProviderEntry>> providers = new EnumMap<>(Priority.class);
     private final List<TransformerEntry> transformers = new ArrayList<>();
-    private final Map<HookEvent, List<GuiRegistryHook>> hooks = new EnumMap<>(HookEvent.class);
+    private final Map<HookEvent, List<HookEntry>> hooks = new EnumMap<>(HookEvent.class);
     
     public GuiRegistry() {}
     
@@ -86,6 +86,8 @@ public final class GuiRegistry implements GuiRegistryAccess {
     public void runPreHook(String i18n, Field field, Object config, Object defaults, GuiRegistryAccess registry) {
         Stream.ofNullable(hooks.get(HookEvent.PRE))
                 .flatMap(List::stream)
+                .filter(entry -> entry.predicate.test(field))
+                .map(HookEntry::hook)
                 .forEach(hook -> hook.run(Collections.emptyList(), i18n, field, config, defaults, registry));
     }
     
@@ -94,6 +96,8 @@ public final class GuiRegistry implements GuiRegistryAccess {
         var constGuis = Collections.unmodifiableList(guis);
         Stream.ofNullable(hooks.get(HookEvent.POST))
                 .flatMap(List::stream)
+                .filter(entry -> entry.predicate.test(field))
+                .map(HookEntry::hook)
                 .forEach(hook -> hook.run(constGuis, i18n, field, config, defaults, registry));
     }
     
@@ -147,18 +151,28 @@ public final class GuiRegistry implements GuiRegistryAccess {
         }
     }
     
-    private void registerHook(HookEvent event, GuiRegistryHook hook) {
-        hooks.computeIfAbsent(event, e -> new ArrayList<>()).add(hook);
+    private void registerHook(HookEvent event, GuiRegistryHook hook, Predicate<Field> predicate) {
+        hooks.computeIfAbsent(event, e -> new ArrayList<>()).add(new HookEntry(predicate, hook));
     }
     
     @ApiStatus.Experimental
     public final void registerPreHook(GuiRegistryHook hook) {
-        registerHook(HookEvent.PRE, hook);
+        registerHook(HookEvent.PRE, hook, field -> true);
+    }
+    
+    @ApiStatus.Experimental
+    public final void registerPredicatePreHook(GuiRegistryHook hook, Predicate<Field> predicate) {
+        registerHook(HookEvent.PRE, hook, predicate);
     }
     
     @ApiStatus.Experimental
     public final void registerPostHook(GuiRegistryHook hook) {
-        registerHook(HookEvent.POST, hook);
+        registerHook(HookEvent.POST, hook, field -> true);
+    }
+    
+    @ApiStatus.Experimental
+    public final void registerPredicatePostHook(GuiRegistryHook hook, Predicate<Field> predicate) {
+        registerHook(HookEvent.POST, hook, predicate);
     }
     
     private enum Priority {
@@ -175,4 +189,5 @@ public final class GuiRegistry implements GuiRegistryAccess {
     
     private record ProviderEntry(Predicate<Field> predicate, GuiProvider provider) {}
     private record TransformerEntry(Predicate<Field> predicate, GuiTransformer transformer) {}
+    private record HookEntry(Predicate<Field> predicate, GuiRegistryHook hook) {}
 }
