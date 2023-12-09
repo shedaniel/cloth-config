@@ -75,9 +75,9 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             
             widget = new EditBox(Minecraft.getInstance().font, 0, 0, 100, 18, Component.empty()) {
                 @Override
-                public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+                public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
                     setFocused(isSelected);
-                    super.render(graphics, mouseX, mouseY, delta);
+                    super.renderWidget(graphics, mouseX, mouseY, delta);
                 }
             };
             widget.setFilter(this::isValidText);

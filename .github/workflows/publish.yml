@@ -18,6 +18,7 @@ on:
             - v11-23w13ab
             - v11
             - v12
+            - v13
 
 jobs:
     build:

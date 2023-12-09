@@ -67,10 +67,10 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         this.original = original;
         this.textFieldWidget = new EditBox(Minecraft.getInstance().font, 0, 0, 148, 18, Component.empty()) {
             @Override
-            public void render(GuiGraphics graphics, int int_1, int int_2, float float_1) {
+            public void renderWidget(GuiGraphics graphics, int int_1, int int_2, float float_1) {
                 setFocused(isSelected && TextFieldListEntry.this.getFocused() == this);
                 textFieldPreRender(this);
-                super.render(graphics, int_1, int_2, float_1);
+                super.renderWidget(graphics, int_1, int_2, float_1);
             }
             
             @Override

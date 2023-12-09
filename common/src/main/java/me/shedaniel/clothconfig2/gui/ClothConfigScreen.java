@@ -132,7 +132,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         addRenderableWidget(Button.builder(isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()).bounds(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20).build());
         addRenderableWidget(new Button(width / 2 + 3, height - 26, buttonWidths, 20, Component.empty(), button -> saveAll(true), Supplier::get) {
             @Override
-            public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+            public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
                 boolean hasErrors = false;
                 for (List<AbstractConfigEntry<?>> entries : Lists.newArrayList(categorizedEntries.values())) {
                     for (AbstractConfigEntry<?> entry : entries)
@@ -145,7 +145,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 }
                 active = isEdited() && !hasErrors;
                 setMessage(hasErrors ? Component.translatable("text.cloth-config.error_cannot_save") : Component.translatable("text.cloth-config.save_and_done"));
-                super.render(graphics, mouseX, mouseY, delta);
+                super.renderWidget(graphics, mouseX, mouseY, delta);
             }
         });
         if (isShowingTabs()) {

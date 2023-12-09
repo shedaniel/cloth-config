@@ -61,9 +61,9 @@ public class ClothConfigTabButton extends AbstractButton {
     }
     
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         active = index != screen.selectedCategoryIndex;
-        super.render(graphics, mouseX, mouseY, delta);
+        super.renderWidget(graphics, mouseX, mouseY, delta);
         
         if (isMouseOver(mouseX, mouseY)) {
             Optional<FormattedText[]> tooltip = getDescription();
