@@ -36,9 +36,9 @@ dependencies {
     forgeDependencies(shadowCommon("me.shedaniel.cloth:basic-math:0.6.1"))
 
     forgeDependencies("cpw.mods:securejarhandler:0.9.48")
-    implementation("blue.endless:jankson:${rootProject.jankson_version}")
-    implementation("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
-    implementation("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
+    modLocalRuntime("blue.endless:jankson:${rootProject.jankson_version}")
+    modLocalRuntime("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
+    modLocalRuntime("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
     forgeDependencies(shadowCommon("blue.endless:jankson:${rootProject.jankson_version}"))
     forgeDependencies(shadowCommon("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}") {
         exclude(module: "gson")
