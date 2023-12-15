@@ -531,7 +531,10 @@ public class DefaultGuiProviders {
     }
     
     private static List<AbstractConfigListEntry> getChildren(String i18n, Class<?> fieldType, Object iConfig, Object iDefaults, GuiRegistryAccess guiProvider) {
-        return Arrays.stream(fieldType.getDeclaredFields())
+        return Stream.of(configClass.getSuperclass().getDeclaredFields(),
+                        configClass.getDeclaredFields())
+                .flatMap(Arrays::stream)
+                .distinct()
                 .map(
                         iField -> {
                             String iI13n = String.format("%s.%s", i18n, iField.getName());
