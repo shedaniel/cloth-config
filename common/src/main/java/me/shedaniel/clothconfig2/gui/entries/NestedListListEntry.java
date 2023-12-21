@@ -113,6 +113,18 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
         }
         
         @Override
+        public void lateRender(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        	nestedEntry.setParent((DynamicEntryListWidget) listListEntry.getParent());
+            nestedEntry.setScreen(listListEntry.getConfigScreen());
+            nestedEntry.lateRender(graphics, mouseX, mouseY, delta);
+        }
+        
+        @Override
+        public int getMorePossibleHeight() {
+        	return nestedEntry.getMorePossibleHeight();
+        }
+        
+        @Override
         public List<? extends GuiEventListener> children() {
             return Collections.singletonList(nestedEntry);
         }

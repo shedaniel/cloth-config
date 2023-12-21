@@ -311,6 +311,21 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
     
     @Override
+    public void lateRender(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.lateRender(graphics, mouseX, mouseY, delta);
+        BaseListCell focused = !isExpanded() || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
+        if(focused != null) {
+        	focused.lateRender(graphics, mouseX, mouseY, delta);
+        }
+    }
+    
+    @Override
+    public int getMorePossibleHeight() { 
+    	BaseListCell focused = !isExpanded() || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
+    	return focused != null ? focused.getMorePossibleHeight() : 0;
+    }
+    
+    @Override
     public void updateSelected(boolean isSelected) {
         for (C cell : cells) {
             cell.updateSelected(isSelected && getFocused() == cell && isExpanded());
