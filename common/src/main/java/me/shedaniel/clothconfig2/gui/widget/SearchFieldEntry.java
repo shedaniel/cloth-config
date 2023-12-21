@@ -132,11 +132,11 @@ public class SearchFieldEntry extends AbstractConfigListEntry<Object> {
     
     @Override
     public List<? extends NarratableEntry> narratables() {
-        return List.of(editBox);
+        return Collections.singletonList(editBox);
     }
     
     @Override
     public List<? extends GuiEventListener> children() {
-        return List.of(editBox);
+        return Collections.singletonList(editBox);
     }
 }
