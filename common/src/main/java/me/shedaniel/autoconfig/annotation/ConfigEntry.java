@@ -19,10 +19,11 @@
 
 package me.shedaniel.autoconfig.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import me.shedaniel.autoconfig.requirements.DefaultRequirements;
+import me.shedaniel.clothconfig2.api.DisableableWidget;
+import me.shedaniel.clothconfig2.api.HideableWidget;
+
+import java.lang.annotation.*;
 
 public class ConfigEntry {
     
@@ -154,4 +155,167 @@ public class ConfigEntry {
             }
         }
     }
+    
+    public static class Requirements {
+        private Requirements() {}
+        
+        /**
+         * Defines a requirement that will control whether this Config Entry GUI is enabled or disabled.
+         *
+         * <p>
+         *     The requirement either references a handler method or another Config Entry GUI.
+         * </p>
+         *
+         * <p>
+         *     If a handler method is referenced, it will be passed {@link #refArgs()} and {@link #staticArgs()}.
+         * </p>
+         *
+         * <p>
+         *     If a Config Entry is referenced, its value will be compared against {@link #conditions()}.
+         * </p>
+         *
+         * <p>
+         *     If a Config Entry is referenced and {@link #conditions()} is empty, an exception will be thrown.
+         *     However if the referenced Config Entry has a <strong>boolean value</strong>, a default condition
+         *     of {@code "true"} will be assumed.
+         * </p>
+         *
+         * @see DisableableWidget
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        @Repeatable(EnableIfGroup.class)
+        public @interface EnableIf {
+            
+            /**
+             * A {@link Ref reference} to a Handler method or a Config Entry.
+             *
+             * @see DefaultRequirements
+             */
+            Ref value();
+            
+            /**
+             * One or more conditions to be compared with the depended-on Config Entry's value.
+             * Will be parsed in the same way as {@link #staticArgs()}.
+             */
+            String[] conditions() default {};
+            
+            /**
+             * Zero or more {@link Ref references} to Config Entries, whose value should be passed to the handler method.
+             */
+            Ref[] refArgs() default {};
+            
+            /**
+             * Zero or more static values to be passed to the handler method.
+             *
+             * <p>The following parameter types are supported:
+             * <ul>
+             *     <li>{@link String}: The arg will be used as-is.
+             *     <li>{@link Character}: The first char of the arg will be used. The arg must be exactly 1 characters long.
+             *     <li>{@link Boolean}: The arg will be checked against the following values (case-insensitive):
+             *     <ul>
+             *         <li>{@code true} for: {@code "true"}, {@code "t"}, or {@code "1"}.
+             *         <li>{@code false} for: {@code "false"}, {@code "f"}, or {@code "0"}.
+             *     </ul>
+             *     <li>{@link Enum}: The arg will be compared against the {@link Enum#name() name values} of the expected Enum.
+             *         The value must be an exact match (case-sensitive).
+             *     <li>{@code short int long float double}: The arg will be parsed using the appropriate method,
+             *         such as {@link Integer#valueOf(String)}.
+             * </ul>
+             * <p>An exception will be thrown if a match is not found, parsing fails, or the expected type is not listed above.
+             */
+            String[] staticArgs() default {};
+        }
+        
+        /**
+         * Defines a requirement that will control whether this Config Entry GUI is displayed on the screen.
+         * 
+         * <p>
+         *     Otherwise identical to {@link EnableIf}
+         * </p>
+         *
+         * @see EnableIf
+         * @see HideableWidget
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        @Repeatable(DisplayIfGroup.class)
+        public @interface DisplayIf {
+            
+            /**
+             * @see EnableIf#value()
+             */
+            Ref value();
+            
+            /**
+             * @see EnableIf#conditions()
+             */
+            String[] conditions() default {};
+            
+            /**
+             * @see EnableIf#refArgs()
+             */
+            Ref[] refArgs() default {};
+            
+            /**
+             * @see EnableIf#staticArgs()
+             */
+            String[] staticArgs() default {};
+        }
+        
+        
+        /**
+         * Can be applied to a handler method to declare a list of {@link Ref refs} that should be passed to the handler
+         * as its initial arguments.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.METHOD)
+        public @interface ConstParams {
+            Ref[] value();
+        }
+        
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface EnableIfGroup {
+            EnableIf[] value();
+            Quantifier quantifier() default Quantifier.ALL;
+        }
+        
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface DisplayIfGroup {
+            DisplayIf[] value();
+            Quantifier quantifier() default Quantifier.ALL;
+        }
+    }
+    
+    /**
+     * Defines a reference to a {@link ConfigEntry}.
+     *
+     * <p>{@code value} should be the name of the {@code ConfigEntry}'s defining field.
+     * <p>{@code cls} defines the class in which to look for the field.
+     * If {@code cls} is set to the default value ({@link None None.class}),
+     * then the annotated class is searched instead.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Ref {
+        String value();
+        Class<?> cls() default None.class;
+    }
+    
+    /**
+     * A quantifier representing how many things are required.
+     */
+    public enum Quantifier {
+        ALL, ANY, ONE, NONE
+    }
+    
+    /**
+     * Used by ConfigEntry annotations to indicate no class is set.
+     */
+    private static class None {
+        private None() {}
+    }
+    
+    private static final String FOO = "FOO";
 }
