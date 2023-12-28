@@ -110,6 +110,50 @@ public class DefaultGuiProviders {
         
         registry.registerAnnotationProvider(
                 (i18n, field, config, defaults, guiProvider) -> {
+                    ConfigEntry.BoundedFloating bounds
+                            = field.getAnnotation(ConfigEntry.BoundedFloating.class);
+                    
+                    return Collections.singletonList(
+                            ENTRY_BUILDER.startFloatSlider(
+                                            Component.translatable(i18n),
+                                            getUnsafely(field, config, 0L),
+                                            (float) bounds.min(),
+                                            (float) bounds.max(),
+                                            bounds.precision()
+                                    )
+                                    .setDefaultValue(() -> getUnsafely(field, defaults))
+                                    .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                                    .build()
+                    );
+                },
+                field -> field.getType() == float.class || field.getType() == Float.class,
+                ConfigEntry.BoundedFloating.class
+        );
+        
+        registry.registerAnnotationProvider(
+                (i18n, field, config, defaults, guiProvider) -> {
+                    ConfigEntry.BoundedFloating bounds
+                            = field.getAnnotation(ConfigEntry.BoundedFloating.class);
+                    
+                    return Collections.singletonList(
+                            ENTRY_BUILDER.startDoubleSlider(
+                                            Component.translatable(i18n),
+                                            getUnsafely(field, config, 0L),
+                                            bounds.min(),
+                                            bounds.max(),
+                                            bounds.precision()
+                                    )
+                                    .setDefaultValue(() -> getUnsafely(field, defaults))
+                                    .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                                    .build()
+                    );
+                },
+                field -> field.getType() == double.class || field.getType() == Double.class,
+                ConfigEntry.BoundedFloating.class
+        );
+        
+        registry.registerAnnotationProvider(
+                (i18n, field, config, defaults, guiProvider) -> {
                     ConfigEntry.ColorPicker colorPicker
                             = field.getAnnotation(ConfigEntry.ColorPicker.class);
                     
