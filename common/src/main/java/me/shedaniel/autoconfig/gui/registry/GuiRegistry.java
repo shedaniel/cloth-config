@@ -21,38 +21,27 @@ package me.shedaniel.autoconfig.gui.registry;
 
 import me.shedaniel.autoconfig.gui.registry.api.GuiProvider;
 import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryAccess;
+import me.shedaniel.autoconfig.gui.registry.api.GuiRegistryHook;
 import me.shedaniel.autoconfig.gui.registry.api.GuiTransformer;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
 public final class GuiRegistry implements GuiRegistryAccess {
     
-    private Map<Priority, List<ProviderEntry>> providers = new HashMap<>();
-    private List<TransformerEntry> transformers = new ArrayList<>();
+    private final Map<Priority, List<ProviderEntry>> providers = new EnumMap<>(Priority.class);
+    private final List<TransformerEntry> transformers = new ArrayList<>();
+    private final Map<HookEvent, List<HookEntry>> hooks = new EnumMap<>(HookEvent.class);
     
-    public GuiRegistry() {
-        for (Priority priority : Priority.values()) {
-            providers.put(priority, new ArrayList<>());
-        }
-    }
-    
-    private static <T> Optional<T> firstPresent(Stream<Supplier<Optional<T>>> optionals) {
-        return optionals
-                .map(Supplier::get)
-                .filter(Optional::isPresent)
-                .findFirst()
-                .orElse(Optional.empty());
-    }
+    public GuiRegistry() {}
     
     @Override
     public List<AbstractConfigListEntry> get(
@@ -62,16 +51,16 @@ public final class GuiRegistry implements GuiRegistryAccess {
             Object defaults,
             GuiRegistryAccess registry
     ) {
-        return firstPresent(
-                Arrays.stream(Priority.values())
-                        .map(priority ->
-                                (Supplier<Optional<ProviderEntry>>) () ->
-                                        providers.get(priority).stream()
-                                                .filter(entry -> entry.predicate.test(field))
-                                                .findFirst()
-                        )
-        )
-                .map(entry -> entry.provider.get(i18n, field, config, defaults, registry))
+        // EnumMap is ordered, so we can use providers.values() reliably.
+        //
+        // Reduce to the highest priority matching GuiProvider,
+        // then use the provider to compute the return value.
+        return providers.values().stream()
+                .flatMap(List::stream)
+                .filter(entry -> entry.predicate.test(field))
+                .map(ProviderEntry::provider)
+                .map(provider -> provider.get(i18n, field, config, defaults, registry))
+                .findFirst()
                 .orElse(null);
     }
     
@@ -84,16 +73,32 @@ public final class GuiRegistry implements GuiRegistryAccess {
             Object defaults,
             GuiRegistryAccess registry
     ) {
-        List<GuiTransformer> matchedTransformers = this.transformers.stream()
+        // Use each GuiTransformer to reduce the guis
+        return this.transformers.stream()
                 .filter(entry -> entry.predicate.test(field))
-                .map(entry -> entry.transformer)
-                .collect(Collectors.toList());
-        
-        for (GuiTransformer transformer : matchedTransformers) {
-            guis = transformer.transform(guis, i18n, field, config, defaults, registry);
-        }
-        
-        return guis;
+                .map(TransformerEntry::transformer)
+                .reduce(guis,
+                        (prevResult, transformer) -> transformer.transform(prevResult, i18n, field, config, defaults, registry),
+                        (a, b) -> { throw new UnsupportedOperationException("Cannot transform GUIs in parallel!"); });
+    }
+    
+    @Override
+    public void runPreHook(String i18n, Field field, Object config, Object defaults, GuiRegistryAccess registry) {
+        Stream.ofNullable(hooks.get(HookEvent.PRE))
+                .flatMap(List::stream)
+                .filter(entry -> entry.predicate.test(field))
+                .map(HookEntry::hook)
+                .forEach(hook -> hook.run(Collections.emptyList(), i18n, field, config, defaults, registry));
+    }
+    
+    @Override
+    public void runPostHook(List<AbstractConfigListEntry> guis, String i18n, Field field, Object config, Object defaults, GuiRegistryAccess registry) {
+        var constGuis = Collections.unmodifiableList(guis);
+        Stream.ofNullable(hooks.get(HookEvent.POST))
+                .flatMap(List::stream)
+                .filter(entry -> entry.predicate.test(field))
+                .map(HookEntry::hook)
+                .forEach(hook -> hook.run(constGuis, i18n, field, config, defaults, registry));
     }
     
     private void registerProvider(Priority priority, GuiProvider provider, Predicate<Field> predicate) {
@@ -146,29 +151,43 @@ public final class GuiRegistry implements GuiRegistryAccess {
         }
     }
     
+    private void registerHook(HookEvent event, GuiRegistryHook hook, Predicate<Field> predicate) {
+        hooks.computeIfAbsent(event, e -> new ArrayList<>()).add(new HookEntry(predicate, hook));
+    }
+    
+    @ApiStatus.Experimental
+    public final void registerPreHook(GuiRegistryHook hook) {
+        registerHook(HookEvent.PRE, hook, field -> true);
+    }
+    
+    @ApiStatus.Experimental
+    public final void registerPredicatePreHook(GuiRegistryHook hook, Predicate<Field> predicate) {
+        registerHook(HookEvent.PRE, hook, predicate);
+    }
+    
+    @ApiStatus.Experimental
+    public final void registerPostHook(GuiRegistryHook hook) {
+        registerHook(HookEvent.POST, hook, field -> true);
+    }
+    
+    @ApiStatus.Experimental
+    public final void registerPredicatePostHook(GuiRegistryHook hook, Predicate<Field> predicate) {
+        registerHook(HookEvent.POST, hook, predicate);
+    }
+    
     private enum Priority {
+        // Ordering is important: highest priority first
         FIRST,
         NORMAL,
         LAST
     }
     
-    private static class ProviderEntry {
-        final Predicate<Field> predicate;
-        final GuiProvider provider;
-        
-        ProviderEntry(Predicate<Field> predicate, GuiProvider provider) {
-            this.predicate = predicate;
-            this.provider = provider;
-        }
+    private enum HookEvent {
+        PRE,
+        POST
     }
     
-    private static class TransformerEntry {
-        final Predicate<Field> predicate;
-        final GuiTransformer transformer;
-        
-        TransformerEntry(Predicate<Field> predicate, GuiTransformer transformer) {
-            this.predicate = predicate;
-            this.transformer = transformer;
-        }
-    }
+    private record ProviderEntry(Predicate<Field> predicate, GuiProvider provider) {}
+    private record TransformerEntry(Predicate<Field> predicate, GuiTransformer transformer) {}
+    private record HookEntry(Predicate<Field> predicate, GuiRegistryHook hook) {}
 }

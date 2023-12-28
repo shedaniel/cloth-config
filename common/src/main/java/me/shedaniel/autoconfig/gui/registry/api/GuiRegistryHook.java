@@ -25,35 +25,13 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.List;
 
+@FunctionalInterface
 @Environment(EnvType.CLIENT)
-public interface GuiRegistryAccess extends GuiProvider, GuiTransformer {
-    default List<AbstractConfigListEntry> getAndTransform(
-            String i18n,
-            Field field,
-            Object config,
-            Object defaults,
-            GuiRegistryAccess registry
-    ) {
-        runPreHook(i18n, field, config, defaults, registry);
-        List<AbstractConfigListEntry> guis = transform(get(i18n, field, config, defaults, registry), i18n, field, config, defaults, registry);
-        runPostHook(Collections.unmodifiableList(guis), i18n, field, config, defaults, registry);
-        return guis;
-    }
-    
-    @ApiStatus.Internal
-    void runPreHook(
-            String i18n,
-            Field field,
-            Object config,
-            Object defaults,
-            GuiRegistryAccess registry
-    );
-    
-    @ApiStatus.Internal
-    void runPostHook(
+@ApiStatus.Experimental
+public interface GuiRegistryHook {
+    void run(
             List<AbstractConfigListEntry> guis,
             String i18n,
             Field field,
