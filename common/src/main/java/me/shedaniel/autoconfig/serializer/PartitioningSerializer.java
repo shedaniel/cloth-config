@@ -22,9 +22,12 @@ package me.shedaniel.autoconfig.serializer;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.util.Utils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +37,12 @@ import java.util.stream.Collectors;
 /**
  * This serializer wraps another serializer and produces a folder with each field of the config
  * corresponding to a single config file.
- * The top level config must inherit from GlobalData.
- * Each field of the top level config must be of a type inheriting from ConfigData.
+ * <br>
+ * The top level config must inherit from {@link GlobalData}.
+ * <br>
+ * Each field of the top level config must be of a type inheriting from {@link ConfigData}.
+ * <br>
+ * Fields marked {@code static} are ignored.
  */
 public final class PartitioningSerializer<T extends PartitioningSerializer.GlobalData, M extends ConfigData> implements ConfigSerializer<T> {
     
@@ -101,6 +108,7 @@ public final class PartitioningSerializer<T extends PartitioningSerializer.Globa
     
     private static List<Field> getModuleFields(Class<?> configClass) {
         return Arrays.stream(configClass.getDeclaredFields())
+                .filter(field -> !Modifier.isStatic(field.getModifiers()))
                 .filter(PartitioningSerializer::isValidModule)
                 .collect(Collectors.toList());
     }
@@ -129,10 +137,18 @@ public final class PartitioningSerializer<T extends PartitioningSerializer.Globa
     public static abstract class GlobalData implements ConfigData {
         
         public GlobalData() {
-            Arrays.stream(getClass().getDeclaredFields())
+            Logger logger = LogManager.getLogger();
+            Field[] fields = getClass().getDeclaredFields();
+    
+            Arrays.stream(fields)
+                    .filter(field -> Modifier.isStatic(field.getModifiers()))
+                    .forEach(field -> logger.warn("Ignoring static field: %s".formatted(field)));
+
+            Arrays.stream(fields)
+                    .filter(field -> !Modifier.isStatic(field.getModifiers()))
                     .filter(field -> !isValidModule(field))
                     .forEach(field -> {
-                        throw new RuntimeException(String.format("Invalid module: %s", field));
+                        throw new RuntimeException("Invalid module: %s".formatted(field));
                     });
         }
         
