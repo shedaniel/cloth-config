@@ -35,7 +35,10 @@ dependencies {
     mappings loom.officialMojangMappings()
 
     modApi "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+    modApi fabricApi.module("fabric-resource-loader-v0", rootProject.fabric_api_version)
+    modApi fabricApi.module("fabric-screen-api-v1", rootProject.fabric_api_version)
+    modApi fabricApi.module("fabric-key-binding-api-v1", rootProject.fabric_api_version)
+    modApi fabricApi.module("fabric-lifecycle-events-v1", rootProject.fabric_api_version)
 
     modApi("me.shedaniel.cloth:basic-math:0.6.1")
     include("me.shedaniel.cloth:basic-math:0.6.1")
@@ -52,9 +55,9 @@ dependencies {
     modCompileOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
-    modLocalRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
-        transitive(false)
-    }
+//    modLocalRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
+//        transitive(false)
+//    }
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
@@ -108,7 +111,7 @@ publishing {
 unifiedPublishing {
     project {
         displayName = "[Fabric $rootProject.supported_version] v$project.version"
-        releaseType = "release"
+        releaseType = "beta"
         gameVersions = []
         gameLoaders = ["fabric"]
         
@@ -118,7 +121,7 @@ unifiedPublishing {
             curseforge {
                 token = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
                 id = project.curseforge_id
-                gameVersions.addAll "1.20.4", "1.20.3", "1.20.3-Snapshot", "Java 17"
+                gameVersions.addAll "1.20.5-Snapshot", "Java 17"
             }
         }
 
@@ -127,7 +130,7 @@ unifiedPublishing {
                 token = project.hasProperty("modrinth_key") ? project.property("modrinth_key") : System.getenv("modrinth_key")
                 id = project.modrinth_id
                 version = "$project.version+$project.name"
-                gameVersions.addAll project.minecraft_version, "1.20.3"
+                gameVersions.addAll project.minecraft_version
             }
         }
     }

@@ -30,6 +30,7 @@ import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.api.scroll.ScrollingContainer;
 import me.shedaniel.clothconfig2.gui.entries.EmptyEntry;
+import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.clothconfig2.gui.widget.SearchFieldEntry;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.ChatFormatting;
@@ -43,6 +44,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -213,12 +215,17 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             requestingReferenceRebuilding = false;
         }
         int sliderPosition = getSideSliderPosition();
-        ScissorsHandler.INSTANCE.scissor(new Rectangle(sliderPosition, 0, width - sliderPosition, height));
-        if (isTransparentBackground()) {
-            graphics.fillGradient(14, 0, width, height, -1072689136, -804253680);
-        } else {
-            renderDirtBackground(graphics);
+        if (!isTransparentBackground()) {
+            ScissorsHandler.INSTANCE.scissor(new Rectangle(sliderPosition, 0, width - sliderPosition, height));
+            renderMenuBackground(graphics);
             overlayBackground(graphics, new Rectangle(14, 0, width, height), 64, 64, 64, 255, 255);
+        } else {
+            if (this.minecraft.level == null) {
+                this.renderPanorama(graphics, delta);
+            }
+            renderBlurredBackground(delta);
+            renderMenuBackground(graphics);
+            ScissorsHandler.INSTANCE.scissor(new Rectangle(sliderPosition, 0, width - sliderPosition, height));
         }
         listWidget.width = width - sliderPosition;
         listWidget.setLeftPos(sliderPosition);
@@ -235,8 +242,14 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         sideSlider.updatePosition(delta);
         sideScroller.updatePosition(delta);
         if (isTransparentBackground()) {
-            graphics.fillGradient(0, 0, sliderPosition, height, -1240461296, -972025840);
-            graphics.fillGradient(0, 0, sliderPosition - 14, height, 1744830464, 1744830464);
+            RenderSystem.enableBlend();
+            graphics.blit(new ResourceLocation("textures/gui/menu_list_background.png"), 0, 0, sliderPosition, height, sliderPosition, height, 32, 32);
+            graphics.blit(new ResourceLocation("textures/gui/menu_list_background.png"), 0, 0, sliderPosition - 14, height, sliderPosition - 14, height, 32, 32);
+            graphics.blit(DynamicEntryListWidget.VERTICAL_HEADER_SEPARATOR, sliderPosition - 1, 0, 0.0F, 0.0F, 1, this.height, 2, 32);
+            if (sliderPosition - 14 - 1 > 0) {
+                graphics.blit(DynamicEntryListWidget.VERTICAL_HEADER_SEPARATOR, sliderPosition - 14 - 1, 0, 0.0F, 0.0F, 1, this.height, 2, 32);
+            }
+            RenderSystem.disableBlend();
         } else {
             Tesselator tesselator = Tesselator.getInstance();
             BufferBuilder buffer = tesselator.getBuilder();
@@ -255,14 +268,11 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             buffer.vertex(sliderPosition - 14, 0, 0.0D).uv((sliderPosition - 14) / 32.0F, sideScroller.scrollAmountInt() / 32.0F).color(32, 32, 32, 255).endVertex();
             buffer.vertex(0, 0, 0.0D).uv(0, sideScroller.scrollAmountInt() / 32.0F).color(32, 32, 32, 255).endVertex();
             tesselator.end();
-        }
-        {
+            
             Matrix4f matrix = graphics.pose().last().pose();
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder buffer = tesselator.getBuilder();
             int shadeColor = isTransparentBackground() ? 120 : 160;
             buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             buffer.vertex(matrix, sliderPosition + 4, 0, 100.0F).color(0, 0, 0, 0).endVertex();
@@ -373,6 +383,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
             return null;
         }
+        
         @Override
         public Object getValue() {
             return null;

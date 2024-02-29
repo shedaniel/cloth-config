@@ -49,8 +49,8 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean tabsSmoothScroll = true;
     private boolean listSmoothScroll = true;
     private boolean doesConfirmSave = true;
-    private boolean transparentBackground = false;
-    private ResourceLocation defaultBackground = Screen.BACKGROUND_LOCATION;
+    private boolean transparentBackground = true;
+    private ResourceLocation defaultBackground = new ResourceLocation("textures/block/dirt.png");
     private Consumer<Screen> afterInitConsumer = screen -> {};
     private final Map<String, ConfigCategory> categoryMap = Maps.newLinkedHashMap();
     private String fallbackCategory = null;
