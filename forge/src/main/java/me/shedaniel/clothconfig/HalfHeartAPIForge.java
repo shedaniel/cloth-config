@@ -17,9 +17,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package me.shedaniel.clothconfig;
+package me.gamerben.hhapi;
 
-import me.shedaniel.clothconfig2.ClothConfigInitializer;
+import me.gamerben.hhapi2.HalfHeartInitializer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.IExtensionPoint;
@@ -27,10 +27,10 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkConstants;
 
-@Mod(ClothConfigInitializer.MOD_ID)
-public class ClothConfigForge {
-    public ClothConfigForge() {
+@Mod(HalfHeartAPIInitializer.MOD_ID)
+public class HalfHeartAPIForge {
+    public HalfHeartAPIForge() {
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClothConfigForgeDemo::registerModsPage);
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> HalfHeartForgeDemo::registerModsPage);
     }
 }
