@@ -5,7 +5,7 @@ plugins {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/cloth-config.accessWidener")
+    accessWidenerPath = file("src/main/resources/HalfHeartAPI.accessWidener")
 }
 
 architectury {
