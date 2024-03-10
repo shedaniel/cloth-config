@@ -37,8 +37,8 @@ dependencies {
     modApi "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
-    modApi("me.shedaniel.cloth:basic-math:0.6.1")
-    include("me.shedaniel.cloth:basic-math:0.6.1")
+    modApi("me.gamerben.hhapi:basic-math:0.6.1")
+    include("me.gamerben.hhapi:basic-math:0.6.1")
 
     implementation("blue.endless:jankson:${rootProject.jankson_version}")
     implementation("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
@@ -68,9 +68,9 @@ processResources {
 }
 
 shadowJar {
-    relocate "blue.endless.jankson", "${rootProject.maven_group}.clothconfig.shadowed.blue.endless.jankson"
-    relocate "com.moandjiezana.toml", "${rootProject.maven_group}.clothconfig.shadowed.com.moandjiezana.toml"
-    relocate "org.yaml.snakeyaml", "${rootProject.maven_group}.clothconfig.shadowed.org.yaml.snakeyaml"
+    relocate "blue.endless.jankson", "${rootProject.maven_group}.HalfHeartAPI.shadowed.blue.endless.jankson"
+    relocate "com.moandjiezana.toml", "${rootProject.maven_group}.HalfHeartAPI.shadowed.com.moandjiezana.toml"
+    relocate "org.yaml.snakeyaml", "${rootProject.maven_group}.HalfHeartAPI.shadowed.org.yaml.snakeyaml"
     
     configurations = [project.configurations.shadowCommon]
     classifier "shadow"
@@ -98,9 +98,9 @@ publishing {
     repositories {
         if (System.getenv("MAVEN_PASS") != null) {
             maven {
-                url = "https://deploy.shedaniel.me/"
+                url = "https://github.com/gamerbenyt/halfheartAPI/"
                 credentials {
-                    username = "shedaniel"
+                    username = "gamerbenyt"
                     password = System.getenv("MAVEN_PASS")
                 }
             }
