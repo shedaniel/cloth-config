@@ -17,16 +17,16 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package me.shedaniel.clothconfig;
+package me.gamerben.hhapi;
 
-import me.shedaniel.clothconfig2.ClothConfigDemo;
+import me.gamerben.hhapi2.HalfHeartAPIDemo;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.fml.ModLoadingContext;
 
-public class ClothConfigForgeDemo {
+public class HalfHeartAPIForgeDemo {
     public static void registerModsPage() {
         ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> {
-            return ClothConfigDemo.getConfigBuilderWithDemo().setParentScreen(parent).build();
+            return HalfHeartAPIDemo.getConfigBuilderWithDemo().setParentScreen(parent).build();
         }));
     }
 }
