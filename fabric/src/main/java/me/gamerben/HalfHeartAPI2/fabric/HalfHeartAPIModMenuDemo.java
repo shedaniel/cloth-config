@@ -17,7 +17,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package me.shedaniel.clothconfig2.fabric;
+package me.gamerben.halfheartapi2.fabric;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
@@ -27,7 +27,7 @@ import me.shedaniel.autoconfig.example.ExampleConfig;
 import me.shedaniel.clothconfig2.ClothConfigDemo;
 import net.minecraft.client.gui.screens.Screen;
 
-public class ClothConfigModMenuDemo implements ModMenuApi {
+public class HalfHeartAPIModMenuDemo implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
         return screen -> {

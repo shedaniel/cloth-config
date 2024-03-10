@@ -17,16 +17,20 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package me.shedaniel.clothconfig;
+package me.gamerben.hhapi;
 
-import me.shedaniel.clothconfig2.ClothConfigDemo;
-import net.minecraftforge.client.ConfigScreenHandler;
+import me.gamerben.hhapi2.HalfHeartInitializer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.NetworkConstants;
 
-public class ClothConfigForgeDemo {
-    public static void registerModsPage() {
-        ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> {
-            return ClothConfigDemo.getConfigBuilderWithDemo().setParentScreen(parent).build();
-        }));
+@Mod(HalfHeartAPIInitializer.MOD_ID)
+public class HalfHeartAPIForge {
+    public HalfHeartAPIForge() {
+        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> HalfHeartForgeDemo::registerModsPage);
     }
 }

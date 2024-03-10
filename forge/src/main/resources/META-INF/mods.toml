@@ -1,20 +1,20 @@
 modLoader = "javafml"
 loaderVersion = "[34,)"
-issueTrackerURL = "https://github.com/architectury/ClothConfig/issues/"
-displayURL = "https://www.curseforge.com/minecraft/mc-mods/cloth-config-forge/"
+issueTrackerURL = "https://github.com/gamerbenyt/halfheartAPI/issues/"
+displayURL = "ORIGINALMODhttps://www.curseforge.com/minecraft/mc-mods/cloth-config-forge/"
 logoFile = "icon.png"
-authors = "shedaniel"
+authors = "gamerben"
 license = "GNU LGPLv3"
 
 [[mods]]
-modId = "cloth_config"
+modId = "half_heart_api"
 version = "${version}"
-displayName = "Cloth Config v8 API"
+displayName = "Half Heart API v1.0.0"
 description = '''
 An API for config screens.
 '''
 
-[[dependencies.cloth_config]]
+[[dependencies.half_heart_api]]
 modId = "forge"
 mandatory = true
 versionRange = "[41.0.94,)"

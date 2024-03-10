@@ -32,8 +32,8 @@ dependencies {
 
     forge "net.minecraftforge:forge:${rootProject.architectury.minecraft}-${rootProject.forge_version}"
 
-    modLocalRuntime("me.shedaniel.cloth:basic-math:0.6.1")
-    forgeDependencies(shadowCommon("me.shedaniel.cloth:basic-math:0.6.1"))
+    modLocalRuntime("me.gamerben.hhapi:basic-math:0.6.1")
+    forgeDependencies(shadowCommon("me.gamerben.hhapi:basic-math:0.6.1"))
 
     forgeDependencies("cpw.mods:securejarhandler:0.9.48")
     implementation("blue.endless:jankson:${rootProject.jankson_version}")
@@ -59,9 +59,9 @@ processResources {
 shadowJar {
     exclude "fabric.mod.json"
     exclude "cloth-config.accessWidener"
-    relocate "blue.endless.jankson", "${rootProject.maven_group}.clothconfig.shadowed.blue.endless.jankson"
-    relocate "com.moandjiezana.toml", "${rootProject.maven_group}.clothconfig.shadowed.com.moandjiezana.toml"
-    relocate "org.yaml.snakeyaml", "${rootProject.maven_group}.clothconfig.shadowed.org.yaml.snakeyaml"
+    relocate "blue.endless.jankson", "${rootProject.maven_group}.halfheartapi.shadowed.blue.endless.jankson"
+    relocate "com.moandjiezana.toml", "${rootProject.maven_group}.halfheartapi.shadowed.com.moandjiezana.toml"
+    relocate "org.yaml.snakeyaml", "${rootProject.maven_group}.halfheartapi.shadowed.org.yaml.snakeyaml"
 
     configurations = [project.configurations.shadowCommon]
     classifier "shadow"
@@ -89,9 +89,9 @@ publishing {
     repositories {
         if (System.getenv("MAVEN_PASS") != null) {
             maven {
-                url = "https://deploy.shedaniel.me/"
+                url = "https://about:blank/"
                 credentials {
-                    username = "shedaniel"
+                    username = "gamerben"
                     password = System.getenv("MAVEN_PASS")
                 }
             }

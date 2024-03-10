@@ -1,16 +1,16 @@
 {
     "schemaVersion": 1,
-    "id": "cloth-config",
-    "name": "Cloth Config v8",
-    "description": "An API for config screens.",
+    "id": "half-heart-api",
+    "name": "Half Heart API v1.0.0",
+    "description": "An API For Half Heart Based On Cloth Config",
     "version": "${version}",
     "authors": [
-        "shedaniel"
+        "gamerben"
     ],
     "contact": {
-        "homepage": "https://minecraft.curseforge.com/projects/cloth-config",
-        "sources": "https://github.com/shedaniel/ClothConfig",
-        "issues": "https://github.com/shedaniel/ClothConfig/issues"
+        "homepage": "",
+        "sources": "https://github.com/gamerbenyt/halfheartAPI"
+        "issues": "https://github.com/gamerbenyt/halfheartAPI/issues"
     },
     "license": "GNU LGPLv3",
     "icon": "icon.png",
@@ -19,11 +19,11 @@
             "me.shedaniel.autoconfig.example.ExampleInits::exampleCommonInit"
         ],
         "modmenu": [
-            "me.shedaniel.clothconfig2.fabric.ClothConfigModMenuDemo"
+            "me.gamerben.halfheartapi2.fabric.ClothConfigModMenuDemo"
         ]
     },
     "provides": [
-        "cloth-config2"
+        "halfheartapi2"
     ],
     "depends": {
         "fabricloader": ">=0.14.0"
