@@ -55,9 +55,9 @@ dependencies {
     modCompileOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive(false)
     }
-//    modLocalRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
-//        transitive(false)
-//    }
+    modLocalRuntime("com.terraformersmc:modmenu:${mod_menu_version}") {
+        transitive(false)
+    }
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
