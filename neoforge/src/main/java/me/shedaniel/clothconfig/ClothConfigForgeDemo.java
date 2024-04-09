@@ -21,12 +21,12 @@ package me.shedaniel.clothconfig;
 
 import me.shedaniel.clothconfig2.ClothConfigDemo;
 import net.neoforged.fml.ModLoadingContext;
-import net.neoforged.neoforge.client.ConfigScreenHandler;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 public class ClothConfigForgeDemo {
     public static void registerModsPage() {
-        ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> {
+        ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory.class, () -> (client, parent) -> {
             return ClothConfigDemo.getConfigBuilderWithDemo().setParentScreen(parent).build();
-        }));
+        });
     }
 }

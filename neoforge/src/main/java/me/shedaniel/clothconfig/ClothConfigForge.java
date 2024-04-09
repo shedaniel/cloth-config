@@ -22,14 +22,11 @@ package me.shedaniel.clothconfig;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.DistExecutor;
-import net.neoforged.fml.IExtensionPoint;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 
 @Mod(ClothConfigInitializer.MOD_ID)
 public class ClothConfigForge {
     public ClothConfigForge() {
-        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> IExtensionPoint.DisplayTest.IGNORESERVERONLY, (a, b) -> true));
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClothConfigForgeDemo::registerModsPage);
     }
 }
