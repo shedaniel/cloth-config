@@ -99,6 +99,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             categorizedEntries.put(category.getCategoryKey(), entries);
             if (category.getBackground() != null) {
                 registerCategoryBackground(category.getCategoryKey().getString(), category.getBackground());
+                registerCategoryTransparency(category.getCategoryKey().getString(), false);
             }
         });
         
@@ -227,10 +228,14 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             buttonLeftTab.active = tabsScroller.scrollAmount > 0d;
             buttonRightTab.active = tabsScroller.scrollAmount < getTabsMaximumScrolled() - width + 40;
         }
-        if (isTransparentBackground()) {
-            graphics.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
+        if (!isTransparentBackground()) {
+            renderMenuBackground(graphics);
         } else {
-            renderDirtBackground(graphics);
+            if (this.minecraft.level == null) {
+                this.renderPanorama(graphics, delta);
+            }
+            renderBlurredBackground(delta);
+            renderMenuBackground(graphics);
         }
         listWidget.render(graphics, mouseX, mouseY, delta);
         ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
@@ -425,7 +430,9 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             if (!screen.isTransparentBackground())
                 super.renderBackBackground(graphics, buffer, tessellator);
             else {
-                graphics.fillGradient(left, top, right, bottom, 0x68000000, 0x68000000);
+                RenderSystem.enableBlend();
+                graphics.blit(new ResourceLocation("textures/gui/menu_list_background.png"), this.left, this.top, this.right, this.bottom, this.width, this.bottom - this.top, 32, 32);
+                RenderSystem.disableBlend();
             }
         }
         

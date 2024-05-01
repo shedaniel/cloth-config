@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "cloth-config",
-    "name": "Cloth Config v13",
+    "name": "Cloth Config v14",
     "description": "An API for config screens.",
     "version": "${version}",
     "authors": [
@@ -27,7 +27,7 @@
     ],
     "depends": {
         "fabricloader": ">=0.14.0",
-        "minecraft": ">=1.20-"
+        "minecraft": ">=1.20.5-"
     },
     "accessWidener": "cloth-config.accessWidener",
     "custom": {

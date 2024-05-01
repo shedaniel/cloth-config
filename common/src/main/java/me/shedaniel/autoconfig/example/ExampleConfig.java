@@ -32,7 +32,7 @@ import java.util.List;
 @SuppressWarnings({"unused", "FieldMayBeFinal"})
 @ApiStatus.Internal
 @Config(name = "autoconfig1u_example")
-@Config.Gui.Background("minecraft:textures/block/oak_planks.png")
+@Config.Gui.Background(Config.Gui.Background.TRANSPARENT)
 @Config.Gui.CategoryBackground(category = "b", background = "minecraft:textures/block/stone.png")
 public class ExampleConfig extends PartitioningSerializer.GlobalData {
     @ConfigEntry.Category("a")

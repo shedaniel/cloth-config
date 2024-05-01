@@ -40,6 +40,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -53,6 +54,8 @@ import java.util.function.Predicate;
 
 @Environment(EnvType.CLIENT)
 public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry<E>> extends AbstractContainerEventHandler implements Renderable, NarratableEntry {
+    public static final ResourceLocation VERTICAL_HEADER_SEPARATOR = new ResourceLocation("cloth-config2:textures/gui/vertical_header_separator.png");
+    public static final ResourceLocation VERTICAL_FOOTER_SEPARATOR = new ResourceLocation("cloth-config2:textures/gui/vertical_footer_separator.png");
     protected static final int DRAG_OUTSIDE = -2;
     protected final Minecraft client;
     private final List<E> entries = new Entries();
@@ -308,8 +311,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         this.renderHoleBackground(graphics, 0, this.top, 255, 255);
         this.renderHoleBackground(graphics, this.bottom, this.height, 255, 255);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        graphics.fillGradient(this.left, this.top, this.right, this.top + 4, 0xff000000, 0);
-        graphics.fillGradient(this.left, this.bottom - 4, this.right, this.bottom, 0, 0xff000000);
+        RenderSystem.enableBlend();
+        graphics.blit(CreateWorldScreen.HEADER_SEPARATOR, this.left, this.top - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
+        graphics.blit(CreateWorldScreen.FOOTER_SEPARATOR, this.left, this.bottom, 0.0F, 0.0F, this.width, 2, 32, 2);
+        RenderSystem.disableBlend();
         
         int maxScroll = this.getMaxScroll();
         renderScrollBar(graphics, tesselator, buffer, maxScroll, scrollbarPosition, int_4);

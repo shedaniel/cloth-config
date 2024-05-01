@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
     id "me.shedaniel.unified-publishing"
     id "maven-publish"
 }
@@ -49,10 +49,10 @@ dependencies {
 }
 
 processResources {
-    filesMatching("META-INF/mods.toml") {
+    filesMatching("META-INF/neoforge.mods.toml") {
         expand "version": project.version
     }
-    inputs.property "META-INF/mods.toml", project.version
+    inputs.property "META-INF/neoforge.mods.toml", project.version
 }
 
 shadowJar {
@@ -96,10 +96,11 @@ publishing {
 }
 
 unifiedPublishing {
+    if (rootProject.neoforge_pr != "") return
     project {
         displayName = "[NeoForge $rootProject.supported_version] v$project.version"
         releaseType = "release"
-        gameVersions = ["1.20.3", "1.20.4"]
+        gameVersions = ["1.20.5"]
         gameLoaders = ["neoforge"]
 
         mainPublication remapJar
@@ -108,7 +109,7 @@ unifiedPublishing {
             curseforge {
                 token = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
                 id = project.curseforge_id
-                gameVersions.addAll "Java 17"
+                gameVersions.addAll "Java 21"
             }
         }
 

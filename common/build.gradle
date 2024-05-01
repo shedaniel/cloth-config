@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
     id "maven-publish"
 }
 
@@ -31,7 +31,7 @@ dependencies {
 }
 
 architectury {
-    common("fabric", "forge", "neoforge")
+    common("fabric", "neoforge")
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

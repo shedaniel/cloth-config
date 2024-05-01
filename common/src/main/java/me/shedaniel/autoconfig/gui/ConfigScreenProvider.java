@@ -100,9 +100,9 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
             String bg = configClass.getAnnotation(Config.Gui.Background.class).value();
             ResourceLocation bgId = ResourceLocation.tryParse(bg);
             if (TRANSPARENT_BACKGROUND.equals(bgId))
-                builder.transparentBackground();
+                builder.transparentBackground().setDefaultBackgroundTexture(null);
             else
-                builder.setDefaultBackgroundTexture(bgId);
+                builder.solidBackground().setDefaultBackgroundTexture(bgId);
         }
         
         Map<String, ResourceLocation> categoryBackgrounds =

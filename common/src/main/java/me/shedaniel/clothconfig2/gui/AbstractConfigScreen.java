@@ -137,7 +137,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     }
     
     public boolean isTransparentBackground() {
-        return transparentBackground && Minecraft.getInstance().level != null;
+        return transparentBackground;
     }
     
     @ApiStatus.Internal

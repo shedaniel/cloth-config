@@ -28,6 +28,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.Map;
 
 public abstract class AbstractTabbedConfigScreen extends AbstractConfigScreen implements TabbedConfigScreen {
+    private final Map<String, Boolean> categoryTransparentBackground = Maps.newHashMap();
     private final Map<String, ResourceLocation> categoryBackgroundLocation = Maps.newHashMap();
     
     protected AbstractTabbedConfigScreen(Screen parent, Component title, ResourceLocation backgroundLocation) {
@@ -37,6 +38,19 @@ public abstract class AbstractTabbedConfigScreen extends AbstractConfigScreen im
     @Override
     public final void registerCategoryBackground(String text, ResourceLocation identifier) {
         this.categoryBackgroundLocation.put(text, identifier);
+    }
+    
+    @Override
+    public void registerCategoryTransparency(String text, boolean transparent) {
+        this.categoryTransparentBackground.put(text, transparent);
+    }
+    
+    @Override
+    public boolean isTransparentBackground() {
+        Component selectedCategory = getSelectedCategory();
+        if (categoryTransparentBackground.containsKey(selectedCategory.getString()))
+            return categoryTransparentBackground.get(selectedCategory.getString());
+        return super.isTransparentBackground();
     }
     
     @Override

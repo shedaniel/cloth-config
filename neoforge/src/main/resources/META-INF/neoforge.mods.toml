@@ -9,14 +9,14 @@ license = "GNU LGPLv3"
 [[mods]]
 modId = "cloth_config"
 version = "${version}"
-displayName = "Cloth Config v13 API"
+displayName = "Cloth Config v14 API"
 description = '''
 An API for config screens.
 '''
 
 [[dependencies.cloth_config]]
 modId = "neoforge"
-mandatory = true
-versionRange = "[20.2,)"
+type = "required"
+versionRange = "[20.5.0-alpha.24w14a,)"
 ordering = "NONE"
 side = "BOTH"

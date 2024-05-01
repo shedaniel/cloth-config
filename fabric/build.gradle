@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
     id "me.shedaniel.unified-publishing"
     id "maven-publish"
 }
@@ -35,7 +35,10 @@ dependencies {
     mappings loom.officialMojangMappings()
 
     modApi "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+    modApi fabricApi.module("fabric-resource-loader-v0", rootProject.fabric_api_version)
+    modApi fabricApi.module("fabric-screen-api-v1", rootProject.fabric_api_version)
+    modApi fabricApi.module("fabric-key-binding-api-v1", rootProject.fabric_api_version)
+    modApi fabricApi.module("fabric-lifecycle-events-v1", rootProject.fabric_api_version)
 
     modApi("me.shedaniel.cloth:basic-math:0.6.1")
     include("me.shedaniel.cloth:basic-math:0.6.1")
@@ -118,7 +121,7 @@ unifiedPublishing {
             curseforge {
                 token = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
                 id = project.curseforge_id
-                gameVersions.addAll "1.20.4", "1.20.3", "1.20.3-Snapshot", "Java 17"
+                gameVersions.addAll "1.20.5", "Java 21"
             }
         }
 
@@ -127,7 +130,7 @@ unifiedPublishing {
                 token = project.hasProperty("modrinth_key") ? project.property("modrinth_key") : System.getenv("modrinth_key")
                 id = project.modrinth_id
                 version = "$project.version+$project.name"
-                gameVersions.addAll project.minecraft_version, "1.20.3"
+                gameVersions.addAll project.minecraft_version
             }
         }
     }
