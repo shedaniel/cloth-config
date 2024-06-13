@@ -100,7 +100,7 @@ unifiedPublishing {
     project {
         displayName = "[NeoForge $rootProject.supported_version] v$project.version"
         releaseType = "release"
-        gameVersions = ["1.20.5"]
+        gameVersions = ["1.21"]
         gameLoaders = ["neoforge"]
 
         mainPublication remapJar

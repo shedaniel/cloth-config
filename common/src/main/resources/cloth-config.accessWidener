@@ -3,4 +3,3 @@ accessible method net/minecraft/client/gui/Font renderText (Ljava/lang/String;FF
 accessible field net/minecraft/client/gui/components/Button onPress Lnet/minecraft/client/gui/components/Button$OnPress;
 mutable field net/minecraft/client/gui/components/Button onPress Lnet/minecraft/client/gui/components/Button$OnPress;
 accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
-accessible field com/mojang/blaze3d/vertex/Tesselator buffer Lcom/mojang/blaze3d/vertex/ByteBufferBuilder;

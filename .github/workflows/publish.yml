@@ -21,6 +21,7 @@ on:
             - v13
             - v14
             - v14-24w14potato
+            - v15
 
 jobs:
     build:

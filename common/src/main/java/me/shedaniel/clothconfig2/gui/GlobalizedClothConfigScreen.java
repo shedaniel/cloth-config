@@ -286,10 +286,10 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         }
         Rectangle slideArrowBounds = new Rectangle(sliderPosition - 14, 0, 14, height);
         {
-            MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(Tesselator.getInstance().buffer);
+            MultiBufferSource.BufferSource immediate = graphics.bufferSource();
             font.renderText(">", sliderPosition - 7 - font.width(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil((1 - sideSlider.scrollAmount()) * 255.0F), 0, 255) << 24, false, graphics.pose().last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
             font.renderText("<", sliderPosition - 7 - font.width("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil(sideSlider.scrollAmount() * 255.0F), 0, 255) << 24, false, graphics.pose().last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
-            immediate.endBatch();
+            graphics.flush();
             
             Rectangle scrollerBounds = sideScroller.getBounds();
             if (!scrollerBounds.isEmpty()) {
