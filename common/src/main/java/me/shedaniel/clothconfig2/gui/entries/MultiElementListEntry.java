@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 @Environment(EnvType.CLIENT)
 public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Expandable {
     
-    private static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
+    private static final ResourceLocation CONFIG_TEX = ResourceLocation.fromNamespaceAndPath("cloth-config2", "textures/gui/cloth_config.png");
     private final T object;
     private final List<AbstractConfigListEntry<?>> entries;
     private final MultiElementListEntry<T>.CategoryLabelWidget widget;

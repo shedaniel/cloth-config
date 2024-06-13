@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 @Environment(EnvType.CLIENT)
 public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends BaseListEntry<T, C, SELF>> extends TooltipListEntry<List<T>> implements Expandable {
     
-    protected static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
+    protected static final ResourceLocation CONFIG_TEX = ResourceLocation.fromNamespaceAndPath("cloth-config2", "textures/gui/cloth_config.png");
     @NotNull protected final List<C> cells;
     @NotNull protected final List<GuiEventListener> widgets;
     @NotNull protected final List<NarratableEntry> narratables;

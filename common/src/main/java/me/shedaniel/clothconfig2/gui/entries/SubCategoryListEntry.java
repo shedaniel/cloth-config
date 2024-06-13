@@ -46,7 +46,7 @@ import java.util.*;
 @Environment(EnvType.CLIENT)
 public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigListEntry>> implements Expandable {
     
-    private static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
+    private static final ResourceLocation CONFIG_TEX = ResourceLocation.fromNamespaceAndPath("cloth-config2", "textures/gui/cloth_config.png");
     private final List<AbstractConfigListEntry> entries;
     private final CategoryLabelWidget widget;
     private final List<Object> children; // GuiEventListener & NarratableEntry

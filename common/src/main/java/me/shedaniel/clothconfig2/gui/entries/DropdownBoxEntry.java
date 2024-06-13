@@ -446,21 +446,19 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 222 : 172;
                 
                 Tesselator tesselator = Tesselator.getInstance();
-                BufferBuilder buffer = tesselator.getBuilder();
+                BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
                 
                 // Bottom
-                buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-                buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).color(bottomc, bottomc, bottomc, 255).endVertex();
-                buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).color(bottomc, bottomc, bottomc, 255).endVertex();
-                buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).color(bottomc, bottomc, bottomc, 255).endVertex();
-                buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(bottomc, bottomc, bottomc, 255).endVertex();
+                buffer.addVertex(scrollbarPositionMinX, minY + height, 0.0F).setColor(bottomc, bottomc, bottomc, 255);
+                buffer.addVertex(scrollbarPositionMaxX, minY + height, 0.0F).setColor(bottomc, bottomc, bottomc, 255);
+                buffer.addVertex(scrollbarPositionMaxX, minY, 0.0F).setColor(bottomc, bottomc, bottomc, 255);
+                buffer.addVertex(scrollbarPositionMinX, minY, 0.0F).setColor(bottomc, bottomc, bottomc, 255);
                 
                 // Top
-                buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).color(topc, topc, topc, 255).endVertex();
-                buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).color(topc, topc, topc, 255).endVertex();
-                buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).color(topc, topc, topc, 255).endVertex();
-                buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(topc, topc, topc, 255).endVertex();
-                tesselator.end();
+                buffer.addVertex(scrollbarPositionMinX, (minY + height - 1), 0.0F).setColor(topc, topc, topc, 255);
+                buffer.addVertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0F).setColor(topc, topc, topc, 255);
+                buffer.addVertex((scrollbarPositionMaxX - 1), minY, 0.0F).setColor(topc, topc, topc, 255);
+                buffer.addVertex(scrollbarPositionMinX, minY, 0.0F).setColor(topc, topc, topc, 255);
             }
             graphics.pose().popPose();
         }

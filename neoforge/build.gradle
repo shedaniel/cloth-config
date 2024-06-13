@@ -32,7 +32,7 @@ dependencies {
 
     neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
 
-    modLocalRuntime("me.shedaniel.cloth:basic-math:0.6.1")
+    compileOnly("me.shedaniel.cloth:basic-math:0.6.1")
     forgeRuntimeLibrary(shadowCommon("me.shedaniel.cloth:basic-math:0.6.1"))
 
     modLocalRuntime("blue.endless:jankson:${rootProject.jankson_version}")
@@ -100,7 +100,7 @@ unifiedPublishing {
     project {
         displayName = "[NeoForge $rootProject.supported_version] v$project.version"
         releaseType = "release"
-        gameVersions = ["1.20.5"]
+        gameVersions = ["1.21"]
         gameLoaders = ["neoforge"]
 
         mainPublication remapJar

@@ -45,7 +45,7 @@ import static java.util.stream.Collectors.*;
 @Environment(EnvType.CLIENT)
 public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Screen> {
     
-    private static final ResourceLocation TRANSPARENT_BACKGROUND = new ResourceLocation(Config.Gui.Background.TRANSPARENT);
+    private static final ResourceLocation TRANSPARENT_BACKGROUND = ResourceLocation.parse(Config.Gui.Background.TRANSPARENT);
     
     private final ConfigManager<T> manager;
     private final GuiRegistryAccess registry;
@@ -110,7 +110,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
                         .collect(
                                 toMap(
                                         Config.Gui.CategoryBackground::category,
-                                        ann -> new ResourceLocation(ann.background())
+                                        ann -> ResourceLocation.parse(ann.background())
                                 )
                         );
         
