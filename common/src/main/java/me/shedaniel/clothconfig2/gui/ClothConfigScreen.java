@@ -313,17 +313,15 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         RenderSystem.blendFuncSeparate(770, 771, 0, 1);
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder buffer = tesselator.getBuilder();
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY() + 4, 0.0F).uv(0, 1f).color(0, 0, 0, lightColor).endVertex();
-        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY() + 4, 0.0F).uv(1f, 1f).color(0, 0, 0, lightColor).endVertex();
-        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY(), 0.0F).uv(1f, 0).color(0, 0, 0, darkColor).endVertex();
-        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY(), 0.0F).uv(0, 0).color(0, 0, 0, darkColor).endVertex();
-        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY(), 0.0F).uv(0, 1f).color(0, 0, 0, darkColor).endVertex();
-        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY(), 0.0F).uv(1f, 1f).color(0, 0, 0, darkColor).endVertex();
-        buffer.vertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0F).uv(1f, 0).color(0, 0, 0, lightColor).endVertex();
-        buffer.vertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY() - 4, 0.0F).uv(0, 0).color(0, 0, 0, lightColor).endVertex();
-        tesselator.end();
+        BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        buffer.addVertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY() + 4, 0.0F).setUv(0, 1f).setColor(0, 0, 0, lightColor);
+        buffer.addVertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY() + 4, 0.0F).setUv(1f, 1f).setColor(0, 0, 0, lightColor);
+        buffer.addVertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMinY(), 0.0F).setUv(1f, 0).setColor(0, 0, 0, darkColor);
+        buffer.addVertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMinY(), 0.0F).setUv(0, 0).setColor(0, 0, 0, darkColor);
+        buffer.addVertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY(), 0.0F).setUv(0, 1f).setColor(0, 0, 0, darkColor);
+        buffer.addVertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY(), 0.0F).setUv(1f, 1f).setColor(0, 0, 0, darkColor);
+        buffer.addVertex(matrix, tabsBounds.getMaxX() - 20, tabsBounds.getMaxY() - 4, 0.0F).setUv(1f, 0).setColor(0, 0, 0, lightColor);
+        buffer.addVertex(matrix, tabsBounds.getMinX() + 20, tabsBounds.getMaxY() - 4, 0.0F).setUv(0, 0).setColor(0, 0, 0, lightColor);
         RenderSystem.disableBlend();
     }
     
@@ -397,10 +395,10 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             float n = (float) (k >> 16 & 255) / 255.0F;
             float o = (float) (k >> 8 & 255) / 255.0F;
             float p = (float) (k & 255) / 255.0F;
-            bufferBuilder.vertex(matrix4f, (float) xEnd, (float) yStart, (float) i).color(g, h, l, f).endVertex();
-            bufferBuilder.vertex(matrix4f, (float) xStart, (float) yStart, (float) i).color(g, h, l, f).endVertex();
-            bufferBuilder.vertex(matrix4f, (float) xStart, (float) yEnd, (float) i).color(n, o, p, m).endVertex();
-            bufferBuilder.vertex(matrix4f, (float) xEnd, (float) yEnd, (float) i).color(n, o, p, m).endVertex();
+            bufferBuilder.addVertex(matrix4f, (float) xEnd, (float) yStart, (float) i).setColor(g, h, l, f);
+            bufferBuilder.addVertex(matrix4f, (float) xStart, (float) yStart, (float) i).setColor(g, h, l, f);
+            bufferBuilder.addVertex(matrix4f, (float) xStart, (float) yEnd, (float) i).setColor(n, o, p, m);
+            bufferBuilder.addVertex(matrix4f, (float) xEnd, (float) yEnd, (float) i).setColor(n, o, p, m);
         }
         
         @Override
@@ -431,7 +429,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 super.renderBackBackground(graphics, buffer, tessellator);
             else {
                 RenderSystem.enableBlend();
-                graphics.blit(new ResourceLocation("textures/gui/menu_list_background.png"), this.left, this.top, this.right, this.bottom, this.width, this.bottom - this.top, 32, 32);
+                graphics.blit(ResourceLocation.withDefaultNamespace("textures/gui/menu_list_background.png"), this.left, this.top, this.right, this.bottom, this.width, this.bottom - this.top, 32, 32);
                 RenderSystem.disableBlend();
             }
         }
