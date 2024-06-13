@@ -32,7 +32,7 @@ dependencies {
 
     neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
 
-    modLocalRuntime("me.shedaniel.cloth:basic-math:0.6.1")
+    compileOnly("me.shedaniel.cloth:basic-math:0.6.1")
     forgeRuntimeLibrary(shadowCommon("me.shedaniel.cloth:basic-math:0.6.1"))
 
     modLocalRuntime("blue.endless:jankson:${rootProject.jankson_version}")
