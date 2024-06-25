@@ -133,14 +133,14 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
     public static class TopCellElementBuilder {
         public static final Function<String, ResourceLocation> IDENTIFIER_FUNCTION = str -> {
             try {
-                return new ResourceLocation(str);
+                return ResourceLocation.parse(str);
             } catch (NumberFormatException e) {
                 return null;
             }
         };
         public static final Function<String, ResourceLocation> ITEM_IDENTIFIER_FUNCTION = str -> {
             try {
-                ResourceLocation identifier = new ResourceLocation(str);
+                ResourceLocation identifier = ResourceLocation.parse(str);
                 if (BuiltInRegistries.ITEM.getOptional(identifier).isPresent())
                     return identifier;
             } catch (Exception ignored) {
@@ -149,7 +149,7 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         };
         public static final Function<String, ResourceLocation> BLOCK_IDENTIFIER_FUNCTION = str -> {
             try {
-                ResourceLocation identifier = new ResourceLocation(str);
+                ResourceLocation identifier = ResourceLocation.parse(str);
                 if (BuiltInRegistries.BLOCK.getOptional(identifier).isPresent())
                     return identifier;
             } catch (Exception ignored) {
@@ -158,14 +158,14 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         };
         public static final Function<String, Item> ITEM_FUNCTION = str -> {
             try {
-                return BuiltInRegistries.ITEM.getOptional(new ResourceLocation(str)).orElse(null);
+                return BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(str)).orElse(null);
             } catch (Exception ignored) {
             }
             return null;
         };
         public static final Function<String, Block> BLOCK_FUNCTION = str -> {
             try {
-                return BuiltInRegistries.BLOCK.getOptional(new ResourceLocation(str)).orElse(null);
+                return BuiltInRegistries.BLOCK.getOptional(ResourceLocation.parse(str)).orElse(null);
             } catch (Exception ignored) {
             }
             return null;

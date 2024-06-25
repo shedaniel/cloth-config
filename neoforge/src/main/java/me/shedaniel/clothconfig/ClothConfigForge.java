@@ -20,13 +20,14 @@
 package me.shedaniel.clothconfig;
 
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.DistExecutor;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 @Mod(ClothConfigInitializer.MOD_ID)
 public class ClothConfigForge {
     public ClothConfigForge() {
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClothConfigForgeDemo::registerModsPage);
+        if (FMLEnvironment.dist.isClient()) {
+            ClothConfigForgeDemo.registerModsPage();
+        }
     }
 }

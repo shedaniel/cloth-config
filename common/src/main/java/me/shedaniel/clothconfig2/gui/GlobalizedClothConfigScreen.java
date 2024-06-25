@@ -205,7 +205,6 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         }
     }
     
-    @SuppressWarnings("deprecation")
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         this.lastHoveredReference = null;
@@ -243,8 +242,8 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         sideScroller.updatePosition(delta);
         if (isTransparentBackground()) {
             RenderSystem.enableBlend();
-            graphics.blit(new ResourceLocation("textures/gui/menu_list_background.png"), 0, 0, sliderPosition, height, sliderPosition, height, 32, 32);
-            graphics.blit(new ResourceLocation("textures/gui/menu_list_background.png"), 0, 0, sliderPosition - 14, height, sliderPosition - 14, height, 32, 32);
+            graphics.blit(ResourceLocation.withDefaultNamespace("textures/gui/menu_list_background.png"), 0, 0, sliderPosition, height, sliderPosition, height, 32, 32);
+            graphics.blit(ResourceLocation.withDefaultNamespace("textures/gui/menu_list_background.png"), 0, 0, sliderPosition - 14, height, sliderPosition - 14, height, 32, 32);
             graphics.blit(DynamicEntryListWidget.VERTICAL_HEADER_SEPARATOR, sliderPosition - 1, 0, 0.0F, 0.0F, 1, this.height, 2, 32);
             if (sliderPosition - 14 - 1 > 0) {
                 graphics.blit(DynamicEntryListWidget.VERTICAL_HEADER_SEPARATOR, sliderPosition - 14 - 1, 0, 0.0F, 0.0F, 1, this.height, 2, 32);
@@ -252,49 +251,45 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             RenderSystem.disableBlend();
         } else {
             Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder buffer = tesselator.getBuilder();
+            BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
             RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
             RenderSystem.setShaderTexture(0, getBackgroundLocation());
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             float f = 32.0F;
-            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-            buffer.vertex(sliderPosition - 14, height, 0.0D).uv(0, height / 32.0F).color(68, 68, 68, 255).endVertex();
-            buffer.vertex(sliderPosition, height, 0.0D).uv(14 / 32.0F, height / 32.0F).color(68, 68, 68, 255).endVertex();
-            buffer.vertex(sliderPosition, 0, 0.0D).uv(14 / 32.0F, 0).color(68, 68, 68, 255).endVertex();
-            buffer.vertex(sliderPosition - 14, 0, 0.0D).uv(0, 0).color(68, 68, 68, 255).endVertex();
+            buffer.addVertex(sliderPosition - 14, height, 0.0F).setUv(0, height / 32.0F).setColor(68, 68, 68, 255);
+            buffer.addVertex(sliderPosition, height, 0.0F).setUv(14 / 32.0F, height / 32.0F).setColor(68, 68, 68, 255);
+            buffer.addVertex(sliderPosition, 0, 0.0F).setUv(14 / 32.0F, 0).setColor(68, 68, 68, 255);
+            buffer.addVertex(sliderPosition - 14, 0, 0.0F).setUv(0, 0).setColor(68, 68, 68, 255);
             
-            buffer.vertex(0, height, 0.0D).uv(0, (height + sideScroller.scrollAmountInt()) / 32.0F).color(32, 32, 32, 255).endVertex();
-            buffer.vertex(sliderPosition - 14, height, 0.0D).uv((sliderPosition - 14) / 32.0F, (height + sideScroller.scrollAmountInt()) / 32.0F).color(32, 32, 32, 255).endVertex();
-            buffer.vertex(sliderPosition - 14, 0, 0.0D).uv((sliderPosition - 14) / 32.0F, sideScroller.scrollAmountInt() / 32.0F).color(32, 32, 32, 255).endVertex();
-            buffer.vertex(0, 0, 0.0D).uv(0, sideScroller.scrollAmountInt() / 32.0F).color(32, 32, 32, 255).endVertex();
-            tesselator.end();
+            buffer.addVertex(0, height, 0.0F).setUv(0, (height + sideScroller.scrollAmountInt()) / 32.0F).setColor(32, 32, 32, 255);
+            buffer.addVertex(sliderPosition - 14, height, 0.0F).setUv((sliderPosition - 14) / 32.0F, (height + sideScroller.scrollAmountInt()) / 32.0F).setColor(32, 32, 32, 255);
+            buffer.addVertex(sliderPosition - 14, 0, 0.0F).setUv((sliderPosition - 14) / 32.0F, sideScroller.scrollAmountInt() / 32.0F).setColor(32, 32, 32, 255);
+            buffer.addVertex(0, 0, 0.0F).setUv(0, sideScroller.scrollAmountInt() / 32.0F).setColor(32, 32, 32, 255);
             
             Matrix4f matrix = graphics.pose().last().pose();
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             int shadeColor = isTransparentBackground() ? 120 : 160;
-            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            buffer.vertex(matrix, sliderPosition + 4, 0, 100.0F).color(0, 0, 0, 0).endVertex();
-            buffer.vertex(matrix, sliderPosition, 0, 100.0F).color(0, 0, 0, shadeColor).endVertex();
-            buffer.vertex(matrix, sliderPosition, height, 100.0F).color(0, 0, 0, shadeColor).endVertex();
-            buffer.vertex(matrix, sliderPosition + 4, height, 100.0F).color(0, 0, 0, 0).endVertex();
-            tesselator.end();
+            buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            buffer.addVertex(matrix, sliderPosition + 4, 0, 100.0F).setColor(0, 0, 0, 0);
+            buffer.addVertex(matrix, sliderPosition, 0, 100.0F).setColor(0, 0, 0, shadeColor);
+            buffer.addVertex(matrix, sliderPosition, height, 100.0F).setColor(0, 0, 0, shadeColor);
+            buffer.addVertex(matrix, sliderPosition + 4, height, 100.0F).setColor(0, 0, 0, 0);
             shadeColor /= 2;
-            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            buffer.vertex(matrix, sliderPosition - 14, 0, 100.0F).color(0, 0, 0, shadeColor).endVertex();
-            buffer.vertex(matrix, sliderPosition - 14 - 4, 0, 100.0F).color(0, 0, 0, 0).endVertex();
-            buffer.vertex(matrix, sliderPosition - 14 - 4, height, 100.0F).color(0, 0, 0, 0).endVertex();
-            buffer.vertex(matrix, sliderPosition - 14, height, 100.0F).color(0, 0, 0, shadeColor).endVertex();
-            tesselator.end();
+            buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            buffer.addVertex(matrix, sliderPosition - 14, 0, 100.0F).setColor(0, 0, 0, shadeColor);
+            buffer.addVertex(matrix, sliderPosition - 14 - 4, 0, 100.0F).setColor(0, 0, 0, 0);
+            buffer.addVertex(matrix, sliderPosition - 14 - 4, height, 100.0F).setColor(0, 0, 0, 0);
+            buffer.addVertex(matrix, sliderPosition - 14, height, 100.0F).setColor(0, 0, 0, shadeColor);
             RenderSystem.disableBlend();
         }
         Rectangle slideArrowBounds = new Rectangle(sliderPosition - 14, 0, 14, height);
         {
-            MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+            MultiBufferSource.BufferSource immediate = graphics.bufferSource();
             font.renderText(">", sliderPosition - 7 - font.width(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil((1 - sideSlider.scrollAmount()) * 255.0F), 0, 255) << 24, false, graphics.pose().last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
             font.renderText("<", sliderPosition - 7 - font.width("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil(sideSlider.scrollAmount() * 255.0F), 0, 255) << 24, false, graphics.pose().last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
-            immediate.endBatch();
+            graphics.flush();
             
             Rectangle scrollerBounds = sideScroller.getBounds();
             if (!scrollerBounds.isEmpty()) {
