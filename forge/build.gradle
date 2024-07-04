@@ -37,7 +37,9 @@ dependencies {
 
     forgeDependencies("cpw.mods:securejarhandler:0.9.48")
     modLocalRuntime("blue.endless:jankson:${rootProject.jankson_version}")
-    modLocalRuntime("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}")
+    modLocalRuntime("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}") {
+        exclude(module: "gson")
+    }
     modLocalRuntime("org.yaml:snakeyaml:${rootProject.snakeyaml_version}")
     forgeDependencies(shadowCommon("blue.endless:jankson:${rootProject.jankson_version}"))
     forgeDependencies(shadowCommon("com.moandjiezana.toml:toml4j:${rootProject.toml4j_version}") {
@@ -98,9 +100,9 @@ publishing {
 
 unifiedPublishing {
     project {
-        displayName = "[MinecraftForge $rootProject.supported_version] v$project.version"
+        displayName = "[Forge $rootProject.supported_version] v$project.version"
         releaseType = "release"
-        gameVersions = ["1.20.3", "1.20.4"]
+        gameVersions = ["1.20.6"]
         gameLoaders = ["forge"]
 
         mainPublication remapJar
@@ -124,3 +126,12 @@ unifiedPublishing {
 }
 
 rootProject.tasks.getByName("modPublish").dependsOn tasks.getByName("publishUnified")
+
+
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute module("cpw.mods:securejarhandler") using module("net.minecraftforge:securemodules:2.2.19")
+        substitute module("io.github.juuxel:union-relauncher") using module("dev.jab125:union-relauncher:1.1.1.3")
+    }
+    resolutionStrategy.force("net.sf.jopt-simple:jopt-simple:5.0.4")
+}
