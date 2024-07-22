@@ -25,7 +25,7 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 public class ClothConfigForgeDemo {
     public static void registerModsPage() {
-        ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory.class, () -> (client, parent) -> {
+        ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory.class, () -> (container, parent) -> {
             return ClothConfigDemo.getConfigBuilderWithDemo().setParentScreen(parent).build();
         });
     }
