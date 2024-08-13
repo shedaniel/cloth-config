@@ -121,7 +121,7 @@ unifiedPublishing {
             curseforge {
                 token = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
                 id = project.curseforge_id
-                gameVersions.addAll "1.20.5", "Java 21"
+                gameVersions.addAll "1.20.5", "1.20.6", "Java 21"
             }
         }
 
@@ -130,7 +130,7 @@ unifiedPublishing {
                 token = project.hasProperty("modrinth_key") ? project.property("modrinth_key") : System.getenv("modrinth_key")
                 id = project.modrinth_id
                 version = "$project.version+$project.name"
-                gameVersions.addAll project.minecraft_version
+                gameVersions.addAll "1.20.5", project.minecraft_version
             }
         }
     }
