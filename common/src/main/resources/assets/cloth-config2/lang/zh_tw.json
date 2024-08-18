@@ -4,7 +4,7 @@
     "text.cloth-config.quit_config": "變更尚未儲存",
     "text.cloth-config.quit_config_sure": "確定要離開嗎？變更將不會被儲存！",
     "text.cloth-config.cancel_discard": "放棄變更",
-    "text.cloth-config.quit_discard": "退出並放棄變更",
+    "text.cloth-config.quit_discard": "離開並放棄變更",
     "text.cloth-config.config": "設定",
     "text.cloth-config.multi_error": "多個問題！",
     "text.cloth-config.not_editable": "不可編輯！",
@@ -41,12 +41,12 @@
     "category.cloth-config.scrolling": "捲動",
     "category.cloth-config.testing": "預覽設定",
     "option.cloth-config.scrollDuration": "滾動時間",
-    "option.cloth-config.scrollStep": "滾動距離",
+    "option.cloth-config.scrollStep": "捲動距離",
     "option.cloth-config.bounceBackMultiplier": "反彈倍率",
     "option.cloth-config.setDefaultSmoothScroll": "設為預設平滑滾動",
     "option.cloth-config.disableSmoothScroll": "停用平滑捲動",
     "text.cloth-config.testing.1": "你是模組開發者，想要使用 %1$s 嗎？前往 %2$s 開始吧。你也可以 %3$s。",
     "text.cloth-config.testing.2": "Cloth Config Wiki",
-    "text.cloth-config.testing.3": "點選此處開啟 Minecraft 選項檔案（無特殊原因）"
+    "text.cloth-config.testing.3": "按這裡開啟 Minecraft 選項檔案（無特殊原因）"
   }
   
