@@ -22,16 +22,9 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
-import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.api.ScrollingContainer;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.math.impl.PointHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -45,7 +38,7 @@ import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
@@ -58,6 +51,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static me.shedaniel.clothconfig2.api.ScrollingContainer.handleScrollingPosition;
+import static me.shedaniel.clothconfig2.api.scroll.ScrollingContainer.SCROLLER_SPRITE;
 
 @SuppressWarnings("deprecation")
 @Environment(EnvType.CLIENT)
@@ -414,7 +408,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             graphics.pose().pushPose();
             graphics.pose().translate(0, 0, 300f);
             
-            ScissorsHandler.INSTANCE.scissor(new Rectangle(lastRectangle.x, lastRectangle.y + lastRectangle.height + 1, cWidth - 6, last10Height - 1));
+            graphics.enableScissor(lastRectangle.x, lastRectangle.y + lastRectangle.height + 1, lastRectangle.x + cWidth - 6, lastRectangle.y + lastRectangle.height + last10Height);
             double yy = lastRectangle.y + lastRectangle.height - scroll;
             for (SelectionCellElement<R> cell : currentElements) {
                 if (yy + getCellCreator().getCellHeight() >= lastRectangle.y + lastRectangle.height && yy <= lastRectangle.y + lastRectangle.height + last10Height + 1) {
@@ -424,7 +418,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                     cell.dontRender(graphics, delta);
                 yy += getCellCreator().getCellHeight();
             }
-            ScissorsHandler.INSTANCE.removeLastScissor();
+            graphics.disableScissor();
             
             if (currentElements.isEmpty()) {
                 Font textRenderer = Minecraft.getInstance().font;
@@ -433,7 +427,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             }
             
             if (getMaxScrollPosition() > 6) {
-                RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
                 int scrollbarPositionMinX = lastRectangle.x + getCellCreator().getCellWidth() - 6;
                 int scrollbarPositionMaxX = scrollbarPositionMinX + 6;
                 int height = (int) (((last10Height) * (last10Height)) / this.getMaxScrollPosition());
@@ -442,23 +435,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 height = Math.max(10, height);
                 int minY = (int) Math.min(Math.max((int) scroll * (last10Height - height) / getMaxScrollPosition() + (lastRectangle.y + lastRectangle.height + 1), (lastRectangle.y + lastRectangle.height + 1)), (lastRectangle.y + lastRectangle.height + 1 + last10Height) - height);
                 
-                int bottomc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 168 : 128;
-                int topc = new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height).contains(PointHelper.ofMouse()) ? 222 : 172;
-                
-                Tesselator tesselator = Tesselator.getInstance();
-                BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-                
-                // Bottom
-                buffer.addVertex(scrollbarPositionMinX, minY + height, 0.0F).setColor(bottomc, bottomc, bottomc, 255);
-                buffer.addVertex(scrollbarPositionMaxX, minY + height, 0.0F).setColor(bottomc, bottomc, bottomc, 255);
-                buffer.addVertex(scrollbarPositionMaxX, minY, 0.0F).setColor(bottomc, bottomc, bottomc, 255);
-                buffer.addVertex(scrollbarPositionMinX, minY, 0.0F).setColor(bottomc, bottomc, bottomc, 255);
-                
-                // Top
-                buffer.addVertex(scrollbarPositionMinX, (minY + height - 1), 0.0F).setColor(topc, topc, topc, 255);
-                buffer.addVertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0F).setColor(topc, topc, topc, 255);
-                buffer.addVertex((scrollbarPositionMaxX - 1), minY, 0.0F).setColor(topc, topc, topc, 255);
-                buffer.addVertex(scrollbarPositionMinX, minY, 0.0F).setColor(topc, topc, topc, 255);
+                graphics.blitSprite(RenderType::guiTextured, SCROLLER_SPRITE, scrollbarPositionMinX, minY, 6, height);
             }
             graphics.pose().popPose();
         }

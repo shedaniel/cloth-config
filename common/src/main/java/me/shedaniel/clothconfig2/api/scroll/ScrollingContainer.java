@@ -29,12 +29,15 @@ import me.shedaniel.clothconfig2.api.animator.NumberAnimator;
 import me.shedaniel.clothconfig2.api.animator.ValueAnimator;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.math.impl.PointHelper;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.FastColor;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 public abstract class ScrollingContainer {
+    public static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.withDefaultNamespace("widget/scroller");
+    public static final ResourceLocation SCROLLER_BACKGROUND_SPRITE = ResourceLocation.withDefaultNamespace("widget/scroller_background");
     private final NumberAnimator<Double> scroll = ValueAnimator.ofDouble();
     private boolean draggingScrollBar = false;
     private long scrollDuration = ClothConfigInitializer.getScrollDuration();
@@ -106,6 +109,10 @@ public abstract class ScrollingContainer {
         }
     }
     
+    public void setScrollTarget(double scrollTarget) {
+        this.scroll.setTarget(scrollTarget);
+    }
+    
     public void updatePosition(float delta) {
         scroll.setTarget(handleBounceBack(this.scrollTarget(), this.getMaxScroll(), delta));
         this.scroll.update(delta);
@@ -137,10 +144,10 @@ public abstract class ScrollingContainer {
     }
     
     public void renderScrollBar(GuiGraphics graphics) {
-        renderScrollBar(graphics, 0, 1, 1);
+        renderScrollBar(graphics, ARGB.alpha(255), 1);
     }
     
-    public void renderScrollBar(GuiGraphics graphics, int background, float alpha, float scrollBarAlphaOffset) {
+    public void renderScrollBar(GuiGraphics graphics, int background, float alpha) {
         if (hasScrollBar()) {
             Rectangle bounds = getBounds();
             int maxScroll = getMaxScroll();
@@ -151,16 +158,8 @@ public abstract class ScrollingContainer {
             int minY = Math.min(Math.max((int) scrollAmount() * (bounds.height - height) / maxScroll + bounds.y, bounds.y), bounds.getMaxY() - height);
             
             int scrollbarPositionMinX = getScrollBarX(bounds.getMaxX());
-            int scrollbarPositionMaxX = scrollbarPositionMinX + 6;
-            boolean hovered = (new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height)).contains(PointHelper.ofMouse());
-            float bottomC = (hovered ? .67f : .5f) * scrollBarAlphaOffset;
-            float topC = (hovered ? .87f : .67f) * scrollBarAlphaOffset;
-            
-            graphics.fill(scrollbarPositionMinX, bounds.y, scrollbarPositionMaxX, bounds.getMaxY(), background);
-            graphics.fill(scrollbarPositionMinX, minY, scrollbarPositionMaxX, minY + height,
-                    FastColor.ARGB32.color(Math.round(alpha * 255.0F), Math.round(bottomC * 255.0F), Math.round(bottomC * 255.0F), Math.round(bottomC * 255.0F)));
-            graphics.fill(scrollbarPositionMinX, minY, scrollbarPositionMaxX - 1, minY + height - 1,
-                    FastColor.ARGB32.color(Math.round(alpha * 255.0F), Math.round(topC * 255.0F), Math.round(topC * 255.0F), Math.round(topC * 255.0F)));
+            graphics.blitSprite(RenderType::guiTextured, SCROLLER_BACKGROUND_SPRITE, scrollbarPositionMinX, bounds.y, 6, bounds.height, background);
+            graphics.blitSprite(RenderType::guiTextured, SCROLLER_SPRITE, scrollbarPositionMinX, minY, 6, height, ARGB.white(alpha));
         }
     }
     

@@ -17,26 +17,15 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package me.shedaniel.clothconfig2.api;
+package me.shedaniel.clothconfig2;
 
-import me.shedaniel.clothconfig2.impl.ScissorsHandlerImpl;
-import me.shedaniel.math.Rectangle;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 
-import java.util.List;
-
-@Environment(EnvType.CLIENT)
-public interface ScissorsHandler {
-    ScissorsHandler INSTANCE = ScissorsHandlerImpl.INSTANCE;
-    
-    void clearScissors();
-    
-    List<Rectangle> getScissorsAreas();
-    
-    void scissor(Rectangle rectangle);
-    
-    void removeLastScissor();
-    
-    void applyScissors();
+@ApiStatus.Internal
+public class CCTextures {
+    private static final String MOD_ID = "cloth-config2";
+    public static final ResourceLocation VERTICAL_HEADER_SEPARATOR = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/gui/vertical_header_separator.png");
+    public static final ResourceLocation VERTICAL_FOOTER_SEPARATOR = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/gui/vertical_footer_separator.png");
+    public static final ResourceLocation CONFIG = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/gui/cloth_config.png");
 }

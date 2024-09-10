@@ -32,6 +32,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -290,11 +291,11 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
         boolean insideLabel = labelWidget.rectangle.contains(mouseX, mouseY);
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);
-        graphics.blit(CONFIG_TEX, x - 15, y + 5, 24 + 9, (isEnabled() ? (insideLabel && !insideCreateNew && !insideDelete ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9);
+        graphics.blit(RenderType::guiTextured, CONFIG_TEX, x - 15, y + 5, 24 + 9, (isEnabled() ? (insideLabel && !insideCreateNew && !insideDelete ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9, 256, 256);
         if (isInsertButtonEnabled())
-            graphics.blit(CONFIG_TEX, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9);
+            graphics.blit(RenderType::guiTextured, CONFIG_TEX, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9, 256, 256);
         if (isDeleteButtonEnabled())
-            graphics.blit(CONFIG_TEX, x - 15 + (isInsertButtonEnabled() ? 26 : 13), y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9);
+            graphics.blit(RenderType::guiTextured, CONFIG_TEX, x - 15 + (isInsertButtonEnabled() ? 26 : 13), y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9, 256, 256);
         resetWidget.setX(x + entryWidth - resetWidget.getWidth());
         resetWidget.setY(y);
         resetWidget.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault();

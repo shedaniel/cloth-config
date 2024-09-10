@@ -21,8 +21,7 @@ package me.shedaniel.clothconfig2.gui;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
@@ -36,7 +35,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -366,26 +365,16 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         this.tooltips.add(tooltip);
     }
     
+    @Deprecated
     protected void overlayBackground(GuiGraphics graphics, Rectangle rect, int red, int green, int blue, int startAlpha, int endAlpha) {
-        overlayBackground(graphics.pose(), rect, red, green, blue, startAlpha, endAlpha);
-    }
-    
-    protected void overlayBackground(PoseStack matrices, Rectangle rect, int red, int green, int blue, int startAlpha, int endAlpha) {
-        overlayBackground(matrices.last().pose(), rect, red, green, blue, startAlpha, endAlpha);
-    }
-    
-    protected void overlayBackground(Matrix4f matrix, Rectangle rect, int red, int green, int blue, int startAlpha, int endAlpha) {
-        if (isTransparentBackground())
-            return;
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        RenderSystem.setShaderTexture(0, getBackgroundLocation());
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        buffer.addVertex(matrix, rect.getMinX(), rect.getMaxY(), 0.0F).setUv(rect.getMinX() / 32.0F, rect.getMaxY() / 32.0F).setColor(red, green, blue, endAlpha);
-        buffer.addVertex(matrix, rect.getMaxX(), rect.getMaxY(), 0.0F).setUv(rect.getMaxX() / 32.0F, rect.getMaxY() / 32.0F).setColor(red, green, blue, endAlpha);
-        buffer.addVertex(matrix, rect.getMaxX(), rect.getMinY(), 0.0F).setUv(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).setColor(red, green, blue, startAlpha);
-        buffer.addVertex(matrix, rect.getMinX(), rect.getMinY(), 0.0F).setUv(rect.getMinX() / 32.0F, rect.getMinY() / 32.0F).setColor(red, green, blue, startAlpha);
+        graphics.drawSpecial(source -> {
+            VertexConsumer buffer = source.getBuffer(RenderType.guiTextured(getBackgroundLocation()));
+            Matrix4f matrix = graphics.pose().last().pose();
+            buffer.addVertex(matrix, rect.getMinX(), rect.getMaxY(), 0.0F).setUv(rect.getMinX() / 32.0F, rect.getMaxY() / 32.0F).setColor(red, green, blue, endAlpha);
+            buffer.addVertex(matrix, rect.getMaxX(), rect.getMaxY(), 0.0F).setUv(rect.getMaxX() / 32.0F, rect.getMaxY() / 32.0F).setColor(red, green, blue, endAlpha);
+            buffer.addVertex(matrix, rect.getMaxX(), rect.getMinY(), 0.0F).setUv(rect.getMaxX() / 32.0F, rect.getMinY() / 32.0F).setColor(red, green, blue, startAlpha);
+            buffer.addVertex(matrix, rect.getMinX(), rect.getMinY(), 0.0F).setUv(rect.getMinX() / 32.0F, rect.getMinY() / 32.0F).setColor(red, green, blue, startAlpha);
+        });
     }
     
     @Override

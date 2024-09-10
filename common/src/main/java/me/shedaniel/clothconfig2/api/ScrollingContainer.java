@@ -28,10 +28,13 @@ import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.math.impl.PointHelper;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.FastColor;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+
+import static me.shedaniel.clothconfig2.api.scroll.ScrollingContainer.SCROLLER_BACKGROUND_SPRITE;
+import static me.shedaniel.clothconfig2.api.scroll.ScrollingContainer.SCROLLER_SPRITE;
 
 @Deprecated
 public abstract class ScrollingContainer {
@@ -141,16 +144,8 @@ public abstract class ScrollingContainer {
             int minY = Math.min(Math.max((int) scrollAmount * (bounds.height - height) / maxScroll + bounds.y, bounds.y), bounds.getMaxY() - height);
             
             int scrollbarPositionMinX = getScrollBarX();
-            int scrollbarPositionMaxX = scrollbarPositionMinX + 6;
-            boolean hovered = (new Rectangle(scrollbarPositionMinX, minY, scrollbarPositionMaxX - scrollbarPositionMinX, height)).contains(PointHelper.ofMouse());
-            float bottomC = (hovered ? .67f : .5f) * scrollBarAlphaOffset;
-            float topC = (hovered ? .87f : .67f) * scrollBarAlphaOffset;
-            
-            graphics.fill(scrollbarPositionMinX, bounds.y, scrollbarPositionMaxX, bounds.getMaxY(), background);
-            graphics.fill(scrollbarPositionMinX, minY, scrollbarPositionMaxX, minY + height,
-                    FastColor.ARGB32.color(Math.round(alpha * 255.0F), Math.round(bottomC * 255.0F), Math.round(bottomC * 255.0F), Math.round(bottomC * 255.0F)));
-            graphics.fill(scrollbarPositionMinX, minY, scrollbarPositionMaxX - 1, minY + height - 1,
-                    FastColor.ARGB32.color(Math.round(alpha * 255.0F), Math.round(topC * 255.0F), Math.round(topC * 255.0F), Math.round(topC * 255.0F)));
+            graphics.blitSprite(RenderType::guiTextured, SCROLLER_BACKGROUND_SPRITE, scrollbarPositionMinX, bounds.y, 6, bounds.height, background);
+            graphics.blitSprite(RenderType::guiTextured, SCROLLER_SPRITE, scrollbarPositionMinX, minY, 6, height, ARGB.white(alpha));
         }
     }
     

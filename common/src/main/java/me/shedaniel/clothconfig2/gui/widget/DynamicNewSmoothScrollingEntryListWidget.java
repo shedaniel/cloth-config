@@ -19,9 +19,8 @@
 
 package me.shedaniel.clothconfig2.gui.widget;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.Tesselator;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
+import me.shedaniel.math.Color;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.math.impl.PointHelper;
 import net.fabricmc.api.EnvType;
@@ -29,7 +28,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 
 import static me.shedaniel.clothconfig2.api.ScrollingContainer.clampExtension;
@@ -133,9 +131,9 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     }
     
     @Override
-    protected void renderScrollBar(GuiGraphics graphics, Tesselator tessellator, BufferBuilder buffer, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
+    protected void renderScrollBar(GuiGraphics graphics, int maxScroll, int scrollbarPositionMinX, int scrollbarPositionMaxX) {
         if (!smoothScrolling)
-            super.renderScrollBar(graphics, tessellator, buffer, maxScroll, scrollbarPositionMinX, scrollbarPositionMaxX);
+            super.renderScrollBar(graphics, maxScroll, scrollbarPositionMinX, scrollbarPositionMaxX);
         else if (maxScroll > 0) {
             int height = ((this.bottom - this.top) * (this.bottom - this.top)) / this.getMaxScrollPosition();
             height = Mth.clamp(height, 32, this.bottom - this.top - 8);
@@ -148,9 +146,9 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
             
             graphics.fill(scrollbarPositionMinX, this.top, scrollbarPositionMaxX, this.bottom, 0xff000000);
             graphics.fill(scrollbarPositionMinX, minY, scrollbarPositionMaxX, minY + height,
-                    FastColor.ARGB32.color(255, bottomc, bottomc, bottomc));
+                    Color.ofRGBA(bottomc, bottomc, bottomc, 255).getColor());
             graphics.fill(scrollbarPositionMinX, minY, scrollbarPositionMaxX - 1, minY + height - 1,
-                    FastColor.ARGB32.color(255, topc, topc, topc));
+                    Color.ofRGBA(topc, topc, topc, 255).getColor());
         }
     }
     

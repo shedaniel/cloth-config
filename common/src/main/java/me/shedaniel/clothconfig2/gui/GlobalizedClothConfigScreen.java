@@ -22,15 +22,12 @@ package me.shedaniel.clothconfig2.gui;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import me.shedaniel.clothconfig2.CCTextures;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.api.scroll.ScrollingContainer;
 import me.shedaniel.clothconfig2.gui.entries.EmptyEntry;
-import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.clothconfig2.gui.widget.SearchFieldEntry;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.ChatFormatting;
@@ -44,9 +41,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -215,26 +210,26 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         }
         int sliderPosition = getSideSliderPosition();
         if (!isTransparentBackground()) {
-            ScissorsHandler.INSTANCE.scissor(new Rectangle(sliderPosition, 0, width - sliderPosition, height));
+            graphics.enableScissor(sliderPosition, 0, width, height);
             renderMenuBackground(graphics);
             overlayBackground(graphics, new Rectangle(14, 0, width, height), 64, 64, 64, 255, 255);
         } else {
             if (this.minecraft.level == null) {
                 this.renderPanorama(graphics, delta);
             }
-            renderBlurredBackground(delta);
+            renderBlurredBackground();
             renderMenuBackground(graphics);
-            ScissorsHandler.INSTANCE.scissor(new Rectangle(sliderPosition, 0, width - sliderPosition, height));
+            graphics.enableScissor(sliderPosition, 0, width, height);
         }
         listWidget.width = width - sliderPosition;
         listWidget.setLeftPos(sliderPosition);
         listWidget.render(graphics, mouseX, mouseY, delta);
-        ScissorsHandler.INSTANCE.scissor(new Rectangle(listWidget.left, listWidget.top, listWidget.width, listWidget.bottom - listWidget.top));
+        graphics.enableScissor(listWidget.left, listWidget.top, listWidget.left + listWidget.width, listWidget.bottom);
         for (AbstractConfigEntry<?> child : listWidget.children())
             child.lateRender(graphics, mouseX, mouseY, delta);
-        ScissorsHandler.INSTANCE.removeLastScissor();
+        graphics.disableScissor();
         graphics.drawString(font, title.getVisualOrderText(), (int) (sliderPosition + (width - sliderPosition) / 2f - font.width(title) / 2f), 12, -1);
-        ScissorsHandler.INSTANCE.removeLastScissor();
+        graphics.disableScissor();
         cancelButton.setX(sliderPosition + (width - sliderPosition) / 2 - cancelButton.getWidth() - 3);
         exitButton.setX(sliderPosition + (width - sliderPosition) / 2 + 3);
         super.render(graphics, mouseX, mouseY, delta);
@@ -242,58 +237,54 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
         sideScroller.updatePosition(delta);
         if (isTransparentBackground()) {
             RenderSystem.enableBlend();
-            graphics.blit(ResourceLocation.withDefaultNamespace("textures/gui/menu_list_background.png"), 0, 0, sliderPosition, height, sliderPosition, height, 32, 32);
-            graphics.blit(ResourceLocation.withDefaultNamespace("textures/gui/menu_list_background.png"), 0, 0, sliderPosition - 14, height, sliderPosition - 14, height, 32, 32);
-            graphics.blit(DynamicEntryListWidget.VERTICAL_HEADER_SEPARATOR, sliderPosition - 1, 0, 0.0F, 0.0F, 1, this.height, 2, 32);
+            graphics.blit(RenderType::guiTextured, ResourceLocation.withDefaultNamespace("textures/gui/menu_list_background.png"), 0, 0, sliderPosition, height, sliderPosition, height, 32, 32);
+            graphics.blit(RenderType::guiTextured, ResourceLocation.withDefaultNamespace("textures/gui/menu_list_background.png"), 0, 0, sliderPosition - 14, height, sliderPosition - 14, height, 32, 32);
+            graphics.blit(RenderType::guiTextured, CCTextures.VERTICAL_HEADER_SEPARATOR, sliderPosition - 1, 0, 0.0F, 0.0F, 1, this.height, 2, 32);
             if (sliderPosition - 14 - 1 > 0) {
-                graphics.blit(DynamicEntryListWidget.VERTICAL_HEADER_SEPARATOR, sliderPosition - 14 - 1, 0, 0.0F, 0.0F, 1, this.height, 2, 32);
+                graphics.blit(RenderType::guiTextured, CCTextures.VERTICAL_HEADER_SEPARATOR, sliderPosition - 14 - 1, 0, 0.0F, 0.0F, 1, this.height, 2, 32);
             }
             RenderSystem.disableBlend();
         } else {
-            Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-            RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-            RenderSystem.setShaderTexture(0, getBackgroundLocation());
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            float f = 32.0F;
-            buffer.addVertex(sliderPosition - 14, height, 0.0F).setUv(0, height / 32.0F).setColor(68, 68, 68, 255);
-            buffer.addVertex(sliderPosition, height, 0.0F).setUv(14 / 32.0F, height / 32.0F).setColor(68, 68, 68, 255);
-            buffer.addVertex(sliderPosition, 0, 0.0F).setUv(14 / 32.0F, 0).setColor(68, 68, 68, 255);
-            buffer.addVertex(sliderPosition - 14, 0, 0.0F).setUv(0, 0).setColor(68, 68, 68, 255);
-            
-            buffer.addVertex(0, height, 0.0F).setUv(0, (height + sideScroller.scrollAmountInt()) / 32.0F).setColor(32, 32, 32, 255);
-            buffer.addVertex(sliderPosition - 14, height, 0.0F).setUv((sliderPosition - 14) / 32.0F, (height + sideScroller.scrollAmountInt()) / 32.0F).setColor(32, 32, 32, 255);
-            buffer.addVertex(sliderPosition - 14, 0, 0.0F).setUv((sliderPosition - 14) / 32.0F, sideScroller.scrollAmountInt() / 32.0F).setColor(32, 32, 32, 255);
-            buffer.addVertex(0, 0, 0.0F).setUv(0, sideScroller.scrollAmountInt() / 32.0F).setColor(32, 32, 32, 255);
-            
-            Matrix4f matrix = graphics.pose().last().pose();
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            int shadeColor = isTransparentBackground() ? 120 : 160;
-            buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            buffer.addVertex(matrix, sliderPosition + 4, 0, 100.0F).setColor(0, 0, 0, 0);
-            buffer.addVertex(matrix, sliderPosition, 0, 100.0F).setColor(0, 0, 0, shadeColor);
-            buffer.addVertex(matrix, sliderPosition, height, 100.0F).setColor(0, 0, 0, shadeColor);
-            buffer.addVertex(matrix, sliderPosition + 4, height, 100.0F).setColor(0, 0, 0, 0);
-            shadeColor /= 2;
-            buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            buffer.addVertex(matrix, sliderPosition - 14, 0, 100.0F).setColor(0, 0, 0, shadeColor);
-            buffer.addVertex(matrix, sliderPosition - 14 - 4, 0, 100.0F).setColor(0, 0, 0, 0);
-            buffer.addVertex(matrix, sliderPosition - 14 - 4, height, 100.0F).setColor(0, 0, 0, 0);
-            buffer.addVertex(matrix, sliderPosition - 14, height, 100.0F).setColor(0, 0, 0, shadeColor);
-            RenderSystem.disableBlend();
+            graphics.drawSpecial(source -> {
+                VertexConsumer buffer = source.getBuffer(RenderType.guiTextured(getBackgroundLocation()));
+                Matrix4f matrix = graphics.pose().last().pose();
+                float f = 32.0F;
+                buffer.addVertex(matrix, sliderPosition - 14, height, 0.0F).setUv(0, height / 32.0F).setColor(68, 68, 68, 255);
+                buffer.addVertex(matrix, sliderPosition, height, 0.0F).setUv(14 / 32.0F, height / 32.0F).setColor(68, 68, 68, 255);
+                buffer.addVertex(matrix, sliderPosition, 0, 0.0F).setUv(14 / 32.0F, 0).setColor(68, 68, 68, 255);
+                buffer.addVertex(matrix, sliderPosition - 14, 0, 0.0F).setUv(0, 0).setColor(68, 68, 68, 255);
+                
+                buffer.addVertex(matrix, 0, height, 0.0F).setUv(0, (height + sideScroller.scrollAmountInt()) / 32.0F).setColor(32, 32, 32, 255);
+                buffer.addVertex(matrix, sliderPosition - 14, height, 0.0F).setUv((sliderPosition - 14) / 32.0F, (height + sideScroller.scrollAmountInt()) / 32.0F).setColor(32, 32, 32, 255);
+                buffer.addVertex(matrix, sliderPosition - 14, 0, 0.0F).setUv((sliderPosition - 14) / 32.0F, sideScroller.scrollAmountInt() / 32.0F).setColor(32, 32, 32, 255);
+                buffer.addVertex(matrix, 0, 0, 0.0F).setUv(0, sideScroller.scrollAmountInt() / 32.0F).setColor(32, 32, 32, 255);
+                
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                int shadeColor = isTransparentBackground() ? 120 : 160;
+                buffer = source.getBuffer(RenderType.gui());
+                buffer.addVertex(matrix, sliderPosition + 4, 0, 100.0F).setColor(0, 0, 0, 0);
+                buffer.addVertex(matrix, sliderPosition, 0, 100.0F).setColor(0, 0, 0, shadeColor);
+                buffer.addVertex(matrix, sliderPosition, height, 100.0F).setColor(0, 0, 0, shadeColor);
+                buffer.addVertex(matrix, sliderPosition + 4, height, 100.0F).setColor(0, 0, 0, 0);
+                shadeColor /= 2;
+                buffer.addVertex(matrix, sliderPosition - 14, 0, 100.0F).setColor(0, 0, 0, shadeColor);
+                buffer.addVertex(matrix, sliderPosition - 14 - 4, 0, 100.0F).setColor(0, 0, 0, 0);
+                buffer.addVertex(matrix, sliderPosition - 14 - 4, height, 100.0F).setColor(0, 0, 0, 0);
+                buffer.addVertex(matrix, sliderPosition - 14, height, 100.0F).setColor(0, 0, 0, shadeColor);
+                RenderSystem.disableBlend();
+            });
         }
         Rectangle slideArrowBounds = new Rectangle(sliderPosition - 14, 0, 14, height);
         {
-            MultiBufferSource.BufferSource immediate = graphics.bufferSource();
-            font.renderText(">", sliderPosition - 7 - font.width(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil((1 - sideSlider.scrollAmount()) * 255.0F), 0, 255) << 24, false, graphics.pose().last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
-            font.renderText("<", sliderPosition - 7 - font.width("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil(sideSlider.scrollAmount() * 255.0F), 0, 255) << 24, false, graphics.pose().last().pose(), immediate, Font.DisplayMode.NORMAL, 0, 15728880);
-            graphics.flush();
+            graphics.drawSpecial(source -> {
+                font.renderText(">", sliderPosition - 7 - font.width(">") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil((1 - sideSlider.scrollAmount()) * 255.0F), 0, 255) << 24, false, graphics.pose().last().pose(), source, Font.DisplayMode.NORMAL, 0, 15728880);
+                font.renderText("<", sliderPosition - 7 - font.width("<") / 2f, height / 2, (slideArrowBounds.contains(mouseX, mouseY) ? 16777120 : 16777215) | Mth.clamp(Mth.ceil(sideSlider.scrollAmount() * 255.0F), 0, 255) << 24, false, graphics.pose().last().pose(), source, Font.DisplayMode.NORMAL, 0, 15728880);
+            });
             
             Rectangle scrollerBounds = sideScroller.getBounds();
             if (!scrollerBounds.isEmpty()) {
-                ScissorsHandler.INSTANCE.scissor(new Rectangle(0, 0, sliderPosition - 14, height));
+                graphics.enableScissor(0, 0, sliderPosition - 14, height);
                 int scrollOffset = scrollerBounds.y - sideScroller.scrollAmountInt();
                 for (Reference reference : references) {
                     graphics.pose().pushPose();
@@ -305,7 +296,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
                     graphics.pose().popPose();
                     scrollOffset += (font.lineHeight + 3) * reference.getScale();
                 }
-                ScissorsHandler.INSTANCE.removeLastScissor();
+                graphics.disableScissor();
                 sideScroller.renderScrollBar(graphics);
             }
         }
