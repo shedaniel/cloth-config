@@ -36,7 +36,7 @@
   "modifier.cloth-config.alt": "Alt + %s",
   "modifier.cloth-config.ctrl": "Ctrl + %s",
   "modifier.cloth-config.shift": "Shift + %s",
-  "title.cloth-config.config": "Cloth Mod Config Config",
+  "title.cloth-config.config": "Cloth Mod Config配置",
     "category.cloth-config.scrolling": "滚动",
     "category.cloth-config.testing": "配置演示",
     "option.cloth-config.scrollDuration": "滚动时长",
