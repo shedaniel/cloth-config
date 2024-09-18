@@ -51,4 +51,14 @@ public class DefaultGuiRegistryAccess implements GuiRegistryAccess {
     ) {
         return guis;
     }
+    
+    @Override
+    public void runPreHook(String i18n, Field field, Object config, Object defaults, GuiRegistryAccess registry) {
+        // No-op
+    }
+    
+    @Override
+    public void runPostHook(List<AbstractConfigListEntry> guis, String i18n, Field field, Object config, Object defaults, GuiRegistryAccess registry) {
+        // No-op
+    }
 }

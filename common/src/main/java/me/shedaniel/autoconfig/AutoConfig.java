@@ -21,6 +21,7 @@ package me.shedaniel.autoconfig;
 
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.gui.ConfigScreenProvider;
+import me.shedaniel.autoconfig.gui.DefaultGuiHooks;
 import me.shedaniel.autoconfig.gui.DefaultGuiProviders;
 import me.shedaniel.autoconfig.gui.DefaultGuiTransformers;
 import me.shedaniel.autoconfig.gui.registry.ComposedGuiRegistryAccess;
@@ -99,6 +100,6 @@ public class AutoConfig {
     @Environment(EnvType.CLIENT)
     private static class ClientOnly {
         private static final GuiRegistry defaultGuiRegistry =
-                DefaultGuiTransformers.apply(DefaultGuiProviders.apply(new GuiRegistry()));
+                DefaultGuiHooks.apply(DefaultGuiTransformers.apply(DefaultGuiProviders.apply(new GuiRegistry())));
     }
 }
