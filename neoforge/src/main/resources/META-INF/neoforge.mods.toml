@@ -17,6 +17,6 @@ An API for config screens.
 [[dependencies.cloth_config]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.0.110-beta,)"
+versionRange = "[21.2.0-beta,)"
 ordering = "NONE"
 side = "BOTH"
