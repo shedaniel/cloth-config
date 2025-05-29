@@ -45,9 +45,6 @@ allprojects {
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
 
-        // The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
-        // JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
-        // We'll use that if it's available, but otherwise we'll use the older option.
         options.release = 21
     }
 
@@ -64,6 +61,8 @@ allprojects {
 
         ignoreFailures = true
     }
+
+    java.withSourcesJar()
 }
 
 task licenseFormatAll
