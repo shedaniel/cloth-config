@@ -31,6 +31,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
@@ -45,7 +46,7 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public class TextListEntry extends TooltipListEntry<Object> {
     public static final int LINE_HEIGHT = 12;
-    public static final int DISABLED_COLOR = Objects.requireNonNull(ChatFormatting.DARK_GRAY.getColor());
+    public static final int DISABLED_COLOR = ARGB.opaque(Objects.requireNonNull(ChatFormatting.DARK_GRAY.getColor()));
     private final Font textRenderer = Minecraft.getInstance().font;
     private final int color;
     private final Component text;
