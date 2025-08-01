@@ -21,7 +21,7 @@
     "text.cloth-config.error.color.invalid_blue": "Недійсне значення синього!",
     "text.cloth-config.error.color.invalid_color": "Недійсний колір!",
     "text.cloth-config.error.color.no_hash": "Недійсний колір! (Не вказано #)",
-    "text.cloth-config.list.add": "Вставити",
+    "text.cloth-config.list.add": "Уставити",
     "text.cloth-config.list.remove": "Видалити вибране",
     "text.cloth-config.error_cannot_save": "Не вдалося зберегти"
     "text.cloth-config.reset_value": "Скинути",
