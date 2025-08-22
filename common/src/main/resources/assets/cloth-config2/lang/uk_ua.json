@@ -23,7 +23,7 @@
     "text.cloth-config.error.color.no_hash": "Недійсний колір! (Не вказано #)",
     "text.cloth-config.list.add": "Уставити",
     "text.cloth-config.list.remove": "Видалити вибране",
-    "text.cloth-config.error_cannot_save": "Не вдалося зберегти"
+    "text.cloth-config.error_cannot_save": "Не вдалося зберегти",
     "text.cloth-config.reset_value": "Скинути",
     "text.cloth.reset_value": "Скинути",
     "text.cloth-config.restart_required": "Потрібен перезапуск",
@@ -47,6 +47,6 @@
     "option.cloth-config.disableSmoothScroll": "Вимкнути плавне прокручування усталено",
     "text.cloth-config.testing.1": "Якщо ви бажаєте скористатися %1$s, можете переглянути %2$s. Ви також можете %3$s",
     "text.cloth-config.testing.2": "вікі Cloth Config",
-    "text.cloth-config.testing.3": "натиснути тут щоб відкрити файл налаштувань Minecraft просто так.",
+    "text.cloth-config.testing.3": "натиснути тут, щоб відкрити файл налаштувань Minecraft просто так.",
     "modmenu.descriptionTranslation.cloth-config": "API для екрана налаштувань"
 }
