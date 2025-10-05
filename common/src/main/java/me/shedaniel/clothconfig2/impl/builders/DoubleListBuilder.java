@@ -50,6 +50,7 @@ public class DoubleListBuilder extends AbstractRangeListBuilder<Double, DoubleLi
         return super.setCellErrorSupplier(cellErrorSupplier);
     }
     
+    @Override
     public DoubleListBuilder setErrorSupplier(Function<List<Double>, Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;
         return this;
@@ -120,6 +121,7 @@ public class DoubleListBuilder extends AbstractRangeListBuilder<Double, DoubleLi
         return super.removeMax();
     }
     
+    @Override
     public DoubleListBuilder setDefaultValue(List<Double> defaultValue) {
         this.defaultValue = () -> defaultValue;
         return this;

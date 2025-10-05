@@ -127,6 +127,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
             this.headerHeight = 0;
     }
     
+    @Override
     public NarrationPriority narrationPriority() {
         if (this.isFocused()) {
             return NarrationPriority.FOCUSED;
@@ -135,6 +136,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         }
     }
     
+    @Override
     public void updateNarration(NarrationElementOutput narrationElementOutput) {
         E entry = this.hoveredItem;
         if (entry != null) {
@@ -173,10 +175,12 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         this.selectedItem = item;
     }
     
+    @Override
     public E getFocused() {
         return (E) super.getFocused();
     }
     
+    @Override
     public List<E> children() {
         return this.entries;
     }
@@ -385,6 +389,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return this.width / 2 + 124;
     }
     
+    @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         this.updateScrollingState(event.x(), event.y(), event.button());
         if (!this.isMouseOver(event.x(), event.y())) {
@@ -406,10 +411,12 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         }
     }
     
+    @Override
     public ScreenRectangle getRectangle() {
         return new ScreenRectangle(this.left, this.top, this.right - this.left, this.bottom - this.top);
     }
     
+    @Override
     public void setFocused(@Nullable GuiEventListener guiEventListener) {
         super.setFocused(guiEventListener);
         int i = this.entries.indexOf(guiEventListener);
@@ -461,6 +468,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return null;
     }
     
+    @Override
     public boolean mouseReleased(MouseButtonEvent event) {
         if (this.getFocused() != null) {
             this.getFocused().mouseReleased(event);
@@ -469,6 +477,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return false;
     }
     
+    @Override
     public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
         if (super.mouseDragged(event, deltaX, deltaY)) {
             return true;
@@ -491,6 +500,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         }
     }
     
+    @Override
     public boolean mouseScrolled(double double_1, double double_2, double amountX, double amountY) {
         for (E entry : visibleChildren()) {
             if (entry.mouseScrolled(double_1, double_2, amountX, amountY)) {
@@ -501,6 +511,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         return amountY != 0;
     }
     
+    @Override
     public boolean keyPressed(KeyEvent keyEvent) {
         if (super.keyPressed(keyEvent)) {
             return true;
@@ -527,6 +538,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         this.ensureVisible(item);
     }
     
+    @Override
     public boolean isMouseOver(double double_1, double double_2) {
         return double_2 >= (double) this.top && double_2 <= (double) this.bottom && double_1 >= (double) this.left && double_1 <= (double) this.right;
     }
@@ -633,6 +645,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         
         public abstract void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta);
         
+        @Override
         public boolean isMouseOver(double double_1, double double_2) {
             return this.bounds.contains(double_1, double_2);
         }

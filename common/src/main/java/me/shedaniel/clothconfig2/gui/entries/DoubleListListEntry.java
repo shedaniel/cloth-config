@@ -91,6 +91,7 @@ public class DoubleListListEntry extends AbstractTextFieldListListEntry<Double, 
             return text.chars().allMatch(c -> Character.isDigit(c) || c == '-' || c == '.');
         }
         
+        @Override
         public Double getValue() {
             try {
                 return Double.valueOf(widget.getValue());

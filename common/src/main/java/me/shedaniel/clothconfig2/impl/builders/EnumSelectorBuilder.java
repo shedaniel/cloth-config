@@ -64,6 +64,7 @@ public class EnumSelectorBuilder<T extends Enum<?>> extends AbstractFieldBuilder
         return super.setDefaultValue(defaultValue);
     }
     
+    @Override
     public EnumSelectorBuilder<T> setDefaultValue(T defaultValue) {
         Objects.requireNonNull(defaultValue);
         this.defaultValue = () -> defaultValue;

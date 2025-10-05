@@ -91,6 +91,7 @@ public class LongListListEntry extends AbstractTextFieldListListEntry<Long, Long
             return text.chars().allMatch(c -> Character.isDigit(c) || c == '-');
         }
         
+        @Override
         public Long getValue() {
             try {
                 return Long.valueOf(widget.getValue());

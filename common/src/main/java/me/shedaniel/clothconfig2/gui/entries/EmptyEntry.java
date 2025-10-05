@@ -43,6 +43,7 @@ public class EmptyEntry extends AbstractConfigListEntry<Object> {
         return height;
     }
     
+    @Override
     @Nullable
     public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
         return null;

@@ -340,6 +340,7 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             return 4 + strings.size() * 10;
         }
         
+        @Override
         @Nullable
         public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
             return null;

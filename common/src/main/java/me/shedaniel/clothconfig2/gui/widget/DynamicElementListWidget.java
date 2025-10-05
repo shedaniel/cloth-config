@@ -50,6 +50,7 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         super(client, width, height, top, bottom, backgroundLocation);
     }
     
+    @Override
     @Nullable
     public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
         if (this.getItemCount() == 0) {
@@ -101,6 +102,7 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         }
     }
     
+    @Override
     public void updateNarration(NarrationElementOutput narrationElementOutput) {
         E entry = this.hoveredItem;
         if (entry != null) {
@@ -117,6 +119,7 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         narrationElementOutput.add(NarratedElementType.USAGE, Component.translatable("narration.component_list.usage"));
     }
     
+    @Override
     public void setFocused(@Nullable GuiEventListener guiEventListener) {
         super.setFocused(guiEventListener);
         if (guiEventListener == null) {
@@ -125,10 +128,12 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         
     }
     
+    @Override
     public NarratableEntry.NarrationPriority narrationPriority() {
         return this.isFocused() ? NarrationPriority.FOCUSED : super.narrationPriority();
     }
     
+    @Override
     protected boolean isSelected(int i) {
         return false;
     }
@@ -144,19 +149,23 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         public ElementEntry() {
         }
         
+        @Override
         public boolean isDragging() {
             return this.dragging;
         }
         
+        @Override
         public void setDragging(boolean bl) {
             this.dragging = bl;
         }
         
+        @Override
         @Nullable
         public GuiEventListener getFocused() {
             return this.focused;
         }
         
+        @Override
         public void setFocused(@Nullable GuiEventListener guiEventListener) {
             if (this.focused != null) {
                 this.focused.setFocused(false);
@@ -179,6 +188,7 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
             }
         }
         
+        @Override
         @Nullable
         public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
             if (focusNavigationEvent instanceof FocusNavigationEvent.ArrowNavigation arrowNavigation) {
@@ -206,8 +216,10 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
             return ContainerEventHandler.super.nextFocusPath(focusNavigationEvent);
         }
         
+        @Override
         public abstract List<? extends NarratableEntry> narratables();
         
+        @Override
         public void updateNarration(NarrationElementOutput narrationElementOutput) {
             List<? extends NarratableEntry> list = this.narratables();
             Screen.NarratableSearchResult narratableSearchResult = Screen.findNarratableWidget(list, this.lastNarratable);

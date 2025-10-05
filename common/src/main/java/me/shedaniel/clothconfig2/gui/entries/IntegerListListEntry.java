@@ -91,6 +91,7 @@ public class IntegerListListEntry extends AbstractTextFieldListListEntry<Integer
             return text.chars().allMatch(c -> Character.isDigit(c) || c == '-');
         }
         
+        @Override
         public Integer getValue() {
             try {
                 return Integer.valueOf(widget.getValue());

@@ -91,6 +91,7 @@ public class FloatListListEntry extends AbstractTextFieldListListEntry<Float, Fl
             return text.chars().allMatch(c -> Character.isDigit(c) || c == '-' || c == '.');
         }
         
+        @Override
         public Float getValue() {
             try {
                 return Float.valueOf(widget.getValue());

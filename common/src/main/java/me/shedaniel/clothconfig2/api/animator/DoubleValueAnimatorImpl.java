@@ -104,6 +104,7 @@ final class DoubleValueAnimatorImpl extends NumberAnimator<Double> {
         return amount;
     }
     
+    @Override
     public Double target() {
         return target;
     }
