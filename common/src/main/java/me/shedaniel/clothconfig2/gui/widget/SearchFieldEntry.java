@@ -113,7 +113,7 @@ public class SearchFieldEntry extends AbstractConfigListEntry<Object> {
         this.editBox.setY(y + entryHeight / 2 - 9);
         this.editBox.render(graphics, mouseX, mouseY, delta);
         if (this.editBox.getValue().isEmpty()) {
-            this.editBox.setSuggestion("Search...");
+            this.editBox.setSuggestion(Component.translatable("text.cloth-config.search").getString());
         } else {
             this.editBox.setSuggestion(null);
         }
