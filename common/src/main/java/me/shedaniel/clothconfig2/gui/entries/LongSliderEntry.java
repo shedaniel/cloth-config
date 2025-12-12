@@ -21,6 +21,8 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.Window;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
@@ -41,6 +43,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class LongSliderEntry extends TooltipListEntry<Long> {
     
     protected Slider sliderWidget;
@@ -49,7 +52,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     protected final long orginial;
     private long minimum, maximum;
     private final Supplier<Long> defaultValue;
-    private Function<Long, Component> textGetter = value -> Component.literal(String.format("Value: %d", value));
+    private Function<Long, Component> textGetter = value -> Component.translatable("text.cloth-config.value", value);
     private final List<AbstractWidget> widgets;
     
     @ApiStatus.Internal
