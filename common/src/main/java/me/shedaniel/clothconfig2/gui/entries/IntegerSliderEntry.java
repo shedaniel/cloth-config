@@ -49,7 +49,7 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
     protected final long orginial;
     private int minimum, maximum;
     private final Supplier<Integer> defaultValue;
-    private Function<Integer, Component> textGetter = integer -> Component.literal(String.format("Value: %d", integer));
+    private Function<Integer, Component> textGetter = integer -> Component.translatable("text.cloth-config.value", value);
     private final List<AbstractWidget> widgets;
     
     @ApiStatus.Internal
