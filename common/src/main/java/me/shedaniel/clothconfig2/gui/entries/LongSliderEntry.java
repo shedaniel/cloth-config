@@ -169,7 +169,9 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         
         @Override
         protected void applyValue() {
+            this.value = Mth.clamp(this.value, 0.0d, 1.0d);
             LongSliderEntry.this.value.set((long) (minimum + Math.abs(maximum - minimum) * value));
+            updateMessage();
         }
         
         @Override
@@ -183,6 +185,8 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         public boolean mouseDragged(MouseButtonEvent event, double double_3, double double_4) {
             if (!isEditable())
                 return false;
+            this.value = Mth.clamp(this.value, 0.0d, 1.0d);
+            applyValue();
             return super.mouseDragged(event, double_3, double_4);
         }
         
@@ -191,7 +195,8 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
         }
         
         public void setValue(double integer) {
-            this.value = integer;
+            this.value = Mth.clamp(integer, 0.0d, 1.0d);
+            applyValue();
         }
     }
     

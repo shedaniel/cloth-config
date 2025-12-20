@@ -169,7 +169,9 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
         
         @Override
         protected void applyValue() {
+            this.value = Mth.clamp(this.value, 0.0d, 1.0d);
             IntegerSliderEntry.this.value.set((int) (minimum + Math.abs(maximum - minimum) * value));
+            updateMessage();
         }
         
         @Override
@@ -183,6 +185,8 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
         public boolean mouseDragged(MouseButtonEvent event, double double_3, double double_4) {
             if (!isEditable())
                 return false;
+            this.value = Mth.clamp(this.value, 0.0d, 1.0d);
+            applyValue();
             return super.mouseDragged(event, double_3, double_4);
         }
         
@@ -192,10 +196,12 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
         
         public void setProgress(double integer) {
             this.value = integer;
+            applyValue();
         }
         
         public void setValue(double integer) {
-            this.value = integer;
+            this.value = Mth.clamp(integer, 0.0d, 1.0d);
+            applyValue();
         }
     }
     
