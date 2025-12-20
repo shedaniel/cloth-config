@@ -194,8 +194,9 @@ public class IntegerSliderEntry extends TooltipListEntry<Integer> {
             this.value = integer;
         }
         
+        @Override
         public void setValue(double integer) {
-            this.value = integer;
+            super.setValue(integer);
         }
     }
     

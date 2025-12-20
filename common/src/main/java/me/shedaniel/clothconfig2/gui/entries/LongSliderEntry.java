@@ -190,8 +190,9 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
             return value;
         }
         
+        @Override
         public void setValue(double integer) {
-            this.value = integer;
+            super.setValue(integer);
         }
     }
     
