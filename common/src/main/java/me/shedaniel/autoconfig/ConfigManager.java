@@ -91,6 +91,12 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
         try {
             T deserialized = serializer.deserialize();
             
+            if (deserialized == null) {
+                config = serializer.createDefault();
+                config.validatePostLoad();
+                return false;
+            }
+            
             for (ConfigSerializeEvent.Load<T> load : loadEvent) {
                 InteractionResult result = load.onLoad(this, deserialized);
                 if (result == InteractionResult.FAIL) {
