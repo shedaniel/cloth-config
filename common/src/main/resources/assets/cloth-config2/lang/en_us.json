@@ -26,6 +26,8 @@
     "text.cloth-config.error_cannot_save": "Error!",
     "text.cloth-config.reset_value": "Reset",
     "text.cloth.reset_value": "Reset",
+    "text.cloth-config.search": "Search...",
+    "text.cloth-config.value": "Value: %d",
     "text.cloth-config.restart_required": "Restart Required",
     "text.cloth-config.restart_required_sub": "One of your modified settings requires Minecraft to be restarted. Do you want to proceed?",
     "text.cloth-config.exit_minecraft": "Exit Minecraft",
