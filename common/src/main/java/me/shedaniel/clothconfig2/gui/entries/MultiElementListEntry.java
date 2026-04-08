@@ -272,5 +272,10 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         public void updateNarration(NarrationElementOutput narrationElementOutput) {
             narrationElementOutput.add(NarratedElementType.TITLE, getFieldName());
         }
+
+        @Override
+        public boolean isMouseOver(double mouseX, double mouseY) {
+            return rectangle.contains(mouseX, mouseY);
+        }
     }
 }

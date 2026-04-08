@@ -163,6 +163,9 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         
         @Override
         public void setFocused(@Nullable GuiEventListener guiEventListener) {
+            if (this.focused == guiEventListener) {
+                return;
+            }
             if (this.focused != null) {
                 this.focused.setFocused(false);
             }
