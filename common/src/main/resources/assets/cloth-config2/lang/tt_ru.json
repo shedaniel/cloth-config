@@ -29,7 +29,7 @@
     "text.cloth.reset_value": "Ташлау",
     "text.cloth-config.restart_required": "Яңадан кушу таләп ителә",
     "text.cloth-config.restart_required_sub": "Үзгәртелгән көйләүләрнең берсе Minecraft яңадан кушуны таләп итә. Сез дәвам итәргә телисезме?",
-    "text.cloth-config.exit_minecraft": "Minecraft-тан чыгу",
+    "text.cloth-config.exit_minecraft": "Minecraft'тан чыгу",
     "text.cloth-config.ignore_restart": "Яңадан кушуга әһәмият бирмәү",
     "text.cloth-config.boolean.value.true": "§aӘйе",
     "text.cloth-config.boolean.value.false": "§cЮк",
