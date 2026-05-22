@@ -1,4 +1,5 @@
 {
+    "modmenu.descriptionTranslation.cloth-config": "An API for config screens.",
     "text.cloth-config.save_and_done": "Save & Quit",
     "text.cloth-config.apply": "Apply Changes",
     "text.cloth-config.quit_config": "Changes Not Saved",
