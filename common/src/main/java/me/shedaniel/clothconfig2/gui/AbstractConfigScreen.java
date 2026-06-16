@@ -165,9 +165,9 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         save();
         if (openOtherScreens) {
             if (isRequiresRestart())
-                AbstractConfigScreen.this.minecraft.setScreen(new ClothRequiresRestartScreen(parent));
+                AbstractConfigScreen.this.minecraft.gui.setScreen(new ClothRequiresRestartScreen(parent));
             else
-                AbstractConfigScreen.this.minecraft.setScreen(parent);
+                AbstractConfigScreen.this.minecraft.gui.setScreen(parent);
         }
     }
     
@@ -313,9 +313,9 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     
     protected final boolean quit() {
         if (confirmSave && isEdited())
-            minecraft.setScreen(new ConfirmScreen(new QuitSaveConsumer(), Component.translatable("text.cloth-config.quit_config"), Component.translatable("text.cloth-config.quit_config_sure"), Component.translatable("text.cloth-config.quit_discard"), Component.translatable("gui.cancel")));
+            minecraft.gui.setScreen(new ConfirmScreen(new QuitSaveConsumer(), Component.translatable("text.cloth-config.quit_config"), Component.translatable("text.cloth-config.quit_config_sure"), Component.translatable("text.cloth-config.quit_discard"), Component.translatable("gui.cancel")));
         else
-            minecraft.setScreen(parent);
+            minecraft.gui.setScreen(parent);
         return true;
     }
     
@@ -323,9 +323,9 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
         @Override
         public void accept(boolean t) {
             if (!t)
-                minecraft.setScreen(AbstractConfigScreen.this);
+                minecraft.gui.setScreen(AbstractConfigScreen.this);
             else
-                minecraft.setScreen(parent);
+                minecraft.gui.setScreen(parent);
         }
     }
     

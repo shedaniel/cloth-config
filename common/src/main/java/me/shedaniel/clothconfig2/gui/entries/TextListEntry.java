@@ -20,9 +20,7 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -31,6 +29,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.FormattedCharSink;
@@ -41,13 +40,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public class TextListEntry extends TooltipListEntry<Object> {
     public static final int LINE_HEIGHT = 12;
-    public static final int DISABLED_COLOR = ARGB.opaque(Objects.requireNonNull(ChatFormatting.DARK_GRAY.getColor()));
+    public static final int DISABLED_COLOR = ARGB.opaque(TextColor.DARK_GRAY.getValue());
     private final Font textRenderer = Minecraft.getInstance().font;
     private final int color;
     private final Component text;

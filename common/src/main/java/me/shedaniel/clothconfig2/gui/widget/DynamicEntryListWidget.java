@@ -20,10 +20,6 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import me.shedaniel.clothconfig2.api.DisableableWidget;
 import me.shedaniel.clothconfig2.api.HideableWidget;
 import me.shedaniel.clothconfig2.api.Requirement;
@@ -541,9 +537,6 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected void renderList(GuiGraphicsExtractor graphics, int startX, int startY, int mouseX, int mouseY, float delta) {
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        
         hoveredItem = this.isMouseOver(mouseX, mouseY) ? this.getItemAtPosition(mouseX, mouseY) : null;
         
         int heights = 0; // itemHeight accumulator

@@ -22,6 +22,7 @@ package me.shedaniel.clothconfig2.gui;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.datafixers.util.Pair;
 import me.shedaniel.clothconfig2.api.AbstractConfigEntry;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -45,7 +46,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Tuple;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Matrix4f;
 
@@ -75,7 +75,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     };
     public ListWidget<AbstractConfigEntry<AbstractConfigEntry<?>>> listWidget;
     private final LinkedHashMap<Component, List<AbstractConfigEntry<?>>> categorizedEntries = Maps.newLinkedHashMap();
-    private final List<Tuple<Component, Integer>> tabs;
+    private final List<Pair<Component, Integer>> tabs;
     private SearchFieldEntry searchFieldEntry;
     private AbstractWidget buttonLeftTab, buttonRightTab;
     private Rectangle tabsBounds, tabsLeftBounds, tabsRightBounds;
@@ -90,8 +90,8 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             List<AbstractConfigEntry<?>> entries = Lists.newArrayList();
             for (Object object : category.getEntries()) {
                 AbstractConfigListEntry<?> entry;
-                if (object instanceof Tuple<?, ?>) {
-                    entry = (AbstractConfigListEntry<?>) ((Tuple<?, ?>) object).getB();
+                if (object instanceof Pair<?, ?>) {
+                    entry = (AbstractConfigListEntry<?>) ((Pair<?, ?>) object).getSecond();
                 } else {
                     entry = (AbstractConfigListEntry<?>) object;
                 }
@@ -105,13 +105,13 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             }
         });
         
-        this.tabs = categorizedEntries.keySet().stream().map(s -> new Tuple<>(s, Minecraft.getInstance().font.width(s) + 8)).collect(Collectors.toList());
+        this.tabs = categorizedEntries.keySet().stream().map(s -> new Pair<>(s, Minecraft.getInstance().font.width(s) + 8)).collect(Collectors.toList());
         this.categoryMap = categoryMap;
     }
     
     @Override
     public Component getSelectedCategory() {
-        return tabs.get(selectedCategoryIndex).getA();
+        return tabs.get(selectedCategoryIndex).getFirst();
     }
     
     @Override
@@ -164,8 +164,8 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 }
             });
             int j = 0;
-            for (Tuple<Component, Integer> tab : tabs) {
-                tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getB(), 20, tab.getA(), this.categoryMap.get(tab.getA().getString()).getDescription()));
+            for (Pair<Component, Integer> tab : tabs) {
+                tabButtons.add(new ClothConfigTabButton(this, j, -100, 43, tab.getSecond(), 20, tab.getFirst(), this.categoryMap.get(tab.getFirst().getString()).getDescription()));
                 j++;
             }
             childrenL().addAll(tabButtons);
@@ -198,7 +198,7 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     public double getTabsMaximumScrolled() {
         if (tabsMaximumScrolled == -1d) {
             int[] i = {0};
-            for (Tuple<Component, Integer> pair : tabs) i[0] += pair.getB() + 2;
+            for (Pair<Component, Integer> pair : tabs) i[0] += pair.getSecond() + 2;
             tabsMaximumScrolled = i[0];
         }
         return tabsMaximumScrolled + 6;

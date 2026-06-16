@@ -212,7 +212,7 @@ public class ClothConfigDemo {
         if (Minecraft.getInstance().level != null) {
             testing.addEntry(entryBuilder.startTextDescription(
                     Component.translatable("text.cloth-config.testing.1",
-                            Component.literal("ClothConfig").withStyle(s -> s.withBold(true).withHoverEvent(new HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(Util.make(new ItemStack(Items.PINK_WOOL), stack -> {
+                            Component.literal("ClothConfig").withStyle(s -> s.withBold(true).withHoverEvent(new HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(Util.make(new ItemStack(Items.WOOL.pink()), stack -> {
                                 stack.set(DataComponents.CUSTOM_NAME, Component.literal("(\u30FB\u2200\u30FB)"));
                                 stack.enchant(VanillaRegistries.createLookup().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.EFFICIENCY), 10);
                             }))))),

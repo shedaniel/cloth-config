@@ -1,5 +1,5 @@
 plugins {
-    id "com.gradleup.shadow" version "9.2.2"
+    id "com.gradleup.shadow" version "9.4.2"
     id "me.shedaniel.unified-publishing"
     id "maven-publish"
 }
@@ -126,7 +126,7 @@ unifiedPublishing {
     project {
         displayName = "[Fabric $rootProject.supported_version] v$project.version"
         releaseType = "release"
-        gameVersions = ["1.21.11"]
+        gameVersions = ["26.2"]
         gameLoaders = ["fabric"]
         
         mainPublication shadowJar
@@ -135,7 +135,7 @@ unifiedPublishing {
             curseforge {
                 token = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
                 id = project.curseforge_id
-                gameVersions.addAll "Java 21"
+                gameVersions.addAll "Java 25"
             }
         }
 

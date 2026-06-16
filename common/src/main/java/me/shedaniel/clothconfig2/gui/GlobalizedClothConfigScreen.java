@@ -21,6 +21,7 @@ package me.shedaniel.clothconfig2.gui;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mojang.datafixers.util.Pair;
 import me.shedaniel.clothconfig2.CCTextures;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.*;
@@ -47,7 +48,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Tuple;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -109,8 +109,8 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
             List<AbstractConfigEntry<?>> entries = Lists.newArrayList();
             for (Object object : category.getEntries()) {
                 AbstractConfigListEntry<?> entry;
-                if (object instanceof Tuple<?, ?>) {
-                    entry = (AbstractConfigListEntry<?>) ((Tuple<?, ?>) object).getB();
+                if (object instanceof Pair<?,?>) {
+                    entry = (AbstractConfigListEntry<?>) ((Pair<?, ?>) object).getSecond();
                 } else {
                     entry = (AbstractConfigListEntry<?>) object;
                 }

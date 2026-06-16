@@ -30,7 +30,7 @@ public class ClothRequiresRestartScreen extends ConfirmScreen {
             if (t)
                 Minecraft.getInstance().stop();
             else
-                Minecraft.getInstance().setScreen(parent);
+                Minecraft.getInstance().gui.setScreen(parent);
         }, Component.translatable("text.cloth-config.restart_required"), Component.translatable("text.cloth-config.restart_required_sub"), Component.translatable("text.cloth-config.exit_minecraft"), Component.translatable("text.cloth-config.ignore_restart"));
     }
 }
