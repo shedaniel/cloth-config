@@ -72,12 +72,6 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             
             widget = new EditBox(Minecraft.getInstance().font, 0, 0, 100, 18, Component.empty()) {
                 @Override
-                public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-                    setFocused(isSelected);
-                    super.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
-                }
-
-                @Override
                 public void insertText(String input) {
                     String before = this.getValue();
                     super.insertText(input);
@@ -98,6 +92,7 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         @Override
         public void updateSelected(boolean isSelected) {
             this.isSelected = isSelected;
+            widget.setFocused(isSelected);
         }
         
         /**

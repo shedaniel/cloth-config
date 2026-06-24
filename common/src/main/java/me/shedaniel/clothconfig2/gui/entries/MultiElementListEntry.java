@@ -208,7 +208,11 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     public List<? extends GuiEventListener> children() {
         return isExpanded() ? (List) children : Collections.singletonList(widget);
     }
-    
+
+    @Override
+    public void setFocused(boolean focused) {
+    }
+
     @Override
     public List<? extends NarratableEntry> narratables() {
         return isExpanded() ? (List) children : Collections.singletonList(widget);

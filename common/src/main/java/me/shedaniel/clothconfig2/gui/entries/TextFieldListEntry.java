@@ -65,7 +65,6 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         this.textFieldWidget = new EditBox(Minecraft.getInstance().font, 0, 0, 148, 18, Component.empty()) {
             @Override
             public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int int_1, int int_2, float float_1) {
-                setFocused(isSelected && TextFieldListEntry.this.getFocused() == this);
                 textFieldPreRender(this);
                 super.extractWidgetRenderState(graphics, int_1, int_2, float_1);
             }
@@ -112,6 +111,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     @Override
     public void updateSelected(boolean isSelected) {
         this.isSelected = isSelected;
+        textFieldWidget.setFocused(isSelected);
     }
     
     @Override
