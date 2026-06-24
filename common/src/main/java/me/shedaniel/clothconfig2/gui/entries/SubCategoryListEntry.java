@@ -263,7 +263,11 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     public List<? extends GuiEventListener> children() {
         return isExpanded() ? (List) children : Collections.singletonList(widget);
     }
-    
+
+    @Override
+    public void setFocused(boolean focused) {
+    }
+
     @Override
     public List<? extends NarratableEntry> narratables() {
         return isExpanded() ? (List) children : Collections.singletonList(widget);

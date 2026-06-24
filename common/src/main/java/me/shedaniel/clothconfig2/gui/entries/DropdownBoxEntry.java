@@ -112,8 +112,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     
     @Override
     public void updateSelected(boolean isSelected) {
-        selectionElement.topRenderer.isSelected = isSelected;
+        selectionElement.topRenderer.updateSelected(isSelected);
         selectionElement.menu.isSelected = isSelected;
+    }
+
+    @Override
+    public void setFocused(boolean focused) {
     }
     
     @NotNull
@@ -231,7 +235,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public List<? extends GuiEventListener> children() {
             return Lists.newArrayList(topRenderer, menu);
         }
-        
+
+        @Override
+        public void setFocused(boolean focused) {
+        }
+
         @Override
         public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
             dontReFocus = false;
@@ -659,7 +667,15 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         @Deprecated private final Rectangle bounds = new Rectangle();
         @Deprecated private DropdownBoxEntry<R> entry;
         protected boolean isSelected = false;
-        
+
+        public void updateSelected(boolean isSelected) {
+            this.isSelected = isSelected;
+        }
+
+        @Override
+        public void setFocused(boolean focused) {
+        }
+
         public abstract R getValue();
         
         public abstract void setValue(R value);
@@ -733,12 +749,6 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             this.toTextFunction = Objects.requireNonNull(toTextFunction);
             textFieldWidget = new EditBox(Minecraft.getInstance().font, 0, 0, 148, 18, Component.empty()) {
                 @Override
-                public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-                    setFocused(isSuggestionMode() && isSelected && DefaultSelectionTopCellElement.this.getParent().getFocused() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.getFocused() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.getFocused() == this);
-                    super.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
-                }
-                
-                @Override
                 public boolean keyPressed(KeyEvent event) {
                     if (event.key() == GLFW.GLFW_KEY_ENTER || event.key() == GLFW.GLFW_KEY_ESCAPE) {
                         DefaultSelectionTopCellElement.this.selectFirstRecommendation();
@@ -756,7 +766,13 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             textFieldWidget.setMaxLength(999999);
             textFieldWidget.setValue(toTextFunction.apply(value).getString());
         }
-        
+
+        @Override
+        public void updateSelected(boolean isSelected) {
+            super.updateSelected(isSelected);
+            textFieldWidget.setFocused(isSuggestionMode() && isSelected && getParent().selectionElement.getFocused() == this);
+        }
+
         @Override
         public boolean isEdited() {
             return super.isEdited() || !getValue().equals(original);
