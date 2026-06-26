@@ -115,6 +115,23 @@ public class ConfigEntry {
         }
         
         /**
+         * Applies a tooltip to every field that supports it, defined in your lang file.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.TYPE)
+        public @interface GlobalTooltip {
+            int count() default 1;
+        }
+        
+        /**
+         * Prevents {@link ConfigEntry.Gui.GlobalTooltip} from working on the given field.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface SkipGlobalTooltip {
+        }
+        
+        /**
          * Applies no tooltip to list entries that support it, defined in your lang file.
          */
         @Retention(RetentionPolicy.RUNTIME)

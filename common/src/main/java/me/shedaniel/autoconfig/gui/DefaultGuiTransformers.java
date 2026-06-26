@@ -31,6 +31,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
@@ -48,14 +49,19 @@ public class DefaultGuiTransformers {
     
     public static GuiRegistry apply(GuiRegistry registry) {
         
-        registry.registerAnnotationTransformer(
+        registry.registerPredicateTransformer(
                 (guis, i18n, field, config, defaults, guiProvider) -> guis.stream()
                         .peek(gui -> {
                             if (!(gui instanceof TextListEntry)) {
                                 ConfigEntry.Gui.Tooltip tooltip = field.getAnnotation(ConfigEntry.Gui.Tooltip.class);
-                                if (tooltip.count() == 0) {
+                                ConfigEntry.Gui.GlobalTooltip globalTooltip = getGlobalTooltip(field);
+                                
+                                final int globalCount = globalTooltip != null ? globalTooltip.count() : 0;
+                                final int count = tooltip != null ? tooltip.count() : globalCount;
+                                
+                                if (count == 0) {
                                     tryRemoveTooltip(gui);
-                                } else if (tooltip.count() == 1) {
+                                } else if (count == 1) {
                                     tryApplyTooltip(
                                             gui,
                                             new Component[]{
@@ -64,7 +70,7 @@ public class DefaultGuiTransformers {
                                     );
                                 } else {
                                     tryApplyTooltip(
-                                            gui, IntStream.range(0, tooltip.count()).boxed()
+                                            gui, IntStream.range(0, count).boxed()
                                                     .map(i -> String.format("%s.%s[%d]", i18n, "@Tooltip", i))
                                                     .map(Component::translatable)
                                                     .toArray(Component[]::new)
@@ -73,7 +79,8 @@ public class DefaultGuiTransformers {
                             }
                         })
                         .collect(Collectors.toList()),
-                ConfigEntry.Gui.Tooltip.class
+                field -> field.isAnnotationPresent(ConfigEntry.Gui.Tooltip.class) ||
+                        (getGlobalTooltip(field) != null && !field.isAnnotationPresent(ConfigEntry.Gui.SkipGlobalTooltip.class))
         );
         
         registry.registerAnnotationTransformer(
@@ -127,6 +134,21 @@ public class DefaultGuiTransformers {
         );
         
         return registry;
+    }
+    
+    /**
+     * Checks if any of the parent classes have the {@link ConfigEntry.Gui.GlobalTooltip} annotation
+     * @return {@link ConfigEntry.Gui.GlobalTooltip} annotation instance if found, else null
+     */
+    public static ConfigEntry.Gui.GlobalTooltip getGlobalTooltip(Field field) {
+        Class<?> currentClass = field.getDeclaringClass();
+        while (currentClass != null) {
+            if (currentClass.isAnnotationPresent(ConfigEntry.Gui.GlobalTooltip.class)) {
+                return currentClass.getAnnotation(ConfigEntry.Gui.GlobalTooltip.class);
+            }
+            currentClass = currentClass.getEnclosingClass();
+        }
+        return null;
     }
     
     private static void tryApplyTooltip(AbstractConfigListEntry gui, Component[] text) {
