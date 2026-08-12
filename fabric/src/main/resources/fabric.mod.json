@@ -8,9 +8,9 @@
         "shedaniel"
     ],
     "contact": {
-        "homepage": "https://minecraft.curseforge.com/projects/cloth-config",
-        "sources": "https://github.com/shedaniel/ClothConfig",
-        "issues": "https://github.com/shedaniel/ClothConfig/issues"
+        "homepage": "https://modrinth.com/mod/cloth-config",
+        "sources": "https://github.com/shedaniel/cloth-config",
+        "issues": "https://github.com/shedaniel/cloth-config/issues"
     },
     "license": "GNU LGPLv3",
     "icon": "icon.png",
