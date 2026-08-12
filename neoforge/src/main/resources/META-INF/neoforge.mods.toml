@@ -8,7 +8,7 @@ modId = "cloth_config"
 version = "${version}"
 displayName = "Cloth Config v26.2 API"
 displayURL = "https://modrinth.com/mod/cloth-config"
-logoFile = "icon.png"
+iconFile = "icon.png"
 authors = "shedaniel"
 description = '''
 An API for config screens.
