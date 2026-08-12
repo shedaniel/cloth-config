@@ -1,13 +1,13 @@
 modLoader = "javafml"
 loaderVersion = "[1,)"
-issueTrackerURL = "https://github.com/architectury/ClothConfig/issues/"
+issueTrackerURL = "https://github.com/shedaniel/cloth-config/issues/"
 license = "GNU LGPLv3"
 
 [[mods]]
 modId = "cloth_config"
 version = "${version}"
 displayName = "Cloth Config v26.2 API"
-displayURL = "https://www.curseforge.com/minecraft/mc-mods/cloth-config-forge/"
+displayURL = "https://modrinth.com/mod/cloth-config"
 logoFile = "icon.png"
 authors = "shedaniel"
 description = '''
