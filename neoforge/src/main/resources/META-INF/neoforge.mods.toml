@@ -1,15 +1,15 @@
 modLoader = "javafml"
 loaderVersion = "[1,)"
 issueTrackerURL = "https://github.com/architectury/ClothConfig/issues/"
-displayURL = "https://www.curseforge.com/minecraft/mc-mods/cloth-config-forge/"
-logoFile = "icon.png"
-authors = "shedaniel"
 license = "GNU LGPLv3"
 
 [[mods]]
 modId = "cloth_config"
 version = "${version}"
 displayName = "Cloth Config v26.2 API"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/cloth-config-forge/"
+logoFile = "icon.png"
+authors = "shedaniel"
 description = '''
 An API for config screens.
 '''
