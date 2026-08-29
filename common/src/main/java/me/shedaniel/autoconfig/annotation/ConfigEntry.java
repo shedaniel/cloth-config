@@ -149,8 +149,12 @@ public class ConfigEntry {
             EnumDisplayOption option() default EnumDisplayOption.DROPDOWN;
             
             enum EnumDisplayOption {
+                /** A selection-only dropdown containing every enum value. */
                 DROPDOWN,
-                BUTTON
+                /** A button that cycles through the enum values. */
+                BUTTON,
+                /** An editable text field that suggests matching enum values. */
+                SUGGESTION
             }
         }
     }

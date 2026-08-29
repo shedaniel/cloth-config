@@ -157,6 +157,7 @@ public class DefaultGuiProviders {
                                             enums,
                                             getUnsafely(field, config, getUnsafely(field, defaults))
                                     )
+                                    .setNameProvider(value -> getEnumName(i18n, value))
                                     .setDefaultValue(() -> getUnsafely(field, defaults))
                                     .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
                                     .build()
@@ -169,6 +170,9 @@ public class DefaultGuiProviders {
         registry.registerPredicateProvider(
                 (i18n, field, config, defaults, guiProvider) -> {
                     List<Enum<?>> enums = Arrays.asList(((Class<? extends Enum<?>>) field.getType()).getEnumConstants());
+                    Function<Enum<?>, Component> nameProvider = value -> getEnumName(i18n, value);
+                    boolean suggestionMode = field.isAnnotationPresent(ConfigEntry.Gui.EnumHandler.class)
+                            && field.getAnnotation(ConfigEntry.Gui.EnumHandler.class).option() == ConfigEntry.Gui.EnumHandler.EnumDisplayOption.SUGGESTION;
                     return Collections.singletonList(
                             ENTRY_BUILDER.startDropdownMenu(
                                             Component.translatable(i18n),
@@ -177,17 +181,18 @@ public class DefaultGuiProviders {
                                                     str -> {
                                                         String s = Component.literal(str).getString();
                                                         for (Enum<?> constant : enums) {
-                                                            if (DEFAULT_NAME_PROVIDER.apply(constant).getString().equals(s)) {
+                                                            if (nameProvider.apply(constant).getString().equals(s)) {
                                                                 return constant;
                                                             }
                                                         }
                                                         return null;
                                                     },
-                                                    DEFAULT_NAME_PROVIDER
+                                                    nameProvider
                                             ),
-                                            DropdownMenuBuilder.CellCreatorBuilder.of(DEFAULT_NAME_PROVIDER)
+                                            DropdownMenuBuilder.CellCreatorBuilder.of(nameProvider)
                                     )
                                     .setSelections(enums)
+                                    .setSuggestionMode(suggestionMode)
                                     .setDefaultValue(() -> getUnsafely(field, defaults))
                                     .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
                                     .build()
@@ -523,6 +528,13 @@ public class DefaultGuiProviders {
         return registry;
     }
     
+    private static Component getEnumName(String i18n, Enum<?> value) {
+        String valueKey = i18n + "." + value.name().toLowerCase(Locale.ROOT);
+        return I18n.get(valueKey).equals(valueKey)
+                ? DEFAULT_NAME_PROVIDER.apply(value)
+                : Component.translatable(valueKey);
+    }
+
     private static List<AbstractConfigListEntry> getChildren(String i18n, Field field, Object config, Object defaults, GuiRegistryAccess guiProvider) {
         return getChildren(i18n, field.getType(), getUnsafely(field, config), getUnsafely(field, defaults), guiProvider);
     }
