@@ -40,7 +40,9 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -143,7 +145,13 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     
     @Override
     public List<? extends NarratableEntry> narratables() {
-        return Collections.singletonList(resetButton);
+        List<NarratableEntry> narratables = Lists.newArrayList(resetButton);
+        for (GuiEventListener child : selectionElement.topRenderer.children()) {
+            if (child instanceof NarratableEntry narratable) {
+                narratables.add(narratable);
+            }
+        }
+        return narratables;
     }
     
     @Override
@@ -720,7 +728,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     public static class DefaultSelectionTopCellElement<R> extends SelectionTopCellElement<R> {
+        private static final int HORIZONTAL_PADDING = 4;
+        private static final int LABEL_ARROW_GAP = 2;
+
         protected EditBox textFieldWidget;
+        private final Button selectionButton;
         protected Function<String, R> toObjectFunction;
         protected Function<R, Component> toTextFunction;
         protected final R original;
@@ -755,6 +767,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             textFieldWidget.setBordered(false);
             textFieldWidget.setMaxLength(999999);
             textFieldWidget.setValue(toTextFunction.apply(value).getString());
+            selectionButton = Button.builder(toTextFunction.apply(value), ignored -> {}).bounds(0, 0, 0, 0).build();
         }
         
         @Override
@@ -769,11 +782,47 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             textFieldWidget.setWidth(width - 8);
             textFieldWidget.setEditable(getParent().isEditable());
             textFieldWidget.setTextColor(getPreferredTextColor());
-            textFieldWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+            if (isSuggestionMode()) {
+                textFieldWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+            } else {
+                textFieldWidget.setFocused(false);
+                extractSelectionRenderState(graphics, x, y, width, height);
+            }
+        }
+
+        private void extractSelectionRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
+            Font font = Minecraft.getInstance().font;
+            Component label = toTextFunction.apply(value);
+            selectionButton.setX(x);
+            selectionButton.setY(y);
+            selectionButton.setWidth(width);
+            selectionButton.setHeight(height);
+            selectionButton.active = getParent().isEditable();
+            selectionButton.setMessage(label);
+            String arrow = getParent().getMorePossibleHeight() >= 0 ? "▴" : "▾";
+            int arrowWidth = font.width(arrow);
+            int labelWidth = Math.max(0, width - HORIZONTAL_PADDING * 2 - LABEL_ARROW_GAP - arrowWidth);
+            int textY = y + Math.max(0, (height - font.lineHeight) / 2);
+
+            if (font.width(label) <= labelWidth) {
+                graphics.text(font, label, x + HORIZONTAL_PADDING, textY, getPreferredTextColor());
+            } else {
+                String ellipsis = "…";
+                int ellipsisWidth = font.width(ellipsis);
+                if (labelWidth >= ellipsisWidth) {
+                    FormattedText truncated = font.substrByWidth(label, labelWidth - ellipsisWidth);
+                    graphics.text(font, Language.getInstance().getVisualOrder(truncated), x + HORIZONTAL_PADDING, textY, getPreferredTextColor());
+                    graphics.text(font, ellipsis, x + HORIZONTAL_PADDING + font.width(truncated), textY, getPreferredTextColor());
+                }
+            }
+
+            graphics.text(font, arrow, x + width - HORIZONTAL_PADDING - arrowWidth, textY, getPreferredTextColor());
         }
         
         @Override
         public R getValue() {
+            if (!isSuggestionMode())
+                return value;
             if (hasError())
                 return value;
             return toObjectFunction.apply(textFieldWidget.getValue());
@@ -781,17 +830,21 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         @Override
         public void setValue(R value) {
+            this.value = value;
+            selectionButton.setMessage(toTextFunction.apply(value));
             textFieldWidget.setValue(toTextFunction.apply(value).getString());
             textFieldWidget.moveCursorTo(0, false);
         }
         
         @Override
         public Component getSearchTerm() {
-            return Component.literal(textFieldWidget.getValue());
+            return isSuggestionMode() ? Component.literal(textFieldWidget.getValue()) : toTextFunction.apply(value);
         }
         
         @Override
         public Optional<Component> getError() {
+            if (!isSuggestionMode())
+                return Optional.empty();
             if (toObjectFunction.apply(textFieldWidget.getValue()) != null)
                 return Optional.empty();
             return Optional.of(Component.literal("Invalid Value!"));
@@ -799,7 +852,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         @Override
         public List<? extends GuiEventListener> children() {
-            return Collections.singletonList(textFieldWidget);
+            return Collections.singletonList(isSuggestionMode() ? textFieldWidget : selectionButton);
         }
     }
 }
