@@ -115,6 +115,14 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         selectionElement.topRenderer.isSelected = isSelected;
         selectionElement.menu.isSelected = isSelected;
     }
+
+    @Override
+    public void setFocused(@Nullable GuiEventListener listener) {
+        super.setFocused(listener);
+        if (listener != selectionElement) {
+            updateSelected(false);
+        }
+    }
     
     @NotNull
     public ImmutableList<T> getSelections() {
@@ -164,6 +172,36 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     @Override
     public boolean mouseScrolled(double double_1, double double_2, double amountX, double amountY) {
         return selectionElement.mouseScrolled(double_1, double_2, amountX, amountY);
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        boolean expanded = getMorePossibleHeight() >= 0;
+        boolean clickedSelection = expanded && (selectionElement.bounds.contains(event.x(), event.y())
+                || selectionElement.menu.children().stream().anyMatch(cell -> cell.isMouseOver(event.x(), event.y())));
+        if (expanded && !selectionElement.isMouseOver(event.x(), event.y())) {
+            closeMenu();
+        }
+
+        boolean handled = super.mouseClicked(event, doubleClick);
+        if (handled && clickedSelection) {
+            closeMenu();
+        }
+        return handled;
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        if (getMorePossibleHeight() >= 0 && event.key() == GLFW.GLFW_KEY_ESCAPE) {
+            closeMenu();
+            return true;
+        }
+        return super.keyPressed(event);
+    }
+
+    private void closeMenu() {
+        updateSelected(false);
+        super.setFocused(null);
     }
     
     @Override
