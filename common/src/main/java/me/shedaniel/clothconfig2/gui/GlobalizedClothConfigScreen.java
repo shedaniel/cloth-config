@@ -21,6 +21,7 @@ package me.shedaniel.clothconfig2.gui;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import me.shedaniel.clothconfig2.CCTextures;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
@@ -286,13 +287,13 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         Rectangle slideBounds = new Rectangle(0, 0, getSideSliderPosition() - 14, height);
-        if (event.button() == 0 && slideBounds.contains(event.x(), event.y()) && lastHoveredReference != null) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && slideBounds.contains(event.x(), event.y()) && lastHoveredReference != null) {
             minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             lastHoveredReference.go();
             return true;
         }
         Rectangle slideArrowBounds = new Rectangle(getSideSliderPosition() - 14, 0, 14, height);
-        if (event.button() == 0 && slideArrowBounds.contains(event.x(), event.y())) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && slideArrowBounds.contains(event.x(), event.y())) {
             setExpanded(!isExpanded());
             minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             return true;

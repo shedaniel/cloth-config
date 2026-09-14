@@ -20,6 +20,7 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.clothconfig2.api.DisableableWidget;
 import me.shedaniel.clothconfig2.api.HideableWidget;
 import me.shedaniel.clothconfig2.api.Requirement;
@@ -375,7 +376,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     protected void updateScrollingState(double double_1, double double_2, int int_1) {
-        this.scrolling = int_1 == 0 && double_1 >= (double) this.getScrollbarPosition() && double_1 < (double) (this.getScrollbarPosition() + 6);
+        this.scrolling = int_1 == InputConstants.MOUSE_BUTTON_LEFT && double_1 >= (double) this.getScrollbarPosition() && double_1 < (double) (this.getScrollbarPosition() + 6);
     }
     
     protected int getScrollbarPosition() {
@@ -395,7 +396,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
                     this.setDragging(true);
                     return true;
                 }
-            } else if (event.button() == 0) {
+            } else if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
                 this.clickedHeader((int) (event.x() - (double) (this.left + this.width / 2 - this.getItemWidth() / 2)), (int) (event.y() - (double) this.top) + (int) this.getScroll() - 4);
                 return true;
             }
@@ -474,7 +475,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
         if (super.mouseDragged(event, deltaX, deltaY)) {
             return true;
-        } else if (event.button() == 0 && this.scrolling) {
+        } else if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && this.scrolling) {
             if (event.y() < (double) this.top) {
                 this.capYPosition(0.0F);
             } else if (event.y() > (double) this.bottom) {
@@ -508,10 +509,10 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     public boolean keyPressed(KeyEvent keyEvent) {
         if (super.keyPressed(keyEvent)) {
             return true;
-        } else if (keyEvent.key() == 264) {
+        } else if (keyEvent.key() == InputConstants.KEY_DOWN) {
             this.moveSelection(1);
             return true;
-        } else if (keyEvent.key() == 265) {
+        } else if (keyEvent.key() == InputConstants.KEY_UP) {
             this.moveSelection(-1);
             return true;
         } else {

@@ -21,6 +21,7 @@ package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.ScrollingContainer;
@@ -45,7 +46,6 @@ import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -466,7 +466,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         public boolean mouseDragged(MouseButtonEvent event, double double_3, double double_4) {
             if (!isExpanded())
                 return false;
-            if (event.button() == 0 && this.scrolling) {
+            if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && this.scrolling) {
                 if (event.y() < (double) lastRectangle.y + lastRectangle.height) {
                     scrollTo(0, false);
                 } else if (event.y() > (double) lastRectangle.y + lastRectangle.height + getHeight()) {
@@ -494,7 +494,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         protected void updateScrollingState(double double_1, double double_2, int int_1) {
-            this.scrolling = isExpanded() && lastRectangle != null && int_1 == 0 && double_1 >= (double) lastRectangle.x + getCellCreator().getCellWidth() - 6 && double_1 < (double) (lastRectangle.x + getCellCreator().getCellWidth());
+            this.scrolling = isExpanded() && lastRectangle != null && int_1 == InputConstants.MOUSE_BUTTON_LEFT && double_1 >= (double) lastRectangle.x + getCellCreator().getCellWidth() - 6 && double_1 < (double) (lastRectangle.x + getCellCreator().getCellWidth());
         }
         
         @Override
@@ -740,7 +740,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 
                 @Override
                 public boolean keyPressed(KeyEvent event) {
-                    if (event.key() == GLFW.GLFW_KEY_ENTER || event.key() == GLFW.GLFW_KEY_ESCAPE) {
+                    if (event.key() == InputConstants.KEY_RETURN || event.key() == InputConstants.KEY_ESCAPE) {
                         DefaultSelectionTopCellElement.this.selectFirstRecommendation();
                         return true;
                     }

@@ -19,6 +19,7 @@
 
 package me.shedaniel.clothconfig2.gui.entries;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -112,7 +113,7 @@ public class TextListEntry extends TooltipListEntry<Object> {
     
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             Style style = this.getTextAt(event.x(), event.y());
             AbstractConfigScreen configScreen = this.getConfigScreen();
             if (configScreen != null && style != null && style.getClickEvent() != null) {

@@ -229,7 +229,7 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
             if (startedKeyCode.isUnknown())
                 startedKeyCode.setKeyCode(InputConstants.Type.MOUSE.getOrCreate(event.button()));
             else if (focusedBinding.isAllowModifiers()) {
-                if (startedKeyCode.getType() == InputConstants.Type.KEYSYM) {
+                if (startedKeyCode.getType() == InputConstants.Type.KEYBOARD) {
                     int code = startedKeyCode.getKeyCode().getValue();
                     if (event.hasControlDown()) {
                         Modifier modifier = startedKeyCode.getModifier();
@@ -259,12 +259,12 @@ public abstract class AbstractConfigScreen extends Screen implements ConfigScree
     
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (this.focusedBinding != null && (focusedBinding.isAllowKey() || event.key() == 256)) {
-            if (event.key() != 256) {
+        if (this.focusedBinding != null && (focusedBinding.isAllowKey() || event.key() == InputConstants.KEY_ESCAPE)) {
+            if (event.key() != InputConstants.KEY_ESCAPE) {
                 if (startedKeyCode.isUnknown())
                     startedKeyCode.setKeyCode(InputConstants.getKey(event));
                 else if (focusedBinding.isAllowModifiers()) {
-                    if (startedKeyCode.getType() == InputConstants.Type.KEYSYM) {
+                    if (startedKeyCode.getType() == InputConstants.Type.KEYBOARD) {
                         int code = startedKeyCode.getKeyCode().getValue();
                         if (event.hasControlDown()) {
                             Modifier modifier = startedKeyCode.getModifier();

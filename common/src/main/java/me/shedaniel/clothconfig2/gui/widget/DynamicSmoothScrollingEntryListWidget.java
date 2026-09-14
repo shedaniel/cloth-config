@@ -19,6 +19,7 @@
 
 package me.shedaniel.clothconfig2.gui.widget;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.animator.NumberAnimator;
 import me.shedaniel.clothconfig2.api.animator.ValueAnimator;
@@ -65,9 +66,9 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
     public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
         if (!smoothScrolling)
             return super.mouseDragged(event, deltaX, deltaY);
-        if ((this.getFocused() != null && this.isDragging() && event.button() == 0) && this.getFocused().mouseDragged(event, deltaX, deltaY)) {
+        if ((this.getFocused() != null && this.isDragging() && event.button() == InputConstants.MOUSE_BUTTON_LEFT) && this.getFocused().mouseDragged(event, deltaX, deltaY)) {
             return true;
-        } else if (event.button() == 0 && this.scrolling) {
+        } else if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && this.scrolling) {
             if (event.y() < (double) this.top) {
                 this.capYPosition(0.0D);
             } else if (event.y() > (double) this.bottom) {

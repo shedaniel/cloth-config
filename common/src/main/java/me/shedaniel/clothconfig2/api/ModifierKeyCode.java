@@ -21,9 +21,8 @@ package me.shedaniel.clothconfig2.api;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.clothconfig2.impl.ModifierKeyCodeImpl;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLMouse;
 
 public interface ModifierKeyCode {
     static ModifierKeyCode of(InputConstants.Key keyCode, Modifier modifier) {
@@ -59,24 +58,18 @@ public interface ModifierKeyCode {
     }
     
     default boolean matchesKey(int keyCode, int scanCode) {
-        if (isUnknown())
-            return false;
-        if (keyCode == InputConstants.UNKNOWN.getValue()) {
-            return getType() == InputConstants.Type.SCANCODE && getKeyCode().getValue() == scanCode && getModifier().matchesCurrent();
-        } else {
-            return getType() == InputConstants.Type.KEYSYM && getKeyCode().getValue() == keyCode && getModifier().matchesCurrent();
-        }
+        return !isUnknown() && getType() == InputConstants.Type.KEYBOARD && getKeyCode().getValue() == keyCode && getModifier().matchesCurrent();
     }
     
     default boolean matchesCurrentMouse() {
         if (!isUnknown() && getType() == InputConstants.Type.MOUSE && getModifier().matchesCurrent()) {
-            return GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), getKeyCode().getValue()) == GLFW.GLFW_PRESS;
+            return (SDLMouse.SDL_GetMouseState(null, null) & (1 << (getKeyCode().getValue() - 1))) != 0;
         }
         return false;
     }
     
     default boolean matchesCurrentKey() {
-        return !isUnknown() && getType() == InputConstants.Type.KEYSYM && getModifier().matchesCurrent() && InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), getKeyCode().getValue());
+        return !isUnknown() && getType() == InputConstants.Type.KEYBOARD && getModifier().matchesCurrent() && InputConstants.isKeyDown(getKeyCode().getValue());
     }
     
     default ModifierKeyCode setKeyCodeAndModifier(InputConstants.Key keyCode, Modifier modifier) {

@@ -95,7 +95,7 @@ public class ClothConfigDemo {
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory testing = builder.getOrCreateCategory(Component.translatable("category.cloth-config.testing"));
         testing.addEntry(entryBuilder.startKeyCodeField(Component.literal("Cool Key"), InputConstants.UNKNOWN).setDefaultValue(InputConstants.UNKNOWN).build());
-        testing.addEntry(entryBuilder.startModifierKeyCodeField(Component.literal("Cool Modifier Key"), ModifierKeyCode.of(InputConstants.Type.KEYSYM.getOrCreate(79), Modifier.of(false, true, false))).setDefaultValue(ModifierKeyCode.of(InputConstants.Type.KEYSYM.getOrCreate(79), Modifier.of(false, true, false))).build());
+        testing.addEntry(entryBuilder.startModifierKeyCodeField(Component.literal("Cool Modifier Key"), ModifierKeyCode.of(InputConstants.Type.KEYBOARD.getOrCreate(InputConstants.KEY_O), Modifier.of(false, true, false))).setDefaultValue(ModifierKeyCode.of(InputConstants.Type.KEYBOARD.getOrCreate(InputConstants.KEY_O), Modifier.of(false, true, false))).build());
         testing.addEntry(entryBuilder.startDoubleList(Component.literal("A list of Doubles"), Arrays.asList(1d, 2d, 3d)).setDefaultValue(Arrays.asList(1d, 2d, 3d)).build());
         testing.addEntry(entryBuilder.startLongList(Component.literal("A list of Longs"), Arrays.asList(1L, 2L, 3L)).setDefaultValue(Arrays.asList(1L, 2L, 3L)).setInsertButtonEnabled(false).build());
         testing.addEntry(entryBuilder.startStrList(Component.literal("A list of Strings"), Arrays.asList("abc", "xyz")).setTooltip(Component.literal("Yes this is some beautiful tooltip\nOh and this is the second line!")).setDefaultValue(Arrays.asList("abc", "xyz")).build());
@@ -214,7 +214,7 @@ public class ClothConfigDemo {
                     Component.translatable("text.cloth-config.testing.1",
                             Component.literal("ClothConfig").withStyle(s -> s.withBold(true).withHoverEvent(new HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(Util.make(new ItemStack(Items.WOOL.pink()), stack -> {
                                 stack.set(DataComponents.CUSTOM_NAME, Component.literal("(\u30FB\u2200\u30FB)"));
-                                stack.enchant(VanillaRegistries.createLookup().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.EFFICIENCY), 10);
+                                stack.enchant(VanillaRegistries.createWorldLookup().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.EFFICIENCY), 10);
                             }))))),
                             Component.translatable("text.cloth-config.testing.2").withStyle(s -> {
                                 try {

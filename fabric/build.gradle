@@ -34,7 +34,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
 
     api "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-    api fabricApi.module("fabric-resource-loader-v0", rootProject.fabric_api_version)
+    api fabricApi.module("fabric-resource-loader-v1", rootProject.fabric_api_version)
     api fabricApi.module("fabric-screen-api-v1", rootProject.fabric_api_version)
     api fabricApi.module("fabric-key-mapping-api-v1", rootProject.fabric_api_version)
     api fabricApi.module("fabric-lifecycle-events-v1", rootProject.fabric_api_version)
@@ -126,7 +126,7 @@ unifiedPublishing {
     project {
         displayName = "[Fabric $rootProject.supported_version] v$project.version"
         releaseType = "release"
-        gameVersions = ["26.2"]
+        gameVersions = [rootProject.minecraft_version]
         gameLoaders = ["fabric"]
         
         mainPublication shadowJar
@@ -135,7 +135,7 @@ unifiedPublishing {
             curseforge {
                 token = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
                 id = project.curseforge_id
-                gameVersions.addAll "Java 25"
+                gameVersions = ["26.3-snapshot", "Java 25", "Client", "Server"]
             }
         }
 

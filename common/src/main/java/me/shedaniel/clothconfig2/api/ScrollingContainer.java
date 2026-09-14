@@ -24,6 +24,7 @@
  */
 package me.shedaniel.clothconfig2.api;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
@@ -154,7 +155,7 @@ public abstract class ScrollingContainer {
     }
     
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy, boolean snapToRows, double rowSize) {
-        if (button == 0 && draggingScrollBar) {
+        if (button == InputConstants.MOUSE_BUTTON_LEFT && draggingScrollBar) {
             float height = getMaxScrollHeight();
             Rectangle bounds = getBounds();
             int actualHeight = bounds.height;
