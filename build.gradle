@@ -37,7 +37,7 @@ allprojects {
     version = rootProject.base_version + "." + runNumber
 
     base {
-        archivesName = rootProject.archives_base_name
+        archivesName = rootProject.archives_base_name + "-$project.name"
     }
 
     group = rootProject.maven_group
