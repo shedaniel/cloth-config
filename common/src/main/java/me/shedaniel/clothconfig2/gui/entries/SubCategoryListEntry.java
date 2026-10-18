@@ -77,7 +77,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     @Override
     public boolean isRequiresRestart() {
         for (AbstractConfigListEntry entry : entries)
-            if (entry.isRequiresRestart())
+            if (entry.isRequiresRestart() && entry.isEdited())
                 return true;
         return false;
     }
