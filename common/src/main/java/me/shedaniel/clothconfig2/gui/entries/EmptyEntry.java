@@ -75,7 +75,7 @@ public class EmptyEntry extends AbstractConfigListEntry<Object> {
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {}
+    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isHovered) {}
     
     @Override
     public List<? extends GuiEventListener> children() {

@@ -35,7 +35,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -198,7 +197,7 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
                     return null;
                 }
                 
-                int j = Mth.clamp(var10000 + this.children().indexOf(this.getFocused()), 0, this.children().size() - 1);
+                int j = Math.clamp(var10000 + this.children().indexOf(this.getFocused()), 0, this.children().size() - 1);
                 
                 for (int k = j; k >= 0 && k < this.children().size(); k += var10000) {
                     GuiEventListener guiEventListener = this.children().get(k);

@@ -30,6 +30,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -40,9 +41,7 @@ import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,8 +74,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isHovered) {
+        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, isHovered);
         Window window = Minecraft.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && (!defaultValue.get().equals(getValue()) || getConfigError().isPresent());
         this.resetButton.setY(y);
@@ -93,8 +92,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             this.selectionElement.bounds.x = x + entryWidth - 150 + 1;
         }
         this.selectionElement.bounds.width = 150 - resetButton.getWidth() - 4;
-        resetButton.extractRenderState(graphics, mouseX, mouseY, delta);
-        selectionElement.extractRenderState(graphics, mouseX, mouseY, delta);
+        resetButton.extractRenderState(graphics);
+        selectionElement.extractRenderState(graphics);
     }
     
     @Override
@@ -152,8 +151,8 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public void lateRender(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        selectionElement.lateRender(graphics, mouseX, mouseY, delta);
+    public void lateRender(GuiGraphicsExtractor graphics) {
+        selectionElement.lateRender(graphics);
     }
     
     @Override
@@ -191,13 +190,13 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        public void extractRenderState(GuiGraphicsExtractor graphics) {
             graphics.fill(bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height, topRenderer.isSelected ? -1 : 0xffa0a0a0);
             graphics.fill(bounds.x + 1, bounds.y + 1, bounds.x + bounds.width - 1, bounds.y + bounds.height - 1, 0xff000000);
-            topRenderer.extractRenderState(graphics, mouseX, mouseY, bounds.x, bounds.y, bounds.width, bounds.height, delta);
+            topRenderer.extractRenderState(graphics, bounds.x, bounds.y, bounds.width, bounds.height);
             topRenderer.updateBounds(bounds);
             if (menu.isExpanded())
-                menu.extractRenderState(graphics, mouseX, mouseY, bounds, delta);
+                menu.extractRenderState(graphics, bounds);
         }
         
         @Deprecated
@@ -212,9 +211,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             return false;
         }
         
-        public void lateRender(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        public void lateRender(GuiGraphicsExtractor graphics) {
             if (menu.isExpanded())
-                menu.lateRender(graphics, mouseX, mouseY, delta);
+                menu.lateRender(graphics);
         }
         
         public int getMorePossibleHeight() {
@@ -275,9 +274,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         
         public abstract void initCells();
         
-        public abstract void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, Rectangle rectangle, float delta);
+        public abstract void extractRenderState(GuiGraphicsExtractor graphics, Rectangle rectangle);
         
-        public abstract void lateRender(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta);
+        public abstract void lateRender(GuiGraphicsExtractor graphics);
         
         public abstract int getHeight();
         
@@ -395,12 +394,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, Rectangle rectangle, float delta) {
+        public void extractRenderState(GuiGraphicsExtractor graphics, Rectangle rectangle) {
             if (!getEntry().selectionElement.topRenderer.getSearchTerm().equals(lastSearchKeyword)) {
                 lastSearchKeyword = getEntry().selectionElement.topRenderer.getSearchTerm();
                 search();
             }
-            updatePosition(delta);
+            updatePosition(graphics.partialTicks());
             lastRectangle = rectangle.clone();
             lastRectangle.translate(0, -1);
         }
@@ -412,7 +411,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public void lateRender(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        public void lateRender(GuiGraphicsExtractor graphics) {
             int last10Height = getHeight();
             int cWidth = getCellCreator().getCellWidth();
             graphics.fill(lastRectangle.x, lastRectangle.y + lastRectangle.height, lastRectangle.x + cWidth, lastRectangle.y + lastRectangle.height + last10Height + 1, isExpanded() ? -1 : -6250336);
@@ -424,10 +423,10 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 if (yy + getCellCreator().getCellHeight() >= lastRectangle.y + lastRectangle.height && yy <= lastRectangle.y + lastRectangle.height + last10Height + 1) {
                     graphics.fill(lastRectangle.x + 1, (int) yy, lastRectangle.x + getCellCreator().getCellWidth(), (int) yy + getCellCreator().getCellHeight(), 0xFF000000);
                     cell.bounds.setBounds(lastRectangle.x, (int) yy, getMaxScrollPosition() > 6 ? getCellCreator().getCellWidth() - 6 : getCellCreator().getCellWidth(), getCellCreator().getCellHeight());
-                    cell.extractRenderState(graphics, mouseX, mouseY, lastRectangle.x, (int) yy, getMaxScrollPosition() > 6 ? getCellCreator().getCellWidth() - 6 : getCellCreator().getCellWidth(), getCellCreator().getCellHeight(), delta);
+                    cell.extractRenderState(graphics, lastRectangle.x, (int) yy, getMaxScrollPosition() > 6 ? getCellCreator().getCellWidth() - 6 : getCellCreator().getCellWidth(), getCellCreator().getCellHeight());
                 } else {
                     cell.bounds.setBounds(0, 0, 0, 0);
-                    cell.dontRender(graphics, delta);
+                    cell.dontRender(graphics);
                 }
                 yy += getCellCreator().getCellHeight();
             }
@@ -443,12 +442,12 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 int scrollbarPositionMinX = lastRectangle.x + getCellCreator().getCellWidth() - 6;
                 int scrollbarPositionMaxX = scrollbarPositionMinX + 6;
                 int height = (int) (((last10Height) * (last10Height)) / this.getMaxScrollPosition());
-                height = Mth.clamp(height, 32, last10Height - 8);
+                height = Math.clamp(height, 32, last10Height - 8);
                 height -= Math.min((scroll < 0 ? (int) -scroll : scroll > getMaxScrollPosition() ? (int) scroll - getMaxScrollPosition() : 0), height * .95);
                 height = Math.max(10, height);
                 int minY = (int) Math.min(Math.max((int) scroll * (last10Height - height) / getMaxScrollPosition() + (lastRectangle.y + lastRectangle.height + 1), (lastRectangle.y + lastRectangle.height + 1)), (lastRectangle.y + lastRectangle.height + 1 + last10Height) - height);
                 
-                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, scrollbarPositionMinX, minY, 6, height);
+                graphics.blitSprite(GuiPipeline.TEXTURED, SCROLLER_SPRITE, scrollbarPositionMinX, minY, 6, height);
             }
         }
         
@@ -474,11 +473,11 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
                 } else {
                     double double_5 = Math.max(1, this.getMaxScrollPosition());
                     int int_2 = getHeight();
-                    int int_3 = Mth.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
+                    int int_3 = Math.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
                     double double_6 = Math.max(1.0D, double_5 / (double) (int_2 - int_3));
                     this.offset(double_4 * double_6, false);
                 }
-                target = Mth.clamp(target, 0, getMaxScrollPosition());
+                target = Math.clamp(target, 0, getMaxScrollPosition());
                 return true;
             }
             return false;
@@ -577,9 +576,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             return entry;
         }
         
-        public abstract void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta);
+        public abstract void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height);
         
-        public abstract void dontRender(GuiGraphicsExtractor graphics, float delta);
+        public abstract void dontRender(GuiGraphicsExtractor graphics);
         
         @Nullable
         public abstract Component getSearchKey();
@@ -608,7 +607,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+        public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
+            int mouseX = graphics.mouseX();
+            int mouseY = graphics.mouseY();
             rendering = true;
             this.x = x;
             this.y = y;
@@ -621,7 +622,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public void dontRender(GuiGraphicsExtractor graphics, float delta) {
+        public void dontRender(GuiGraphicsExtractor graphics) {
             rendering = false;
         }
         
@@ -707,7 +708,7 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             }
         }
         
-        public abstract void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta);
+        public abstract void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height);
         
         private void updateBounds(Rectangle bounds) {
             this.bounds.setBounds(bounds);
@@ -733,9 +734,9 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
             this.toTextFunction = Objects.requireNonNull(toTextFunction);
             textFieldWidget = new EditBox(Minecraft.getInstance().font, 0, 0, 148, 18, Component.empty()) {
                 @Override
-                public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+                public void extractWidgetRenderState(GuiGraphicsExtractor graphics) {
                     setFocused(isSuggestionMode() && isSelected && DefaultSelectionTopCellElement.this.getParent().getFocused() == DefaultSelectionTopCellElement.this.getParent().selectionElement && DefaultSelectionTopCellElement.this.getParent().selectionElement.getFocused() == DefaultSelectionTopCellElement.this && DefaultSelectionTopCellElement.this.getFocused() == this);
-                    super.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
+                    super.extractWidgetRenderState(graphics);
                 }
                 
                 @Override
@@ -763,13 +764,13 @@ public class DropdownBoxEntry<T> extends TooltipListEntry<T> {
         }
         
         @Override
-        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+        public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
             textFieldWidget.setX(x + 4);
             textFieldWidget.setY(y + 6);
             textFieldWidget.setWidth(width - 8);
             textFieldWidget.setEditable(getParent().isEditable());
             textFieldWidget.setTextColor(getPreferredTextColor());
-            textFieldWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+            textFieldWidget.extractRenderState(graphics);
         }
         
         @Override

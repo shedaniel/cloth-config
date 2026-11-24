@@ -107,17 +107,17 @@ public class SearchFieldEntry extends AbstractConfigListEntry<Object> {
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        this.editBox.setWidth(Mth.clamp(entryWidth - 10, 0, 500));
+    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isHovered) {
+        this.editBox.setWidth(Math.clamp(entryWidth - 10, 0, 500));
         this.editBox.setX(x + entryWidth / 2 - this.editBox.getWidth() / 2);
         this.editBox.setY(y + entryHeight / 2 - 9);
-        this.editBox.extractRenderState(graphics, mouseX, mouseY, delta);
+        this.editBox.extractRenderState(graphics);
         if (this.editBox.getValue().isEmpty()) {
             this.editBox.setSuggestion("Search...");
         } else {
             this.editBox.setSuggestion(null);
         }
-        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, isHovered);
     }
     
     @Override

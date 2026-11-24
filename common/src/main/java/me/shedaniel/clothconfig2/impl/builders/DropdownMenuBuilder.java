@@ -176,15 +176,15 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         }
         
         public static SelectionTopCellElement<Identifier> ofItemIdentifier(Item item) {
-            return new DefaultSelectionTopCellElement<Identifier>(BuiltInRegistries.ITEM.getKey(item), ITEM_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
+            return new DefaultSelectionTopCellElement<>(BuiltInRegistries.ITEM.getKey(item), ITEM_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
                 @Override
-                public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+                public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
                     textFieldWidget.setX(x + 4);
                     textFieldWidget.setY(y + 6);
                     textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEditable(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());
-                    textFieldWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+                    textFieldWidget.extractRenderState(graphics);
                     ItemStack stack = hasConfigError() ? new ItemStack(Items.BARRIER) : new ItemStack(BuiltInRegistries.ITEM.getValue(getValue()));
                     graphics.item(stack, x + width - 18, y + 2);
                 }
@@ -192,15 +192,15 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         }
         
         public static SelectionTopCellElement<Identifier> ofBlockIdentifier(Block block) {
-            return new DefaultSelectionTopCellElement<Identifier>(BuiltInRegistries.BLOCK.getKey(block), BLOCK_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
+            return new DefaultSelectionTopCellElement<>(BuiltInRegistries.BLOCK.getKey(block), BLOCK_IDENTIFIER_FUNCTION, identifier -> Component.literal(identifier.toString())) {
                 @Override
-                public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+                public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
                     textFieldWidget.setX(x + 4);
                     textFieldWidget.setY(y + 6);
                     textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEditable(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());
-                    textFieldWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+                    textFieldWidget.extractRenderState(graphics);
                     ItemStack stack = hasConfigError() ? new ItemStack(Items.BARRIER) : new ItemStack(BuiltInRegistries.BLOCK.getValue(getValue()));
                     graphics.item(stack, x + width - 18, y + 2);
                 }
@@ -208,15 +208,15 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         }
         
         public static SelectionTopCellElement<Item> ofItemObject(Item item) {
-            return new DefaultSelectionTopCellElement<Item>(item, ITEM_FUNCTION, i -> Component.literal(BuiltInRegistries.ITEM.getKey(i).toString())) {
+            return new DefaultSelectionTopCellElement<>(item, ITEM_FUNCTION, i -> Component.literal(BuiltInRegistries.ITEM.getKey(i).toString())) {
                 @Override
-                public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+                public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
                     textFieldWidget.setX(x + 4);
                     textFieldWidget.setY(y + 6);
                     textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEditable(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());
-                    textFieldWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+                    textFieldWidget.extractRenderState(graphics);
                     ItemStack stack = hasConfigError() ? new ItemStack(Items.BARRIER) : new ItemStack(getValue());
                     graphics.item(stack, x + width - 18, y + 2);
                 }
@@ -224,15 +224,15 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
         }
         
         public static SelectionTopCellElement<Block> ofBlockObject(Block block) {
-            return new DefaultSelectionTopCellElement<Block>(block, BLOCK_FUNCTION, i -> Component.literal(BuiltInRegistries.BLOCK.getKey(i).toString())) {
+            return new DefaultSelectionTopCellElement<>(block, BLOCK_FUNCTION, i -> Component.literal(BuiltInRegistries.BLOCK.getKey(i).toString())) {
                 @Override
-                public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+                public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
                     textFieldWidget.setX(x + 4);
                     textFieldWidget.setY(y + 6);
                     textFieldWidget.setWidth(width - 4 - 20);
                     textFieldWidget.setEditable(getParent().isEditable());
                     textFieldWidget.setTextColor(getPreferredTextColor());
-                    textFieldWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+                    textFieldWidget.extractRenderState(graphics);
                     ItemStack stack = hasConfigError() ? new ItemStack(Items.BARRIER) : new ItemStack(getValue());
                     graphics.item(stack, x + width - 18, y + 2);
                 }
@@ -366,12 +366,14 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
                     ItemStack s = new ItemStack(BuiltInRegistries.ITEM.getValue(selection));
                     return new DropdownBoxEntry.DefaultSelectionCellElement<Identifier>(selection, toTextFunction) {
                         @Override
-                        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+                        public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
                             rendering = true;
                             this.x = x;
                             this.y = y;
                             this.width = width;
                             this.height = height;
+                            int mouseX = graphics.mouseX();
+                            int mouseY = graphics.mouseY();
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
@@ -414,12 +416,14 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
                     ItemStack s = new ItemStack(BuiltInRegistries.BLOCK.getValue(selection));
                     return new DropdownBoxEntry.DefaultSelectionCellElement<Identifier>(selection, toTextFunction) {
                         @Override
-                        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+                        public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
                             rendering = true;
                             this.x = x;
                             this.y = y;
                             this.width = width;
                             this.height = height;
+                            int mouseX = graphics.mouseX();
+                            int mouseY = graphics.mouseY();
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
@@ -461,12 +465,14 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
                     ItemStack s = new ItemStack(selection);
                     return new DropdownBoxEntry.DefaultSelectionCellElement<Item>(selection, toTextFunction) {
                         @Override
-                        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+                        public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
                             rendering = true;
                             this.x = x;
                             this.y = y;
                             this.width = width;
                             this.height = height;
+                            int mouseX = graphics.mouseX();
+                            int mouseY = graphics.mouseY();
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, -15132391);
@@ -508,12 +514,14 @@ public class DropdownMenuBuilder<T> extends FieldBuilder<T, DropdownBoxEntry<T>,
                     ItemStack s = new ItemStack(selection);
                     return new DropdownBoxEntry.DefaultSelectionCellElement<Block>(selection, toTextFunction) {
                         @Override
-                        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+                        public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
                             rendering = true;
                             this.x = x;
                             this.y = y;
                             this.width = width;
                             this.height = height;
+                            int mouseX = graphics.mouseX();
+                            int mouseY = graphics.mouseY();
                             boolean b = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
                             if (b)
                                 graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, -15132391);

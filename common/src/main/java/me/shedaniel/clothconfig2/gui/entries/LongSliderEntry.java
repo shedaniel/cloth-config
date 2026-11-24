@@ -31,7 +31,6 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -99,7 +98,7 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     
     @Deprecated
     public void setValue(long value) {
-        sliderWidget.setValue((Mth.clamp(value, minimum, maximum) - minimum) / (double) Math.abs(maximum - minimum));
+        sliderWidget.setValue((Math.clamp(value, minimum, maximum) - minimum) / (double) Math.abs(maximum - minimum));
         this.value.set(Math.min(Math.max(value, minimum), maximum));
         sliderWidget.updateMessage();
     }
@@ -135,8 +134,8 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isHovered) {
+        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, isHovered);
         Window window = Minecraft.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && defaultValue.get() != value.get();
         this.resetButton.setY(y);
@@ -153,8 +152,8 @@ public class LongSliderEntry extends TooltipListEntry<Long> {
             this.sliderWidget.setX(x + entryWidth - 150);
         }
         this.sliderWidget.setWidth(150 - resetButton.getWidth() - 2);
-        resetButton.extractRenderState(graphics, mouseX, mouseY, delta);
-        sliderWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+        resetButton.extractRenderState(graphics);
+        sliderWidget.extractRenderState(graphics);
     }
     
     private class Slider extends AbstractSliderButton {

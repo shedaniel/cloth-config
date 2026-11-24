@@ -109,8 +109,8 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isHovered) {
+        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, isHovered);
         Window window = Minecraft.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && getDefaultIndex() != this.index.get();
         this.resetButton.setY(y);
@@ -128,8 +128,8 @@ public class SelectionListEntry<T> extends TooltipListEntry<T> {
             this.buttonWidget.setX(x + entryWidth - 150);
         }
         this.buttonWidget.setWidth(150 - resetButton.getWidth() - 2);
-        resetButton.extractRenderState(graphics, mouseX, mouseY, delta);
-        buttonWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+        resetButton.extractRenderState(graphics);
+        buttonWidget.extractRenderState(graphics);
     }
     
     private int getDefaultIndex() {

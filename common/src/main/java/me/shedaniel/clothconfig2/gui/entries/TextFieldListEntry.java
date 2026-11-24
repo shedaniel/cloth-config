@@ -64,10 +64,10 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         this.original = original;
         this.textFieldWidget = new EditBox(Minecraft.getInstance().font, 0, 0, 148, 18, Component.empty()) {
             @Override
-            public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int int_1, int int_2, float float_1) {
+            public void extractWidgetRenderState(GuiGraphicsExtractor graphics) {
                 setFocused(isSelected && TextFieldListEntry.this.getFocused() == this);
                 textFieldPreRender(this);
-                super.extractWidgetRenderState(graphics, int_1, int_2, float_1);
+                super.extractWidgetRenderState(graphics);
             }
             
             @Override
@@ -115,8 +115,8 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isHovered) {
+        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, isHovered);
         Window window = Minecraft.getInstance().getWindow();
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault(textFieldWidget.getValue());
         this.resetButton.setY(y);
@@ -133,8 +133,8 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
             this.textFieldWidget.setX(x + entryWidth - 148);
         }
         setTextFieldWidth(textFieldWidget, 148 - resetButton.getWidth() - 4);
-        resetButton.extractRenderState(graphics, mouseX, mouseY, delta);
-        textFieldWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+        resetButton.extractRenderState(graphics);
+        textFieldWidget.extractRenderState(graphics);
     }
     
     protected boolean isMatchDefault(String text) {

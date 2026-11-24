@@ -104,10 +104,10 @@ public final class NestedListListEntry<T, INNER extends AbstractConfigListEntry<
         }
         
         @Override
-        public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isSelected) {
             nestedEntry.setParent((DynamicEntryListWidget) listListEntry.getParent());
             nestedEntry.setScreen(listListEntry.getConfigScreen());
-            nestedEntry.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+            nestedEntry.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, isSelected);
         }
         
         @Override

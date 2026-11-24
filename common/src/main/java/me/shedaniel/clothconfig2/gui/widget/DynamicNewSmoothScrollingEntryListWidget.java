@@ -28,7 +28,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
 
 import static me.shedaniel.clothconfig2.api.ScrollingContainer.clampExtension;
 import static me.shedaniel.clothconfig2.api.ScrollingContainer.handleScrollingPosition;
@@ -56,7 +55,7 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     @Override
     public void capYPosition(double double_1) {
         if (!smoothScrolling)
-            this.scroll = Mth.clamp(double_1, 0.0D, this.getMaxScroll());
+            this.scroll = Math.clamp(double_1, 0.0D, this.getMaxScroll());
         else {
             scroll = clampExtension(double_1, getMaxScroll());
             target = clampExtension(double_1, getMaxScroll());
@@ -77,9 +76,9 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
             } else {
                 double double_5 = Math.max(1, this.getMaxScroll());
                 int int_2 = this.bottom - this.top;
-                int int_3 = Mth.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
+                int int_3 = Math.clamp((int) ((float) (int_2 * int_2) / (float) this.getMaxScrollPosition()), 32, int_2 - 8);
                 double double_6 = Math.max(1.0D, double_5 / (double) (int_2 - int_3));
-                this.capYPosition(Mth.clamp(this.getScroll() + deltaY * double_6, 0, getMaxScroll()));
+                this.capYPosition(Math.clamp(this.getScroll() + deltaY * double_6, 0, getMaxScroll()));
             }
             return true;
         }
@@ -96,7 +95,7 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
         if (amountY == 0) return false;
         if (!smoothScrolling && amountY != 0) {
             scroll += 16 * -amountY;
-            this.scroll = Mth.clamp(amountY, 0.0D, this.getMaxScroll());
+            this.scroll = Math.clamp(amountY, 0.0D, this.getMaxScroll());
             return true;
         }
         offset(ClothConfigInitializer.getScrollStep() * -amountY, true);
@@ -122,11 +121,11 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor graphics) {
         double[] target = {this.target};
-        scroll = handleScrollingPosition(target, scroll, getMaxScroll(), delta, start, duration);
+        scroll = handleScrollingPosition(target, scroll, getMaxScroll(), graphics.partialTicks(), start, duration);
         this.target = target[0];
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        super.extractRenderState(graphics);
     }
     
     @Override
@@ -135,7 +134,7 @@ public abstract class DynamicNewSmoothScrollingEntryListWidget<E extends Dynamic
             super.renderScrollBar(graphics, maxScroll, scrollbarPositionMinX, scrollbarPositionMaxX);
         else if (maxScroll > 0) {
             int height = ((this.bottom - this.top) * (this.bottom - this.top)) / this.getMaxScrollPosition();
-            height = Mth.clamp(height, 32, this.bottom - this.top - 8);
+            height = Math.clamp(height, 32, this.bottom - this.top - 8);
             height -= Math.min((scroll < 0 ? (int) -scroll : scroll > getMaxScroll() ? (int) scroll - getMaxScroll() : 0), height * .95);
             height = Math.max(10, height);
             int minY = Math.min(Math.max((int) this.getScroll() * (this.bottom - this.top - height) / maxScroll + this.top, this.top), this.bottom - height);

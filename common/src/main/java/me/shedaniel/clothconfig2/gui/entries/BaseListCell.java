@@ -48,7 +48,7 @@ public abstract class BaseListCell extends AbstractContainerEventHandler impleme
     
     public abstract int getCellHeight();
     
-    public abstract void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta);
+    public abstract void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isSelected);
     
     public void updateBounds(boolean expanded, int x, int y, int entryWidth, int entryHeight) {}
     
