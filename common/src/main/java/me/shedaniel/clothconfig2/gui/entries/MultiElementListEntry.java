@@ -27,12 +27,13 @@ import me.shedaniel.clothconfig2.api.Expandable;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.narration.NarrationTrigger;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -108,10 +109,12 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isHovered) {
+        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, isHovered);
+        int mouseX = graphics.mouseX();
+        int mouseY = graphics.mouseY();
         boolean insideWidget = widget.rectangle.contains(mouseX, mouseY);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, CCTextures.CONFIG, x - 15, y + 5, 24, (isEnabled() ? (insideWidget ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9, 256, 256);
+        graphics.blit(GuiPipeline.TEXTURED, CCTextures.CONFIG, x - 15, y + 5, 24, (isEnabled() ? (insideWidget ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9, 256, 256);
         graphics.text(Minecraft.getInstance().font, getDisplayedFieldName().getVisualOrderText(), x, y + 6, insideWidget ? 0xffe6fe16 : -1);
         //noinspection rawtypes
         for (AbstractConfigListEntry entry : entries) {
@@ -122,7 +125,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
             int yy = y + 24;
             for (AbstractConfigListEntry<?> entry : entries) {
                 entry.setBounds(new Rectangle(x, yy, entryWidth, entry.getItemHeight()));
-                entry.extractRenderState(graphics, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), mouseX, mouseY, isHovered, delta);
+                entry.extractRenderState(graphics, -1, yy, x + 14, entryWidth - 14, entry.getItemHeight(), isHovered);
                 yy += entry.getItemHeight();
                 yy += Math.max(0, entry.getMorePossibleHeight());
             }
@@ -180,10 +183,10 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
     }
     
     @Override
-    public void lateRender(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void lateRender(GuiGraphicsExtractor graphics) {
         if (isExpanded()) {
             for (AbstractConfigListEntry<?> entry : entries) {
-                entry.lateRender(graphics, mouseX, mouseY, delta);
+                entry.lateRender(graphics);
             }
         }
     }
@@ -247,7 +250,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
             if (isEnabled() && rectangle.contains(event.x(), event.y())) {
                 setExpanded(!expanded);
-                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK));
                 return isHovered = true;
             }
             return isHovered = false;
@@ -264,7 +267,7 @@ public class MultiElementListEntry<T> extends TooltipListEntry<T> implements Exp
         }
         
         @Override
-        public NarrationPriority narrationPriority() {
+        public NarrationPriority narrationPriority(NarrationTrigger trigger) {
             return isHovered ? NarrationPriority.HOVERED : NarrationPriority.NONE;
         }
         

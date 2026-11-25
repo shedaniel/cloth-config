@@ -30,9 +30,8 @@ import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.util.ARGB;
-import net.minecraft.util.Mth;
 
 import static me.shedaniel.clothconfig2.api.scroll.ScrollingContainer.SCROLLER_BACKGROUND_SPRITE;
 import static me.shedaniel.clothconfig2.api.scroll.ScrollingContainer.SCROLLER_SPRITE;
@@ -74,7 +73,7 @@ public abstract class ScrollingContainer {
     }
     
     public final double clamp(double v, double clampExtension) {
-        return Mth.clamp(v, -clampExtension, (double) this.getMaxScroll() + clampExtension);
+        return Math.clamp(v, -clampExtension, (double) this.getMaxScroll() + clampExtension);
     }
     
     public final void offset(double value, boolean animated) {
@@ -127,7 +126,7 @@ public abstract class ScrollingContainer {
     }
     
     public static double clampExtension(double v, double maxScroll, double clampExtension) {
-        return Mth.clamp(v, -clampExtension, maxScroll + clampExtension);
+        return Math.clamp(v, -clampExtension, maxScroll + clampExtension);
     }
     
     public void renderScrollBar(GuiGraphicsExtractor graphics) {
@@ -139,14 +138,14 @@ public abstract class ScrollingContainer {
             Rectangle bounds = getBounds();
             int maxScroll = getMaxScroll();
             int height = bounds.height * bounds.height / getMaxScrollHeight();
-            height = Mth.clamp(height, 32, bounds.height);
+            height = Math.clamp(height, 32, bounds.height);
             height -= Math.min((scrollAmount < 0 ? (int) -scrollAmount : scrollAmount > maxScroll ? (int) scrollAmount - maxScroll : 0), height * .95);
             height = Math.max(10, height);
             int minY = Math.min(Math.max((int) scrollAmount * (bounds.height - height) / maxScroll + bounds.y, bounds.y), bounds.getMaxY() - height);
             
             int scrollbarPositionMinX = getScrollBarX();
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_BACKGROUND_SPRITE, scrollbarPositionMinX, bounds.y, 6, bounds.height, background);
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, scrollbarPositionMinX, minY, 6, height, ARGB.white(alpha));
+            graphics.blitSprite(GuiPipeline.TEXTURED, SCROLLER_BACKGROUND_SPRITE, scrollbarPositionMinX, bounds.y, 6, bounds.height, background);
+            graphics.blitSprite(GuiPipeline.TEXTURED, SCROLLER_SPRITE, scrollbarPositionMinX, minY, 6, height, ARGB.white(alpha));
         }
     }
     
@@ -161,9 +160,9 @@ public abstract class ScrollingContainer {
             int actualHeight = bounds.height;
             if (mouseY >= bounds.y && mouseY <= bounds.getMaxY()) {
                 double maxScroll = Math.max(1, getMaxScroll());
-                double int_3 = Mth.clamp(((double) (actualHeight * actualHeight) / (double) height), 32, actualHeight - 8);
+                double int_3 = Math.clamp(((double) (actualHeight * actualHeight) / (double) height), 32, actualHeight - 8);
                 double double_6 = Math.max(1.0D, maxScroll / (actualHeight - int_3));
-                float to = Mth.clamp((float) (scrollAmount + dy * double_6), 0, getMaxScroll());
+                float to = Math.clamp((float) (scrollAmount + dy * double_6), 0, getMaxScroll());
                 if (snapToRows) {
                     double nearestRow = Math.round(to / rowSize) * rowSize;
                     scrollTo(nearestRow, false);

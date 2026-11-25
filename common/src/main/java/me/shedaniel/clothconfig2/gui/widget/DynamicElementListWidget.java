@@ -26,6 +26,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.narration.NarrationTrigger;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenDirection;
@@ -35,7 +36,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -126,8 +126,8 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
     }
     
     @Override
-    public NarratableEntry.NarrationPriority narrationPriority() {
-        return this.isFocused() ? NarrationPriority.FOCUSED : super.narrationPriority();
+    public NarratableEntry.NarrationPriority narrationPriority(NarrationTrigger trigger) {
+        return this.isFocused() ? NarrationPriority.FOCUSED : super.narrationPriority(trigger);
     }
     
     @Override
@@ -198,7 +198,7 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
                     return null;
                 }
                 
-                int j = Mth.clamp(var10000 + this.children().indexOf(this.getFocused()), 0, this.children().size() - 1);
+                int j = Math.clamp(var10000 + this.children().indexOf(this.getFocused()), 0, this.children().size() - 1);
                 
                 for (int k = j; k >= 0 && k < this.children().size(); k += var10000) {
                     GuiEventListener guiEventListener = this.children().get(k);
@@ -218,7 +218,7 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         @Override
         public void updateNarration(NarrationElementOutput narrationElementOutput) {
             List<? extends NarratableEntry> list = this.narratables();
-            Screen.NarratableSearchResult narratableSearchResult = Screen.findNarratableWidget(list, this.lastNarratable);
+            Screen.NarratableSearchResult narratableSearchResult = Screen.findNarratableWidget(list, this.lastNarratable, narrationElementOutput.narrationTrigger());
             if (narratableSearchResult != null) {
                 if (narratableSearchResult.priority().isTerminal()) {
                     this.lastNarratable = narratableSearchResult.entry();
@@ -242,7 +242,7 @@ public abstract class DynamicElementListWidget<E extends DynamicElementListWidge
         }
         
         @Override
-        public NarrationPriority narrationPriority() {
+        public NarrationPriority narrationPriority(NarrationTrigger trigger) {
             if (this.isFocused()) {
                 return NarrationPriority.FOCUSED;
             } else {

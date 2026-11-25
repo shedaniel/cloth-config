@@ -77,8 +77,8 @@ public class TextListEntry extends TooltipListEntry<Object> {
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isHovered) {
+        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, isHovered);
         if (this.savedWidth != entryWidth || this.savedX != x || this.savedY != y) {
             this.wrappedLines = this.textRenderer.split(this.text, entryWidth);
             this.savedWidth = entryWidth;
@@ -92,6 +92,8 @@ public class TextListEntry extends TooltipListEntry<Object> {
             yy += Minecraft.getInstance().font.lineHeight + 3;
         }
         
+        int mouseX = graphics.mouseX();
+        int mouseY = graphics.mouseY();
         Style style = this.getTextAt(mouseX, mouseY);
         AbstractConfigScreen configScreen = this.getConfigScreen();
         

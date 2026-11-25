@@ -24,6 +24,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.narration.NarrationTrigger;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -72,9 +73,9 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
             
             widget = new EditBox(Minecraft.getInstance().font, 0, 0, 100, 18, Component.empty()) {
                 @Override
-                public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+                public void extractWidgetRenderState(GuiGraphicsExtractor graphics) {
                     setFocused(isSelected);
-                    super.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
+                    super.extractWidgetRenderState(graphics);
                 }
 
                 @Override
@@ -123,12 +124,14 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         }
         
         @Override
-        public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isSelected) {
             widget.setWidth(entryWidth - 12);
             widget.setX(x);
             widget.setY(y + 1);
             widget.setEditable(listListEntry.isEditable());
-            widget.extractRenderState(graphics, mouseX, mouseY, delta);
+            widget.extractRenderState(graphics);
+            int mouseX = graphics.mouseX();
+            int mouseY = graphics.mouseY();
             isHovered = widget.isMouseOver(mouseX, mouseY);
             if (isSelected && listListEntry.isEditable())
                 graphics.fill(x, y + 12, x + entryWidth - 12, y + 13, getConfigError().isPresent() ? 0xffff5555 : 0xffe0e0e0);
@@ -140,7 +143,7 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         }
     
         @Override
-        public NarrationPriority narrationPriority() {
+        public NarrationPriority narrationPriority(NarrationTrigger trigger) {
             return isSelected ? NarrationPriority.FOCUSED : isHovered ? NarrationPriority.HOVERED : NarrationPriority.NONE;
         }
     

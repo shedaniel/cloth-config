@@ -62,8 +62,8 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isHovered) {
+        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, isHovered);
         this.colorDisplayWidget.setY(y);
         ColorValue value = getColorValue(textFieldWidget.getValue());
         if (!value.hasError())
@@ -73,7 +73,7 @@ public class ColorEntry extends TextFieldListEntry<Integer> {
         } else {
             this.colorDisplayWidget.setX(textFieldWidget.getX() - 23);
         }
-        colorDisplayWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+        colorDisplayWidget.extractRenderState(graphics);
     }
     
     @Override

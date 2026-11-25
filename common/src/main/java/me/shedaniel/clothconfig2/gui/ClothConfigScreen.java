@@ -37,11 +37,11 @@ import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -133,10 +133,10 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             listWidget.children().addAll((List) Lists.newArrayList(categorizedEntries.values()).get(selectedCategoryIndex));
         }
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addRenderableWidget(Button.builder(isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), widget -> quit()).bounds(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20).build());
-        addRenderableWidget(new Button(width / 2 + 3, height - 26, buttonWidths, 20, Component.empty(), button -> saveAll(true), Supplier::get) {
+        addRenderableWidget(Button.builder(isEdited() ? Component.translatable("text.cloth-config.cancel_discard") : Component.translatable("gui.cancel"), _ -> quit()).bounds(width / 2 - buttonWidths - 3, height - 26, buttonWidths, 20).build());
+        addRenderableWidget(new Button(width / 2 + 3, height - 26, buttonWidths, 20, Component.empty(), _ -> saveAll(true), Supplier::get) {
             @Override
-            public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+            public void extractContents(GuiGraphicsExtractor graphics) {
                 boolean hasErrors = false;
                 for (List<AbstractConfigEntry<?>> entries : Lists.newArrayList(categorizedEntries.values())) {
                     for (AbstractConfigEntry<?> entry : entries)
@@ -158,10 +158,10 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             tabsBounds = new Rectangle(0, 41, width, 24);
             tabsLeftBounds = new Rectangle(0, 41, 18, 24);
             tabsRightBounds = new Rectangle(width - 18, 41, 18, 24);
-            childrenL().add(buttonLeftTab = new Button(4, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(0, true), Supplier::get) {
+            childrenL().add(buttonLeftTab = new Button(4, 44, 12, 18, Component.empty(), _ -> tabsScroller.scrollTo(0, true), Supplier::get) {
                 @Override
-                public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-                    graphics.blit(RenderPipelines.GUI_TEXTURED, CONFIG_TEX, getX(), getY(), 12, 18 * (!this.isActive() ? 0 : this.isHoveredOrFocused() ? 2 : 1), width, height, 256, 256, ARGB.white(this.alpha));
+                public void extractContents(GuiGraphicsExtractor graphics) {
+                    graphics.blit(GuiPipeline.TEXTURED, CONFIG_TEX, getX(), getY(), 12, 18 * (!this.isActive() ? 0 : this.isHighlighted() ? 2 : 1), width, height, 256, 256, ARGB.white(this.alpha));
                 }
             });
             int j = 0;
@@ -170,10 +170,10 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 j++;
             }
             childrenL().addAll(tabButtons);
-            childrenL().add(buttonRightTab = new Button(width - 16, 44, 12, 18, Component.empty(), button -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true), Supplier::get) {
+            childrenL().add(buttonRightTab = new Button(width - 16, 44, 12, 18, Component.empty(), _ -> tabsScroller.scrollTo(tabsScroller.getMaxScroll(), true), Supplier::get) {
                 @Override
-                public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-                    graphics.blit(RenderPipelines.GUI_TEXTURED, CONFIG_TEX, getX(), getY(), 0, 18 * (!this.isActive() ? 0 : this.isHoveredOrFocused() ? 2 : 1), width, height, 256, 256, ARGB.white(this.alpha));
+                public void extractContents(GuiGraphicsExtractor graphics) {
+                    graphics.blit(GuiPipeline.TEXTURED, CONFIG_TEX, getX(), getY(), 0, 18 * (!this.isActive() ? 0 : this.isHighlighted() ? 2 : 1), width, height, 256, 256, ARGB.white(this.alpha));
                 }
             });
         } else {
@@ -210,9 +210,12 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor graphics) {
+        int mouseX = graphics.mouseX();
+        int mouseY = graphics.mouseY();
+
         if (isShowingTabs()) {
-            tabsScroller.updatePosition(delta * 3);
+            tabsScroller.updatePosition(graphics.partialTicks() * 3);
             int xx = 24 - tabsScroller.scrollAmountInt();
             for (ClothConfigTabButton tabButton : tabButtons) {
                 tabButton.setX(xx);
@@ -225,15 +228,15 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             extractMenuBackground(graphics);
         } else {
             if (this.minecraft.level == null) {
-                this.extractPanorama(graphics, delta);
+                this.extractPanorama(graphics);
             }
             extractBlurredBackground(graphics);
             extractMenuBackground(graphics);
         }
-        listWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+        listWidget.extractRenderState(graphics);
         graphics.enableScissor(listWidget.left, listWidget.top, listWidget.left + listWidget.width, listWidget.bottom);
         for (AbstractConfigEntry child : listWidget.children())
-            child.lateRender(graphics, mouseX, mouseY, delta);
+            child.lateRender(graphics);
         graphics.disableScissor();
         if (isShowingTabs()) {
             graphics.centeredText(minecraft.font, title, width / 2, 18, -1);
@@ -244,11 +247,11 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
             } else {
                 overlayBackground(graphics, onlyInnerTabBounds, 32, 32, 32, 255);
             }
-            tabButtons.forEach(widget -> widget.extractRenderState(graphics, mouseX, mouseY, delta));
-            drawTabsShades(graphics, 0, isTransparentBackground() ? 120 : 255);
+            tabButtons.forEach(widget -> widget.extractRenderState(graphics));
+            drawTabsShades(graphics);
             graphics.disableScissor();
-            buttonLeftTab.extractRenderState(graphics, mouseX, mouseY, delta);
-            buttonRightTab.extractRenderState(graphics, mouseX, mouseY, delta);
+            buttonLeftTab.extractRenderState(graphics);
+            buttonRightTab.extractRenderState(graphics);
         } else
             graphics.centeredText(minecraft.font, title, width / 2, 12, -1);
         
@@ -258,13 +261,13 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 for (AbstractConfigEntry<?> entry : entries)
                     if (entry.getConfigError().isPresent())
                         errors.add(entry.getConfigError().get());
-            if (errors.size() > 0) {
-                String text = "§c" + (errors.size() == 1 ? errors.get(0).plainCopy().getString() : I18n.get("text.cloth-config.multi_error"));
+            if (!errors.isEmpty()) {
+                String text = "§c" + (errors.size() == 1 ? errors.getFirst().plainCopy().getString() : I18n.get("text.cloth-config.multi_error"));
                 if (isTransparentBackground()) {
                     int stringWidth = minecraft.font.width(text);
                     graphics.fillGradient(8, 9, 20 + stringWidth, 14 + minecraft.font.lineHeight, 0x68000000, 0x68000000);
                 }
-                graphics.blit(RenderPipelines.GUI_TEXTURED, CONFIG_TEX, 10, 10, 0, 54, 3, 11, 256, 256);
+                graphics.blit(GuiPipeline.TEXTURED, CONFIG_TEX, 10, 10, 0, 54, 3, 11, 256, 256);
                 graphics.text(minecraft.font, text, 18, 12, -1);
                 if (errors.size() > 1) {
                     int stringWidth = minecraft.font.width(text);
@@ -278,19 +281,19 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 int stringWidth = minecraft.font.width(text);
                 graphics.fillGradient(8, 9, 20 + stringWidth, 14 + minecraft.font.lineHeight, 0x68000000, 0x68000000);
             }
-            graphics.blit(RenderPipelines.GUI_TEXTURED, CONFIG_TEX, 10, 10, 0, 54, 3, 11, 256, 256);
+            graphics.blit(GuiPipeline.TEXTURED, CONFIG_TEX, 10, 10, 0, 54, 3, 11, 256, 256);
             graphics.text(minecraft.font, text, 18, 12, -1);
         }
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        super.extractRenderState(graphics);
     }
     
     @Override
-    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+    public void extractBackground(GuiGraphicsExtractor guiGraphics) {
     }
     
-    private void drawTabsShades(GuiGraphicsExtractor graphics, int lightColor, int darkColor) {
-        graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.HEADER_SEPARATOR, tabsBounds.getMinX() - 20, tabsBounds.getMinY() - 2, 0.0F, 0.0F, tabsBounds.getWidth() + 40, 2, 32, 2);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, tabsBounds.getMinX() - 20, tabsBounds.getMaxY(), 0.0F, 0.0F, tabsBounds.getWidth() + 40, 2, 32, 2);
+    private void drawTabsShades(GuiGraphicsExtractor graphics) {
+        graphics.blit(GuiPipeline.TEXTURED, Screen.HEADER_SEPARATOR, tabsBounds.getMinX() - 20, tabsBounds.getMinY() - 2, 0.0F, 0.0F, tabsBounds.getWidth() + 40, 2, 32, 2);
+        graphics.blit(GuiPipeline.TEXTURED, Screen.FOOTER_SEPARATOR, tabsBounds.getMinX() - 20, tabsBounds.getMaxY(), 0.0F, 0.0F, tabsBounds.getWidth() + 40, 2, 32, 2);
     }
     
     @Override
@@ -327,14 +330,14 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
         }
         
         @Override
-        protected void renderItem(GuiGraphicsExtractor graphics, R item, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+        protected void renderItem(GuiGraphicsExtractor graphics, R item, int index, int y, int x, int entryWidth, int entryHeight, boolean isSelected) {
             if (item instanceof AbstractConfigEntry)
                 ((AbstractConfigEntry) item).updateSelected(getFocused() == item);
-            super.renderItem(graphics, item, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+            super.renderItem(graphics, item, index, y, x, entryWidth, entryHeight, isSelected);
         }
         
         @Override
-        protected void renderList(GuiGraphicsExtractor graphics, int startX, int startY, int mouseX, int mouseY, float delta) {
+        protected void renderList(GuiGraphicsExtractor graphics, int startX, int startY) {
             thisTimeTarget = null;
             Rectangle hoverBounds = currentBounds.value();
             if (!hoverBounds.isEmpty()) {
@@ -343,14 +346,16 @@ public class ClothConfigScreen extends AbstractTabbedConfigScreen {
                 alpha = (alpha * 36 / 255) << 24;
                 graphics.fillGradient(hoverBounds.x, hoverBounds.y - (int) scroll, hoverBounds.getMaxX(), hoverBounds.getMaxY() - (int) scroll, 0xFFFFFF | alpha, 0xFFFFFF | alpha);
             }
-            super.renderList(graphics, startX, startY, mouseX, mouseY, delta);
+            super.renderList(graphics, startX, startY);
+            int mouseX = graphics.mouseX();
+            int mouseY = graphics.mouseY();
             if (thisTimeTarget != null && isMouseOver(mouseX, mouseY)) {
                 lastTouch = System.currentTimeMillis();
             }
             if (thisTimeTarget != null && !thisTimeTarget.equals(currentBounds.target())) {
                 currentBounds.setTo(thisTimeTarget, 100);
             } else if (!currentBounds.target().isEmpty()) {
-                currentBounds.update(delta);
+                currentBounds.update(graphics.partialTicks());
             }
         }
         

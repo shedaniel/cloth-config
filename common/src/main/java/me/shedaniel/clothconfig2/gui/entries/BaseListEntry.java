@@ -25,12 +25,12 @@ import me.shedaniel.clothconfig2.api.ReferenceProvider;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -280,27 +280,29 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isHovered) {
+        super.extractRenderState(graphics, index, y, x, entryWidth, entryHeight, isHovered);
+        int mouseX = graphics.mouseX();
+        int mouseY = graphics.mouseY();
         BaseListCell focused = !isExpanded() || getFocused() == null || !(getFocused() instanceof BaseListCell) ? null : (BaseListCell) getFocused();
         boolean insideLabel = labelWidget.rectangle.contains(mouseX, mouseY);
         boolean insideCreateNew = isInsideCreateNew(mouseX, mouseY);
         boolean insideDelete = isInsideDelete(mouseX, mouseY);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, CONFIG_TEX, x - 15, y + 5, 24 + 9, (isEnabled() ? (insideLabel && !insideCreateNew && !insideDelete ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9, 256, 256);
+        graphics.blit(GuiPipeline.TEXTURED, CONFIG_TEX, x - 15, y + 5, 24 + 9, (isEnabled() ? (insideLabel && !insideCreateNew && !insideDelete ? 18 : 0) : 36) + (isExpanded() ? 9 : 0), 9, 9, 256, 256);
         if (isInsertButtonEnabled())
-            graphics.blit(RenderPipelines.GUI_TEXTURED, CONFIG_TEX, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9, 256, 256);
+            graphics.blit(GuiPipeline.TEXTURED, CONFIG_TEX, x - 15 + 13, y + 5, 24 + 18, insideCreateNew ? 9 : 0, 9, 9, 256, 256);
         if (isDeleteButtonEnabled())
-            graphics.blit(RenderPipelines.GUI_TEXTURED, CONFIG_TEX, x - 15 + (isInsertButtonEnabled() ? 26 : 13), y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9, 256, 256);
+            graphics.blit(GuiPipeline.TEXTURED, CONFIG_TEX, x - 15 + (isInsertButtonEnabled() ? 26 : 13), y + 5, 24 + 27, focused == null ? 0 : insideDelete ? 18 : 9, 9, 9, 256, 256);
         resetWidget.setX(x + entryWidth - resetWidget.getWidth());
         resetWidget.setY(y);
         resetWidget.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault();
-        resetWidget.extractRenderState(graphics, mouseX, mouseY, delta);
+        resetWidget.extractRenderState(graphics);
         int offset = (isInsertButtonEnabled() || isDeleteButtonEnabled() ? 6 : 0) + (isInsertButtonEnabled() ? 9 : 0) + (isDeleteButtonEnabled() ? 9 : 0);
         graphics.text(Minecraft.getInstance().font, getDisplayedFieldName().getVisualOrderText(), x + offset, y + 6, insideLabel && !resetWidget.isMouseOver(mouseX, mouseY) && !insideDelete && !insideCreateNew ? 0xffe6fe16 : getPreferredTextColor());
         if (isExpanded()) {
             int yy = y + 24;
             for (BaseListCell cell : cells) {
-                cell.extractRenderState(graphics, -1, yy, x + 14, entryWidth - 14, cell.getCellHeight(), mouseX, mouseY, getParent().getFocused() != null && getParent().getFocused().equals(this) && getFocused() != null && getFocused().equals(cell), delta);
+                cell.extractRenderState(graphics, -1, yy, x + 14, entryWidth - 14, cell.getCellHeight(), getParent().getFocused() != null && getParent().getFocused().equals(this) && getFocused() != null && getFocused().equals(cell));
                 cell.updateBounds(true, x + 14, yy, entryWidth - 14, cell.getCellHeight());
                 yy += cell.getCellHeight();
             }
@@ -363,7 +365,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                     widgets.add(cell);
                 }
                 cell.onAdd();
-                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK));
                 return true;
             } else if (isDeleteButtonEnabled() && isInsideDelete(event.x(), event.y())) {
                 GuiEventListener focused = getFocused();
@@ -372,12 +374,12 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                     //noinspection SuspiciousMethodCalls
                     cells.remove(focused);
                     widgets.remove(focused);
-                    Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                    Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK));
                 }
                 return true;
             } else if (rectangle.contains(event.x(), event.y())) {
                 setExpanded(!expanded);
-                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK));
                 return true;
             }
             return false;

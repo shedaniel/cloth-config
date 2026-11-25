@@ -26,15 +26,15 @@ import net.minecraft.client.Minecraft;
 public class PointHelper {
     public static Point ofMouse() {
         Minecraft client = Minecraft.getInstance();
-        double mx = client.mouseHandler.xpos() * (double) client.getWindow().getGuiScaledWidth() / (double) client.getWindow().getScreenWidth();
-        double my = client.mouseHandler.ypos() * (double) client.getWindow().getGuiScaledHeight() / (double) client.getWindow().getScreenHeight();
+        double mx = client.mouseHandler.getScaledXPos(client.getWindow());
+        double my = client.mouseHandler.getScaledYPos(client.getWindow());
         return new Point(mx, my);
     }
     
     public static FloatingPoint ofFloatingMouse() {
         Minecraft client = Minecraft.getInstance();
-        double mx = client.mouseHandler.xpos() * (double) client.getWindow().getGuiScaledWidth() / (double) client.getWindow().getScreenWidth();
-        double my = client.mouseHandler.ypos() * (double) client.getWindow().getGuiScaledHeight() / (double) client.getWindow().getScreenHeight();
+        double mx = client.mouseHandler.getScaledXPos(client.getWindow());
+        double my = client.mouseHandler.getScaledYPos(client.getWindow());
         return new FloatingPoint(mx, my);
     }
     

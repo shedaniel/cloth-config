@@ -65,7 +65,9 @@ public abstract class AbstractConfigListEntry<T> extends AbstractConfigEntry<T> 
     }
     
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int index, int y, int x, int entryWidth, int entryHeight, boolean isHovered) {
+        int mouseX = graphics.mouseX();
+        int mouseY = graphics.mouseY();
         if (isMouseInside(mouseX, mouseY, x, y, entryWidth, entryHeight)) {
             Rectangle area = getEntryArea(x, y, entryWidth, entryHeight);
             if (getParent() instanceof ClothConfigScreen.ListWidget)

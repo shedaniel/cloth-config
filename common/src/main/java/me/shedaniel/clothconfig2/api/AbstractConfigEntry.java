@@ -122,7 +122,7 @@ public abstract class AbstractConfigEntry<T> extends DynamicElementListWidget.El
         return getError();
     }
     
-    public void lateRender(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {}
+    public void lateRender(GuiGraphicsExtractor graphics) {}
     
     public void setErrorSupplier(Supplier<Optional<Component>> errorSupplier) {
         this.errorSupplier = errorSupplier;
