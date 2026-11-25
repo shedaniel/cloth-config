@@ -35,6 +35,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.narration.NarrationTrigger;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
@@ -122,7 +123,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
     }
     
     @Override
-    public NarrationPriority narrationPriority() {
+    public NarrationPriority narrationPriority(NarrationTrigger trigger) {
         if (this.isFocused()) {
             return NarrationPriority.FOCUSED;
         } else {
@@ -703,7 +704,7 @@ public abstract class DynamicEntryListWidget<E extends DynamicEntryListWidget.En
         
         void updateNarration(NarrationElementOutput narrationElementOutput) {
             List<? extends NarratableEntry> list = this.narratables();
-            Screen.NarratableSearchResult narratableSearchResult = Screen.findNarratableWidget(list, this.lastNarratable);
+            Screen.NarratableSearchResult narratableSearchResult = Screen.findNarratableWidget(list, this.lastNarratable, narrationElementOutput.narrationTrigger());
             if (narratableSearchResult != null) {
                 if (narratableSearchResult.priority().isTerminal()) {
                     this.lastNarratable = narratableSearchResult.entry();

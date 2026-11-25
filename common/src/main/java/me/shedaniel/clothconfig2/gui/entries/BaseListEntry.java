@@ -365,7 +365,7 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                     widgets.add(cell);
                 }
                 cell.onAdd();
-                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK));
                 return true;
             } else if (isDeleteButtonEnabled() && isInsideDelete(event.x(), event.y())) {
                 GuiEventListener focused = getFocused();
@@ -374,12 +374,12 @@ public abstract class BaseListEntry<T, C extends BaseListCell, SELF extends Base
                     //noinspection SuspiciousMethodCalls
                     cells.remove(focused);
                     widgets.remove(focused);
-                    Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                    Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK));
                 }
                 return true;
             } else if (rectangle.contains(event.x(), event.y())) {
                 setExpanded(!expanded);
-                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK));
                 return true;
             }
             return false;

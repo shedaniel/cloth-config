@@ -24,6 +24,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.narration.NarrationTrigger;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -142,7 +143,7 @@ public abstract class AbstractTextFieldListListEntry<T, C extends AbstractTextFi
         }
     
         @Override
-        public NarrationPriority narrationPriority() {
+        public NarrationPriority narrationPriority(NarrationTrigger trigger) {
             return isSelected ? NarrationPriority.FOCUSED : isHovered ? NarrationPriority.HOVERED : NarrationPriority.NONE;
         }
     

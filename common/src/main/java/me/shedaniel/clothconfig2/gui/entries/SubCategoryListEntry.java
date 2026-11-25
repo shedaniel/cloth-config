@@ -34,6 +34,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.narration.NarrationTrigger;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -312,7 +313,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
             if (isEnabled() && rectangle.contains(event.x(), event.y())) {
                 setExpanded(!expanded);
-                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK));
                 return isHovered = true;
             }
             return isHovered = false;
@@ -328,7 +329,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         }
         
         @Override
-        public NarrationPriority narrationPriority() {
+        public NarrationPriority narrationPriority(NarrationTrigger trigger) {
             return isHovered ? NarrationPriority.HOVERED : NarrationPriority.NONE;
         }
         

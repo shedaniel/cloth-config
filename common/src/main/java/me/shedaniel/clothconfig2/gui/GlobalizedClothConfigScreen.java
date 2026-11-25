@@ -288,14 +288,14 @@ public class GlobalizedClothConfigScreen extends AbstractConfigScreen implements
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         Rectangle slideBounds = new Rectangle(0, 0, getSideSliderPosition() - 14, height);
         if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && slideBounds.contains(event.x(), event.y()) && lastHoveredReference != null) {
-            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK));
             lastHoveredReference.go();
             return true;
         }
         Rectangle slideArrowBounds = new Rectangle(getSideSliderPosition() - 14, 0, 14, height);
         if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && slideArrowBounds.contains(event.x(), event.y())) {
             setExpanded(!isExpanded());
-            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK));
             return true;
         }
         return super.mouseClicked(event, doubleClick);
